@@ -1,5 +1,7 @@
 package hillbillies.model;
 
+import be.kuleuven.cs.som.annotate.*;
+
 /**
  * A class of Units, with a name, weight, strength, agility, toughness and a position in the game world.
  * 
@@ -7,8 +9,8 @@ package hillbillies.model;
  * 			|isValidPosition(this.getPosition())
  * @invar 	Each unit has a name that is a valid name for any unit.
  * 			|isValidName(this.getName())
- * @invar 	Each unit has a valid strength (for any unit).
- * 			|isValidStrength(this.getStrength())
+ * @invar  Each unit can have its strength as strength .
+ *       	| canHaveAsStrength(this.getStrength())
  * @invar	Each unit has a valid agility (for any unit).
  * 			|isValidAgility(this.getAgility())
  * @invar	Each unit has a valid toughness (for any unit).
@@ -48,26 +50,40 @@ public class Unit {
 	 * @param orientation
 	 * 		The orientation of this new Unit.
 	 * @post The name of this new Unit is equal to the given name.
-	 * 		|new.getName() == name
+	 * 		 |new.getName() == name
 	 * @throws IllegalNameException
 	 * 		   The given name is not a valid name for a unit.
-	 *      | ! isValidName(this.getName)
-	 * @post The weight of this new Unit is equal to the given weight.
-	 * 		|new.getWeight() == weight
-	 * @post The strength of this new Unit is equal to the given strength.
-	 * 		|new.getStrength() == strength
-	 * @post The agility of this new Unit is equal to the given agility.
-	 * 		|new.getAgility() == agility
-	 * @post The toughness of this new Unit is equal to the given toughness.
-	 * 		|new.getToughness() == toughness
+	 *       | ! isValidName(this.getName)
+	 * @post   If the given weight is a valid weight for any Unit,
+	 *         the weight of this new Unit is equal to the given
+	 *         weight. 
+	 *       | if (isValidWeight(Weight))
+	 *       |   then new.getWeight() == Weight
+	 * @post   If the given strength is a valid strength for any unit,
+	 *         the strength of this new unit is equal to the given
+	 *         strength.
+	 *       | if (isValidStrength(strength))
+	 *       |   then new.getStrength() == strength
+	 * @post   If the given agility is a valid agility for any unit,
+	 *         the agility of this new unit is equal to the given
+	 *         agility.
+	 *       | if (isValidAgility(agility))
+	 *       |   then new.getAgility() == agility
+	 * @post   If the given toughness is a valid toughness for any unit,
+	 *         the toughness of this new unit is equal to the given
+	 *         toughness. 
+	 *       | if (isValidToughness(toughness))
+	 *       |   then new.getToughness() == toughness
 	 * @post The position of this new Unit is equal to the given position.
 	 * 		|new.getPosition() == position
 	 * @throws IllegalPositionException
 	 * 			The given position is not a valid position for a unit.
 	 * 		| ! isValidPosition(this.getPosition)
-	 * @pre The given number of hit-/staminapoints must be a valid number of hit-/staminapoints for the Unit.
-	 * 		|canHaveAsPoints(this.getHitpoints()) && canHaveAsPoints(this.getStaminaPoints())
-	 * @post The hit-/staminapoints of this new Unit is equal to the given hit-/staminapoints.
+	 * @pre    This new unit can have the given hitpoints as its hitpoints.
+	 *       | canHaveAsHitpoints(hitpoints)
+	 * @post   The hitpoints of this new unit is equal to the given
+	 *         hitpoints.
+	 *       | new.getHitpoints() == hitpoints* @post The hit-/staminapoints of this new Unit is equal to the given hit-/staminapoints.
 	 * @post  If the given orientation is in the range 0..2*PI, the orientation of
 	 *         this new unit is equal to the given orientation.
 	 *         If the given orientation exceeds 2*PI, the orientation for this new
@@ -77,16 +93,192 @@ public class Unit {
 	 */
 	public Unit(String name, int weight, int strength, int agility, int toughness, double[] position, int hitpoints, int staminapoints,double orientation){
 		
-		setWeight(weight);
-		setStrenght(strenght);
-		setAgility(agility);
-		setToughness(toughness);
+		if (canHaveAsWeight(weight))
+			this.weight = weight;
+		if ( canHaveAsStrength(strength))
+			this.strength = strength;
+		if ( canHaveAsAgility(agility))
+			this.agility = agility;
+		if (canHaveAsToughness(toughness))
+			this.toughness = toughness;
 		setOrientation(orientation);
-		assert canHaveAsPoints(hitpoints);
-		assert canHaveAsPoints(staminapoints);
+		assert this.canHaveAsHitpoints(hitpoints);
 		this.hitpoints = hitpoints;
-		this.staminapoints = staminapoints;
 	}
+	
+/**
+ * Return the weight of this Unit.
+ */
+@Basic @Raw @Immutable
+public int getWeight() {
+	return this.weight;
+}
+
+/**
+ * Check whether this Unit can have the given weight as its weight.
+ *  
+ * @param  Weight
+ *         The weight to check.
+ * @return 
+ *       | result == (weight >= (strength + agility)/2)
+*/
+@Raw
+public boolean canHaveAsWeight(int weight) {
+	return weight >= (strength + agility)/2;
+}
+
+
+/**
+ * Return the strength of this unit.
+ */
+@Basic @Raw @Immutable
+public int getStrength() {
+	return this.strength;
+}
+
+/**
+ * Check whether this unit can have the given strength as its strength.
+ *  
+ * @param  strength
+ *         The strength to check.
+ * @return 
+ *       | result == ((25<= strength) && (strength<=100)) 
+*/
+@Raw
+public boolean canHaveAsStrength(int strength) {
+	return (25<= strength) && (strength<=100);
+}
+
+/**
+ * Return the agility of this unit.
+ */
+@Basic @Raw @Immutable
+public int getAgility() {
+	return this.agility;
+}
+
+/**
+ * Check whether this unit can have the given agility as its agility.
+ *  
+ * @param  agility
+ *         The agility to check.
+ * @return 
+ *       | result == ((25<=agility) && (agility<=100))
+*/
+@Raw
+public boolean canHaveAsAgility(int agility) {
+	return ((25<=agility) && (agility<=100));
+}
+
+
+/**
+ * Return the toughness of this unit.
+ */
+@Basic @Raw @Immutable
+public int getToughness() {
+	return this.toughness;
+}
+
+/**
+ * Check whether this unit can have the given toughness as its toughness.
+ *  
+ * @param  toughness
+ *         The toughness to check.
+ * @return 
+ *       | result == ((25<=toughness) && (toughness<=100))
+*/
+@Raw
+public boolean canHaveAsToughness(int toughness) {
+	return ((25<=toughness) && (toughness<=100));
+}
+
+/** TO BE ADDED TO CLASS HEADING
+ * @invar  The name of each unit must be a valid name for any
+ *         unit.
+ *       | isValidName(getName())
+ */
+
+
+/**
+ * Initialize this new unit with given name.
+ *
+ * @param  name
+ *         The name for this new unit.
+ * @effect The name of this new unit is set to
+ *         the given name.
+ *       | this.setName(name)
+ */
+public Unit(String name)
+		throws ExceptionName_Java {
+	this.setName(name);
+}
+
+
+/**
+ * Return the name of this unit.
+ */
+@Basic @Raw
+public String getName() {
+	return this.name;
+}
+
+/**
+ * Check whether the given name is a valid name for
+ * any unit.
+ *  
+ * @param  name
+ *         The name to check.
+ * @return 
+ *       | result == 
+*/
+public static boolean isValidName(String name) {
+	return false;
+}
+
+/**
+ * Set the name of this unit to the given name.
+ * 
+ * @param  name
+ *         The new name for this unit.
+ * @post   The name of this new unit is equal to
+ *         the given name.
+ *       | new.getName() == name
+ * @throws ExceptionName_Java
+ *         The given name is not a valid name for any
+ *         unit.
+ *       | ! isValidName(getName())
+ */
+@Raw
+public void setName(String name) 
+		throws ExceptionName_Java {
+	if (! isValidName(name))
+		throw new ExceptionName_Java();
+	this.name = name;
+}
+
+@Basic @Raw @Immutable
+public int getHitpoints() {
+	return this.hitpoints;
+}
+
+/**
+ * Check whether this unit can have the given hitpoints as its hitpoints.
+ *  
+ * @param  hitpoints
+ *         The hitpoints to check.
+ * @return 
+ *       | result == (hitpoints < max_nbHitpoints())
+*/
+@Raw
+public boolean canHaveAsHitpoints(int hitpoints) {
+	return hitpoints < max_nbHitpoints();
+}
+
+private int max_nbHitpoints() {
+	return 200*(this.getWeight()/100)*(this.getToughness()/100);
+}
+
+
 	
 	/**
 	 * Return the position of this unit. 
@@ -150,8 +342,9 @@ public class Unit {
 	private int weight = 25;
 	
 	/**
-	 * A variable registering the strength of this unit.
+	 * Variable registering the strength of this unit.
 	 */
+
 	private int strength = 25;
 	
 	/**
@@ -165,7 +358,7 @@ public class Unit {
 	private int toughness = 25;
 	
 	/**
-	 * A variabel registering the number of hitpoints of this unit.
+	 * A variable registering the number of hitpoints of this unit.
 	 */
 	private int hitpoints = 0;
 	
