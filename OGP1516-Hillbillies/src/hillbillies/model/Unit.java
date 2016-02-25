@@ -124,7 +124,7 @@ public int getWeight() {
 */
 @Raw
 public boolean canHaveAsWeight(int weight) {
-	return weight >= (strength + agility)/2;
+	return weight >= (this.strength + this.agility)/2;
 }
 
 
@@ -232,7 +232,16 @@ public String getName() {
  *       | result == 
 */
 public static boolean isValidName(String name) {
-	return false;
+	if (name.length()<2)
+		return false;
+	if (!Character.isUpperCase(name.charAt(0)))
+		return false;
+	for (int index =0; index < name.length();) {
+		if(!Character.isLetter(name.charAt(index)) && (!(name.charAt(index)=='"')) &&(!(name.charAt(index)=='\'')) && (!(name.charAt(index)==' ')))
+			return false;
+	}
+	return true;
+	
 }
 
 /**
