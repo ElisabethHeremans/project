@@ -1,6 +1,7 @@
 package hillbillies.model;
 
 import be.kuleuven.cs.som.annotate.*;
+import ogp.framework.util.Util;
 
 /**
  * A class of Units, with a name, weight, strength, agility, toughness and a position in the game world.
@@ -444,9 +445,26 @@ public void setStaminaPoints(int staminaPoints) {
 	 * @throws IllegalArgumentException
 	 * 		If the duration is less than zero or exceeds or equals 0.2 s.
 	 */
-	public void advanceTime(float duration) throws IllegalArgumentException{
+	public void advanceTime(float duration) throws IllegalArgumentException,IllegalPositionException{
 		if(duration<0 || duration>= 0.2)
 			throw new IllegalArgumentException(); 
+		double d = Math.sqrt(Math.pow((getCubeCentre(getTargetPosition())[0]-this.getPosition()[0]),2.0)
+				+Math.pow((getCubeCentre(getTargetPosition())[1]-this.getPosition()[1]),2.0)
+				+Math.pow((getCubeCentre(getTargetPosition())[2]-this.getPosition()[2]),2.0));
+		double[] v = {getCurrentStatus()*(getCubeCentre(getTargetPosition())[0]-this.getPosition()[0])/d,
+				getCurrentStatus()*(getCubeCentre(getTargetPosition())[1]-this.getPosition()[1])/d,
+				getCurrentStatus()*(getCubeCentre(getTargetPosition())[2]-this.getPosition()[2])/d};
+		
+		setPosition(this.getPosition()[0]+v[0]*duration,this.getPosition()[1]+v[1]*duration,this.getPosition()[2]+v[2]*duration);
+	}
+	
+	public void moveToAdjacent(double[] targetPosition, float duration){
+		double[] startPosition = this.getPosition();
+		while (afstand(start,targetPosition)-afstand(start,huidig)>0 && notAttacked()) {
+			advanceTime(duration);
+			huidig = this.getPosition();
+		}
+		
 	}
 	
 
@@ -509,15 +527,39 @@ public double[] getTargetCubePosition(){
 	return {Math.floor(this.getTargetPosition()[0]),Math.floor(this.getTargetPosition()[1]),Math.floor(this.getTargetPosition()[2])};
 }
 
+public double[] getCubeCentre(double[] cubePosition) {
+	return (cubePosition[0]+0.5,cubePosition[1]+0.5,cubePosition[2]+0.5);
+}
+
 /**
  * Variable registering the targetPosition of this unit.
  */
 private double[] targetPosition;
 
 	public double getWalkingSpeed() {
-		getTargetPosition()
+		
+		if (Util.fuzzyEquals(getTargetPosition()[2]-this.getPosition()[2],-1.0))
+			return 0.5*getBaseSpeed();
+		if (Util.fuzzyEquals(getTargetPosition()[2]-this.getPosition()[2],1.0))
+			return 1.2*getBaseSpeed();
+		return getBaseSpeed();
 	}
 	
+	private boolean isSprinting = false;
+	
+	public void startSprinting(){
+		isSprinting = true;
+	}
+	
+	public void stopSprinting(){
+		isSprinting = false;
+	}
+	
+	public double getCurrentStatus() {
+		if (isSprinting)
+			return 2.0*getWalkingSpeed();
+		return getWalkingSpeed();
+	}
 	/**
 	 * Symbolic constant registering the fixed number of cubes in direction x.
 	 */
