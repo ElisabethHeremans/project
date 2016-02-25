@@ -123,6 +123,7 @@ public int getWeight() {
 	return this.weight;
 }
 
+
 /**
  * Check whether this Unit can have the given weight as its weight.
  *  
@@ -238,7 +239,8 @@ public String getName() {
  * @param  name
  *         The name to check.
  * @return 
- *       | result == 
+ *       | result == !name.length()<2 && Character.isUpperCase(name.charAt(0)) 
+ *       | 	&& (Character.isLetter(name.charAt(index)) || name.charAt(index)=='"' || name.charAt(index)=='\'' || name.charAt(index)==' ')
 */
 public static boolean isValidName(String name) {
 	if (name.length()<2)
