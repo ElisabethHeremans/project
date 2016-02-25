@@ -23,6 +23,9 @@ import be.kuleuven.cs.som.annotate.*;
  * 			|isValidOrientation(this.getOrientation()) //we gaan zeggen dat tss 0 en PI*2 moet liggen
  * @invar	The duration is a valid duration for any unit.
  * 			|isValidDuration(this.getDuration())
+ * @invar  The targetPosition of each unit must be a valid targetPosition for any
+ *         unit.
+ *       | isValidTargetPosition(getTargetPosition())
  * @version 1.0
  * @author adminheremans
  */
@@ -83,7 +86,12 @@ public class Unit {
 	 *       | canHaveAsHitpoints(hitpoints)
 	 * @post   The hitpoints of this new unit is equal to the given
 	 *         hitpoints.
-	 *       | new.getHitpoints() == hitpoints* @post The hit-/staminapoints of this new Unit is equal to the given hit-/staminapoints.
+	 *       | new.getHitpoints() == hitpoints
+	 * @pre    The given the number of staminapoints must be a valid the number of staminapoints for any unit.
+	 *       | isValidStaminaPoints(the number of staminapoints)
+	 * @post   The the number of staminapoints of this new unit is equal to the given
+	 *         the number of staminapoints.
+	 *       | new.getStaminaPoints() == staminaPoints
 	 * @post  If the given orientation is in the range 0..2*PI, the orientation of
 	 *         this new unit is equal to the given orientation.
 	 *         If the given orientation exceeds 2*PI, the orientation for this new
@@ -104,6 +112,7 @@ public class Unit {
 		setOrientation(orientation);
 		assert this.canHaveAsHitpoints(hitpoints);
 		this.hitpoints = hitpoints;
+		this.setStaminaPoints(staminaPoints);
 	}
 	
 /**
@@ -209,7 +218,7 @@ public boolean canHaveAsToughness(int toughness) {
  *       | this.setName(name)
  */
 public Unit(String name)
-		throws ExceptionName_Java {
+		throws InvalidNameException {
 	this.setName(name);
 }
 
@@ -274,19 +283,57 @@ public int getHitpoints() {
  * Check whether this unit can have the given hitpoints as its hitpoints.
  *  
  * @param  hitpoints
- *         The hitpoints to check.
+ *         The hitPoints to check.
  * @return 
  *       | result == (hitpoints < max_nbHitpoints())
 */
 @Raw
 public boolean canHaveAsHitpoints(int hitpoints) {
-	return hitpoints < max_nbHitpoints();
+	return hitpoints < max_nbPoints();
 }
 
-private int max_nbHitpoints() {
-	return 200*(this.getWeight()/100)*(this.getToughness()/100);
+private double max_nbPoints() {
+	return Math.ceil(200.0*(this.getWeight()/100.0)*(this.getToughness()/100.0));
 }
 
+/**
+ * Return the the number of staminapoints of this unit.
+ */
+@Basic @Raw
+public int getStaminaPoints() {
+	return this.staminaPoints;
+}
+
+/**
+ * Check whether the given the number of staminapoints is a valid the number of staminapoints for
+ * any unit.
+ *  
+ * @param  the number of staminapoints
+ *         The the number of staminapoints to check.
+ * @return 
+ *       | result == 
+*/
+public boolean isValidStaminaPoints(int staminaPoints) {
+	return staminaPoints < max_nbPoints();
+}
+
+/**
+ * Set the the number of staminapoints of this unit to the given the number of staminapoints.
+ * 
+ * @param  staminaPoints
+ *         The new the number of staminapoints for this unit.
+ * @pre    The given the number of staminapoints must be a valid the number of staminapoints for any
+ *         unit.
+ *       | isValidStaminaPoints(staminaPoints)
+ * @post   The the number of staminapoints of this unit is equal to the given
+ *         the number of staminapoints.
+ *       | new.getStaminaPoints() == staminaPoints
+ */
+@Raw
+public void setStaminaPoints(int staminaPoints) {
+	assert isValidStaminaPoints(staminaPoints);
+	this.staminaPoints = staminaPoints;
+}
 
 	
 	/**
@@ -314,7 +361,7 @@ private int max_nbHitpoints() {
 	 * Return the position of the game world cube in which this unit is positioned
 	 * @return The position
 	 */
-	public int[] getCubePosition(){
+	public double[] getCubePosition(){
 		return {Math.floor(this.getPosition()[0]),Math.floor(this.getPosition()[1]),Math.floor(this.getPosition()[2])};
 	}
 
@@ -334,6 +381,8 @@ private int max_nbHitpoints() {
 			throw new IllegalPositionException(position,this);
 		this.position = position;
 	}
+	
+	
 
 	/**
 	 * A variable registering the position of this unit.
@@ -398,25 +447,74 @@ private int max_nbHitpoints() {
 			throw new IllegalArgumentException(); 
 	}
 	
-//	public int getMaxStaminaPoints(){
-//		return Math.ceil(200.0*(this.getWeight/100.0)*(this.getToughness()/100.0));
-//	}
-//	
-//	public int getMaxHitPoints(){
-//		return Math.ceil(200.0*(this.getWeight/100.0)*(this.getToughness()/100.0));
-//	}
-//
-//	public double getOrientation() {
-//		return orientation;
-//	}
-//
-//	public void setOrientation(double orientation) {
-//		this.orientation = orientation;
-//	}
-//	
-//	public float getBaseSpeed(){
-//		return 1.5*(this.getStrength+this.getAgility)/(200.0*(this.getWeight/100));
-//	}
+
+	public double getBaseSpeed(){
+		return 1.5*(this.getStrength()+this.getAgility())/(200.0*(this.getWeight()/100.0));
+	}
+	
+
+/**
+ * Return the targetPosition of this unit.
+ */
+@Basic @Raw
+public double[] getTargetPosition() {
+	return this.targetPosition;
+}
+
+/**
+ * Check whether the given targetPosition is a valid targetPosition for
+ * any unit.
+ *  
+ * @param  targetPosition
+ *         The targetPosition to check.
+ * @return 
+ *       | result == canHaveAsTargetPosition(targetPosition)
+*/
+public boolean canHaveAsTargetPosition(double[] targetPosition) {
+	return isValidPosition(targetPosition) && isNeighbouringCube(targetPosition);
+}
+
+/**
+ * Set the targetPosition of this unit to the given targetPosition.
+ * 
+ * @param  targetPosition
+ *         The new targetPosition for this unit.
+ * @post   The targetPosition of this new unit is equal to
+ *         the given targetPosition.
+ *       | new.getTargetPosition() == targetPosition
+ * @throws ExceptionName_Java
+ *         The given targetPosition is not a valid targetPosition for any
+ *         unit.
+ *       | ! canHaveAsTargetPosition(getTargetPosition())
+ */
+@Raw
+public void setTargetPosition(double[] targetPosition) 
+		throws IllegalPositionException {
+	if (! canHaveAsTargetPosition(targetPosition))
+		throw new IllegalPositionException();
+	this.targetPosition = targetPosition;
+}
+
+public boolean isNeighbouringCube(double[] cubePosition) {
+	return (Math.abs(cubePosition[0]-this.getCubePosition()[0])<=1) 
+			&& (Math.abs(cubePosition[1]-this.getCubePosition()[1])<=1) 
+			&& (Math.abs(cubePosition[1]-this.getCubePosition()[1])<=1);
+}
+	
+
+
+public double[] getTargetCubePosition(){
+	return {Math.floor(this.getTargetPosition()[0]),Math.floor(this.getTargetPosition()[1]),Math.floor(this.getTargetPosition()[2])};
+}
+
+/**
+ * Variable registering the targetPosition of this unit.
+ */
+private double[] targetPosition;
+
+	public double getWalkingSpeed() {
+		getTargetPosition()
+	}
 	
 	/**
 	 * Symbolic constant registering the fixed number of cubes in direction x.
