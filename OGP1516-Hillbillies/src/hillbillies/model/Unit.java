@@ -277,7 +277,7 @@ public void setName(String name)
 	this.name = name;
 }
 
-@Basic @Raw @Immutable
+@Basic @Raw
 public int getHitpoints() {
 	return this.hitpoints;
 }
@@ -365,7 +365,7 @@ public void setStaminaPoints(int staminaPoints) {
 	 * @return The position
 	 */
 	public double[] getCubePosition(){
-		return {Math.floor(this.getPosition()[0]),Math.floor(this.getPosition()[1]),Math.floor(this.getPosition()[2])};
+		return new double[]{Math.floor(this.getPosition()[0]),Math.floor(this.getPosition()[1]),Math.floor(this.getPosition()[2])};
 	}
 
 	/**
@@ -528,7 +528,7 @@ public double[] getTargetCubePosition(){
 }
 
 public double[] getCubeCentre(double[] cubePosition) {
-	return (cubePosition[0]+0.5,cubePosition[1]+0.5,cubePosition[2]+0.5);
+	return new double[] {cubePosition[0]+0.5, cubePosition[1]+0.5,cubePosition[2]+0.5};
 }
 
 /**
