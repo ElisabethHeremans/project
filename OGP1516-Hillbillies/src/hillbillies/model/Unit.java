@@ -1,6 +1,9 @@
 package hillbillies.model;
 
+import java.util.Random;
+
 import be.kuleuven.cs.som.annotate.*;
+import ogp.framework.util.ModelException;
 import ogp.framework.util.Util;
 
 /**
@@ -451,7 +454,7 @@ public static boolean isValidOrientation(float orientation) {
 /**
  * Set the orientation of this unit to the given orientation.
  * 
- * @param  orientation
+ * @param  d
  *         The new orientation for this unit.
  * @post   If the given orientation is a valid orientation for any unit,
  *         the orientation of this new unit is equal to the given
@@ -460,9 +463,9 @@ public static boolean isValidOrientation(float orientation) {
  *       |   then new.getOrientation() == orientation
  */
 @Raw
-public void setOrientation(float orientation) {
-	if (isValidOrientation(orientation))
-		this.orientation = orientation;
+public void setOrientation(float d) {
+	if (isValidOrientation(d))
+		this.orientation = d;
 }
 
 
@@ -573,26 +576,50 @@ public void setOrientation(float orientation) {
 	 * @throws IllegalArgumentException
 	 * 		If the duration is less than zero or exceeds or equals 0.2 s.
 	 */
-	public void advanceTime(float duration) throws IllegalArgumentException,IllegalArgumentException{
+	public void advanceTime(float duration) throws IllegalArgumentException{
 		if(duration<0 || duration>= 0.2)
 			throw new IllegalArgumentException(); 
-		double d = Math.sqrt(Math.pow((getCubeCentre(getTargetPosition())[0]-this.getPosition()[0]),2.0)
-				+Math.pow((getCubeCentre(getTargetPosition())[1]-this.getPosition()[1]),2.0)
-				+Math.pow((getCubeCentre(getTargetPosition())[2]-this.getPosition()[2]),2.0));
+		double d = getDistance(getCubeCentre(getTargetPosition()),this.getPosition());
 		double[] v = {getCurrentStatus()*(getCubeCentre(getTargetPosition())[0]-this.getPosition()[0])/d,
 				getCurrentStatus()*(getCubeCentre(getTargetPosition())[1]-this.getPosition()[1])/d,
 				getCurrentStatus()*(getCubeCentre(getTargetPosition())[2]-this.getPosition()[2])/d};
 		
 		setPosition(new double[] {this.getPosition()[0]+v[0]*duration,this.getPosition()[1]+v[1]*duration,this.getPosition()[2]+v[2]*duration});
+		setOrientation((float) Math.atan2(v[1],v[0]));
 	}
 	
-	public void moveToAdjacent(double[] targetPosition, float duration){
+	/**
+	 * Move a unit to the center of a neighboring cube.
+	 * @param targetPosition
+	 * 		The position where the unit should go to.
+	 * @param duration
+	 * @throws IllegalArgumentException
+	 * 		If the targetPositon isn't a neighboring cube.
+	 * 		| !canHaveAsTargetPosition(targetPosition)
+	 */
+	
+	public void moveToAdjacent(double[] targetPosition)throws IllegalArgumentException{
+		if(! canHaveAsTargetPosition(targetPosition))
+			throw new IllegalArgumentException(); 
+		float duration = 0;
 		double[] startPosition = this.getPosition();
-		while (afstand(start,targetPosition)-afstand(start,huidig)>0 && notAttacked()) {
+		double[] currentPosition = this.getPosition();
+//		double dx = Math.rint(this.getPosition()[0]-targetPosition[0]);
+//		double dy = Math.rint(this.getPosition()[1]-targetPosition[1]);
+//		double dz = Math.rint(this.getPosition()[2]-targetPosition[2]);
+				
+		while ((getDistance(targetPosition, startPosition)-getDistance(startPosition, currentPosition))>0 && !(isDodging || isDefending)) {	
+			
 			advanceTime(duration);
-			huidig = this.getPosition();
+			currentPosition = this.getPosition();
 		}
 		
+	}
+	
+	public double getDistance(double[] targetPosition, double[] startPosition) {
+		return Math.sqrt(Math.pow(targetPosition[0]-startPosition[0],2.0)
+				+Math.pow(targetPosition[1]-startPosition[1],2.0)
+				+Math.pow(targetPosition[2]-startPosition[2],2.0));
 	}
 	
 
@@ -619,7 +646,7 @@ public double[] getTargetPosition() {
  *       | result == canHaveAsTargetPosition(targetPosition)
 */
 public boolean canHaveAsTargetPosition(double[] targetPosition) {
-	return isValidPosition(targetPosition) && isNeighbouringCube(targetPosition);
+	return isValidPosition(targetPosition) && isNeighboringCube(targetPosition);
 }
 
 /**
@@ -643,17 +670,27 @@ public void setTargetPosition(double[] targetPosition)
 	this.targetPosition = targetPosition;
 }
 
-public boolean isNeighbouringCube(double[] cubePosition) {
+public boolean isNeighboringCube(double[] cubePosition) {
 	return (Math.abs(cubePosition[0]-this.getCubePosition()[0])<=1) 
 			&& (Math.abs(cubePosition[1]-this.getCubePosition()[1])<=1) 
 			&& (Math.abs(cubePosition[1]-this.getCubePosition()[1])<=1);
 }
 	
-
+/**
+ * Return the cube of the targetPosition of this unit.
+ * @return
+ */
 
 public double[] getTargetCubePosition(){
 	return new double[] {Math.floor(this.getTargetPosition()[0]),Math.floor(this.getTargetPosition()[1]),Math.floor(this.getTargetPosition()[2])};
 }
+
+/**
+ * Return the center of a cube.
+ * @param cubePosition
+ * 		A position in the cube of which the center shall be computed.
+ * @return
+ */
 
 public double[] getCubeCentre(double[] cubePosition) {
 	return new double[] {cubePosition[0]+0.5,cubePosition[1]+0.5,cubePosition[2]+0.5};
@@ -664,43 +701,132 @@ public double[] getCubeCentre(double[] cubePosition) {
  */
 private double[] targetPosition;
 
-	public double getWalkingSpeed() {
-		
-		if (Util.fuzzyEquals(getTargetPosition()[2]-this.getPosition()[2],-1.0))
-			return 0.5*getBaseSpeed();
-		if (Util.fuzzyEquals(getTargetPosition()[2]-this.getPosition()[2],1.0))
-			return 1.2*getBaseSpeed();
+//public double getWalkingSpeed() {
+//		
+//	if (Util.fuzzyEquals(getTargetPosition()[2]-this.getPosition()[2],-1.0))
+//		return 0.5*getBaseSpeed();
+//	if (Util.fuzzyEquals(getTargetPosition()[2]-this.getPosition()[2],1.0))
+//		return 1.2*getBaseSpeed();
+//	return getBaseSpeed();
+//}
+
+//public double getWalkingSpeed(double dz) {
+//	if (dz == 1)
+//		return 1.2*getBaseSpeed();
+//	if (dz == -1)
+//		return 0.5*getBaseSpeed();
+//	return getBaseSpeed();
+//	
+//}
+
+public double getWalkingSpeed() {
+	if (Util.fuzzyEquals(getTargetPosition()[2]-this.getPosition()[2],0))
 		return getBaseSpeed();
-	}
+	if (Math.signum(getTargetPosition()[2]-this.getPosition()[2])==-1)
+		return 0.5*getBaseSpeed();
+	return 1.2*getBaseSpeed();
+}
+
 	
-	private boolean isSprinting = false;
+private boolean isSprinting = false;
 	
-	public void startSprinting(){
-		isSprinting = true;
-	}
+public void startSprinting(){
+	isSprinting = true;
 	
-	public void stopSprinting(){
-		isSprinting = false;
-	}
+}
 	
-	public double getCurrentStatus() {
-		if (isSprinting)
-			return 2.0*getWalkingSpeed();
-		return getWalkingSpeed();
-	}
-	/**
-	 * Symbolic constant registering the fixed number of cubes in direction x.
-	 */
-	private static int X = 50;
+public void stopSprinting(){
+	isSprinting = false;
+}
 	
-	/**
-	 * Symbolic constant registering the fixed number of cubes in direction y.
-	 */
-	private static int Y = 50;
+public double getCurrentStatus() {
+	if (isSprinting)
+		return 2.0*getWalkingSpeed();
+	return getWalkingSpeed();
+}
+
+/**
+ * Return the current speed of the given unit.
+ * 
+ * @param unit
+ *            The unit for which to retrieve the speed.
+ * @return The speed of the given unit.
+ * @throws ModelException
+ *             A precondition was violated or an exception was thrown.
+ */
+public double getCurrentSpeed() {
+	if (isSprinting)
+		return 2.0*getWalkingSpeed();
+	return getWalkingSpeed();
+}
+
+public void moveTo (double [] targetPosition) throws IllegalArgumentException {
+	if (! isValidPosition(targetPosition))
+		throw new IllegalArgumentException(); 
+	double[] position = this.getPosition();
+	while ( !(Util.fuzzyEquals(this.getPosition()[0],targetPosition[0]) 
+			&& Util.fuzzyEquals(this.getPosition()[1],targetPosition[1]) 
+			&& Util.fuzzyEquals(this.getPosition()[2],targetPosition[2]))) {
+		if (Util.fuzzyEquals(targetPosition[0]-this.getPosition()[0],0))
+			position[0] += 0;
+		if (Math.signum(getTargetPosition()[0]-this.getPosition()[0])==-1)
+			position[0] += -1;
+		else
+			position[0] += 1;
+		if (Util.fuzzyEquals(targetPosition[1]-this.getPosition()[1],0))
+			position[1] += 0;
+		if (Math.signum(getTargetPosition()[1]-this.getPosition()[1])==-1)
+			position[1] += -1;
+		else
+			position[1] += 1;
+		if (Util.fuzzyEquals(targetPosition[2]-this.getPosition()[2],0))
+			position[2] += 0;
+		if (Math.signum(getTargetPosition()[2]-this.getPosition()[2])==-1)
+			position[2] += -1;
+		else
+			position[2] += 1;
+		moveToAdjacent(position);
+	}	
+}
+
+private boolean isWorking = false;
+
+public void work() {
+	isWorking = true;
+	float duration = 500/this.getStrength();
+}
+private boolean isUnderAttack = false;
+
+public void attack(Unit other) {
+	other.isUnderAttack = true;
+	this.setOrientation((float) Math.atan2(other.getPosition()[1]-this.getPosition()[1],other.getPosition()[0]-this.getPosition()[0]));
+	other.setOrientation((float) Math.atan2(this.getPosition()[1]-other.getPosition()[1],this.getPosition()[0]-other.getPosition()[0]));
+	other.defending(this);
+}
+
+public void defending(Unit unit){
+	if( new Random().nextDouble() <= 0.20*(this.getAgility()/unit.getAgility()))
+		moveToAdjacent();
+		isUnderAttack = false;
+	if( new Random().nextDouble() <= 0.25*((this.getStrength()+this.getAgility())/(unit.getStrength()+unit.getAgility())))
+		isUnderAttack = false;
+	else
+		this.setHitPoints(this.getHitpoints()-unit.getStrength()/10);
+}
+
+/**
+ * Symbolic constant registering the fixed number of cubes in direction x.
+ */
+private static int X = 50;
 	
-	/**
-	 * Symbolic constant registering the fixed number of cubes in direction z.
-	 */
-	private static int Z = 50; //p72
+/**
+ * Symbolic constant registering the fixed number of cubes in direction y.
+ */
+private static int Y = 50;
+	
+/**
+ * Symbolic constant registering the fixed number of cubes in direction z.
+ */
+private static int Z = 50; //p72
 
 }
