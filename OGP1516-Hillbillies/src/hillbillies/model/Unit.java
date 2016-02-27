@@ -8,7 +8,8 @@ import ogp.framework.util.Util;
  * 
  * @invar 	Each unit is positioned inside the game world.
  * 			|isValidPosition(this.getPosition())
- * @invar 	Each unit has a name that is a valid name for any unit.
+ * @invar 	The name of each unit must be a valid name for any
+ *          unit.
  * 			|isValidName(this.getName())
  * @invar  Each unit can have its strength as strength .
  *       	| canHaveAsStrength(this.getStrength())
@@ -53,36 +54,40 @@ public class Unit {
 	 * 		The staminapoints for this new Unit.
 	 * @param orientation
 	 * 		The orientation of this new Unit.
-	 * @post The name of this new Unit is equal to the given name.
-	 * 		 |new.getName() == name
-	 * @throws IllegalNameException
-	 * 		   The given name is not a valid name for a unit.
-	 *       | ! isValidName(this.getName)
+ 	 * @effect The name of this new unit is set to
+ 	 *         the given name.
+ 	 *       | this.setName(name)
 	 * @post   If the given weight is a valid weight for any Unit,
 	 *         the weight of this new Unit is equal to the given
-	 *         weight. 
+	 *         weight. Otherwise, the weight of this new unit is equal
+	 *         to 25.
 	 *       | if (isValidWeight(Weight))
 	 *       |   then new.getWeight() == Weight
+	 *       |   else new.getWeight() == 25
 	 * @post   If the given strength is a valid strength for any unit,
 	 *         the strength of this new unit is equal to the given
-	 *         strength.
+	 *         strength. Otherwise, the strength of this new unit is equal
+	 *         to 25.
 	 *       | if (isValidStrength(strength))
 	 *       |   then new.getStrength() == strength
+	 *       |   else new.getStrength() == 25
 	 * @post   If the given agility is a valid agility for any unit,
 	 *         the agility of this new unit is equal to the given
-	 *         agility.
+	 *         agility. Otherwise, the agility of this new unit is equal
+	 *         to 25.
 	 *       | if (isValidAgility(agility))
 	 *       |   then new.getAgility() == agility
+	 *       |   else new.getAgility() == 25
 	 * @post   If the given toughness is a valid toughness for any unit,
 	 *         the toughness of this new unit is equal to the given
-	 *         toughness. 
+	 *         toughness. Otherwise, the toughness of this new unit is equal
+	 *         to 25. 
 	 *       | if (isValidToughness(toughness))
 	 *       |   then new.getToughness() == toughness
-	 * @post The position of this new Unit is equal to the given position.
-	 * 		|new.getPosition() == position
-	 * @throws IllegalPositionException
-	 * 			The given position is not a valid position for a unit.
-	 * 		| ! isValidPosition(this.getPosition)
+	 *       |   else new.getToughness() == 25
+	 * @effect The position of this new unit is set to
+ 	 *         the given position.
+ 	 *       | this.setPosition(position)
 	 * @pre    This new unit can have the given hitpoints as its hitpoints.
 	 *       | canHaveAsHitpoints(hitpoints)
 	 * @post   The hitpoints of this new unit is equal to the given
@@ -100,128 +105,181 @@ public class Unit {
 	 *         If the given orientation is negative, the orientation for this new
 	 *         unit is equal to (2*PI - the given orientation modulo 2*PI). 
 	 */
-	public Unit(String name, int weight, int strength, int agility, int toughness, double[] position, int hitpoints, int staminapoints,double orientation){
+	public Unit(String name, int weight, int strength, int agility, int toughness, double[] position, int hitpoints, int staminapoints,double orientation)throws IllegalArgumentException {
 		
-		if (canHaveAsWeight(weight))
-			this.weight = weight;
-		if ( canHaveAsStrength(strength))
-			this.strength = strength;
-		if ( canHaveAsAgility(agility))
-			this.agility = agility;
-		if (canHaveAsToughness(toughness))
-			this.toughness = toughness;
+		if (! isValidWeight(weight))
+			weight = 25;
+		setWeight(weight);
+		if (! isValidStrength(strength))
+			strength = 25;
+		setStrength(strength);
+		if (! isValidAgility(agility))
+			agility = 25;
+		setAgility(agility);
+		if (! isValidToughness(toughness))
+			toughness = 25;
+		setToughness(toughness);
 		setOrientation(orientation);
 		assert this.canHaveAsHitpoints(hitpoints);
 		this.hitpoints = hitpoints;
 		this.setStaminaPoints(staminaPoints);
+		this.setName(name);
 	}
 	
 /**
  * Return the weight of this Unit.
  */
-@Basic @Raw @Immutable
+@Basic @Raw 
 public int getWeight() {
 	return this.weight;
 }
 
 
 /**
- * Check whether this Unit can have the given weight as its weight.
- *  
+ * Check whether the given weight is a valid weight for
+ * any unit.
  * @param  Weight
  *         The weight to check.
  * @return 
  *       | result == (weight >= (strength + agility)/2)
 */
 @Raw
-public boolean canHaveAsWeight(int weight) {
+public boolean isValidWeight(int weight) {
 	return weight >= (this.strength + this.agility)/2;
+}
+
+/**
+ * Set the weight of this unit to the given weight.
+ * 
+ * @param  weight
+ *         The new weight for this unit.
+ * @post   If the given weight is a valid weight for any unit,
+ *         the weight of this new unit is equal to the given
+ *         weight.
+ *       | if (isValidWeight(weight))
+ *       |   then new.getWeight() == weight
+ */
+@Raw
+private void setWeight(int weight) {
+	if (isValidWeight(weight))
+		this.weight = weight;
 }
 
 
 /**
  * Return the strength of this unit.
  */
-@Basic @Raw @Immutable
+@Basic @Raw 
 public int getStrength() {
 	return this.strength;
 }
 
 /**
- * Check whether this unit can have the given strength as its strength.
- *  
+ * Check whether the given strength is a valid strength for
+ * any unit.
  * @param  strength
  *         The strength to check.
  * @return 
  *       | result == ((25<= strength) && (strength<=100)) 
 */
 @Raw
-public boolean canHaveAsStrength(int strength) {
+public boolean isValidStrength(int strength) {
 	return (25<= strength) && (strength<=100);
+}
+
+/**
+ * Set the strength of this unit to the given strength.
+ * 
+ * @param  strength
+ *         The new strength for this unit.
+ * @post   If the given strength is a valid strength for any unit,
+ *         the strength of this new unit is equal to the given
+ *         strength.
+ *       | if (isValidStrength(strength))
+ *       |   then new.getStrength() == strength
+ */
+@Raw
+private void setStrength(int strength) {
+	if (isValidStrength(strength))
+		this.strength = strength;
 }
 
 /**
  * Return the agility of this unit.
  */
-@Basic @Raw @Immutable
+@Basic @Raw 
 public int getAgility() {
 	return this.agility;
 }
 
 /**
- * Check whether this unit can have the given agility as its agility.
- *  
+ * Check whether the given agility is a valid agility for
+ * any unit. 
  * @param  agility
  *         The agility to check.
  * @return 
  *       | result == ((25<=agility) && (agility<=100))
 */
 @Raw
-public boolean canHaveAsAgility(int agility) {
+public boolean isValidAgility(int agility) {
 	return ((25<=agility) && (agility<=100));
 }
+
+/**
+ * Set the agility of this unit to the given agility.
+ * 
+ * @param  agility
+ *         The new agility for this unit.
+ * @post   If the given agility is a valid agility for any unit,
+ *         the agility of this new unit is equal to the given
+ *         agility.
+ *       | if (isValidAgility(agility))
+ *       |   then new.getAgility() == agility
+ */
+@Raw
+private void setAgility(int agility) {
+	if (isValidAgility(agility))
+		this.agility = agility;
+}
+
 
 
 /**
  * Return the toughness of this unit.
  */
-@Basic @Raw @Immutable
+@Basic @Raw
 public int getToughness() {
 	return this.toughness;
 }
 
 /**
- * Check whether this unit can have the given toughness as its toughness.
+ * Check whether the given toughness is a valid toughness for
+ * any unit.
  *  
  * @param  toughness
  *         The toughness to check.
  * @return 
  *       | result == ((25<=toughness) && (toughness<=100))
 */
-@Raw
-public boolean canHaveAsToughness(int toughness) {
+public static boolean isValidToughness(int toughness) {
 	return ((25<=toughness) && (toughness<=100));
 }
 
-/** TO BE ADDED TO CLASS HEADING
- * @invar  The name of each unit must be a valid name for any
- *         unit.
- *       | isValidName(getName())
- */
-
-
 /**
- * Initialize this new unit with given name.
- *
- * @param  name
- *         The name for this new unit.
- * @effect The name of this new unit is set to
- *         the given name.
- *       | this.setName(name)
+ * Set the toughness of this unit to the given toughness.
+ * 
+ * @param  toughness
+ *         The new toughness for this unit.
+ * @post   If the given toughness is a valid toughness for any unit,
+ *         the toughness of this new unit is equal to the given
+ *         toughness.
+ *       | if (isValidToughness(toughness))
+ *       |   then new.getToughness() == toughness
  */
-public Unit(String name)
-		throws InvalidNameException {
-	this.setName(name);
+@Raw
+private void setToughness(int toughness) {
+	if (isValidToughness(toughness))
+		this.toughness = toughness;
 }
 
 
@@ -264,20 +322,20 @@ public static boolean isValidName(String name) {
  * @post   The name of this new unit is equal to
  *         the given name.
  *       | new.getName() == name
- * @throws ExceptionName_Java
+ * @throws IllegalArgumentException
  *         The given name is not a valid name for any
  *         unit.
  *       | ! isValidName(getName())
  */
 @Raw
 public void setName(String name) 
-		throws ExceptionName_Java {
+		throws IllegalArgumentException {
 	if (! isValidName(name))
-		throw new ExceptionName_Java();
+		throw new IllegalArgumentException();
 	this.name = name;
 }
 
-@Basic @Raw @Immutable
+@Basic @Raw 
 public int getHitpoints() {
 	return this.hitpoints;
 }
@@ -297,6 +355,12 @@ public boolean canHaveAsHitpoints(int hitpoints) {
 
 private double max_nbPoints() {
 	return Math.ceil(200.0*(this.getWeight()/100.0)*(this.getToughness()/100.0));
+}
+
+@Raw
+public void setHitPoints(int hitpoints) {
+	assert canHaveAsHitpoints(hitpoints);
+	this.hitpoints = hitpoints;
 }
 
 /**
@@ -338,6 +402,70 @@ public void setStaminaPoints(int staminaPoints) {
 	this.staminaPoints = staminaPoints;
 }
 
+/**
+ * @invar  The orientation of each unit must be a valid orientation for any
+ *         unit.
+ *       | isValidOrientation(getOrientation())
+ */
+
+/**
+ * Initialize this new unit with given orientation.
+ * 
+ * @param  orientation
+ *         The orientation for this new unit.
+ * @post   If the given orientation is a valid orientation for any unit,
+ *         the orientation of this new unit is equal to the given
+ *         orientation. Otherwise, the orientation of this new unit is equal
+ *         to PI/2.
+ *       | if (isValidOrientation(orientation))
+ *       |   then new.getOrientation() == orientation
+ *       |   else new.getOrientation() == PI/2
+ */
+public Unit(float orientation) {
+	if (! isValidOrientation(orientation))
+		orientation = (float) ((float) Math.PI/2.0);
+	setOrientation(orientation);
+}
+
+/**
+ * Return the orientation of this unit.
+ */
+@Basic @Raw
+public float getOrientation() {
+	return this.orientation;
+}
+
+/**
+ * Check whether the given orientation is a valid orientation for
+ * any unit.
+ *  
+ * @param  orientation
+ *         The orientation to check.
+ * @return 
+ *       | result == 
+*/
+public static boolean isValidOrientation(float orientation) {
+	return false;
+}
+
+/**
+ * Set the orientation of this unit to the given orientation.
+ * 
+ * @param  orientation
+ *         The new orientation for this unit.
+ * @post   If the given orientation is a valid orientation for any unit,
+ *         the orientation of this new unit is equal to the given
+ *         orientation.
+ *       | if (isValidOrientation(orientation))
+ *       |   then new.getOrientation() == orientation
+ */
+@Raw
+public void setOrientation(float orientation) {
+	if (isValidOrientation(orientation))
+		this.orientation = orientation;
+}
+
+
 	
 	/**
 	 * Return the position of this unit. 
@@ -365,7 +493,7 @@ public void setStaminaPoints(int staminaPoints) {
 	 * @return The position
 	 */
 	public double[] getCubePosition(){
-		return {Math.floor(this.getPosition()[0]),Math.floor(this.getPosition()[1]),Math.floor(this.getPosition()[2])};
+		return new double[] {Math.floor(this.getPosition()[0]),Math.floor(this.getPosition()[1]),Math.floor(this.getPosition()[2])};
 	}
 
 	/**
@@ -379,9 +507,9 @@ public void setStaminaPoints(int staminaPoints) {
 	 * 		|!isValidPosition(position)
 	 */
 	@Raw
-	private void setPosition(double[] position) throws IllegalPositionException{
+	private void setPosition(double[] position) throws IllegalArgumentException{
 		if (!isValidPosition(position))
-			throw new IllegalPositionException(position,this);
+			throw new IllegalArgumentException();
 		this.position = position;
 	}
 	
@@ -445,7 +573,7 @@ public void setStaminaPoints(int staminaPoints) {
 	 * @throws IllegalArgumentException
 	 * 		If the duration is less than zero or exceeds or equals 0.2 s.
 	 */
-	public void advanceTime(float duration) throws IllegalArgumentException,IllegalPositionException{
+	public void advanceTime(float duration) throws IllegalArgumentException,IllegalArgumentException{
 		if(duration<0 || duration>= 0.2)
 			throw new IllegalArgumentException(); 
 		double d = Math.sqrt(Math.pow((getCubeCentre(getTargetPosition())[0]-this.getPosition()[0]),2.0)
@@ -455,7 +583,7 @@ public void setStaminaPoints(int staminaPoints) {
 				getCurrentStatus()*(getCubeCentre(getTargetPosition())[1]-this.getPosition()[1])/d,
 				getCurrentStatus()*(getCubeCentre(getTargetPosition())[2]-this.getPosition()[2])/d};
 		
-		setPosition(this.getPosition()[0]+v[0]*duration,this.getPosition()[1]+v[1]*duration,this.getPosition()[2]+v[2]*duration);
+		setPosition(new double[] {this.getPosition()[0]+v[0]*duration,this.getPosition()[1]+v[1]*duration,this.getPosition()[2]+v[2]*duration});
 	}
 	
 	public void moveToAdjacent(double[] targetPosition, float duration){
@@ -509,9 +637,9 @@ public boolean canHaveAsTargetPosition(double[] targetPosition) {
  */
 @Raw
 public void setTargetPosition(double[] targetPosition) 
-		throws IllegalPositionException {
+		throws IllegalArgumentException {
 	if (! canHaveAsTargetPosition(targetPosition))
-		throw new IllegalPositionException();
+		throw new IllegalArgumentException();
 	this.targetPosition = targetPosition;
 }
 
@@ -524,11 +652,11 @@ public boolean isNeighbouringCube(double[] cubePosition) {
 
 
 public double[] getTargetCubePosition(){
-	return {Math.floor(this.getTargetPosition()[0]),Math.floor(this.getTargetPosition()[1]),Math.floor(this.getTargetPosition()[2])};
+	return new double[] {Math.floor(this.getTargetPosition()[0]),Math.floor(this.getTargetPosition()[1]),Math.floor(this.getTargetPosition()[2])};
 }
 
 public double[] getCubeCentre(double[] cubePosition) {
-	return (cubePosition[0]+0.5,cubePosition[1]+0.5,cubePosition[2]+0.5);
+	return new double[] {cubePosition[0]+0.5,cubePosition[1]+0.5,cubePosition[2]+0.5};
 }
 
 /**
