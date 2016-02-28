@@ -97,18 +97,16 @@ public class Unit {
 	 *         hitpoints.
 	 *       | new.getHitpoints() == hitpoints
 	 * @pre    The given the number of staminapoints must be a valid the number of staminapoints for any unit.
-	 *       | isValidStaminaPoints(the number of staminapoints)
+	 *       | canHaveAsStaminaPoints(the number of staminapoints)
 	 * @post   The the number of staminapoints of this new unit is equal to the given
 	 *         the number of staminapoints.
 	 *       | new.getStaminaPoints() == staminaPoints
-	 * @post  If the given orientation is in the range 0..2*PI, the orientation of
-	 *         this new unit is equal to the given orientation.
-	 *         If the given orientation exceeds 2*PI, the orientation for this new
-	 *         unit is equal to the given orientation modulo 2*PI.
-	 *         If the given orientation is negative, the orientation for this new
-	 *         unit is equal to (2*PI - the given orientation modulo 2*PI). 
+	 * @effect  The orientation of this new unit is set to the given orientation
+	 * 		 | this.setOrientation(orientation)
 	 */
-	public Unit(String name, int weight, int strength, int agility, int toughness, double[] position, int hitpoints, int staminapoints,double orientation)throws IllegalArgumentException {
+	
+	@Raw
+	public Unit(String name, int weight, int strength, int agility, int toughness, double[] position, int hitpoints, int staminaPoints,double orientation)throws IllegalArgumentException {
 		
 		if (! isValidWeight(weight))
 			weight = 25;
@@ -340,7 +338,7 @@ public void setName(String name)
 
 
 @Basic @Raw
-public int getHitpoints() {
+public double getHitpoints() {
 	return this.hitpoints;
 }
 
@@ -362,21 +360,21 @@ private double max_nbPoints() {
 }
 
 @Raw
-public void setHitPoints(int hitpoints) {
+private void setHitPoints(double hitpoints) {
 	assert canHaveAsHitpoints(hitpoints);
 	this.hitpoints = hitpoints;
 }
 
 /**
- * Return the the number of staminapoints of this unit.
+ * Return the the number of staminaPoints of this unit.
  */
 @Basic @Raw
-public int getStaminaPoints() {
+public double getStaminaPoints() {
 	return this.staminaPoints;
 }
 
 /**
- * Check whether the given the number of staminapoints is a valid the number of staminapoints for
+ * Check whether the given the number of staminaPoints is a valid the number of staminapoints for
  * any unit.
  *  
  * @param  the number of staminapoints
@@ -384,7 +382,7 @@ public int getStaminaPoints() {
  * @return 
  *       | result == 
 */
-public boolean isValidStaminaPoints(int staminaPoints) {
+public boolean canHaveAsStaminaPoints(int staminaPoints) {
 	return staminaPoints < max_nbPoints();
 }
 
@@ -395,41 +393,19 @@ public boolean isValidStaminaPoints(int staminaPoints) {
  *         The new the number of staminapoints for this unit.
  * @pre    The given the number of staminapoints must be a valid the number of staminapoints for any
  *         unit.
- *       | isValidStaminaPoints(staminaPoints)
+ *       | canHaveAsStaminaPoints(staminaPoints)
  * @post   The the number of staminapoints of this unit is equal to the given
  *         the number of staminapoints.
  *       | new.getStaminaPoints() == staminaPoints
  */
 @Raw
-public void setStaminaPoints(int staminaPoints) {
-	assert isValidStaminaPoints(staminaPoints);
+private void setStaminaPoints(double staminaPoints) {
+	assert canHaveAsStaminaPoints(staminaPoints);
 	this.staminaPoints = staminaPoints;
 }
 
-/**
- * @invar  The orientation of each unit must be a valid orientation for any
- *         unit.
- *       | isValidOrientation(getOrientation())
- */
 
-/**
- * Initialize this new unit with given orientation.
- * 
- * @param  orientation
- *         The orientation for this new unit.
- * @post   If the given orientation is a valid orientation for any unit,
- *         the orientation of this new unit is equal to the given
- *         orientation. Otherwise, the orientation of this new unit is equal
- *         to PI/2.
- *       | if (isValidOrientation(orientation))
- *       |   then new.getOrientation() == orientation
- *       |   else new.getOrientation() == PI/2
- */
-public Unit(float orientation) {
-	if (! isValidOrientation(orientation))
-		orientation = (float) ((float) Math.PI/2.0);
-	setOrientation(orientation);
-}
+
 
 /**
  * Return the orientation of this unit.
@@ -439,34 +415,31 @@ public float getOrientation() {
 	return this.orientation;
 }
 
-/**
- * Check whether the given orientation is a valid orientation for
- * any unit.
- *  
- * @param  orientation
- *         The orientation to check.
- * @return 
- *       | result == 
-*/
-public static boolean isValidOrientation(float orientation) {
-	return false;
-}
 
 /**
  * Set the orientation of this unit to the given orientation.
  * 
- * @param  d
+ * @param  orientation
  *         The new orientation for this unit.
- * @post   If the given orientation is a valid orientation for any unit,
- *         the orientation of this new unit is equal to the given
- *         orientation.
- *       | if (isValidOrientation(orientation))
- *       |   then new.getOrientation() == orientation
+ * @post  If the given orientation is in the range 0..2*PI, the orientation of
+ *         this new unit is equal to the given orientation.
+ *         | if (0 <= orientation <= 2*PI)
+ *         | 	new.orientation = orientation
+ * @post  If the given orientation exceeds 2*PI, the orientation for this new
+ *         unit is equal to the given orientation modulo 2*PI.
+ *         | if (orientation > 2*PI)
+ *         | 	new.orientation = orientation % 2*PI
+ * @post  If the given orientation is negative, the orientation for this new
+ *         unit is equal to (2*PI + the given orientation modulo 2*PI). 
+ *         | if (orientation < 0)
+ *         | 	new.orientation = 2*PI + orientation % (2*PI)
  */
 @Raw
-public void setOrientation(float d) {
-	if (isValidOrientation(d))
-		this.orientation = d;
+private void setOrientation(float orientation) {
+	if (orientation >= 0.0)
+		this.orientation = orientation % (2*Math.PI);
+	else
+		this.orientation = 2*Math.PI + orientation % (2*Math.PI)
 }
 
 
@@ -555,12 +528,12 @@ public void setOrientation(float d) {
 	/**
 	 * A variable registering the number of hitpoints of this unit.
 	 */
-	private int hitpoints = 0;
+	private double hitpoints = 0;
 	
 	/**
 	 * A variable registering the number of stamina points of this unit.
 	 */
-	private int staminaPoints = 0;
+	private double staminaPoints = 0;
 	
 	/**
 	 * A variable registering the orientation of this unit.
@@ -582,13 +555,26 @@ public void setOrientation(float d) {
 	public void advanceTime(float duration) throws IllegalArgumentException{
 		if(duration<0 || duration>= 0.2)
 			throw new IllegalArgumentException(); 
-		double d = getDistance(getCubeCentre(getTargetPosition()),this.getPosition());
-		double[] v = {getCurrentStatus()*(getCubeCentre(getTargetPosition())[0]-this.getPosition()[0])/d,
-				getCurrentStatus()*(getCubeCentre(getTargetPosition())[1]-this.getPosition()[1])/d,
-				getCurrentStatus()*(getCubeCentre(getTargetPosition())[2]-this.getPosition()[2])/d};
+		if (isMoving && !interrupted) // werk interrupted nog uit!
+			double d = getDistance(getCubeCentre(getTargetPosition()),this.getPosition());
+			double[] v = new double[] {getCurrentSpeed()*(getCubeCentre(getTargetPosition())[0]-this.getPosition()[0])/d,
+					getCurrentSpeed()*(getCubeCentre(getTargetPosition())[1]-this.getPosition()[1])/d,
+					getCurrentSpeed()*(getCubeCentre(getTargetPosition())[2]-this.getPosition()[2])/d};
+			
+			setPosition(new double[] {this.getPosition()[0]+v[0]*duration,this.getPosition()[1]+v[1]*duration,this.getPosition()[2]+v[2]*duration});
+			setOrientation(float Math.atan2(v[1],v[0]));
+			if (isSprinting)
+				setStaminaPoints(this.getStaminaPoints()-10.0*duration);
+				startSprinting();
+		if (getDistance(targetPosition, startPosition)-getDistance(startPosition, currentPosition)<0)
+			isMoving = false;
+			setPosition(targetPosition);
+		if (isWorking)
+			workingTime -= duration;
+			
+		//if under attack, isMoving = false
+		// if voorbij target; setPosition(targetPosition)
 		
-		setPosition(new double[] {this.getPosition()[0]+v[0]*duration,this.getPosition()[1]+v[1]*duration,this.getPosition()[2]+v[2]*duration});
-		setOrientation((float) Math.atan2(v[1],v[0]));
 	}
 	
 	/**
@@ -597,27 +583,40 @@ public void setOrientation(float d) {
 	 * 		The position where the unit should go to.
 	 * @param duration
 	 * @throws IllegalArgumentException
-	 * 		If the targetPositon isn't a neighboring cube.
+	 * 		If the targetPositon isn't a neighbouring cube.
 	 * 		| !canHaveAsTargetPosition(targetPosition)
 	 */
 	
-	public void moveToAdjacent(double[] targetPosition)throws IllegalArgumentException{
-		if(! canHaveAsTargetPosition(targetPosition))
-			throw new IllegalArgumentException(); 
-		float duration = 0;
-		double[] startPosition = this.getPosition();
-		double[] currentPosition = this.getPosition();
-//		double dx = Math.rint(this.getPosition()[0]-targetPosition[0]);
-//		double dy = Math.rint(this.getPosition()[1]-targetPosition[1]);
-//		double dz = Math.rint(this.getPosition()[2]-targetPosition[2]);
-				
-		while ((getDistance(targetPosition, startPosition)-getDistance(startPosition, currentPosition))>0 && !(isDodging || isDefending)) {	
-			
-			advanceTime(duration);
-			currentPosition = this.getPosition();
-		}
+	public void moveToAdjacent(int dx,int dy,int dz)throws IllegalArgumentException{
+		if (!((dx >= -1 || dx <= 1) && (dy >= -1 || dy <= 1) &&(dz >= -1 || dz <= 1)))
+			throw new IllegalArgumentException();
+		if (!isValidPosition(getPosition()[0]+(double)dx,getPosition()[1]+(double)dy,getPosition()[2]+(double)dz))
+			throw new IllegalArgumentException();
+		float duration = 0.1;
+		double m = 0.5;
+		startPosition = new double[] this.getPosition(); //is het nu gekopieerd? of referentie naar hetzelfde?
+		//double[] currentPosition = this.getPosition();
+		targetPosition = new double[] {this.getCubePosition()[0] + (double) dx + m, this.getCubePosition()[1] 
+				+ (double) dy + m, this.getCubePosition()[2] + (double) dz + m};
+		isMoving = true;
+		setWalkingSpeed(dz);
 		
+//		while ((getDistance(targetPosition, startPosition)-getDistance(startPosition, currentPosition))>0 && !(isDodging || isDefending)) {
+//			advanceTime(duration);
+//			currentPosition = this.getPosition();
+		
+		
+		if ((getDistance(targetPosition, startPosition)-getDistance(startPosition, currentPosition))<0)
+			setPosition(targetPosition);
 	}
+
+	
+	private int dx = 0;
+	private int dy = 0;
+	private int dz = 0;
+	private double [] startPosition;
+	private double [] targetPosition;
+	private boolean isMoving = false;
 	
 	public double getDistance(double[] targetPosition, double[] startPosition) {
 		return Math.sqrt(Math.pow(targetPosition[0]-startPosition[0],2.0)
@@ -631,79 +630,79 @@ public void setOrientation(float d) {
 	}
 	
 
-/**
- * Return the targetPosition of this unit.
- */
-@Basic @Raw
-public double[] getTargetPosition() {
-	return this.targetPosition;
-}
-
-/**
- * Check whether the given targetPosition is a valid targetPosition for
- * any unit.
- *  
- * @param  targetPosition
- *         The targetPosition to check.
- * @return 
- *       | result == canHaveAsTargetPosition(targetPosition)
-*/
-public boolean canHaveAsTargetPosition(double[] targetPosition) {
-	return isValidPosition(targetPosition) && isNeighboringCube(targetPosition);
-}
-
-/**
- * Set the targetPosition of this unit to the given targetPosition.
- * 
- * @param  targetPosition
- *         The new targetPosition for this unit.
- * @post   The targetPosition of this new unit is equal to
- *         the given targetPosition.
- *       | new.getTargetPosition() == targetPosition
- * @throws ExceptionName_Java
- *         The given targetPosition is not a valid targetPosition for any
- *         unit.
- *       | ! canHaveAsTargetPosition(getTargetPosition())
- */
-@Raw
-public void setTargetPosition(double[] targetPosition) 
-		throws IllegalArgumentException {
-	if (! canHaveAsTargetPosition(targetPosition))
-		throw new IllegalArgumentException();
-	this.targetPosition = targetPosition;
-}
-
-public boolean isNeighboringCube(double[] cubePosition) {
-	return (Math.abs(cubePosition[0]-this.getCubePosition()[0])<=1) 
-			&& (Math.abs(cubePosition[1]-this.getCubePosition()[1])<=1) 
-			&& (Math.abs(cubePosition[1]-this.getCubePosition()[1])<=1);
-}
-	
-/**
- * Return the cube of the targetPosition of this unit.
- * @return
- */
-
-public double[] getTargetCubePosition(){
-	return new double[] {Math.floor(this.getTargetPosition()[0]),Math.floor(this.getTargetPosition()[1]),Math.floor(this.getTargetPosition()[2])};
-}
-
-/**
- * Return the center of a cube.
- * @param cubePosition
- * 		A position in the cube of which the center shall be computed.
- * @return
- */
-
-public double[] getCubeCentre(double[] cubePosition) {
-	return new double[] {cubePosition[0]+0.5,cubePosition[1]+0.5,cubePosition[2]+0.5};
-
-}
-
-/**
- * Variable registering the targetPosition of this unit.
- */
-private double[] targetPosition;
+///**
+// * Return the targetPosition of this unit.
+// */
+//@Basic @Raw
+//public double[] getTargetPosition() {
+//	return this.targetPosition;
+//}
+//
+///**
+// * Check whether the given targetPosition is a valid targetPosition for
+// * any unit.
+// *  
+// * @param  targetPosition
+// *         The targetPosition to check.
+// * @return 
+// *       | result == canHaveAsTargetPosition(targetPosition)
+//*/
+//public boolean canHaveAsTargetPosition(double[] targetPosition) {
+//	return isValidPosition(targetPosition) && isNeighbouringCube(targetPosition);
+//}
+//
+///**
+// * Set the targetPosition of this unit to the given targetPosition.
+// * 
+// * @param  targetPosition
+// *         The new targetPosition for this unit.
+// * @post   The targetPosition of this new unit is equal to
+// *         the given targetPosition.
+// *       | new.getTargetPosition() == targetPosition
+// * @throws ExceptionName_Java
+// *         The given targetPosition is not a valid targetPosition for any
+// *         unit.
+// *       | ! canHaveAsTargetPosition(getTargetPosition())
+// */
+//@Raw
+//public void setTargetPosition(double[] targetPosition) 
+//		throws IllegalArgumentException {
+//	if (! canHaveAsTargetPosition(targetPosition))
+//		throw new IllegalArgumentException();
+//	this.targetPosition = targetPosition;
+//}
+//
+//public boolean isNeighbouringCube(double[] cubePosition) {
+//	return (Math.abs(cubePosition[0]-this.getCubePosition()[0])<=1) 
+//			&& (Math.abs(cubePosition[1]-this.getCubePosition()[1])<=1) 
+//			&& (Math.abs(cubePosition[1]-this.getCubePosition()[1])<=1);
+//}
+//	
+///**
+// * Return the cube of the targetPosition of this unit.
+// * @return
+// */
+//
+//public double[] getTargetCubePosition(){
+//	return new double[] {Math.floor(this.getTargetPosition()[0]),Math.floor(this.getTargetPosition()[1]),Math.floor(this.getTargetPosition()[2])};
+//}
+//
+///**
+// * Return the center of a cube.
+// * @param cubePosition
+// * 		A position in the cube of which the center shall be computed.
+// * @return
+// */
+//
+//public double[] getCubeCentre(double[] cubePosition) {
+//	return new double[] {cubePosition[0]+0.5,cubePosition[1]+0.5,cubePosition[2]+0.5};
+//
+//}
+//
+///**
+// * Variable registering the targetPosition of this unit.
+// */
+//private double[] targetPosition;
 
 //public double getWalkingSpeed() {
 //		
@@ -714,36 +713,33 @@ private double[] targetPosition;
 //	return getBaseSpeed();
 //}
 
-//public double getWalkingSpeed(double dz) {
-//	if (dz == 1)
-//		return 1.2*getBaseSpeed();
-//	if (dz == -1)
-//		return 0.5*getBaseSpeed();
-//	return getBaseSpeed();
-//	
-//}
-
-public double getWalkingSpeed() {
-	if (Util.fuzzyEquals(getTargetPosition()[2]-this.getPosition()[2],0))
-		return getBaseSpeed();
-	if (Math.signum(getTargetPosition()[2]-this.getPosition()[2])==-1)
-		return 0.5*getBaseSpeed();
-	return 1.2*getBaseSpeed();
+private void setWalkingSpeed(int dz) {
+	if (dz == -1)
+		walkingSpeed = 1.2*getBaseSpeed();
+	if (dz == 1)
+		walkingSpeed = 0.5*getBaseSpeed();
+	else
+		walkingSpeed = getBaseSpeed();
 }
 
+public double getWalkingSpeed() {
+	return this.walkingSpeed;
+}
+
+private double walkingSpeed = 0;
 	
 private boolean isSprinting = false;
 	
 public void startSprinting(){
-	isSprinting = true;
-	
+	if (isMoving && getStaminaPoints() >0)
+		isSprinting = true;
 }
 	
 public void stopSprinting(){
 	isSprinting = false;
 }
 	
-public double getCurrentStatus() {
+public double getSpeed() {
 	if (isSprinting)
 		return 2.0*getWalkingSpeed();
 	return getWalkingSpeed();
@@ -767,55 +763,67 @@ public double getCurrentSpeed() {
 public void moveTo (double [] targetPosition) throws IllegalArgumentException {
 	if (! isValidPosition(targetPosition))
 		throw new IllegalArgumentException(); 
-	double[] position = this.getPosition();
+	int x = 0;
+	int y = 0;
+	int z = 0;
 	while ( !(Util.fuzzyEquals(this.getPosition()[0],targetPosition[0]) 
 			&& Util.fuzzyEquals(this.getPosition()[1],targetPosition[1]) 
 			&& Util.fuzzyEquals(this.getPosition()[2],targetPosition[2]))) {
 		if (Util.fuzzyEquals(targetPosition[0]-this.getPosition()[0],0))
-			position[0] += 0;
-		if (Math.signum(getTargetPosition()[0]-this.getPosition()[0])==-1)
-			position[0] += -1;
+			x= 0;
+		else if (Math.signum(getTargetPosition()[0]-this.getPosition()[0])==-1)
+			x= -1;
 		else
-			position[0] += 1;
+			x = 1;
 		if (Util.fuzzyEquals(targetPosition[1]-this.getPosition()[1],0))
-			position[1] += 0;
-		if (Math.signum(getTargetPosition()[1]-this.getPosition()[1])==-1)
-			position[1] += -1;
+			y=0;
+		else if (Math.signum(getTargetPosition()[1]-this.getPosition()[1])==-1)
+			y= -1;
 		else
-			position[1] += 1;
+			y= 1;
 		if (Util.fuzzyEquals(targetPosition[2]-this.getPosition()[2],0))
-			position[2] += 0;
-		if (Math.signum(getTargetPosition()[2]-this.getPosition()[2])==-1)
-			position[2] += -1;
+			z= 0;
+		else if (Math.signum(getTargetPosition()[2]-this.getPosition()[2])==-1)
+			z= -1;
 		else
-			position[2] += 1;
-		moveToAdjacent(position);
+			z= 1;
+		moveToAdjacent(x,y,z);
 	}	
 }
 
 private boolean isWorking = false;
 
+
+private float workingTime;
+
 public void work() {
 	isWorking = true;
-	float duration = 500/this.getStrength();
+	workingTime = (float) 500.0/this.getStrength();
 }
+
 private boolean isUnderAttack = false;
 
 public void attack(Unit other) {
-	other.isUnderAttack = true;
+	//other.isUnderAttack = true; // gaat niet zomaar want private!
 	this.setOrientation((float) Math.atan2(other.getPosition()[1]-this.getPosition()[1],other.getPosition()[0]-this.getPosition()[0]));
-	other.setOrientation((float) Math.atan2(this.getPosition()[1]-other.getPosition()[1],this.getPosition()[0]-other.getPosition()[0]));
-	other.defending(this);
+	
+	other.defend(this);
 }
 
-public void defending(Unit unit){
+public void defend(Unit unit){
+	isUnderAttack = true;
+	setOrientation((float) Math.atan2(unit.getPosition()[1]-this.getPosition()[1],unit.getPosition()[0]-this.getPosition()[0]));
 	if( new Random().nextDouble() <= 0.20*(this.getAgility()/unit.getAgility()))
-		moveToAdjacent();
+		try{moveToAdjacent(-1+nextInt(int 3),-1+nextInt(int 3),-1+nextInt(int 3));
+		} catch (IllegalArgumentException exc) {
+			//probeer andere posities uit?
+		}
+	
 		isUnderAttack = false;
 	if( new Random().nextDouble() <= 0.25*((this.getStrength()+this.getAgility())/(unit.getStrength()+unit.getAgility())))
 		isUnderAttack = false;
 	else
-		this.setHitPoints(this.getHitpoints()-unit.getStrength()/10);
+		this.setHitPoints(this.getHitpoints()-unit.getStrength()/10.0);
 }
 
 /**
