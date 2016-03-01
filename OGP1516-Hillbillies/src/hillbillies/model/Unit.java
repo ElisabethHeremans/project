@@ -567,7 +567,7 @@ private void setOrientation(float orientation) {
 			setOrientation((float) Math.atan2(v[1],v[0]));
 			if (isSprinting)
 	
-				if (this.getStaminaPoints()-10.0*duration<0){
+				if (Util.fuzzyLessThanOrEqualTo(this.getStaminaPoints()-10.0*duration,0.0)){
 					setStaminaPoints(0.0);
 					stopSprinting();}
 				else{
@@ -582,7 +582,14 @@ private void setOrientation(float orientation) {
 			moveTo(targetPosition);
 			// of default behaviour?
 		if (status == Status.WORKING)
-			workingTime -= duration;
+			if (workingTime < totalWorkingTime){
+				workingTime += duration;
+				progressWork = workingTime/totalWorkingTime;}
+			else 
+			{
+				progressWork = 100;
+				startDefaultBehaviour();
+			}
 		if (Util.fuzzyEquals(getStaminaPoints(),0.0) || Util.fuzzyEquals(getHitpoints(),0.0))
 			rest();
 		
@@ -598,7 +605,7 @@ private void setOrientation(float orientation) {
 			else if (this.getStaminaPoints() < max_nbPoints())
 				this.setStaminaPoints((getToughness()/100.0)*5*duration+getStaminaPoints());
 			else
-				status = Status.DEFAULT;
+				startDefaultBehaviour();
 		}
 		
 		
@@ -622,7 +629,7 @@ private void setOrientation(float orientation) {
 		if (!isValidPosition(new double[] {getPosition()[0]+(double)dx,getPosition()[1]+(double)dy,getPosition()[2]+(double)dz}))
 			throw new IllegalArgumentException();
 		if (status != Status.MOVING)
-			float duration = 0.1;
+			float duration = (float) 0.1;
 			double m = 0.5;
 			startPosition = new double[] this.getPosition(); //is het nu gekopieerd? of referentie naar hetzelfde?
 		//double[] currentPosition = this.getPosition();
@@ -793,51 +800,62 @@ public double getCurrentSpeed() {
 public void moveTo (double [] targetPosition) throws IllegalArgumentException {
 	if (! isValidPosition(targetPosition))
 		throw new IllegalArgumentException(); 
-	int x = 0;
-	int y = 0;
-	int z = 0;
-	while ( !(Util.fuzzyEquals(this.getPosition()[0],targetPosition[0]) 
-			&& Util.fuzzyEquals(this.getPosition()[1],targetPosition[1]) 
-			&& Util.fuzzyEquals(this.getPosition()[2],targetPosition[2]))) {
-		if (Util.fuzzyEquals(targetPosition[0]-this.getPosition()[0],0))
-			x= 0;
-		else if (Math.signum(targetPosition[0]-this.getPosition()[0])==-1)
-			x= -1;
-		else
-			x = 1;
-		if (Util.fuzzyEquals(targetPosition[1]-this.getPosition()[1],0))
-			y=0;
-		else if (Math.signum(targetPosition[1]-this.getPosition()[1])==-1)
-			y= -1;
-		else
-			y= 1;
-		if (Util.fuzzyEquals(targetPosition[2]-this.getPosition()[2],0))
-			z= 0;
-		else if (Math.signum(targetPosition[2]-this.getPosition()[2])==-1)
-			z= -1;
-		else
-			z= 1;
-		if (status != Status.INITIAL_RESTING)
-		status = Status.NOT_MOVING;
-		moveToAdjacent(x,y,z);
-	}	
+	if (canMove()){
+		int x = 0;
+		int y = 0;
+		int z = 0;
+		while ( !(Util.fuzzyEquals(this.getPosition()[0],targetPosition[0]) 
+				&& Util.fuzzyEquals(this.getPosition()[1],targetPosition[1]) 
+				&& Util.fuzzyEquals(this.getPosition()[2],targetPosition[2]))) {
+			if (Util.fuzzyEquals(targetPosition[0]-this.getPosition()[0],0))
+				x= 0;
+			else if (Math.signum(targetPosition[0]-this.getPosition()[0])==-1)
+				x= -1;
+			else
+				x = 1;
+			if (Util.fuzzyEquals(targetPosition[1]-this.getPosition()[1],0))
+				y=0;
+			else if (Math.signum(targetPosition[1]-this.getPosition()[1])==-1)
+				y= -1;
+			else
+				y= 1;
+			if (Util.fuzzyEquals(targetPosition[2]-this.getPosition()[2],0))
+				z= 0;
+			else if (Math.signum(targetPosition[2]-this.getPosition()[2])==-1)
+				z= -1;
+			else
+				z= 1;
+			moveToAdjacent(x,y,z);
+		}
+	}
+	}
+
+public boolean canMove() {
+	if (status == Status.RESTING && status == Status.MOVING)
+		return true;
+	return false;
 }
 
-//private boolean isWorking = false;
+
 
 
 private float workingTime;
+private float totalWorkingTime;
+private float progressWork;
 
 public void work() {
-	if (status != Status.MOVING && status != Status.INITIAL_RESTING)
+	if (canWork())
 		status = Status.WORKING;
-		workingTime = (float) 500.0/this.getStrength();
+		workingTime = (float) 0.0;
+		totalWorkingTime = (float) 500.0/this.getStrength();
+		progressWork = workingTime/totalWorkingTime;
+	while (status == Status.WORKING)
+		advanceTime((float) 0.2);
 }
 
-private boolean isUnderAttack = false;
+
 
 public void attack(Unit other) throws IllegalArgumentException {
-	//other.isUnderAttack = true; // gaat niet zomaar want private!
 	if (!this.getCubePosition().isNeighbouringCube(other.getCubePosition()))
 			throw new IllegalArgumentException();
 	if (status != Status.MOVING)
@@ -891,7 +909,8 @@ long currentTime = System.currentTimeMillis();
 
 public boolean mustRest() {
 	currentTime = System.currentTimeMillis();
-	if (Util.fuzzyGreaterThanOrEqualTo(currentTime -startTime, 3000))
+	if (Util.fuzzyGreaterThanOrEqualTo(currentTime -startTime, 3000) || Util.fuzzyLessThanOrEqualTo(this.getStaminaPoints(),0) 
+			||Util.fuzzyLessThanOrEqualTo(this.getHitpoints(),0))
 		return true;
 	return false;
 }
@@ -919,7 +938,9 @@ private static int Y = 50;
 private static int Z = 50; //p727
 
 public boolean canWork() {
-	
+	if (status != Status.MOVING && status != Status.INITIAL_RESTING && status != Status.ATTACKING)
+		return true;
+	return false;
 }
 
 }
