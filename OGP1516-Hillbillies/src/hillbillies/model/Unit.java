@@ -106,11 +106,9 @@ public class Unit {
 	 */
 	
 	@Raw
-	public Unit(String name, int weight, int strength, int agility, int toughness, double[] position, int hitpoints, int staminaPoints,double orientation)throws IllegalArgumentException {
+	public Unit(String name, double[] position, int weight, int strength, int agility, int toughness,boolean enableDefaultBehavior, double hitpoints,double staminaPoints,double orientation)throws IllegalArgumentException {
 		
-		if (! isValidWeight(weight))
-			weight = 25;
-		setWeight(weight);
+
 		if (! isValidStrength(strength))
 			strength = 25;
 		setStrength(strength);
@@ -120,11 +118,20 @@ public class Unit {
 		if (! isValidToughness(toughness))
 			toughness = 25;
 		setToughness(toughness);
+		if (! canHaveAsWeight(weight))
+			weight = 25;
+		setWeight(weight);
 		setOrientation((float) orientation);
 		assert this.canHaveAsHitpoints(hitpoints);
-		this.hitpoints = hitpoints;
+		this.setHitPoints(hitpoints);
 		this.setStaminaPoints(staminaPoints);
 		this.setName(name);
+		this.startDefaultBehaviour(); //?????
+	}
+	
+	@Raw 
+	Unit(String name, double[] position, int weight, int strength, int agility, int toughness,boolean enableDefaultBehavior){
+		this(name,position, weight, strength, agility, toughness, enableDefaultBehavior,0.0,0.0,(float) Math.PI/2.0);
 	}
 	
 /**
@@ -137,16 +144,15 @@ public int getWeight() {
 
 
 /**
- * Check whether the given weight is a valid weight for
- * any unit.
+ * Check whether this unit can have the given weight as its weight.
  * @param  Weight
  *         The weight to check.
  * @return 
  *       | result == (weight >= (strength + agility)/2)
 */
 @Raw
-public boolean isValidWeight(int weight) {
-	return weight >= (this.strength + this.agility)/2;
+public boolean canHaveAsWeight(int weight) {
+	return (float) weight >= ((float) this.strength + (float) this.agility)/2;
 }
 
 /**
@@ -157,12 +163,16 @@ public boolean isValidWeight(int weight) {
  * @post   If the given weight is a valid weight for any unit,
  *         the weight of this new unit is equal to the given
  *         weight.
- *       | if (isValidWeight(weight))
+ *       | if (canHaveAsWeight(weight))
  *       |   then new.getWeight() == weight
+ * @post  If the given weight is not a valid weight for any unit, 
+ * 		  the weight of this new unit is equal to the weight of this unit.
+ * 		 |if(!canHaveAsWeight(weight))
+ * 		 |	 then new.getWeight() == this.getWeight()
  */
 @Raw
-private void setWeight(int weight) {
-	if (isValidWeight(weight))
+public void setWeight(int weight) {
+	if (canHaveAsWeight(weight))
 		this.weight = weight;
 }
 
@@ -184,7 +194,7 @@ public int getStrength() {
  *       | result == ((25<= strength) && (strength<=100)) 
 */
 @Raw
-public boolean isValidStrength(int strength) {
+public static boolean isValidStrength(int strength) {
 	return (25<= strength) && (strength<=100);
 }
 
@@ -200,7 +210,7 @@ public boolean isValidStrength(int strength) {
  *       |   then new.getStrength() == strength
  */
 @Raw
-private void setStrength(int strength) {
+public void setStrength(int strength) {
 	if (isValidStrength(strength))
 		this.strength = strength;
 }
@@ -222,7 +232,7 @@ public int getAgility() {
  *       | result == ((25<=agility) && (agility<=100))
 */
 @Raw
-public boolean isValidAgility(int agility) {
+public static boolean isValidAgility(int agility) {
 	return ((25<=agility) && (agility<=100));
 }
 
@@ -238,7 +248,7 @@ public boolean isValidAgility(int agility) {
  *       |   then new.getAgility() == agility
  */
 @Raw
-private void setAgility(int agility) {
+public void setAgility(int agility) {
 	if (isValidAgility(agility))
 		this.agility = agility;
 }
@@ -278,7 +288,7 @@ public static boolean isValidToughness(int toughness) {
  *       |   then new.getToughness() == toughness
  */
 @Raw
-private void setToughness(int toughness) {
+public void setToughness(int toughness) {
 	if (isValidToughness(toughness))
 		this.toughness = toughness;
 }
@@ -454,6 +464,24 @@ private void setOrientation(float orientation) {
 		return position;
 	}
 	
+	public static double[] getPosition(int[] cubePosition){
+		return new double [] {(double)cubePosition[0]+0.5,(double) cubePosition[1] + 0.5, (double) cubePosition[2]+0.5};
+	}
+	
+	/**
+	 * Return the position of the game world cube in which this unit is positioned
+	 * @return The position
+	 */
+	public double[] getCubePosition(){
+	
+		return new double[] {Math.floor(this.getPosition()[0]),Math.floor(this.getPosition()[1]),Math.floor(this.getPosition()[2])};
+	
+	}
+	
+	public int[] getCubeCoordinate(){
+		return new int[] {(int) getCubePosition()[0],(int) getCubePosition()[1],(int) getCubePosition()[2]};
+	}
+
 	/**
 	 * Check whether the given position is a position inside the game world, a valid position.
 	 * @param position
@@ -465,16 +493,6 @@ private void setOrientation(float orientation) {
 		return 0<= position[0] && position[0] <= X && 0<= position[1] && position[1] <= Y && 0<= position[2] && position[2] <= Z;
 	}
 	
-	/**
-	 * Return the position of the game world cube in which this unit is positioned
-	 * @return The position
-	 */
-	public double[] getCubePosition(){
-
-		return new double[] {Math.floor(this.getPosition()[0]),Math.floor(this.getPosition()[1]),Math.floor(this.getPosition()[2])};
-
-	}
-
 	/**
 	 * Set the position of this unit to the given position.
 	 * @param position

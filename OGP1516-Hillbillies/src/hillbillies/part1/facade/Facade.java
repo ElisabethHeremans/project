@@ -4,89 +4,148 @@ import hillbillies.model.Unit;
 import ogp.framework.util.ModelException;
 
 public class Facade implements IFacade {
-
+	
+	
 	@Override
 	public Unit createUnit(String name, int[] initialPosition, int weight, int agility, int strength, int toughness,
 			boolean enableDefaultBehavior) throws ModelException {
-		// TODO Auto-generated method stub
 		try{
-		return Unit(name,initialPosition, weight,  agility, strength,toughness,enableDefaultBehavior);
+			Unit(name,Unit.getPosition(initialPosition), weight,  agility, strength,toughness,enableDefaultBehavior);
 		}
-		catch .. {
+		catch (NullPointerException exc) {
+			throw new ModelException();
+		}
+		catch (IllegalArgumentException exc){
 			throw new ModelException();
 		}
 	}
 
 	@Override
 	public double[] getPosition(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
-		return null;
+		try{
+			return unit.getPosition();
+		}
+		catch (NullPointerException exc){
+			throw new ModelException();
+		}
 	}
 
 	@Override
 	public int[] getCubeCoordinate(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
-		return null;
+		try{
+			return unit.getCubeCoordinate();
+		}
+		catch (NullPointerException exc){
+			throw new ModelException();
+		}
 	}
 
 	@Override
 	public String getName(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
-		return null;
+		try{
+			return unit.getName();
+		}
+		catch (NullPointerException exc){
+			throw new ModelException();
+		}
 	}
 
 	@Override
 	public void setName(Unit unit, String newName) throws ModelException {
-		// TODO Auto-generated method stub
+		try{
+			unit.setName(newName);
+		}
+		catch (IllegalArgumentException exc){
+			throw new ModelException();
+			
+		}
+		catch (NullPointerException exc){
+			throw new ModelException();
+		}
 		
 	}
 
 	@Override
 	public int getWeight(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
-		return 0;
+		try{
+			return unit.getWeight();
+		}
+		catch (NullPointerException exc){
+			throw new ModelException();
+		}
 	}
 
 	@Override
 	public void setWeight(Unit unit, int newValue) throws ModelException {
-		// TODO Auto-generated method stub
+		try{
+			unit.setWeight(newValue);
+		}
+		catch (NullPointerException exc){
+			throw new ModelException();
+		}
 		
 	}
 
 	@Override
 	public int getStrength(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
-		return 0;
+		try{
+			return unit.getStrength();
+		}
+		catch (NullPointerException exc){
+			throw new ModelException();
+		}
 	}
 
 	@Override
 	public void setStrength(Unit unit, int newValue) throws ModelException {
-		// TODO Auto-generated method stub
+		try{
+			unit.setStrength(newValue);
+		}
 		
+		catch (NullPointerException exc){
+			throw new ModelException();
+		}
 	}
 
 	@Override
 	public int getAgility(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
-		return 0;
+		try{
+			return unit.getAgility();
+		}
+		
+		catch (NullPointerException exc){
+			throw new ModelException();
+		}
 	}
 
 	@Override
 	public void setAgility(Unit unit, int newValue) throws ModelException {
-		// TODO Auto-generated method stub
-		
+		try{
+			unit.setAgility(newValue);
+		}
+		catch (NullPointerException exc){
+			throw new ModelException();
+		}
 	}
 
 	@Override
 	public int getToughness(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
-		return 0;
+		try{
+			return unit.getToughness();
+		}
+		catch (NullPointerException exc){
+			throw new ModelException();
+		}
 	}
 
 	@Override
 	public void setToughness(Unit unit, int newValue) throws ModelException {
-		// TODO Auto-generated method stub
-		
+		try{
+			unit.setToughness(newValue);
+		}
+		catch (NullPointerException exc){
+			throw new ModelException();
+		}
 	}
 
 	@Override

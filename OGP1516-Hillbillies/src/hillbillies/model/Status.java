@@ -1,5 +1,6 @@
 package hillbillies.model;
 
+@Value
 public enum Status {
 	MOVING{
 	},
