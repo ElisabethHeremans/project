@@ -9,7 +9,8 @@ public enum Status {
 	INTERRUPTED_MOVING,
 	INITIAL_RESTING,
 	RESTING,
-	DEFAULT
+	DEFAULT,
+	DONE
 	
 	
 	
