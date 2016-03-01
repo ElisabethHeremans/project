@@ -120,7 +120,7 @@ public class Unit {
 		if (! isValidToughness(toughness))
 			toughness = 25;
 		setToughness(toughness);
-		setOrientation(orientation);
+		setOrientation((float) orientation);
 		assert this.canHaveAsHitpoints(hitpoints);
 		this.hitpoints = hitpoints;
 		this.setStaminaPoints(staminaPoints);
@@ -351,7 +351,7 @@ public double getHitpoints() {
  *       | result == (hitpoints < max_nbHitpoints())
 */
 @Raw
-public boolean canHaveAsHitpoints(int hitpoints) {
+public boolean canHaveAsHitpoints(double hitpoints) {
 	return hitpoints < max_nbPoints();
 }
 
@@ -382,7 +382,7 @@ public double getStaminaPoints() {
  * @return 
  *       | result == 
 */
-public boolean canHaveAsStaminaPoints(int staminaPoints) {
+public boolean canHaveAsStaminaPoints(double staminaPoints) {
 	return staminaPoints < max_nbPoints();
 }
 
@@ -437,9 +437,9 @@ public float getOrientation() {
 @Raw
 private void setOrientation(float orientation) {
 	if (orientation >= 0.0)
-		this.orientation = orientation % (2*Math.PI);
+		this.orientation = (float) (orientation % (2*Math.PI));
 	else
-		this.orientation = 2*Math.PI + orientation % (2*Math.PI)
+		this.orientation = (float) (2*Math.PI + orientation % (2*Math.PI));
 }
 
 
@@ -555,22 +555,24 @@ private void setOrientation(float orientation) {
 	public void advanceTime(float duration) throws IllegalArgumentException{
 		if(duration<0 || duration>= 0.2)
 			throw new IllegalArgumentException(); 
-		if (status == MOVING) 
-			double d = getDistance(getCubeCentre(getTargetPosition()),this.getPosition());
+		if (mustRest())
+			rest();
+		if (status == Status.MOVING) 
+			double d = getDistance(getCubeCentre(targetPosition),this.getPosition());
 			double[] v = new double[] {getCurrentSpeed()*(nextTargetPosition[0]-this.getPosition()[0])/d,
 					getCurrentSpeed()*(nextTargetPosition[1]-this.getPosition()[1])/d,
 					getCurrentSpeed()*(nextTargetPosition[2]-this.getPosition()[2])/d};
 			
 			setPosition(new double[] {this.getPosition()[0]+v[0]*duration,this.getPosition()[1]+v[1]*duration,this.getPosition()[2]+v[2]*duration});
-			setOrientation(float Math.atan2(v[1],v[0]));
+			setOrientation((float) Math.atan2(v[1],v[0]));
 			if (isSprinting)
 	
-				if (this.getStaminaPoints()-10.0*duration<0)
-					setStaminaPoints(0.0)
-					stopSprinting();
-				else
+				if (this.getStaminaPoints()-10.0*duration<0){
+					setStaminaPoints(0.0);
+					stopSprinting();}
+				else{
 					setStaminaPoints(this.getStaminaPoints()-10.0*duration);
-					startSprinting();
+					startSprinting();}
 			advanceTime(duration); //????
 					
 			
@@ -579,18 +581,30 @@ private void setOrientation(float orientation) {
 			setPosition(nextTargetPosition);
 			moveTo(targetPosition);
 			// of default behaviour?
-		if (status = WORKING)
+		if (status == Status.WORKING)
 			workingTime -= duration;
 		if (Util.fuzzyEquals(getStaminaPoints(),0.0) || Util.fuzzyEquals(getHitpoints(),0.0))
-			rest()
+			rest();
+		
+		
 				
-				
-		if (status = INITIAL_RESTING)
-			this.setHitPoints((getToughness()/200.0)*5*duration+getHitPoints())
-			
+		if (status == Status.INITIAL_RESTING)
+			this.setHitPoints((getToughness()/200.0)*5*duration+getHitpoints());
+			recoveredHitpoints += (getToughness()/200.0)*5*duration;
+		
+		if (status == Status.RESTING){
+			if (this.getHitpoints()<max_nbPoints())
+				this.setHitPoints((getToughness()/200.0)*5*duration+getHitpoints());
+			else if (this.getStaminaPoints() < max_nbPoints())
+				this.setStaminaPoints((getToughness()/100.0)*5*duration+getStaminaPoints());
+			else
+				status = Status.DEFAULT;
+		}
 		
 		
 	}
+	
+
 	
 	/**
 	 * Move a unit to the center of a neighboring cube.
@@ -605,9 +619,9 @@ private void setOrientation(float orientation) {
 	public void moveToAdjacent(int dx,int dy,int dz)throws IllegalArgumentException{
 		if (!((dx >= -1 || dx <= 1) && (dy >= -1 || dy <= 1) &&(dz >= -1 || dz <= 1)))
 			throw new IllegalArgumentException();
-		if (!isValidPosition(getPosition()[0]+(double)dx,getPosition()[1]+(double)dy,getPosition()[2]+(double)dz))
+		if (!isValidPosition(new double[] {getPosition()[0]+(double)dx,getPosition()[1]+(double)dy,getPosition()[2]+(double)dz}))
 			throw new IllegalArgumentException();
-		if (status != MOVING)
+		if (status != Status.MOVING)
 			float duration = 0.1;
 			double m = 0.5;
 			startPosition = new double[] this.getPosition(); //is het nu gekopieerd? of referentie naar hetzelfde?
@@ -615,7 +629,7 @@ private void setOrientation(float orientation) {
 			nextTargetPosition = new double[] {this.getCubePosition()[0] + (double) dx + m, this.getCubePosition()[1] 
 				+ (double) dy + m, this.getCubePosition()[2] + (double) dz + m};
 		//isMoving = true;
-			status = MOVING;
+			status = Status.MOVING;
 			setWalkingSpeed(dz);
 		
 //		while ((getDistance(targetPosition, startPosition)-getDistance(startPosition, currentPosition))>0 && !(isDodging || isDefending)) {
@@ -709,7 +723,7 @@ public boolean isNeighbouringCube(double[] cubePosition) {
 ///**
 // * Return the center of a cube.
 // * @param cubePosition
-// * 		A position in the cube of which the center shall be computed.
+// * 		The position of the cube.
 // * @return
 // */
 //
@@ -750,7 +764,7 @@ private double walkingSpeed = 0;
 private boolean isSprinting = false;
 	
 public void startSprinting(){
-	if (status == MOVING && getStaminaPoints() >0)
+	if (status == Status.MOVING && getStaminaPoints() >0)
 		isSprinting = true;
 	else
 		isSprinting = false;
@@ -787,24 +801,24 @@ public void moveTo (double [] targetPosition) throws IllegalArgumentException {
 			&& Util.fuzzyEquals(this.getPosition()[2],targetPosition[2]))) {
 		if (Util.fuzzyEquals(targetPosition[0]-this.getPosition()[0],0))
 			x= 0;
-		else if (Math.signum(getTargetPosition()[0]-this.getPosition()[0])==-1)
+		else if (Math.signum(targetPosition[0]-this.getPosition()[0])==-1)
 			x= -1;
 		else
 			x = 1;
 		if (Util.fuzzyEquals(targetPosition[1]-this.getPosition()[1],0))
 			y=0;
-		else if (Math.signum(getTargetPosition()[1]-this.getPosition()[1])==-1)
+		else if (Math.signum(targetPosition[1]-this.getPosition()[1])==-1)
 			y= -1;
 		else
 			y= 1;
 		if (Util.fuzzyEquals(targetPosition[2]-this.getPosition()[2],0))
 			z= 0;
-		else if (Math.signum(getTargetPosition()[2]-this.getPosition()[2])==-1)
+		else if (Math.signum(targetPosition[2]-this.getPosition()[2])==-1)
 			z= -1;
 		else
 			z= 1;
-		if (status != INITIAL_RESTING)
-		status = NOT_MOVING;
+		if (status != Status.INITIAL_RESTING)
+		status = Status.NOT_MOVING;
 		moveToAdjacent(x,y,z);
 	}	
 }
@@ -815,8 +829,8 @@ public void moveTo (double [] targetPosition) throws IllegalArgumentException {
 private float workingTime;
 
 public void work() {
-	if (status != MOVING && status != INITIAL_RESTING)
-		status = WORKING;
+	if (status != Status.MOVING && status != Status.INITIAL_RESTING)
+		status = Status.WORKING;
 		workingTime = (float) 500.0/this.getStrength();
 }
 
@@ -824,21 +838,21 @@ private boolean isUnderAttack = false;
 
 public void attack(Unit other) throws IllegalArgumentException {
 	//other.isUnderAttack = true; // gaat niet zomaar want private!
-	if (!this.getCubePosition().isNeighbouringCube(other.getCubePosition())
+	if (!this.getCubePosition().isNeighbouringCube(other.getCubePosition()))
 			throw new IllegalArgumentException();
-	if (status != MOVING)
-		status = ATTACKING;
+	if (status != Status.MOVING)
+		status = Status.ATTACKING;
 		this.setOrientation((float) Math.atan2(other.getPosition()[1]-this.getPosition()[1],other.getPosition()[0]-this.getPosition()[0]));
 	
 		other.defend(this);
 }
 
 public void defend(Unit unit){
-	previousStatus = this.status.clone()
-	status = DEFENDING;
+	Status previousStatus = this.status;
+	status = Status.DEFENDING;
 	setOrientation((float) Math.atan2(unit.getPosition()[1]-this.getPosition()[1],unit.getPosition()[0]-this.getPosition()[0]));
 	if( new Random().nextDouble() <= 0.20*(this.getAgility()/unit.getAgility()))
-		try{moveToAdjacent(-1+nextInt(int 3),-1+nextInt(int 3),-1+nextInt(int 3));
+		try{moveToAdjacent(-1+java.util.Random.nextInt(int 3),-1+Random.nextInt(int 3),-1+Random().nextInt(int 3));
 		} catch (IllegalArgumentException exc) {
 			defend(unit);
 		}
@@ -846,22 +860,49 @@ public void defend(Unit unit){
 		
 	if( new Random().nextDouble() <= 0.25*((this.getStrength()+this.getAgility())/(unit.getStrength()+unit.getAgility())))
 		
-	else
-		double newHitPoints = this.getHitpoints()-unit.getStrength()/10.0
+	else {
+		double newHitPoints = this.getHitpoints()-unit.getStrength()/10.0;
 		if (newHitPoints >0)
 			this.setHitPoints(newHitPoints);
 		else
-			this.setHitPoints(0.0);
-	if (previousStatus = MOVING)
-		status = MOVING;
+			this.setHitPoints(0.0);}
+	if (previousStatus == Status.MOVING)
+		status = Status.MOVING;
 		moveTo(targetPosition);
 }
 
 public void rest(){
-	if (status != MOVING)
-		status = INITIAL_RESTING;
+	if (mustRest() || canRest()){
+		long startTime = System.currentTimeMillis();
+		recoveredHitpoints = 0.0;
+		if (this.getHitpoints() < max_nbPoints())
+			status = Status.INITIAL_RESTING;
+		while (status == Status.INITIAL_RESTING && this.getHitpoints() < max_nbPoints() && recoveredHitpoints < 1.0)
+			advanceTime((float) 0.2);
+		status = Status.RESTING;
+		while (status == Status.RESTING)
+			advanceTime((float) 0.2);
+			
+	}
 }
 
+long startTime = System.currentTimeMillis();
+long currentTime = System.currentTimeMillis();
+
+public boolean mustRest() {
+	currentTime = System.currentTimeMillis();
+	if (Util.fuzzyGreaterThanOrEqualTo(currentTime -startTime, 3000))
+		return true;
+	return false;
+}
+
+public boolean canRest(){
+	if (status == Status.DEFAULT)
+		return true;
+	return false;
+}
+
+private double recoveredHitpoints = 0.0;
 /**
  * Symbolic constant registering the fixed number of cubes in direction x.
  */
@@ -875,6 +916,10 @@ private static int Y = 50;
 /**
  * Symbolic constant registering the fixed number of cubes in direction z.
  */
-private static int Z = 50; //p72
+private static int Z = 50; //p727
+
+public boolean canWork() {
+	
+}
 
 }
