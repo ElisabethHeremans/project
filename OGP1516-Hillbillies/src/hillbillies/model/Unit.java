@@ -461,7 +461,7 @@ private void setOrientation(float orientation) {
 	 */
 	@Basic @Raw
 	public double[] getPosition() {
-		return position;
+		return this.position;
 	}
 	
 	public static double[] getPosition(int[] cubePosition){
@@ -847,9 +847,9 @@ public void moveTo (double [] targetPosition) throws IllegalArgumentException {
 		}
 	}
 	}
-
+// ik heb hier de && vervangen door || aangezien een status niet meerdere dingen tegelijk kan zijn
 public boolean canMove() {
-	if (status == Status.RESTING && status == Status.MOVING)
+	if (status == Status.RESTING || status == Status.MOVING || status == Status.DONE)
 		return true;
 	return false;
 }
@@ -874,7 +874,7 @@ public void work() {
 
 
 public void attack(Unit other) throws IllegalArgumentException {
-	if (!this.getCubePosition().isNeighbouringCube(other.getCubePosition()))
+	if (!isNeighbouringCube(other.getCubePosition()))
 			throw new IllegalArgumentException();
 	if (status != Status.MOVING)
 		status = Status.ATTACKING;
@@ -887,15 +887,16 @@ public void defend(Unit unit){
 	Status previousStatus = this.status;
 	status = Status.DEFENDING;
 	setOrientation((float) Math.atan2(unit.getPosition()[1]-this.getPosition()[1],unit.getPosition()[0]-this.getPosition()[0]));
-	if( new Random().nextDouble() <= 0.20*(this.getAgility()/unit.getAgility()))
-		try{moveToAdjacent(-1+java.util.Random.nextInt(int 3),-1+Random.nextInt(int 3),-1+Random().nextInt(int 3));
+	if( new Random().nextDouble() <= 0.20*(this.getAgility()/unit.getAgility())){
+		try{moveToAdjacent  (-1+(new Random().nextInt(3)),-1+(new Random().nextInt(3)),-1+(new Random().nextInt(3)));
 		} catch (IllegalArgumentException exc) {
 			defend(unit);
 		}
+		status = Status.DONE;}
 	
 		
 	if( new Random().nextDouble() <= 0.25*((this.getStrength()+this.getAgility())/(unit.getStrength()+unit.getAgility())))
-		
+		status = Status.DONE;
 	else {
 		double newHitPoints = this.getHitpoints()-unit.getStrength()/10.0;
 		if (newHitPoints >0)
@@ -934,7 +935,7 @@ public boolean mustRest() {
 }
 
 public boolean canRest(){
-	if (status == Status.DEFAULT)
+	if (status == Status.DEFAULT || status == Status.DONE)
 		return true;
 	return false;
 }
@@ -956,9 +957,27 @@ private static int Y = 50;
 private static int Z = 50; //p727
 
 public boolean canWork() {
-	if (status != Status.MOVING && status != Status.INITIAL_RESTING && status != Status.ATTACKING)
+	if (status != Status.MOVING && status != Status.INITIAL_RESTING && status != Status.ATTACKING || status == Status.DONE)
 		return true;
 	return false;
+}
+
+public void startDefaultBehaviour(){
+	if (status == Status.MOVING && isSprinting == false && new Random().nextDouble() <= 0.5)
+		startSprinting();
+		
+	int i = new Random().nextInt(3);
+	if (i == 0)
+		moveTo(new double[] {(new Random().nextDouble())*50,(new Random().nextDouble())*50,(new Random().nextDouble())*50 });
+	if (i==1)
+		work();
+	if (i == 2)
+		rest();
+	
+}
+
+public void stopDefaultBehaviour() {
+	status = Status.DONE;
 }
 
 }
