@@ -1,5 +1,6 @@
 package hillbillies.part1.facade;
 
+import hillbillies.model.Status;
 import hillbillies.model.Unit;
 import ogp.framework.util.ModelException;
 
@@ -10,7 +11,7 @@ public class Facade implements IFacade {
 	public Unit createUnit(String name, int[] initialPosition, int weight, int agility, int strength, int toughness,
 			boolean enableDefaultBehavior) throws ModelException {
 		try{
-			Unit(name,Unit.getPosition(initialPosition), weight,  agility, strength,toughness,enableDefaultBehavior);
+			return new Unit(name,Unit.getPosition(initialPosition), weight,  agility, strength,toughness,enableDefaultBehavior);
 		}
 		catch (NullPointerException exc) {
 			throw new ModelException();
@@ -150,129 +151,238 @@ public class Facade implements IFacade {
 
 	@Override
 	public int getMaxHitPoints(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
-		return 0;
+		try{
+			return (int) unit.max_nbPoints();
+		}
+		catch (NullPointerException exc){
+			throw new ModelException();
+		}
 	}
 
 	@Override
 	public int getCurrentHitPoints(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
-		return 0;
+		try{
+			return (int) unit.getHitpoints();
+		}
+		catch (NullPointerException exc){
+			throw new ModelException();
+		}
 	}
 
 	@Override
 	public int getMaxStaminaPoints(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
-		return 0;
+		try{
+			return (int) unit.max_nbPoints();
+		}
+		catch (NullPointerException exc){
+			throw new ModelException();
+		}
 	}
 
 	@Override
 	public int getCurrentStaminaPoints(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
-		return 0;
+		try{
+			return (int) unit.getStaminaPoints();
+		}
+		catch (NullPointerException exc){
+			throw new ModelException();
+		}
 	}
 
 	@Override
 	public void advanceTime(Unit unit, double dt) throws ModelException {
-		// TODO Auto-generated method stub
-		
+		try{
+			unit.advanceTime((float)dt); 
+		}
+		catch (NullPointerException exc){
+			
+			exc.printStackTrace();
+			throw new ModelException();
+
+		}
+		catch (IllegalArgumentException exc){
+			throw new ModelException();
+		}
 	}
 
 	@Override
 	public void moveToAdjacent(Unit unit, int dx, int dy, int dz) throws ModelException {
-		// TODO Auto-generated method stub
-		
+		try{
+			unit.moveToAdjacent(dx, dy, dz);
+		}
+		catch (NullPointerException exc){
+			throw new ModelException();
+		}
+		catch (IllegalArgumentException exc){
+			throw new ModelException();
+		}
 	}
 
 	@Override
 	public double getCurrentSpeed(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
-		return 0;
+		try{
+			return unit.getCurrentSpeed();
+		}
+		catch (NullPointerException exc){
+			throw new ModelException();
+		}
+		
 	}
 
 	@Override
 	public boolean isMoving(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
-		return false;
+		try{
+			return unit.status == Status.MOVING;
+		}
+		catch (NullPointerException exc){
+			throw new ModelException();
+		}
+		
 	}
 
 	@Override
 	public void startSprinting(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
-		
+		try{
+			unit.startSprinting();
+		}
+		catch (NullPointerException exc){
+			throw new ModelException();
+		}
+			
 	}
 
 	@Override
 	public void stopSprinting(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
-		
+		try{
+			unit.stopSprinting();
+		}
+		catch (NullPointerException exc){
+			throw new ModelException();
+		}
+				
 	}
 
 	@Override
 	public boolean isSprinting(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
-		return false;
-	}
+		try{
+			return unit.isSprinting;
+		}
+		catch (NullPointerException exc){
+			throw new ModelException();
+		}
+			}
 
 	@Override
 	public double getOrientation(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
+		try{
+			return (double) unit.getOrientation();
+		}
+		catch (NullPointerException exc){
+			throw new ModelException();
+		}
 		
-		return 0;
 	}
 
 	@Override
 	public void moveTo(Unit unit, int[] cube) throws ModelException {
-		// TODO Auto-generated method stub
-		
+		try{
+			unit.moveTo(cube);
+		}
+		catch (NullPointerException exc){
+			throw new ModelException();
+		}
+		catch (IllegalArgumentException exc){
+			throw new ModelException();
+		}		
 	}
 
 	@Override
 	public void work(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
-		
-	}
+		try{
+			unit.work();
+		}
+		catch (NullPointerException exc){
+			throw new ModelException();
+		}
+			
+		}
 
 	@Override
 	public boolean isWorking(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
-		return false;
+		try{
+			return unit.status == Status.WORKING;
+		}
+		catch (NullPointerException exc){
+			throw new ModelException();
+		}
+		
 	}
 
 	@Override
 	public void fight(Unit attacker, Unit defender) throws ModelException {
-		// TODO Auto-generated method stub
-		
+		try{
+			attacker.attack(defender);
+			//defender.defend(attacker);
+		}
+		catch (NullPointerException exc){
+			throw new ModelException();
+		}
+		catch (IllegalArgumentException exc){
+			throw new ModelException();
+		}			
 	}
 
 	@Override
 	public boolean isAttacking(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
-		return false;
+		try{
+			return unit.status == Status.ATTACKING;
+		}
+		catch (NullPointerException exc){
+			throw new ModelException();
+		}
+		
 	}
 
 	@Override
 	public void rest(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
+		try{
+			unit.rest();
+		}
+		catch (NullPointerException exc){
+			throw new ModelException();
+		}
+			
 		
 	}
 
 	@Override
 	public boolean isResting(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
-		return false;
+		try{
+			return unit.status == Status.RESTING;
+		}
+		catch (NullPointerException exc){
+			throw new ModelException();
+		}
 	}
 
 	@Override
 	public void setDefaultBehaviorEnabled(Unit unit, boolean value) throws ModelException {
-		// TODO Auto-generated method stub
-		
+		try{
+			unit.setEnableDefaultBehaviour(value);
+		}
+		catch (NullPointerException exc){
+			throw new ModelException();
+		}		
 	}
 
 	@Override
 	public boolean isDefaultBehaviorEnabled(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
-		return false;
+		try{
+			return unit.isEnableDefaultBehaviour();
+		}
+		catch (NullPointerException exc){
+			throw new ModelException();
+		}
 	}
 	
 }

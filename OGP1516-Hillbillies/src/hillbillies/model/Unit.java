@@ -37,8 +37,8 @@ import ogp.framework.util.Util;
 public class Unit { 
 	
 	/**
-	 * Initialize this new unit with a given name, weight, strength, 
-	 * agility, toughness, position, hitpoints, staminapoints and an orientation.
+	 * Initialize this new unit with a given name, position, weight, strength, 
+	 * agility, toughness, state of default behaviour, hitpoints, staminapoints and an orientation.
 	 * @param name
 	 * 		The name for this new Unit.
 	 * @param weight
@@ -49,6 +49,8 @@ public class Unit {
 	 * 		The agility for this new Unit.
 	 * @param toughness
 	 * 		The toughness for this new Unit.
+	 * @param enableDefaultBehavior
+	 * 		The state of default behaviour for this new Unit.
 	 * @param position
 	 * 		The position of this new Unit.
 	 * @param hitpoints
@@ -126,11 +128,12 @@ public class Unit {
 		this.setHitPoints(hitpoints);
 		this.setStaminaPoints(staminaPoints);
 		this.setName(name);
-		this.startDefaultBehaviour(); //?????
+		this.setPosition(position);
+		
 	}
 	
 	@Raw 
-	Unit(String name, double[] position, int weight, int strength, int agility, int toughness,boolean enableDefaultBehavior){
+	public Unit(String name, double[] position, int weight, int strength, int agility, int toughness,boolean enableDefaultBehavior){
 		this(name,position, weight, strength, agility, toughness, enableDefaultBehavior,0.0,0.0,(float) Math.PI/2.0);
 	}
 	
@@ -308,7 +311,8 @@ public String getName() {
  *  
  * @param  name
  *         The name to check.
- * @return 
+ * @return The given name is at least two characters long and starts with an uppercase letter. 
+ * 		   The name consists of letters, quotes and spaces.
  *       | result == !name.length()<2 && Character.isUpperCase(name.charAt(0)) 
  *       | 	&& (Character.isLetter(name.charAt(index)) || name.charAt(index)=='"' || name.charAt(index)=='\'' || name.charAt(index)==' ')
 */
@@ -317,7 +321,7 @@ public static boolean isValidName(String name) {
 		return false;
 	if (!Character.isUpperCase(name.charAt(0)))
 		return false;
-	for (int index =0; index < name.length();) {
+	for (int index =0; index < name.length() ;index++) {
 		if(!Character.isLetter(name.charAt(index)) && (!(name.charAt(index)=='"')) &&(!(name.charAt(index)=='\'')) && (!(name.charAt(index)==' ')))
 			return false;
 	}
@@ -346,6 +350,10 @@ public void setName(String name)
 	this.name = name;
 }
 
+/**
+ * A variable registering the name of this unit.
+ */
+private String name = "Unit";
 
 @Basic @Raw
 public double getHitpoints() {
@@ -365,7 +373,7 @@ public boolean canHaveAsHitpoints(double hitpoints) {
 	return hitpoints < max_nbPoints();
 }
 
-private double max_nbPoints() {
+public double max_nbPoints() {
 	return Math.ceil(200.0*(this.getWeight()/100.0)*(this.getToughness()/100.0));
 }
 
@@ -515,12 +523,9 @@ private void setOrientation(float orientation) {
 	/**
 	 * A variable registering the position of this unit.
 	 */
-	private double[] position = {0.0,0.0,0.0};
+	private double[] position = {10.0, 10.0, 0.5};
 	
-	/**
-	 * A variable registering the name of this unit.
-	 */
-	private String name = "Unit";
+
 	
 	/**
 	 * A variable registering the weight of this unit.
@@ -566,21 +571,36 @@ private void setOrientation(float orientation) {
 	/**
 	 * Update the position and activity status.
 	 * @param duration
-	 * @post The new position and activity status of a unit.
+	 * 			The game time after which advanceTime is called.
+	 * @effect If this unit must rest, the new unit shall rest.
+	 * @effect If this unit is doing nothing, but he hasn't reached his targetPosition, he shall resume moving to the targetPosition. 
+	 * @effect If this units default behaviour is enabled, and this unit is doing nothing, he shall start default behaviour.
+	 * @effect If this unit is moving, set the position of this new unit to the updated position 
+	 * 			(the old position + this unit's speed * duration) and set the orientation of this new unit to the direction in which he is going.
+	 * 			If this unit is sprinting, decrease the stamina points with one per 0.1 s. 
+	 * 				If the stamina points are equal to or less than zero, this unit stops sprinting and its stamina points are set to 0.
+	 * 			If this unit has arrived to the target position, its new position is the target position, its status is DONE and its new target position is null.
+	 * 			If this unit has arrived to the next target position (the center of the next cube), 
+	 * 				its new position is the next target position and it moves to the target position.
+	 * 			
+	 * @post If this unit is working, and if his task is not completed, the new working time is increased with duration, and the progress is updated.
+	 * 			Else if the unit is working and the task is completed, the new status is DONE.
+	 * 
+	 * @effect If this unit is working
 	 * @throws IllegalArgumentException
 	 * 		If the duration is less than zero or exceeds or equals 0.2 s.
 	 */
 	public void advanceTime(float duration) throws IllegalArgumentException{
 		if(duration<0 || duration>= 0.2)
-			throw new IllegalArgumentException(); 
+			throw new IllegalArgumentException();
+		restTimer += duration;
 		if (mustRest())
 			rest();
-		if (status == Status.DONE && targetPosition != null)
+		if (status == Status.DONE && targetPosition != null && !this.isEnableDefaultBehaviour())
 			moveTo(targetPosition);
-		else if (status == Status.DONE)
+		if (this.isEnableDefaultBehaviour() && status == Status.DONE)
 			startDefaultBehaviour();
-		
-		if (status == Status.MOVING) {
+		else if (status == Status.MOVING) {
 			double d = getDistance(getCubeCentre(targetPosition),this.getPosition());
 			double[] v = new double[] {getCurrentSpeed()*(nextTargetPosition[0]-this.getPosition()[0])/d,
 					getCurrentSpeed()*(nextTargetPosition[1]-this.getPosition()[1])/d,
@@ -602,23 +622,27 @@ private void setOrientation(float orientation) {
 			if (getDistance(targetPosition, startPosition)-getDistance(startPosition, this.getPosition())<0){
 				setPosition(targetPosition);
 				targetPosition = null;
-			}
-			else if (getDistance(nextTargetPosition, startPosition)-getDistance(startPosition, this.getPosition())<0)
-				setPosition(nextTargetPosition);
-				moveTo(targetPosition);
 				status = Status.DONE;
+				
+			}
+			else if (getDistance(nextTargetPosition, startPosition)-getDistance(startPosition, this.getPosition())<0){
+				setPosition(nextTargetPosition);
+				
+				moveTo(targetPosition);
+			}
 		}
 				
-		if (status == Status.WORKING)
+		else if (status == Status.WORKING){
 			if (workingTime < totalWorkingTime){
 				workingTime += duration;
 				progressWork = workingTime/totalWorkingTime;}
 			else 
 			{
-				progressWork = 100;
+				progressWork = (float) 1.0;
 				status = Status.DONE;
 			}
-		if (status == Status.INITIAL_RESTING)
+		}
+		else if (status == Status.INITIAL_RESTING){
 			
 			if (recoveredHitpoints >= 1.0 || this.getHitpoints() >= max_nbPoints()){
 				this.setHitPoints(max_nbPoints());
@@ -628,8 +652,9 @@ private void setOrientation(float orientation) {
 				this.setHitPoints((getToughness()/200.0)*5*duration+getHitpoints());
 				recoveredHitpoints += (getToughness()/200.0)*5*duration;
 			}
+		}
 		
-		if (status == Status.RESTING){
+		else if (status == Status.RESTING){
 			if (this.getHitpoints()<max_nbPoints())
 				this.setHitPoints((getToughness()/200.0)*5*duration+getHitpoints());
 			else if (this.getStaminaPoints() < max_nbPoints()){
@@ -641,11 +666,13 @@ private void setOrientation(float orientation) {
 				status = Status.DONE;
 			}
 		}
-		if (status == Status.ATTACKING){
+		else if (status == Status.ATTACKING){
 			attackTimer += duration;
 			if (attackTimer >=1.0)
 				status = Status.DONE;
 		}
+		
+		
 		
 		
 	}
@@ -667,23 +694,15 @@ private void setOrientation(float orientation) {
 			throw new IllegalArgumentException();
 		if (!isValidPosition(new double[] {getPosition()[0]+(double)dx,getPosition()[1]+(double)dy,getPosition()[2]+(double)dz}))
 			throw new IllegalArgumentException();
-		if (status != Status.MOVING)
-			double m = 0.5;
-			startPosition = new double[] this.getPosition(); //is het nu gekopieerd? of referentie naar hetzelfde?
-		//double[] currentPosition = this.getPosition();
-			nextTargetPosition = new double[] {this.getCubePosition()[0] + (double) dx + m, this.getCubePosition()[1] 
-				+ (double) dy + m, this.getCubePosition()[2] + (double) dz + m};
-		//isMoving = true;
+		if (canMove()){
 			status = Status.MOVING;
+			double[] startPosition = new double[] {this.getPosition()[0],this.getPosition()[1],this.getPosition()[2]};
+		//double[] currentPosition = this.getPosition();
+			nextTargetPosition = getCubeCentre(new double[] {this.getCubePosition()[0] + (double) dx , this.getCubePosition()[1] 
+				+ (double) dy , this.getCubePosition()[2] + (double) dz });
 			setWalkingSpeed(dz);
-		
-//		while ((getDistance(targetPosition, startPosition)-getDistance(startPosition, currentPosition))>0 && !(isDodging || isDefending)) {
-//			advanceTime(duration);
-//			currentPosition = this.getPosition();
-		
-		
-//		if ((getDistance(targetPosition, startPosition)-getDistance(startPosition, currentPosition))<0)
-//			setPosition(targetPosition);
+		}
+
 	}
 
 	
@@ -694,7 +713,7 @@ private void setOrientation(float orientation) {
 	private double [] targetPosition;
 	private double[] nextTargetPosition;
 	//private boolean isMoving = false;
-	private Status status;
+	public Status status = Status.DONE;
 	
 	public double getDistance(double[] targetPosition, double[] startPosition) {
 		return Math.sqrt(Math.pow(targetPosition[0]-startPosition[0],2.0)
@@ -776,20 +795,6 @@ public double[] getCubeCentre(double[] cubePosition) {
 	return new double[] {cubePosition[0]+0.5,cubePosition[1]+0.5,cubePosition[2]+0.5};
 
 }
-//
-///**
-// * Variable registering the targetPosition of this unit.
-// */
-//private double[] targetPosition;
-
-//public double getWalkingSpeed() {
-//		
-//	if (Util.fuzzyEquals(getTargetPosition()[2]-this.getPosition()[2],-1.0))
-//		return 0.5*getBaseSpeed();
-//	if (Util.fuzzyEquals(getTargetPosition()[2]-this.getPosition()[2],1.0))
-//		return 1.2*getBaseSpeed();
-//	return getBaseSpeed();
-//}
 
 private void setWalkingSpeed(int dz) {
 	if (dz == -1)
@@ -806,7 +811,7 @@ public double getWalkingSpeed() {
 
 private double walkingSpeed = 0;
 	
-private boolean isSprinting = false;
+public boolean isSprinting = false;
 	
 public void startSprinting(){
 	if (status == Status.MOVING && getStaminaPoints() >0)
@@ -830,21 +835,26 @@ public void stopSprinting(){
  *             A precondition was violated or an exception was thrown.
  */
 public double getCurrentSpeed() {
-	if (isSprinting)
-		return 2.0*getWalkingSpeed();
-	return getWalkingSpeed();
+	if (status != Status.MOVING){
+		return 0.0;
+	}
+	else{
+		if (isSprinting)
+			return 2.0*getWalkingSpeed();
+		return getWalkingSpeed();
+	}
 }
 
 public void moveTo (double [] targetPosition) throws IllegalArgumentException {
 	if (! isValidPosition(targetPosition))
-		throw new IllegalArgumentException(); 
+		throw new IllegalArgumentException();
+	
 	if (canMove()){
+		status = Status.IN_CENTER;
 		int x = 0;
 		int y = 0;
 		int z = 0;
-		while ( !(Util.fuzzyEquals(this.getPosition()[0],targetPosition[0]) 
-				&& Util.fuzzyEquals(this.getPosition()[1],targetPosition[1]) 
-				&& Util.fuzzyEquals(this.getPosition()[2],targetPosition[2]))) {
+		
 			if (Util.fuzzyEquals(targetPosition[0]-this.getPosition()[0],0))
 				x= 0;
 			else if (Math.signum(targetPosition[0]-this.getPosition()[0])==-1)
@@ -864,18 +874,22 @@ public void moveTo (double [] targetPosition) throws IllegalArgumentException {
 			else
 				z= 1;
 			moveToAdjacent(x,y,z);
-		}
+		
 	}
 	}
-// ik heb hier de && vervangen door || aangezien een status niet meerdere dingen tegelijk kan zijn
+
+public void moveTo (int[] cubePosition) throws IllegalArgumentException {
+	moveTo(new double[] {(double)cubePosition[0]+0.5,(double)cubePosition[1]+0.5,(double)cubePosition[2]+0.5});
+}
+
 public boolean canMove() {
-	if (status == Status.RESTING || status == Status.MOVING || status == Status.DONE)
+	if (status == Status.RESTING || status == Status.DONE || status == Status.IN_CENTER)
 		return true;
 	return false;
 }
 
 
-
+private double restTimer;
 
 private float workingTime;
 private float totalWorkingTime;
@@ -886,7 +900,7 @@ public void work() {
 		status = Status.WORKING;
 		workingTime = (float) 0.0;
 		totalWorkingTime = (float) 500.0/this.getStrength();
-		progressWork = workingTime/totalWorkingTime;
+		progressWork = (float) 0.0;
 	
 }
 
@@ -937,31 +951,24 @@ public void defend(Unit unit){
 
 public void rest(){
 	if (mustRest() || canRest()){
-		long startTime = System.currentTimeMillis();
+		restTimer = 0.0;
 		recoveredHitpoints = 0.0;
-		
 		if (this.getHitpoints() < max_nbPoints())
 			status = Status.INITIAL_RESTING;
 		else
-			status = Status.RESTING;
-		
-			
+			status = Status.RESTING;	
 	}
 }
 
-long startTime = System.currentTimeMillis();
-long currentTime = System.currentTimeMillis();
-
 public boolean mustRest() {
-	currentTime = System.currentTimeMillis();
-	if (Util.fuzzyGreaterThanOrEqualTo(currentTime -startTime, 3000) || Util.fuzzyLessThanOrEqualTo(this.getStaminaPoints(),0) 
-			||Util.fuzzyLessThanOrEqualTo(this.getHitpoints(),0))
+	
+	if (restTimer >=180 || this.getStaminaPoints()<= 0 ||this.getHitpoints()<=0)
 		return true;
 	return false;
 }
 
 public boolean canRest(){
-	if (status == Status.DONE)
+	if (status == Status.DONE || status == Status.RESTING || status == Status.WORKING || status == Status.IN_CENTER)
 		return true;
 	return false;
 }
@@ -983,27 +990,55 @@ private static int Y = 50;
 private static int Z = 50; //p727
 
 public boolean canWork() {
-	if (status != Status.MOVING && status != Status.INITIAL_RESTING && status != Status.ATTACKING || status == Status.DONE)
+	if (status != Status.MOVING && status != Status.INITIAL_RESTING && status != Status.ATTACKING)
 		return true;
 	return false;
 }
 
 public void startDefaultBehaviour(){
-	if (status == Status.MOVING && isSprinting == false && new Random().nextDouble() <= 0.5)
-		startSprinting();
-		
-	int i = new Random().nextInt(3);
-	if (i == 0)
-		moveTo(new double[] {(new Random().nextDouble())*50,(new Random().nextDouble())*50,(new Random().nextDouble())*50 });
-	if (i==1)
-		work();
-	if (i == 2)
-		rest();
+	if (status == Status.DONE){
+		enableDefaultBehaviour = true;
+		int i = new Random().nextInt(4);
+		if (i == 0){
+			status = Status.MOVING;
+			startSprinting();
+			moveTo(new double[] {(new Random().nextDouble())*50,(new Random().nextDouble())*50,(new Random().nextDouble())*50 });
+		}
+		if (i==1){
+			status = Status.MOVING;
+			stopSprinting();
+			moveTo(new double[] {(new Random().nextDouble())*50,(new Random().nextDouble())*50,(new Random().nextDouble())*50 });
+		}
+		if (i==2)
+			work();
+		if (i == 3)
+			rest();
+	}
+	else
+		enableDefaultBehaviour= false;
 	
 }
 
 public void stopDefaultBehaviour() {
+	enableDefaultBehaviour = false;
 	status = Status.DONE;
 }
+private boolean enableDefaultBehaviour;
+
+/**
+ * @return the enableDefaultBehaviour
+ */
+public boolean isEnableDefaultBehaviour() {
+	return enableDefaultBehaviour;
+}
+
+/**
+ * @param enableDefaultBehaviour the enableDefaultBehaviour to set
+ */
+public void setEnableDefaultBehaviour(boolean enableDefaultBehaviour) {
+	this.enableDefaultBehaviour = enableDefaultBehaviour;
+}
+
+
 
 }
