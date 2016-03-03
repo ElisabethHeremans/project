@@ -575,7 +575,12 @@ private void setOrientation(float orientation) {
 			throw new IllegalArgumentException(); 
 		if (mustRest())
 			rest();
-		if (status == Status.MOVING) 
+		if (status == Status.DONE && targetPosition != null)
+			moveTo(targetPosition);
+		else if (status == Status.DONE)
+			startDefaultBehaviour();
+		
+		if (status == Status.MOVING) {
 			double d = getDistance(getCubeCentre(targetPosition),this.getPosition());
 			double[] v = new double[] {getCurrentSpeed()*(nextTargetPosition[0]-this.getPosition()[0])/d,
 					getCurrentSpeed()*(nextTargetPosition[1]-this.getPosition()[1])/d,
@@ -583,22 +588,27 @@ private void setOrientation(float orientation) {
 			
 			setPosition(new double[] {this.getPosition()[0]+v[0]*duration,this.getPosition()[1]+v[1]*duration,this.getPosition()[2]+v[2]*duration});
 			setOrientation((float) Math.atan2(v[1],v[0]));
-			if (isSprinting)
+			if (isSprinting){
 	
 				if (Util.fuzzyLessThanOrEqualTo(this.getStaminaPoints()-10.0*duration,0.0)){
 					setStaminaPoints(0.0);
-					stopSprinting();}
+					stopSprinting();
+					}
 				else{
 					setStaminaPoints(this.getStaminaPoints()-10.0*duration);
-					startSprinting();}
-			advanceTime(duration); //????
-					
-			
+					startSprinting();
+					}
+			}
+			if (getDistance(targetPosition, startPosition)-getDistance(startPosition, this.getPosition())<0){
+				setPosition(targetPosition);
+				targetPosition = null;
+			}
+			else if (getDistance(nextTargetPosition, startPosition)-getDistance(startPosition, this.getPosition())<0)
+				setPosition(nextTargetPosition);
+				moveTo(targetPosition);
+				status = Status.DONE;
+		}
 				
-		if (getDistance(nextTargetPosition, startPosition)-getDistance(startPosition, this.getPosition())<0)
-			setPosition(nextTargetPosition);
-			moveTo(targetPosition);
-			// of default behaviour?
 		if (status == Status.WORKING)
 			if (workingTime < totalWorkingTime){
 				workingTime += duration;
@@ -606,24 +616,35 @@ private void setOrientation(float orientation) {
 			else 
 			{
 				progressWork = 100;
-				startDefaultBehaviour();
+				status = Status.DONE;
 			}
-		if (Util.fuzzyEquals(getStaminaPoints(),0.0) || Util.fuzzyEquals(getHitpoints(),0.0))
-			rest();
-		
-		
-				
 		if (status == Status.INITIAL_RESTING)
-			this.setHitPoints((getToughness()/200.0)*5*duration+getHitpoints());
-			recoveredHitpoints += (getToughness()/200.0)*5*duration;
+			
+			if (recoveredHitpoints >= 1.0 || this.getHitpoints() >= max_nbPoints()){
+				this.setHitPoints(max_nbPoints());
+				status = Status.RESTING;
+			}
+			else{
+				this.setHitPoints((getToughness()/200.0)*5*duration+getHitpoints());
+				recoveredHitpoints += (getToughness()/200.0)*5*duration;
+			}
 		
 		if (status == Status.RESTING){
 			if (this.getHitpoints()<max_nbPoints())
 				this.setHitPoints((getToughness()/200.0)*5*duration+getHitpoints());
-			else if (this.getStaminaPoints() < max_nbPoints())
+			else if (this.getStaminaPoints() < max_nbPoints()){
+				this.setHitPoints(max_nbPoints());
 				this.setStaminaPoints((getToughness()/100.0)*5*duration+getStaminaPoints());
-			else
-				startDefaultBehaviour();
+			}
+			else{
+				this.setStaminaPoints(max_nbPoints());
+				status = Status.DONE;
+			}
+		}
+		if (status == Status.ATTACKING){
+			attackTimer += duration;
+			if (attackTimer >=1.0)
+				status = Status.DONE;
 		}
 		
 		
@@ -647,7 +668,6 @@ private void setOrientation(float orientation) {
 		if (!isValidPosition(new double[] {getPosition()[0]+(double)dx,getPosition()[1]+(double)dy,getPosition()[2]+(double)dz}))
 			throw new IllegalArgumentException();
 		if (status != Status.MOVING)
-			float duration = (float) 0.1;
 			double m = 0.5;
 			startPosition = new double[] this.getPosition(); //is het nu gekopieerd? of referentie naar hetzelfde?
 		//double[] currentPosition = this.getPosition();
@@ -745,17 +765,17 @@ public boolean isNeighbouringCube(double[] cubePosition) {
 //	return new double[] {Math.floor(this.getTargetPosition()[0]),Math.floor(this.getTargetPosition()[1]),Math.floor(this.getTargetPosition()[2])};
 //}
 //
-///**
-// * Return the center of a cube.
-// * @param cubePosition
-// * 		The position of the cube.
-// * @return
-// */
-//
-//public double[] getCubeCentre(double[] cubePosition) {
-//	return new double[] {cubePosition[0]+0.5,cubePosition[1]+0.5,cubePosition[2]+0.5};
-//
-//}
+/**
+ * Return the center of a cube.
+ * @param cubePosition
+ * 		The position of the cube.
+ * @return
+ */
+
+public double[] getCubeCentre(double[] cubePosition) {
+	return new double[] {cubePosition[0]+0.5,cubePosition[1]+0.5,cubePosition[2]+0.5};
+
+}
 //
 ///**
 // * Variable registering the targetPosition of this unit.
@@ -867,8 +887,7 @@ public void work() {
 		workingTime = (float) 0.0;
 		totalWorkingTime = (float) 500.0/this.getStrength();
 		progressWork = workingTime/totalWorkingTime;
-	while (status == Status.WORKING)
-		advanceTime((float) 0.2);
+	
 }
 
 
@@ -876,12 +895,21 @@ public void work() {
 public void attack(Unit other) throws IllegalArgumentException {
 	if (!isNeighbouringCube(other.getCubePosition()))
 			throw new IllegalArgumentException();
-	if (status != Status.MOVING)
+	if (canAttack()){
 		status = Status.ATTACKING;
 		this.setOrientation((float) Math.atan2(other.getPosition()[1]-this.getPosition()[1],other.getPosition()[0]-this.getPosition()[0]));
-	
 		other.defend(this);
+		attackTimer = 0.0;
+	}
 }
+public boolean canAttack(){
+	if (status != Status.MOVING)
+		return true;
+	return false;
+	
+}
+
+private double attackTimer;
 
 public void defend(Unit unit){
 	Status previousStatus = this.status;
@@ -903,22 +931,20 @@ public void defend(Unit unit){
 			this.setHitPoints(newHitPoints);
 		else
 			this.setHitPoints(0.0);}
-	if (previousStatus == Status.MOVING)
-		status = Status.MOVING;
-		moveTo(targetPosition);
+	
+	status = Status.DONE;
 }
 
 public void rest(){
 	if (mustRest() || canRest()){
 		long startTime = System.currentTimeMillis();
 		recoveredHitpoints = 0.0;
+		
 		if (this.getHitpoints() < max_nbPoints())
 			status = Status.INITIAL_RESTING;
-		while (status == Status.INITIAL_RESTING && this.getHitpoints() < max_nbPoints() && recoveredHitpoints < 1.0)
-			advanceTime((float) 0.2);
-		status = Status.RESTING;
-		while (status == Status.RESTING)
-			advanceTime((float) 0.2);
+		else
+			status = Status.RESTING;
+		
 			
 	}
 }
@@ -935,7 +961,7 @@ public boolean mustRest() {
 }
 
 public boolean canRest(){
-	if (status == Status.DEFAULT || status == Status.DONE)
+	if (status == Status.DONE)
 		return true;
 	return false;
 }
