@@ -619,6 +619,7 @@ public class Unit {
 			throw new IllegalArgumentException();
 		restTimer += duration;
 		if (mustRest())
+			restTimer = 0;
 			rest();
 		if (status == Status.DONE && targetPosition != null && !this.isEnableDefaultBehaviour())
 			moveTo(targetPosition);
@@ -646,25 +647,25 @@ public class Unit {
 			System.out.println("position " + this.getPosition()[0] +","+ this.getPosition()[1]+","+ this.getPosition()[2]);
 			System.out.println(getDistance(nextTargetPosition, startPosition)-getDistance(startPosition, this.getPosition()));
 
-			if (targetPosition != null){
-				if (getDistance(targetPosition, startPosition)-getDistance(startPosition, this.getPosition())<0){
-					setPosition(targetPosition);
-					targetPosition = null;
-					status = Status.DONE;
-				
+			if (targetPosition != null && getDistance(targetPosition, startPosition)-getDistance(startPosition, this.getPosition())<0){
+				setPosition(targetPosition);
+				targetPosition = null;
+				status = Status.DONE;
 			}
 			
 			}
 			else if (getDistance(nextTargetPosition, startPosition)-getDistance(startPosition, this.getPosition())<0){
 
 				setPosition(nextTargetPosition);
-				if (targetPosition != null)
+				if (targetPosition != null){
+					System.out.println("moveto" + targetPosition +"huidige loc" + this.getPosition());
 					moveTo(targetPosition);
+				}
 				else
 					status = Status.DONE;
 
 			}
-		}
+		
 
 		else if (status == Status.WORKING) {
 			if (workingTime < totalWorkingTime) {
@@ -762,7 +763,7 @@ public class Unit {
 	 *		|	+ Math.pow(targetPosition[1] - startPosition[1], 2.0)
 	 *		|	+ Math.pow(targetPosition[2] - startPosition[2], 2.0))
 	 */
-	public double getDistance(double[] targetPosition, double[] startPosition) {
+	public static double getDistance(double[] targetPosition, double[] startPosition) {
 		return Math.sqrt(Math.pow(targetPosition[0] - startPosition[0], 2.0)
 				+ Math.pow(targetPosition[1] - startPosition[1], 2.0)
 				+ Math.pow(targetPosition[2] - startPosition[2], 2.0));
@@ -899,8 +900,9 @@ public class Unit {
 	public void moveTo(double[] targetPosition) throws IllegalArgumentException {
 		if (!isValidPosition(targetPosition))
 			throw new IllegalArgumentException();
-
+		
 		if (canMove()) {
+			this.targetPosition = targetPosition;
 			status = Status.IN_CENTER;
 			int x = 0;
 			int y = 0;
@@ -977,7 +979,6 @@ public class Unit {
 	private double attackTimer;
 
 	public void defend(Unit unit) {
-		Status previousStatus = this.status;
 		status = Status.DEFENDING;
 		setOrientation((float) Math.atan2(unit.getPosition()[1] - this.getPosition()[1],
 				unit.getPosition()[0] - this.getPosition()[0]));
@@ -1019,14 +1020,15 @@ public class Unit {
 
 	public boolean mustRest() {
 
-		if (restTimer >= 180 || this.getStaminaPoints() <= 0 || this.getHitpoints() <= 0)
+		if (restTimer >= 180 )
 			return true;
 		return false;
 	}
 
 	public boolean canRest() {
-		if (status == Status.DONE || status == Status.RESTING || status == Status.WORKING || status == Status.IN_CENTER)
-			return true;
+		if(this.getStaminaPoints() <= 0 || this.getHitpoints() <= 0)
+			if (status == Status.DONE || status == Status.RESTING || status == Status.WORKING || status == Status.IN_CENTER)
+				return true;
 		return false;
 	}
 	/**
