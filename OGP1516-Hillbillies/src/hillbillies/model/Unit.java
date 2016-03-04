@@ -732,12 +732,29 @@ public class Unit {
 		}
 
 	}
-
+	/**
+	 * A variable registering the amount of cubes the unit needs to move in the x-direction.
+	 */
 	private int dx = 0;
+	/**
+	 * A variable registering the amount of cubes the unit needs to move in the y-direction.
+	 */
 	private int dy = 0;
+	/**
+	 * A variable registering the amount of cubes the unit needs to move in the z-direction.
+	 */
 	private int dz = 0;
+	/**
+	 * A variable registering the start position of this unit.
+	 */
 	private double[] startPosition;
+	/**
+	 * A variable registering the target position of this unit.
+	 */
 	private double[] targetPosition;
+	/**
+	 * A variable registering the next cube this unit will move to.
+	 */
 	private double[] nextTargetPosition;
 	public Status status = Status.DONE;
 
@@ -823,7 +840,10 @@ public class Unit {
 	public double getWalkingSpeed() {
 		return this.walkingSpeed;
 	}
-
+	
+	/**
+	 * A variable registering the walkingspeed of this unit.
+	 */
 	private double walkingSpeed = 0;
 
 	public boolean isSprinting = false;
@@ -921,19 +941,47 @@ public class Unit {
 		moveTo(new double[] { (double) cubePosition[0] + 0.5, (double) cubePosition[1] + 0.5,
 				(double) cubePosition[2] + 0.5 });
 	}
-
+	
+	/**
+	 * Check whether it's possible for a unit to move.
+	 * @return True only if the unit is currently resting or doing nothing or 
+	 * 			is moving and is currently in the center of a cube.
+	 * 		   | result == (status == Status.RESTING || status == Status.DONE || status == Status.IN_CENTER)
+	 */
 	public boolean canMove() {
 		if (status == Status.RESTING || status == Status.DONE || status == Status.IN_CENTER)
 			return true;
 		return false;
 	}
-
+	
+	/**
+	 * A variable registering the passed game time since the last rest.
+	 */
 	private double restTimer;
-
+	/**
+	 * A variable registering the duration that the unit is working.
+	 */
 	private float workingTime;
+	/**
+	 * A variable registering the duration that the unit must work to complete a task.
+	 */
 	private float totalWorkingTime;
+	/**
+	 * A variable registering the progress of a unit's work.
+	 */
 	private float progressWork;
-
+	
+	/**
+	 * Makes the unit work.
+	 * @post If a unit can work, his status will be updated to working.
+	 * 		 | if (canWork())
+	 *		 |	then status = Status.WORKING
+	 * @post The workingTime and the progressWork of the unit will be set on zero
+	 * 			and the totalWorkingTime will be calculated as 500 divided by the unit's strength.
+	 * 		 | workingTime = (float) 0.0
+	 *		 | totalWorkingTime = (float) 500.0 / this.getStrength()
+	 *	 	 | progressWork = (float) 0.0
+	 */
 	public void work() {
 		if (canWork())
 			status = Status.WORKING;
@@ -942,7 +990,25 @@ public class Unit {
 		progressWork = (float) 0.0;
 
 	}
-
+	
+	/**
+	 * Makes the unit attack an other unit.
+	 * @param other
+	 * 		The unit that will be attacked.
+	 * @post If the unit can attack an other unit, his status will be updated to attacking
+	 * 			and the attackTimer will be set to zero.
+	 * 		 | if (canAttack())
+	 * 		 |	then status = Status.ATTACKING && attackTimer = 0.0
+	 * @effect If the unit can attack an other unit, 
+	 * 			the orientation of the attacking will be changed so that the units face eachother
+	 * 			and the other unit will try to defend himself.
+	 * 		 | if (canAttack())
+	 * 		 |	then this.setOrientation((float) Math.atan2(other.getPosition()[1] - this.getPosition()[1],
+			 |		other.getPosition()[0] - this.getPosition()[0])) && other.defend(this).
+	 * @throws IllegalArgumentException
+	 * 			If the unit that will be attacked isn't positioned in a neighboring cube.
+	 * 			| (!isNeighbouringCube(other.getCubePosition()))
+	 */
 	public void attack(Unit other) throws IllegalArgumentException {
 		if (!isNeighbouringCube(other.getCubePosition()))
 			throw new IllegalArgumentException();
@@ -954,16 +1020,37 @@ public class Unit {
 			attackTimer = 0.0;
 		}
 	}
-
+	
+	/**
+	 * Check whether it's possible for a unit to attack.
+	 * @return True if the unit is not currently moving.
+	 * 		   | result == (status != Status.MOVING)
+	 */
 	public boolean canAttack() {
 		if (status != Status.MOVING)
 			return true;
 		return false;
 
 	}
-
+	/**
+	 * A variable registering the duration of the attack.
+	 */
 	private double attackTimer;
 
+	/**
+	 * Makes the unit defend itself against an attack of an other unit.
+	 * @param unit
+	 * 		The attacking unit.
+	 * @effect Change the orientation of the defending unit so that the two units are facing each other.
+	 * 		   | setOrientation((float) Math.atan2(unit.getPosition()[1] - this.getPosition()[1],
+	 *		   |	unit.getPosition()[0] - this.getPosition()[0]))
+	 * @effect If the unit is able to dodge, he will jump to a random neighboring cube.
+	 * 		   | if (new Random().nextDouble() <= 0.20 * (this.getAgility() / unit.getAgility()))
+	 * 		   |	then moveToAdjacent(-1 + (new Random().nextInt(3)), -1 + (new Random().nextInt(3)),
+	 * 		   |		-1 + (new Random().nextInt(3)))
+	 * @post If the unit wasn't able to dodge but he is able to block the attack,
+	 * 			the unit's status will be updated to done.
+	 */
 	public void defend(Unit unit) {
 		Status previousStatus = this.status;
 		status = Status.DEFENDING;
@@ -992,7 +1079,10 @@ public class Unit {
 
 		status = Status.DONE;
 	}
-
+	
+	/**
+	 * 
+	 */
 	public void rest() {
 		if (mustRest() || canRest()) {
 			restTimer = 0.0;
@@ -1003,14 +1093,25 @@ public class Unit {
 				status = Status.RESTING;
 		}
 	}
-
+	
+	/**
+	 * Checks whether the unit needs to rest.
+	 * @return True only if 3 minutes of game time have past or the stamina points or hitpoints or equal to zero.
+	 * 		   | result == (restTimer >= 180 || this.getStaminaPoints() <= 0 || this.getHitpoints() <= 0)
+	 */
 	public boolean mustRest() {
 
 		if (restTimer >= 180 || this.getStaminaPoints() <= 0 || this.getHitpoints() <= 0)
 			return true;
 		return false;
 	}
-
+	/**
+	 * Check whether it's possible for a unit to rest.
+	 * @return True only if the unit is currently doing nothing or is resting or 
+	 * 			working or is moving and is currently in the center of a cube.
+	 * 		   | result == (status == Status.DONE || status == Status.RESTING || 
+	 * 				status == Status.WORKING || status == Status.IN_CENTER)
+	 */
 	public boolean canRest() {
 		if (status == Status.DONE || status == Status.RESTING || status == Status.WORKING || status == Status.IN_CENTER)
 			return true;
@@ -1032,9 +1133,15 @@ public class Unit {
 
 	/**
 	 * Symbolic constant registering the fixed number of cubes in direction z.
-	 */
+	 */ 
 	private static int Z = 50; // p727
-
+	
+	/**
+	 * Check whether it's possible for a unit to work.
+	 * @return True only if the unit wasn't currently moving or 
+	 * 			wasn't initial resting or wasn't attacking an other unit.
+	 * 		   | result == (status != Status.MOVING && status != Status.INITIAL_RESTING && status != Status.ATTACKING)
+	 */
 	public boolean canWork() {
 		if (status != Status.MOVING && status != Status.INITIAL_RESTING && status != Status.ATTACKING)
 			return true;
@@ -1070,7 +1177,9 @@ public class Unit {
 		enableDefaultBehaviour = false;
 		status = Status.DONE;
 	}
-
+	/**
+	 * A boolean to check if the default behavior is enabled.
+	 */
 	private boolean enableDefaultBehaviour;
 
 	/**
