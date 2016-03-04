@@ -625,17 +625,17 @@ public class Unit {
 		if (this.isEnableDefaultBehaviour() && status == Status.DONE)
 			startDefaultBehaviour();
 		else if (status == Status.MOVING) {
-			double d = getDistance(getCubeCentre(targetPosition), this.getPosition());
-			double[] v = new double[] { getCurrentSpeed() * (nextTargetPosition[0] - this.getPosition()[0]) / d,
-					getCurrentSpeed() * (nextTargetPosition[1] - this.getPosition()[1]) / d,
-					getCurrentSpeed() * (nextTargetPosition[2] - this.getPosition()[2]) / d };
-
-			setPosition(new double[] { this.getPosition()[0] + v[0] * duration, this.getPosition()[1] + v[1] * duration,
-					this.getPosition()[2] + v[2] * duration });
-			setOrientation((float) Math.atan2(v[1], v[0]));
-			if (isSprinting) {
-
-				if (Util.fuzzyLessThanOrEqualTo(this.getStaminaPoints() - 10.0 * duration, 0.0)) {
+			double d = getDistance(getCubeCentre(nextTargetPosition),startPosition);
+			double[] v = new double[] {getCurrentSpeed()*(nextTargetPosition[0]-startPosition[0])/d,
+					getCurrentSpeed()*(nextTargetPosition[1]-startPosition[1])/d,
+					getCurrentSpeed()*(nextTargetPosition[2]-startPosition[2])/d};
+			
+			setPosition(new double[] {this.getPosition()[0]+v[0]*duration,this.getPosition()[1]+v[1]*duration,this.getPosition()[2]+v[2]*duration});
+			setOrientation((float) Math.atan2(v[1],v[0]));
+			if (isSprinting){
+	
+				if (Util.fuzzyLessThanOrEqualTo(this.getStaminaPoints()-10.0*duration,0.0)){
+			
 					setStaminaPoints(0.0);
 					stopSprinting();
 				} else {
@@ -643,16 +643,26 @@ public class Unit {
 					startSprinting();
 				}
 			}
-			if (getDistance(targetPosition, startPosition) - getDistance(startPosition, this.getPosition()) < 0) {
-				setPosition(targetPosition);
-				targetPosition = null;
-				status = Status.DONE;
+			System.out.println("position " + this.getPosition()[0] +","+ this.getPosition()[1]+","+ this.getPosition()[2]);
+			System.out.println(getDistance(nextTargetPosition, startPosition)-getDistance(startPosition, this.getPosition()));
 
-			} else if (getDistance(nextTargetPosition, startPosition)
-					- getDistance(startPosition, this.getPosition()) < 0) {
+			if (targetPosition != null){
+				if (getDistance(targetPosition, startPosition)-getDistance(startPosition, this.getPosition())<0){
+					setPosition(targetPosition);
+					targetPosition = null;
+					status = Status.DONE;
+				
+			}
+			
+			}
+			else if (getDistance(nextTargetPosition, startPosition)-getDistance(startPosition, this.getPosition())<0){
+
 				setPosition(nextTargetPosition);
+				if (targetPosition != null)
+					moveTo(targetPosition);
+				else
+					status = Status.DONE;
 
-				moveTo(targetPosition);
 			}
 		}
 
@@ -723,11 +733,11 @@ public class Unit {
 			throw new IllegalArgumentException();
 		if (canMove()) {
 			status = Status.MOVING;
-			double[] startPosition = new double[] { this.getPosition()[0], this.getPosition()[1],
-					this.getPosition()[2] };
-			// double[] currentPosition = this.getPosition();
-			nextTargetPosition = getCubeCentre(new double[] { this.getCubePosition()[0] + (double) dx,
-					this.getCubePosition()[1] + (double) dy, this.getCubePosition()[2] + (double) dz });
+			startPosition = new double[] {this.getPosition()[0],this.getPosition()[1],this.getPosition()[2]};
+
+			nextTargetPosition = getCubeCentre(new double[] {this.getCubePosition()[0] + (double) dx , this.getCubePosition()[1] 
+				+ (double) dy , this.getCubePosition()[2] + (double) dz });
+
 			setWalkingSpeed(dz);
 		}
 
@@ -796,6 +806,9 @@ public class Unit {
 				&& (Math.abs(cubePosition[1] - this.getCubePosition()[1]) <= 1);
 	}
 
+
+
+
 	/**
 	 * Return the center of a cube.
 	 * 
@@ -804,7 +817,6 @@ public class Unit {
 	 * @return The center of the given cube. | result ==
 	 *         {cubePosition[0]+0.5,cubePosition[1]+0.5,cubePosition[2]+0.5}
 	 */
-
 	public double[] getCubeCentre(double[] cubePosition) {
 		return new double[] { cubePosition[0] + 0.5, cubePosition[1] + 0.5, cubePosition[2] + 0.5 };
 
@@ -1079,10 +1091,7 @@ public class Unit {
 
 		status = Status.DONE;
 	}
-	
-	/**
-	 * 
-	 */
+
 	public void rest() {
 		if (mustRest() || canRest()) {
 			restTimer = 0.0;
