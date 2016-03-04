@@ -601,10 +601,10 @@ private void setOrientation(float orientation) {
 		if (this.isEnableDefaultBehaviour() && status == Status.DONE)
 			startDefaultBehaviour();
 		else if (status == Status.MOVING) {
-			double d = getDistance(getCubeCentre(targetPosition),this.getPosition());
-			double[] v = new double[] {getCurrentSpeed()*(nextTargetPosition[0]-this.getPosition()[0])/d,
-					getCurrentSpeed()*(nextTargetPosition[1]-this.getPosition()[1])/d,
-					getCurrentSpeed()*(nextTargetPosition[2]-this.getPosition()[2])/d};
+			double d = getDistance(getCubeCentre(nextTargetPosition),startPosition);
+			double[] v = new double[] {getCurrentSpeed()*(nextTargetPosition[0]-startPosition[0])/d,
+					getCurrentSpeed()*(nextTargetPosition[1]-startPosition[1])/d,
+					getCurrentSpeed()*(nextTargetPosition[2]-startPosition[2])/d};
 			
 			setPosition(new double[] {this.getPosition()[0]+v[0]*duration,this.getPosition()[1]+v[1]*duration,this.getPosition()[2]+v[2]*duration});
 			setOrientation((float) Math.atan2(v[1],v[0]));
@@ -619,16 +619,24 @@ private void setOrientation(float orientation) {
 					startSprinting();
 					}
 			}
-			if (getDistance(targetPosition, startPosition)-getDistance(startPosition, this.getPosition())<0){
-				setPosition(targetPosition);
-				targetPosition = null;
-				status = Status.DONE;
+			System.out.println("position " + this.getPosition()[0] +","+ this.getPosition()[1]+","+ this.getPosition()[2]);
+			System.out.println(getDistance(nextTargetPosition, startPosition)-getDistance(startPosition, this.getPosition()));
+
+			if (targetPosition != null){
+				if (getDistance(targetPosition, startPosition)-getDistance(startPosition, this.getPosition())<0){
+					setPosition(targetPosition);
+					targetPosition = null;
+					status = Status.DONE;
 				
+			}
+			
 			}
 			else if (getDistance(nextTargetPosition, startPosition)-getDistance(startPosition, this.getPosition())<0){
 				setPosition(nextTargetPosition);
-				
-				moveTo(targetPosition);
+				if (targetPosition != null)
+					moveTo(targetPosition);
+				else
+					status = Status.DONE;
 			}
 		}
 				
@@ -696,8 +704,8 @@ private void setOrientation(float orientation) {
 			throw new IllegalArgumentException();
 		if (canMove()){
 			status = Status.MOVING;
-			double[] startPosition = new double[] {this.getPosition()[0],this.getPosition()[1],this.getPosition()[2]};
-		//double[] currentPosition = this.getPosition();
+			startPosition = new double[] {this.getPosition()[0],this.getPosition()[1],this.getPosition()[2]};
+
 			nextTargetPosition = getCubeCentre(new double[] {this.getCubePosition()[0] + (double) dx , this.getCubePosition()[1] 
 				+ (double) dy , this.getCubePosition()[2] + (double) dz });
 			setWalkingSpeed(dz);
@@ -727,63 +735,13 @@ private void setOrientation(float orientation) {
 	}
 	
 
-///**
-// * Return the targetPosition of this unit.
-// */
-//@Basic @Raw
-//public double[] getTargetPosition() {
-//	return this.targetPosition;
-//}
-//
-///**
-// * Check whether the given targetPosition is a valid targetPosition for
-// * any unit.
-// *  
-// * @param  targetPosition
-// *         The targetPosition to check.
-// * @return 
-// *       | result == canHaveAsTargetPosition(targetPosition)
-//*/
-//public boolean canHaveAsTargetPosition(double[] targetPosition) {
-//	return isValidPosition(targetPosition) && isNeighbouringCube(targetPosition);
-//}
-//
-///**
-// * Set the targetPosition of this unit to the given targetPosition.
-// * 
-// * @param  targetPosition
-// *         The new targetPosition for this unit.
-// * @post   The targetPosition of this new unit is equal to
-// *         the given targetPosition.
-// *       | new.getTargetPosition() == targetPosition
-// * @throws ExceptionName_Java
-// *         The given targetPosition is not a valid targetPosition for any
-// *         unit.
-// *       | ! canHaveAsTargetPosition(getTargetPosition())
-// */
-//@Raw
-//public void setTargetPosition(double[] targetPosition) 
-//		throws IllegalArgumentException {
-//	if (! canHaveAsTargetPosition(targetPosition))
-//		throw new IllegalArgumentException();
-//	this.targetPosition = targetPosition;
-//}
-//
 public boolean isNeighbouringCube(double[] cubePosition) {
 	return (Math.abs(cubePosition[0]-this.getCubePosition()[0])<=1) 
 			&& (Math.abs(cubePosition[1]-this.getCubePosition()[1])<=1) 
 			&& (Math.abs(cubePosition[1]-this.getCubePosition()[1])<=1);
 }
-//	
-///**
-// * Return the cube of the targetPosition of this unit.
-// * @return
-// */
-//
-//public double[] getTargetCubePosition(){
-//	return new double[] {Math.floor(this.getTargetPosition()[0]),Math.floor(this.getTargetPosition()[1]),Math.floor(this.getTargetPosition()[2])};
-//}
-//
+
+
 /**
  * Return the center of a cube.
  * @param cubePosition
@@ -962,14 +920,16 @@ public void rest(){
 
 public boolean mustRest() {
 	
-	if (restTimer >=180 || this.getStaminaPoints()<= 0 ||this.getHitpoints()<=0)
+	if (restTimer >=180 )
 		return true;
 	return false;
 }
 
 public boolean canRest(){
-	if (status == Status.DONE || status == Status.RESTING || status == Status.WORKING || status == Status.IN_CENTER)
-		return true;
+	if (this.getStaminaPoints()<= 0 ||this.getHitpoints()<=0){
+		if (status == Status.DONE || status == Status.RESTING || status == Status.WORKING || status == Status.IN_CENTER)
+			return true;
+	}
 	return false;
 }
 

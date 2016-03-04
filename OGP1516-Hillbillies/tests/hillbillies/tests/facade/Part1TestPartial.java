@@ -64,10 +64,15 @@ public class Part1TestPartial {
 	public void testCorrectPosition() throws ModelException {
 		IFacade facade = new Facade();
 		Unit unit = facade.createUnit("TestUnit", new int[] { 1, 2, 3 }, 50, 50, 50, 50, false);
+		System.out.println("pos " + facade.getPosition(unit));
 		facade.moveToAdjacent(unit, 1, 0, -1);
 		double speed = facade.getCurrentSpeed(unit);
+		System.out.println("speed " + speed);		
 		double distance = Math.sqrt(2);
+		System.out.println("distance " + distance);
 		double time = distance / speed;
+		System.out.println("position " + facade.getPosition(unit));
+
 		advanceTimeFor(facade, unit, time, 0.05);
 		assertDoublePositionEquals(2.5, 2.5, 2.5, facade.getPosition(unit));
 	}
