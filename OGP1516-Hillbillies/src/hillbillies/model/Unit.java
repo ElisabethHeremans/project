@@ -576,11 +576,7 @@ public class Unit {
 	 */
 	private float orientation = (float) ((float) Math.PI / 2.0);
 
-	/**
-	 * A variable registering the duration before the units position and
-	 * activity status are updated.
-	 */
-	private float duration = 0;
+
 
 	/**
 	 * Update the position and activity status.
@@ -644,27 +640,31 @@ public class Unit {
 					startSprinting();
 				}
 			}
-			System.out.println("position " + this.getPosition()[0] +","+ this.getPosition()[1]+","+ this.getPosition()[2]);
-			System.out.println(getDistance(nextTargetPosition, startPosition)-getDistance(startPosition, this.getPosition()));
+			//System.out.println("position " + this.getPosition()[0] +","+ this.getPosition()[1]+","+ this.getPosition()[2]);
+			//System.out.println(getDistance(nextTargetPosition, startPosition)-getDistance(startPosition, this.getPosition()));
+			//System.out.println("target " + targetPosition[0] + targetPosition[1]);
 
-			if (targetPosition != null && getDistance(targetPosition, startPosition)-getDistance(startPosition, this.getPosition())<0){
+			if (targetPosition != null && startPosition != null
+					&& getDistance(targetPosition, startPosition)-getDistance(startPosition, this.getPosition())<=0.0){
 				setPosition(targetPosition);
-				targetPosition = null;
 				status = Status.DONE;
+				targetPosition = null;
 			}
 			
-			}
-			else if (getDistance(nextTargetPosition, startPosition)-getDistance(startPosition, this.getPosition())<0){
+			
+			else if (nextTargetPosition != null && getDistance(nextTargetPosition, startPosition)-getDistance(startPosition, this.getPosition())<=0.0){
 
 				setPosition(nextTargetPosition);
 				if (targetPosition != null){
-					System.out.println("moveto" + targetPosition +"huidige loc" + this.getPosition());
+					//System.out.println("moveto" + targetPosition +"huidige loc" + this.getPosition());
+					status = Status.IN_CENTER;
 					moveTo(targetPosition);
 				}
 				else
 					status = Status.DONE;
 
 			}
+		}
 		
 
 		else if (status == Status.WORKING) {
@@ -696,7 +696,8 @@ public class Unit {
 				this.setStaminaPoints(max_nbPoints());
 				status = Status.DONE;
 			}
-		} else if (status == Status.ATTACKING) {
+		} 
+		else if (status == Status.ATTACKING) {
 			attackTimer += duration;
 			if (attackTimer >= 1.0)
 				status = Status.DONE;
@@ -733,28 +734,31 @@ public class Unit {
 				getPosition()[2] + (double) dz }))
 			throw new IllegalArgumentException();
 		if (canMove()) {
-			status = Status.MOVING;
 			startPosition = new double[] {this.getPosition()[0],this.getPosition()[1],this.getPosition()[2]};
-
+			
 			nextTargetPosition = getCubeCentre(new double[] {this.getCubePosition()[0] + (double) dx , this.getCubePosition()[1] 
 				+ (double) dy , this.getCubePosition()[2] + (double) dz });
+			status = Status.MOVING;
+
+			//System.out.println("new start position " + this.getPosition()[0] +","+ this.getPosition()[1]+","+ this.getPosition()[2]);
+			//System.out.println("next target " + nextTargetPosition[0] +","+ nextTargetPosition[1]+","+ nextTargetPosition[2]);
 
 			setWalkingSpeed(dz);
 		}
 
 	}
-	/**
-	 * A variable registering the amount of cubes the unit needs to move in the x-direction.
-	 */
-	private int dx = 0;
-	/**
-	 * A variable registering the amount of cubes the unit needs to move in the y-direction.
-	 */
-	private int dy = 0;
-	/**
-	 * A variable registering the amount of cubes the unit needs to move in the z-direction.
-	 */
-	private int dz = 0;
+//	/**
+//	 * A variable registering the amount of cubes the unit needs to move in the x-direction.
+//	 */
+//	private int dx = 0;
+//	/**
+//	 * A variable registering the amount of cubes the unit needs to move in the y-direction.
+//	 */
+//	private int dy = 0;
+//	/**
+//	 * A variable registering the amount of cubes the unit needs to move in the z-direction.
+//	 */
+//	private int dz = 0;
 	/**
 	 * A variable registering the start position of this unit.
 	 */
@@ -971,7 +975,7 @@ public class Unit {
 	/**
 	 * A variable registering the passed game time since the last rest.
 	 */
-	private double restTimer;
+	private double restTimer = 0.0;
 	/**
 	 * A variable registering the duration that the unit is working.
 	 */
