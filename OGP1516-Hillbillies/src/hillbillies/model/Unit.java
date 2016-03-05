@@ -513,8 +513,8 @@ public class Unit {
 	 *         | && (0<= position[2]) && (position[2] <= Z)
 	 */
 	public static boolean isValidPosition(double[] position) {
-		return 0 <= position[0] && position[0] <= X && 0 <= position[1] && position[1] <= Y && 0 <= position[2]
-				&& position[2] <= Z;
+		return 0 <= position[0] && position[0] <= X*L && 0 <= position[1] && position[1] <= Y*L && 0 <= position[2]
+				&& position[2] <= Z*L;
 	}
 
 	/**
@@ -529,7 +529,7 @@ public class Unit {
 	 *             |!isValidPosition(position)
 	 */
 	@Raw
-	private void setPosition(double[] position) throws IllegalArgumentException {
+	public void setPosition(double[] position) throws IllegalArgumentException {
 		if (!isValidPosition(position))
 			throw new IllegalArgumentException();
 		this.position = position;
@@ -627,7 +627,7 @@ public class Unit {
 		if (this.isEnableDefaultBehaviour() && status == Status.DONE)
 			startDefaultBehaviour();
 		else if (status == Status.MOVING) {
-			double d = getDistance(getCubeCenter(nextTargetPosition),startPosition);
+			double d = getDistance(nextTargetPosition,startPosition);
 			double[] v = new double[] {getCurrentSpeed()*(nextTargetPosition[0]-startPosition[0])/d,
 					getCurrentSpeed()*(nextTargetPosition[1]-startPosition[1])/d,
 					getCurrentSpeed()*(nextTargetPosition[2]-startPosition[2])/d};
@@ -722,8 +722,8 @@ public class Unit {
 	 * @effect The walkingSpeed of this unit is set to the given flag. 
 	 * 			| setWalkingspeed(dz)
 	 * @throws IllegalArgumentException
-	 * 			If the unit needs to move more than one cube in the x-, y-, z-direction.
-	 * 			| !((dx >= -1 || dx <= 1) && (dy >= -1 || dy <= 1) && (dz >= -1 || dz <= 1))
+	 * 			If the unit needs to move more than one cube in the x-, y- or z-direction.
+	 * 			| !((dx >= -1 && dx <= 1) && (dy >= -1 && dy <= 1) && (dz >= -1 && dz <= 1))
 	 * @throws IllegalArgumentException
 	 * 			If the unit needs to move in a direction outside the game world.
 	 * 			| !isValidPosition(new double[] { getPosition()[0] + (double) dx, getPosition()[1] + (double) dy,
@@ -731,17 +731,14 @@ public class Unit {
 	 */
 
 	public void moveToAdjacent(int dx, int dy, int dz) throws IllegalArgumentException {
-		if (!((dx >= -1 || dx <= 1) && (dy >= -1 || dy <= 1) && (dz >= -1 || dz <= 1)))
+		if (!((dx >= -1 && dx <= 1) && (dy >= -1 && dy <= 1) && (dz >= -1 && dz <= 1)))
 			throw new IllegalArgumentException();
 		if (!isValidPosition(new double[] { getPosition()[0] + (double) dx, getPosition()[1] + (double) dy,
 				getPosition()[2] + (double) dz }))
 			throw new IllegalArgumentException();
 		if (canMove()) {
 			startPosition = new double[] {this.getPosition()[0],this.getPosition()[1],this.getPosition()[2]};
-			
-
 			nextTargetPosition = getCubeCenter(new double[] {this.getCubePosition()[0] + (double) dx , this.getCubePosition()[1] 
-
 				+ (double) dy , this.getCubePosition()[2] + (double) dz });
 			status = Status.MOVING;
 			setWalkingSpeed(dz);
@@ -776,7 +773,7 @@ public class Unit {
 	 *		|	+ Math.pow(targetPosition[1] - startPosition[1], 2.0)
 	 *		|	+ Math.pow(targetPosition[2] - startPosition[2], 2.0))
 	 */
-	public static double getDistance(double[] targetPosition, double[] startPosition) {
+	private static double getDistance(double[] targetPosition, double[] startPosition) {
 		return Math.sqrt(Math.pow(targetPosition[0] - startPosition[0], 2.0)
 				+ Math.pow(targetPosition[1] - startPosition[1], 2.0)
 				+ Math.pow(targetPosition[2] - startPosition[2], 2.0));
@@ -795,15 +792,22 @@ public class Unit {
 	 * Check whether the given cube is a neighboring cube of the unit's cubePosition.
 	 * @param cubePosition
 	 * 		The position of a cube. 
-	 * @return True only if the difference between the coordinates of the cubeCenters is equal to 1 or -1. 
-	 * 		   | result == (Util.fuzzyEquals(Math.abs(getCubeCentre(cubePosition)[0] - this.getCubePosition()[0]),1.0)
-	 *		   |	&& (Util.fuzzyEquals(Math.abs(getCubeCentre(cubePosition)[1] - this.getCubePosition()[1]),1.0))
-	 *		   |	&& (Util.fuzzyEquals(Math.abs(getCubeCentre(cubePosition)[1] - this.getCubePosition()[1]),1.0)))
+	 * @return True if and only if the difference between the respective x, y and z -coordinates of the cubeCenters are equal to 0, 1 or -1,
+	 * 			and the difference between the respective x,y and z coordinates are not all 0.
+	 * 		   | result == ((Util.fuzzyLessThanOrEqualTo(Math.abs((cubePosition)[0] - this.getCubePosition()[0]),1.0)
+	 *	   	   | 			&& (Util.fuzzyLessThanOrEqualTo(Math.abs((cubePosition)[1] - this.getCubePosition()[1]),1.0))
+	 *		   |			&& (Util.fuzzyLessThanOrEqualTo(Math.abs((cubePosition)[1] - this.getCubePosition()[1]),1.0)))
+	 *	       |		&& !(Util.fuzzyEquals(Math.abs((cubePosition)[0] - this.getCubePosition()[0]),0.0)
+	 *		   |			&& (Util.fuzzyEquals(Math.abs((cubePosition)[1] - this.getCubePosition()[1]),0.0))
+	 *		   |			&& (Util.fuzzyEquals(Math.abs((cubePosition)[1] - this.getCubePosition()[1]),0.0))));
 	 */
-	public boolean isNeighbouringCube(double[] cubePosition) {
-		return (Util.fuzzyEquals(Math.abs(getCubeCenter(cubePosition)[0] - this.getCubePosition()[0]),1.0)
-				&& (Util.fuzzyEquals(Math.abs(getCubeCenter(cubePosition)[1] - this.getCubePosition()[1]),1.0))
-				&& (Util.fuzzyEquals(Math.abs(getCubeCenter(cubePosition)[1] - this.getCubePosition()[1]),1.0)));
+	private boolean isNeighbouringCube(double[] cubePosition) {
+		return ((Util.fuzzyLessThanOrEqualTo(Math.abs((cubePosition)[0] - this.getCubePosition()[0]),1.0)
+				&& (Util.fuzzyLessThanOrEqualTo(Math.abs((cubePosition)[1] - this.getCubePosition()[1]),1.0))
+				&& (Util.fuzzyLessThanOrEqualTo(Math.abs((cubePosition)[1] - this.getCubePosition()[1]),1.0)))
+				&& !(Util.fuzzyEquals(Math.abs((cubePosition)[0] - this.getCubePosition()[0]),0.0)
+						&& (Util.fuzzyEquals(Math.abs((cubePosition)[1] - this.getCubePosition()[1]),0.0))
+						&& (Util.fuzzyEquals(Math.abs((cubePosition)[1] - this.getCubePosition()[1]),0.0))));
 	}
 
 	/**
@@ -892,9 +896,15 @@ public class Unit {
 	/**
 	 * Return the current speed of the given unit.
 	 * 
-	 * @return The speed at which the unit is moving. | result == | if (status
-	 *         != Status.MOVING){ | then 0.0 | else | if (isSprinting) | then
-	 *         2.0*getWalkingSpeed() | else getWalkingSpeed();
+	 * @return The speed at which the unit is moving is 0.0 if the unit isn't moving. 
+	 * 			| if (status != Status.MOVING){ 
+	 * 			| result == 0.0 
+	 * @return The speed at which the unit is moving is 2 times the walking speed if the unit is sprinting.
+	 * 			| if (status == Status.MOVING && isSprinting) 
+	 * 			| result == 2.0*getWalkingSpeed() 
+	 * @return The speed at which the unit is moving is the walking speed if the unit is walking.
+	 * 			| if (status == Status.MOVING && !isSprinting) 
+	 * 			| result == getWalkingSpeed();
 	 */
 	public double getCurrentSpeed() {
 		if (status != Status.MOVING) {
@@ -1198,7 +1208,12 @@ public class Unit {
 	/**
 	 * Symbolic constant registering the fixed number of cubes in direction z.
 	 */ 
-	private static int Z = 50; // p727
+	private static int Z = 50;
+	
+	/**
+	 * Symbolic constant registering the side length of cubes, expressed in meters.
+	 */
+	private static double L = 1.0;
 	
 	/**
 	 * Check whether it's possible for a unit to work.
@@ -1245,15 +1260,15 @@ public class Unit {
 			if (i == 0) {
 				status = Status.IN_CENTER;
 				startSprinting();
-				moveTo(new double[] { (new Random().nextDouble()) * 50, (new Random().nextDouble()) * 50,
-						(new Random().nextDouble()) * 50 });
+				moveTo(new double[] { (new Random().nextDouble()) * X*L, (new Random().nextDouble()) * Y*L,
+						(new Random().nextDouble()) * Z*L });
 			}
 			if (i == 1) {
 				status = Status.IN_CENTER;
 				status = Status.MOVING;
 				stopSprinting();
-				moveTo(new double[] { (new Random().nextDouble()) * 50, (new Random().nextDouble()) * 50,
-						(new Random().nextDouble()) * 50 });
+				moveTo(new double[] { (new Random().nextDouble()) * X*L, (new Random().nextDouble()) * Y*L,
+						(new Random().nextDouble()) * Z*L });
 			}
 			if (i == 2)
 				work();
@@ -1271,6 +1286,8 @@ public class Unit {
 	 */
 	public void stopDefaultBehaviour() {
 		enableDefaultBehaviour = false;
+		targetPosition = null;
+		nextTargetPosition = null;
 		status = Status.DONE;
 	}
 	/**

@@ -322,7 +322,6 @@ public class Facade implements IFacade {
 	public void fight(Unit attacker, Unit defender) throws ModelException {
 		try{
 			attacker.attack(defender);
-			//defender.defend(attacker);
 		}
 		catch (NullPointerException exc){
 			throw new ModelException();
@@ -368,7 +367,11 @@ public class Facade implements IFacade {
 	@Override
 	public void setDefaultBehaviorEnabled(Unit unit, boolean value) throws ModelException {
 		try{
-			unit.setEnableDefaultBehaviour(value);
+			if (value){
+				unit.startDefaultBehaviour();
+			}
+			else
+				unit.stopDefaultBehaviour();
 		}
 		catch (NullPointerException exc){
 			throw new ModelException();
