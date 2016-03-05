@@ -576,8 +576,6 @@ public class Unit {
 	 */
 	private float orientation = (float) ((float) Math.PI / 2.0);
 
-
-
 	/**
 	 * Update the position and activity status of a unit.
 	 * 
@@ -600,15 +598,20 @@ public class Unit {
 	 *         has arrived to the next target position (the center of the next
 	 *         cube), its new position is the next target position and it moves
 	 *         to the target position.
-	 * 
 	 * @post If this unit is working, and if his task is not completed, the new
 	 *       working time is increased with duration, and the progress is
 	 *       updated. Else if the unit is working and the task is completed, the
-	 *       new status is DONE.
-	 * @post If the status of this unit is initial resting and if his recoveredHitpoints are equal to or greater then 1
-	 * 			or his hitpoints are equal to or greater then the maximum value, the unit's status will be updated to resting
-	 * 			and his hitpoints will be set to the maximum value. Else his hitpoints will be increased 
-	 * @effect If this unit is working
+	 *       new status is done.
+	 * @effect If the status of this unit is initial resting and if his recoveredHitpoints are equal to or 
+	 * 			greater then 1 or his hitpoints are equal to or greater then the maximum value, 
+	 * 			the unit's status will be updated to resting and his hitpoints will be set to the maximum value. 
+	 * 			Else his hitpoints will be increased as well as the recovered hitpoints.
+	 * @effect If the status of this unit is resting and if his hitpoints are less then the maximum value, 
+	 * 			the unit will recover hitpoints. If his hitpoints are at the maximum value but 
+	 * 			the stamina points aren't, the unit will recover staminapoints. If both hitpoints and stamina points 
+	 * 			are at the maximum value, the unit's status will be updated to done.
+	 * @post If the unit's status is attacking, the attackTimer will be increased and if the attackTimer becomes 
+	 * 			equal or greater then one, the unit's status will be updated to done.
 	 * @throws IllegalArgumentException
 	 *             If the duration is less than zero or exceeds or equals 0.2 s.
 	 */
@@ -642,18 +645,12 @@ public class Unit {
 					startSprinting();
 				}
 			}
-			//System.out.println("position " + this.getPosition()[0] +","+ this.getPosition()[1]+","+ this.getPosition()[2]);
-			//System.out.println(getDistance(nextTargetPosition, startPosition)-getDistance(startPosition, this.getPosition()));
-			//System.out.println("target " + targetPosition[0] + targetPosition[1]);
-
 			if (targetPosition != null && startPosition != null
 					&& getDistance(targetPosition, startPosition)-getDistance(startPosition, this.getPosition())<=0.0){
 				setPosition(targetPosition);
 				status = Status.DONE;
 				targetPosition = null;
 			}
-			
-			
 			else if (nextTargetPosition != null && getDistance(nextTargetPosition, startPosition)-getDistance(startPosition, this.getPosition())<=0.0){
 
 				setPosition(nextTargetPosition);
@@ -664,11 +661,8 @@ public class Unit {
 				}
 				else
 					status = Status.DONE;
-
 			}
 		}
-		
-
 		else if (status == Status.WORKING) {
 			if (workingTime < totalWorkingTime) {
 				workingTime += duration;
@@ -677,7 +671,8 @@ public class Unit {
 				progressWork = (float) 1.0;
 				status = Status.DONE;
 			}
-		} else if (status == Status.INITIAL_RESTING) {
+		} 
+		else if (status == Status.INITIAL_RESTING) {
 
 			if (recoveredHitpoints >= 1.0 || this.getHitpoints() >= max_nbPoints()) {
 				this.setHitPoints(max_nbPoints());
@@ -687,7 +682,6 @@ public class Unit {
 				recoveredHitpoints += (getToughness() / 200.0) * 5 * duration;
 			}
 		}
-
 		else if (status == Status.RESTING) {
 			if (this.getHitpoints() < max_nbPoints())
 				this.setHitPoints((getToughness() / 200.0) * 5 * duration + getHitpoints());
@@ -742,26 +736,10 @@ public class Unit {
 
 				+ (double) dy , this.getCubePosition()[2] + (double) dz });
 			status = Status.MOVING;
-
-			//System.out.println("new start position " + this.getPosition()[0] +","+ this.getPosition()[1]+","+ this.getPosition()[2]);
-			//System.out.println("next target " + nextTargetPosition[0] +","+ nextTargetPosition[1]+","+ nextTargetPosition[2]);
-
 			setWalkingSpeed(dz);
 		}
-
 	}
-//	/**
-//	 * A variable registering the amount of cubes the unit needs to move in the x-direction.
-//	 */
-//	private int dx = 0;
-//	/**
-//	 * A variable registering the amount of cubes the unit needs to move in the y-direction.
-//	 */
-//	private int dy = 0;
-//	/**
-//	 * A variable registering the amount of cubes the unit needs to move in the z-direction.
-//	 */
-//	private int dz = 0;
+
 	/**
 	 * A variable registering the start position of this unit.
 	 */
@@ -828,11 +806,8 @@ public class Unit {
 	 * @return The center of the given cube. 
 	 * 		   | result == {cubePosition[0]+0.5,cubePosition[1]+0.5,cubePosition[2]+0.5}
 	 */
-<<<<<<< HEAD
-	public static double[] getCubeCentre(double[] cubePosition) {
-=======
-	public double[] getCubeCenter(double[] cubePosition) {
->>>>>>> branch 'master' of https://github.com/ElisabethHeremans/project.git
+
+	public static double[] getCubeCenter(double[] cubePosition) {
 		return new double[] { cubePosition[0] + 0.5, cubePosition[1] + 0.5, cubePosition[2] + 0.5 };
 
 	}
@@ -871,7 +846,7 @@ public class Unit {
 	 * 		   | result == this.walkingSpeed
 	 */
 
-	public double getWalkingSpeed() {
+	private double getWalkingSpeed() {
 		return this.walkingSpeed;
 	}
 	
