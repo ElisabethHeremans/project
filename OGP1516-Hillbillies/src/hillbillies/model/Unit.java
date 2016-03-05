@@ -822,7 +822,7 @@ public class Unit {
 	 * @return The center of the given cube. | result ==
 	 *         {cubePosition[0]+0.5,cubePosition[1]+0.5,cubePosition[2]+0.5}
 	 */
-	public double[] getCubeCentre(double[] cubePosition) {
+	public static double[] getCubeCentre(double[] cubePosition) {
 		return new double[] { cubePosition[0] + 0.5, cubePosition[1] + 0.5, cubePosition[2] + 0.5 };
 
 	}
@@ -1168,12 +1168,13 @@ public class Unit {
 			enableDefaultBehaviour = true;
 			int i = new Random().nextInt(4);
 			if (i == 0) {
-				status = Status.MOVING;
+				status = Status.IN_CENTER;
 				startSprinting();
 				moveTo(new double[] { (new Random().nextDouble()) * 50, (new Random().nextDouble()) * 50,
 						(new Random().nextDouble()) * 50 });
 			}
 			if (i == 1) {
+				status = Status.IN_CENTER;
 				status = Status.MOVING;
 				stopSprinting();
 				moveTo(new double[] { (new Random().nextDouble()) * 50, (new Random().nextDouble()) * 50,

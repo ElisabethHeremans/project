@@ -196,7 +196,7 @@ public class Facade implements IFacade {
 		}
 		catch (NullPointerException exc){
 			
-			exc.printStackTrace();
+			//exc.printStackTrace();
 			throw new ModelException();
 
 		}
