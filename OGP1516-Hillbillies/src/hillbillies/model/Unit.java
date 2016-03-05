@@ -579,7 +579,7 @@ public class Unit {
 
 
 	/**
-	 * Update the position and activity status.
+	 * Update the position and activity status of a unit.
 	 * 
 	 * @param duration
 	 *            The game time after which advanceTime is called.
@@ -605,7 +605,9 @@ public class Unit {
 	 *       working time is increased with duration, and the progress is
 	 *       updated. Else if the unit is working and the task is completed, the
 	 *       new status is DONE.
-	 * 
+	 * @post If the status of this unit is initial resting and if his recoveredHitpoints are equal to or greater then 1
+	 * 			or his hitpoints are equal to or greater then the maximum value, the unit's status will be updated to resting
+	 * 			and his hitpoints will be set to the maximum value. Else his hitpoints will be increased 
 	 * @effect If this unit is working
 	 * @throws IllegalArgumentException
 	 *             If the duration is less than zero or exceeds or equals 0.2 s.
@@ -622,7 +624,7 @@ public class Unit {
 		if (this.isEnableDefaultBehaviour() && status == Status.DONE)
 			startDefaultBehaviour();
 		else if (status == Status.MOVING) {
-			double d = getDistance(getCubeCentre(nextTargetPosition),startPosition);
+			double d = getDistance(getCubeCenter(nextTargetPosition),startPosition);
 			double[] v = new double[] {getCurrentSpeed()*(nextTargetPosition[0]-startPosition[0])/d,
 					getCurrentSpeed()*(nextTargetPosition[1]-startPosition[1])/d,
 					getCurrentSpeed()*(nextTargetPosition[2]-startPosition[2])/d};
@@ -704,7 +706,6 @@ public class Unit {
 		}
 
 	}
-
 	/**
 	 * Move a unit to the center of a neighboring cube.
 	 * @param dx
@@ -736,7 +737,9 @@ public class Unit {
 		if (canMove()) {
 			startPosition = new double[] {this.getPosition()[0],this.getPosition()[1],this.getPosition()[2]};
 			
-			nextTargetPosition = getCubeCentre(new double[] {this.getCubePosition()[0] + (double) dx , this.getCubePosition()[1] 
+
+			nextTargetPosition = getCubeCenter(new double[] {this.getCubePosition()[0] + (double) dx , this.getCubePosition()[1] 
+
 				+ (double) dy , this.getCubePosition()[2] + (double) dz });
 			status = Status.MOVING;
 
@@ -771,6 +774,9 @@ public class Unit {
 	 * A variable registering the next cube this unit will move to.
 	 */
 	private double[] nextTargetPosition;
+	/**
+	 * A variable registering the status of this unit.
+	 */
 	public Status status = Status.DONE;
 
 	/**
@@ -779,7 +785,7 @@ public class Unit {
 	 * 		The first position.
 	 * @param startPosition
 	 * 		The second position.
-	 * @return the distance between the first and the second position by calculating the square root of the sum of the squares of the difference between the coordinates.
+	 * @return the distance between the first and the second position.
 	 * 		| result == Math.sqrt(Math.pow(targetPosition[0] - startPosition[0], 2.0)
 	 *		|	+ Math.pow(targetPosition[1] - startPosition[1], 2.0)
 	 *		|	+ Math.pow(targetPosition[2] - startPosition[2], 2.0))
@@ -802,27 +808,31 @@ public class Unit {
 	/**
 	 * Check whether the given cube is a neighboring cube of the unit's cubePosition.
 	 * @param cubePosition
-	 * 		The cube 
-	 * @return True only if 
+	 * 		The position of a cube. 
+	 * @return True only if the difference between the coordinates of the cubeCenters is equal to 1 or -1. 
+	 * 		   | result == (Util.fuzzyEquals(Math.abs(getCubeCentre(cubePosition)[0] - this.getCubePosition()[0]),1.0)
+	 *		   |	&& (Util.fuzzyEquals(Math.abs(getCubeCentre(cubePosition)[1] - this.getCubePosition()[1]),1.0))
+	 *		   |	&& (Util.fuzzyEquals(Math.abs(getCubeCentre(cubePosition)[1] - this.getCubePosition()[1]),1.0)))
 	 */
 	public boolean isNeighbouringCube(double[] cubePosition) {
-		return (Math.abs(cubePosition[0] - this.getCubePosition()[0]) <= 1)
-				&& (Math.abs(cubePosition[1] - this.getCubePosition()[1]) <= 1)
-				&& (Math.abs(cubePosition[1] - this.getCubePosition()[1]) <= 1);
+		return (Util.fuzzyEquals(Math.abs(getCubeCenter(cubePosition)[0] - this.getCubePosition()[0]),1.0)
+				&& (Util.fuzzyEquals(Math.abs(getCubeCenter(cubePosition)[1] - this.getCubePosition()[1]),1.0))
+				&& (Util.fuzzyEquals(Math.abs(getCubeCenter(cubePosition)[1] - this.getCubePosition()[1]),1.0)));
 	}
-
-
-
 
 	/**
 	 * Return the center of a cube.
 	 * 
 	 * @param cubePosition
 	 *            The position of the cube.
-	 * @return The center of the given cube. | result ==
-	 *         {cubePosition[0]+0.5,cubePosition[1]+0.5,cubePosition[2]+0.5}
+	 * @return The center of the given cube. 
+	 * 		   | result == {cubePosition[0]+0.5,cubePosition[1]+0.5,cubePosition[2]+0.5}
 	 */
+<<<<<<< HEAD
 	public static double[] getCubeCentre(double[] cubePosition) {
+=======
+	public double[] getCubeCenter(double[] cubePosition) {
+>>>>>>> branch 'master' of https://github.com/ElisabethHeremans/project.git
 		return new double[] { cubePosition[0] + 0.5, cubePosition[1] + 0.5, cubePosition[2] + 0.5 };
 
 	}
@@ -835,10 +845,15 @@ public class Unit {
 	 *            0 or 1.
 	 * @effect If the unit is moving to a higher cube, the walkingspeed will be
 	 *         1.2 times the unit's basespeed.
+	 *         | if (dz == -1)
+	 *         | 	then walkingSpeed = 1.2 * getBaseSpeed()
 	 * @effect If the unit is moving to a lower cube, the walkingspeed will be
 	 *         0.5 times the unit's basespeed.
+	 *         | if (dz == 1)
+	 *         | 	then walkingSpeed = 0.5 * getBaseSpeed()
 	 * @effect If the unit stays at the same level, the walkingspeed will be the
 	 *         unit's basespeed.
+	 *         | walkingSpeed = getBaseSpeed()
 	 */
 
 	private void setWalkingSpeed(int dz) {
@@ -851,7 +866,9 @@ public class Unit {
 	}
 
 	/**
-	 * Return the walkingspeed of the given unit.
+	 * Return the walkingspeed of this unit.
+	 * @return the walkingspeed of this unit.
+	 * 		   | result == this.walkingSpeed
 	 */
 
 	public double getWalkingSpeed() {
@@ -862,11 +879,18 @@ public class Unit {
 	 * A variable registering the walkingspeed of this unit.
 	 */
 	private double walkingSpeed = 0;
-
+	/**
+	 * A boolean to register if the unit is sprinting.
+	 */
 	public boolean isSprinting = false;
 
 	/**
 	 * Enable sprinting mode for the given unit.
+	 * @post If the unit is currently moving and the unit's stamina points are greater then zero,
+	 * 		 	isSprinting will be set to true. Otherwise isSprinting will be set to false.
+	 * 		 | if (status == Status.MOVING && getStaminaPoints() > 0)
+	 * 		 | 	then isSprinting = true
+	 * 		 |	else isSprinting = false
 	 */
 	public void startSprinting() {
 		if (status == Status.MOVING && getStaminaPoints() > 0)
@@ -877,6 +901,8 @@ public class Unit {
 
 	/**
 	 * Disable sprinting mode for the given unit.
+	 * @post isSprinting will be set to false.
+	 * 		 | isSprinting = false
 	 */
 	public void stopSprinting() {
 		isSprinting = false;
@@ -954,6 +980,7 @@ public class Unit {
 
 		}
 	}
+
 
 	public void moveTo(int[] cubePosition) throws IllegalArgumentException {
 		moveTo(new double[] { (double) cubePosition[0] + 0.5, (double) cubePosition[1] + 0.5,
@@ -1067,7 +1094,18 @@ public class Unit {
 	 * 		   |	then moveToAdjacent(-1 + (new Random().nextInt(3)), -1 + (new Random().nextInt(3)),
 	 * 		   |		-1 + (new Random().nextInt(3)))
 	 * @post If the unit wasn't able to dodge but he is able to block the attack,
-	 * 			the unit's status will be updated to done.
+	 * 			the unit's status will be updated to done. 
+	 * 		 | if (new Random().nextDouble() <= 0.25*
+	 *	 	 |	((this.getStrength() + this.getAgility()) / (unit.getStrength() + unit.getAgility())))
+	 *		 |		then status = Status.DONE
+	 * @effect If the unit wasn't able to dodge or to block the attack, the unit will lose hitpoints equal to 
+	 * 			to the attacking unit's strength divided by 10. If the hitpoints would go under zero,
+	 * 			they will be set to zero. Afterwards the unit's status will be set to done.
+	 * 		   | double newHitPoints = this.getHitpoints() - unit.getStrength() / 10.0
+	 * 		   | if (newHitPoints > 0)
+	 * 		   |	then this.setHitPoints(newHitPoints)
+	 * 		   |	else this.setHitPoints(0.0)
+	 * 		   | status = Status.DONE;
 	 */
 	public void defend(Unit unit) {
 		status = Status.DEFENDING;
@@ -1096,7 +1134,18 @@ public class Unit {
 
 		status = Status.DONE;
 	}
-
+	
+	/**
+	 * Makes the unit rest.
+	 * @post If a unit needs or can rest, the restTimer and recoveredHitpoints will be set to zero. 
+	 * 		 If a unit needs or can rest and his hitpoints are less then the maximum value of hitpoints,
+	 * 			the unit's status will be set to initial resting, otherwise the status will be set to resting.
+	 * 		 | if (mustRest() || canRest())
+	 * 		 |	then restTimer = 0.0 && recoveredHitpoints = 0.0
+	 * 		 |		if (this.getHitpoints() < max_nbPoints())
+	 * 	 	 |			then status = Status.INITIAL_RESTING
+	 * 		 |			else status = Status.RESTING
+	 */
 	public void rest() {
 		if (mustRest() || canRest()) {
 			restTimer = 0.0;
@@ -1162,7 +1211,33 @@ public class Unit {
 			return true;
 		return false;
 	}
-
+	
+	/**
+	 * Makes the unit start with his default behaviour.
+	 * @post If a unit's status is done, enableDefaultBehaviour becomes true and 
+	 * 		 a random integer from 0 to 4 will be generated. Otherwise the enableDefaultBehaviour becomes false.
+	 * 		 | if (status == Status.DONE)
+	 * 		 |	then enableDefaultBehaviour = true && int i = new Random().nextInt(4)
+	 * 		 |	else enableDefaultBehaviour = false
+	 * @effect If the random integer is equal to zero, the unit's status will be updated to moving and
+	 * 		   he will start sprinting to a random position.
+	 * 		   If the random integer is equal to one, the unit's status will be updated to moving and
+	 * 		   he will start moving(walking) to a random position.
+	 * 		   If the random integer is equal to two, the unit will start working.
+	 * 		   If the random integer is equal to three, the unit will start resting.
+	 * 		   | if (i == 0)
+	 * 		   |	then status = Status.MOVING && startSprinting() &&
+	 * 		   |		moveTo(new double[] { (new Random().nextDouble()) * 50, (new Random().nextDouble()) * 50,
+	 *		   |		 (new Random().nextDouble()) * 50 })
+	 *		   | if (i == 1)
+	 *		   |	then status = Status.MOVING && stopSprinting() &&
+	 *		   |		moveTo(new double[] { (new Random().nextDouble()) * 50, (new Random().nextDouble()) * 50,
+	 *		   |		 (new Random().nextDouble()) * 50 })
+	 *		   | if (i == 2)
+	 *		   |	then work()
+	 *		   | if (i == 3)
+	 *	  	   |	then rest()
+	 */
 	public void startDefaultBehaviour() {
 		if (status == Status.DONE) {
 			enableDefaultBehaviour = true;
@@ -1189,25 +1264,35 @@ public class Unit {
 
 	}
 
+	/**
+	 * Makes the unit stop with his default behaviour.
+	 * @post enableDefaultBehaviour will be set to false and the unit's status will be set to done.
+	 * 		 | enableDefaultBehaviour = false && status = Status.DONE
+	 */
 	public void stopDefaultBehaviour() {
 		enableDefaultBehaviour = false;
 		status = Status.DONE;
 	}
 	/**
-	 * A boolean to check if the default behavior is enabled.
+	 * A boolean to check if the default behaviour is enabled.
 	 */
 	private boolean enableDefaultBehaviour;
 
 	/**
-	 * @return the enableDefaultBehaviour
+	 * Check whether the default behaviour is enabled.
+	 * @return True if the default behaviour is enabled.
+	 * 		   | result == enableDefaultBehaviour
 	 */
 	public boolean isEnableDefaultBehaviour() {
 		return enableDefaultBehaviour;
 	}
 
 	/**
+	 * Set the enableDefaultBehaviour of this unit to the given enableDefaultBehaviour.
 	 * @param enableDefaultBehaviour
-	 *            the enableDefaultBehaviour to set
+	 *          The new enableDefaultBehaviour for this unit.
+	 * @post The enableDefaultBehaviour of this new unit is equal to the given enableDefaultBehaviour.
+	 * 		 | this.enableDefaultBehaviour = enableDefaultBehaviour
 	 */
 	public void setEnableDefaultBehaviour(boolean enableDefaultBehaviour) {
 		this.enableDefaultBehaviour = enableDefaultBehaviour;
