@@ -711,7 +711,15 @@ public class Unit {
 	 * @param dz
 	 * 		The amount of cubes to move in the z-direction; should be -1,
 	 *            0 or 1.
-	 * @effect The walkingspeed of this unit is set to the given flag. 
+	 * @post If the unit can move, the startPosition will be the unit's current position and
+	 * 			his nextTargetPosition will be the center of the neighbouring cube the unit
+	 * 			needs to move to. The unit's status will also be updated to moving.
+	 * 		 | if (canMove())
+	 * 		 |	then startPosition = new double[] {this.getPosition()[0],this.getPosition()[1],this.getPosition()[2]}
+	 * 		 |		&& nextTargetPosition = getCubeCenter(new double[] {this.getCubePosition()[0] + (double) dx ,
+	 * 		 |		   this.getCubePosition()[1] + (double) dy , this.getCubePosition()[2] + (double) dz })
+	 * 		 |		&& status = Status.MOVING
+	 * @effect The walkingSpeed of this unit is set to the given flag. 
 	 * 			| setWalkingspeed(dz)
 	 * @throws IllegalArgumentException
 	 * 			If the unit needs to move more than one cube in the x-, y-, z-direction.
@@ -842,8 +850,6 @@ public class Unit {
 
 	/**
 	 * Return the walkingspeed of this unit.
-	 * @return the walkingspeed of this unit.
-	 * 		   | result == this.walkingSpeed
 	 */
 
 	private double getWalkingSpeed() {
@@ -905,19 +911,30 @@ public class Unit {
 	 * 
 	 * @param targetPosition
 	 *            The coordinate of the cube to move to.
-	 * @effect If the unit can move, |if
-	 *         (Util.fuzzyEquals(targetPosition[0]-this.getPosition()[0],0)) |
-	 *         x= 0; | else if
-	 *         (Math.signum(targetPosition[0]-this.getPosition()[0])==-1) | x=
-	 *         -1; | else | x = 1; | if
-	 *         (Util.fuzzyEquals(targetPosition[1]-this.getPosition()[1],0)) |
-	 *         y=0; | else if
-	 *         (Math.signum(targetPosition[1]-this.getPosition()[1])==-1) | y=
-	 *         -1; | else | y= 1; | if
-	 *         (Util.fuzzyEquals(targetPosition[2]-this.getPosition()[2],0)) |
-	 *         z= 0; | else if
-	 *         (Math.signum(targetPosition[2]-this.getPosition()[2])==-1) | z=
-	 *         -1; | else | z= 1; | moveToAdjacent(x,y,z);
+	 * @effect If the unit can move, the variables x, y and z will register
+	 * 			if the unit needs to go further (=1) in the x-, y-, z-direction or
+	 * 			if the unit needs to go back (=-1) in the x-, y-, z-direction or 
+	 * 			if the unit needs to stay (=0) at the same x-, y-, z-coordinate. 
+	 * 			The unit will then move to the neighbouringcube.
+	 * 		   | if (canMove())
+	 * 		   |	then this.targetPosition = targetPosition && status = Status.IN_CENTER 
+	 * 		   |		&& int x = 0 && int y = 0 && int z = 0 
+	 * 		   |		&& if (Util.fuzzyEquals(targetPosition[0] - this.getPosition()[0], 0))
+	 * 		   |			then x = 0
+	 * 		   |		   else if (Math.signum(targetPosition[0] - this.getPosition()[0]) == -1)
+	 * 		   |		 	then x = -1
+	 * 		   |		   else x = 1
+	 * 		   |		&& if (Util.fuzzyEquals(targetPosition[1] - this.getPosition()[1], 0))
+	 * 		   |			then y = 0
+	 * 		   |		   else if (Math.signum(targetPosition[1] - this.getPosition()[1]) == -1)
+	 * 		   |			then y = -1
+	 * 		   |           else y = 1
+	 * 		   |		&& if (Util.fuzzyEquals(targetPosition[2] - this.getPosition()[2], 0))
+	 * 		   |			then z = 0
+	 * 		   |		   else if (Math.signum(targetPosition[2] - this.getPosition()[2]) == -1)
+	 * 		   |			then z = -1
+	 * 		   |		   else z = 1
+	 * 		   |		&& moveToAdjacent(x,y,z)
 	 * @throws IllegalArgumentException
 	 *             The given targetPosition is not a valid targetPosition for a
 	 *             unit. | ! isValidPosition(targetPosition)
@@ -956,8 +973,16 @@ public class Unit {
 		}
 	}
 
-
-	public void moveTo(int[] cubePosition) throws IllegalArgumentException {
+	/**
+	 * Start moving the given unit to the given cube, given as an array of integers.
+	 * @param cubePosition
+	 * 			The coordinate of the cube to move to.
+	 * @effect The new position of the unit is the center of the given cube.
+	 * 		   | moveTo(new double[] { (double) cubePosition[0] + 0.5, (double) cubePosition[1] + 0.5,
+	 * 		   |	(double) cubePosition[2] + 0.5 })  			
+	 */
+	// ik heb hier de illegalargumentexception verwijderd.
+	public void moveTo(int[] cubePosition){
 		moveTo(new double[] { (double) cubePosition[0] + 0.5, (double) cubePosition[1] + 0.5,
 				(double) cubePosition[2] + 0.5 });
 	}
