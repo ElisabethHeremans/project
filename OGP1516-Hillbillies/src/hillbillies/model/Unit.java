@@ -576,11 +576,7 @@ public class Unit {
 	 */
 	private float orientation = (float) ((float) Math.PI / 2.0);
 
-	/**
-	 * A variable registering the duration before the units position and
-	 * activity status are updated.
-	 */
-	private float duration = 0;
+
 
 	/**
 	 * Update the position and activity status of a unit.
@@ -741,7 +737,9 @@ public class Unit {
 		if (canMove()) {
 			startPosition = new double[] {this.getPosition()[0],this.getPosition()[1],this.getPosition()[2]};
 			
+
 			nextTargetPosition = getCubeCenter(new double[] {this.getCubePosition()[0] + (double) dx , this.getCubePosition()[1] 
+
 				+ (double) dy , this.getCubePosition()[2] + (double) dz });
 			status = Status.MOVING;
 
@@ -792,7 +790,7 @@ public class Unit {
 	 *		|	+ Math.pow(targetPosition[1] - startPosition[1], 2.0)
 	 *		|	+ Math.pow(targetPosition[2] - startPosition[2], 2.0))
 	 */
-	public double getDistance(double[] targetPosition, double[] startPosition) {
+	public static double getDistance(double[] targetPosition, double[] startPosition) {
 		return Math.sqrt(Math.pow(targetPosition[0] - startPosition[0], 2.0)
 				+ Math.pow(targetPosition[1] - startPosition[1], 2.0)
 				+ Math.pow(targetPosition[2] - startPosition[2], 2.0));
@@ -1000,7 +998,7 @@ public class Unit {
 	/**
 	 * A variable registering the passed game time since the last rest.
 	 */
-	private double restTimer;
+	private double restTimer = 0.0;
 	/**
 	 * A variable registering the duration that the unit is working.
 	 */
@@ -1106,7 +1104,6 @@ public class Unit {
 	 * 		   | status = Status.DONE;
 	 */
 	public void defend(Unit unit) {
-		Status previousStatus = this.status;
 		status = Status.DEFENDING;
 		setOrientation((float) Math.atan2(unit.getPosition()[1] - this.getPosition()[1],
 				unit.getPosition()[0] - this.getPosition()[0]));
@@ -1163,7 +1160,7 @@ public class Unit {
 	 */
 	public boolean mustRest() {
 
-		if (restTimer >= 180 || this.getStaminaPoints() <= 0 || this.getHitpoints() <= 0)
+		if (restTimer >= 180 )
 			return true;
 		return false;
 	}
@@ -1175,8 +1172,9 @@ public class Unit {
 	 * 				status == Status.WORKING || status == Status.IN_CENTER)
 	 */
 	public boolean canRest() {
-		if (status == Status.DONE || status == Status.RESTING || status == Status.WORKING || status == Status.IN_CENTER)
-			return true;
+		if(this.getStaminaPoints() <= 0 || this.getHitpoints() <= 0)
+			if (status == Status.DONE || status == Status.RESTING || status == Status.WORKING || status == Status.IN_CENTER)
+				return true;
 		return false;
 	}
 	/**
