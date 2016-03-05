@@ -621,6 +621,7 @@ public class Unit {
 			throw new IllegalArgumentException();
 		restTimer += duration;
 		if (mustRest())
+			restTimer = 0;
 			rest();
 		if (status == Status.DONE && targetPosition != null && !this.isEnableDefaultBehaviour())
 			moveTo(targetPosition);
@@ -645,28 +646,32 @@ public class Unit {
 					startSprinting();
 				}
 			}
-			System.out.println("position " + this.getPosition()[0] +","+ this.getPosition()[1]+","+ this.getPosition()[2]);
-			System.out.println(getDistance(nextTargetPosition, startPosition)-getDistance(startPosition, this.getPosition()));
+			//System.out.println("position " + this.getPosition()[0] +","+ this.getPosition()[1]+","+ this.getPosition()[2]);
+			//System.out.println(getDistance(nextTargetPosition, startPosition)-getDistance(startPosition, this.getPosition()));
+			//System.out.println("target " + targetPosition[0] + targetPosition[1]);
 
-			if (targetPosition != null){
-				if (getDistance(targetPosition, startPosition)-getDistance(startPosition, this.getPosition())<0){
-					setPosition(targetPosition);
-					targetPosition = null;
-					status = Status.DONE;
-				
+			if (targetPosition != null && startPosition != null
+					&& getDistance(targetPosition, startPosition)-getDistance(startPosition, this.getPosition())<=0.0){
+				setPosition(targetPosition);
+				status = Status.DONE;
+				targetPosition = null;
 			}
 			
-			}
-			else if (getDistance(nextTargetPosition, startPosition)-getDistance(startPosition, this.getPosition())<0){
+			
+			else if (nextTargetPosition != null && getDistance(nextTargetPosition, startPosition)-getDistance(startPosition, this.getPosition())<=0.0){
 
 				setPosition(nextTargetPosition);
-				if (targetPosition != null)
+				if (targetPosition != null){
+					//System.out.println("moveto" + targetPosition +"huidige loc" + this.getPosition());
+					status = Status.IN_CENTER;
 					moveTo(targetPosition);
+				}
 				else
 					status = Status.DONE;
 
 			}
 		}
+		
 
 		else if (status == Status.WORKING) {
 			if (workingTime < totalWorkingTime) {
@@ -676,8 +681,7 @@ public class Unit {
 				progressWork = (float) 1.0;
 				status = Status.DONE;
 			}
-		} 
-		else if (status == Status.INITIAL_RESTING) {
+		} else if (status == Status.INITIAL_RESTING) {
 
 			if (recoveredHitpoints >= 1.0 || this.getHitpoints() >= max_nbPoints()) {
 				this.setHitPoints(max_nbPoints());
@@ -698,14 +702,14 @@ public class Unit {
 				this.setStaminaPoints(max_nbPoints());
 				status = Status.DONE;
 			}
-		} else if (status == Status.ATTACKING) {
+		} 
+		else if (status == Status.ATTACKING) {
 			attackTimer += duration;
 			if (attackTimer >= 1.0)
 				status = Status.DONE;
 		}
 
 	}
-
 	/**
 	 * Move a unit to the center of a neighboring cube.
 	 * @param dx
@@ -735,28 +739,31 @@ public class Unit {
 				getPosition()[2] + (double) dz }))
 			throw new IllegalArgumentException();
 		if (canMove()) {
-			status = Status.MOVING;
 			startPosition = new double[] {this.getPosition()[0],this.getPosition()[1],this.getPosition()[2]};
-
+			
 			nextTargetPosition = getCubeCenter(new double[] {this.getCubePosition()[0] + (double) dx , this.getCubePosition()[1] 
 				+ (double) dy , this.getCubePosition()[2] + (double) dz });
+			status = Status.MOVING;
+
+			//System.out.println("new start position " + this.getPosition()[0] +","+ this.getPosition()[1]+","+ this.getPosition()[2]);
+			//System.out.println("next target " + nextTargetPosition[0] +","+ nextTargetPosition[1]+","+ nextTargetPosition[2]);
 
 			setWalkingSpeed(dz);
 		}
 
 	}
-	/**
-	 * A variable registering the amount of cubes the unit needs to move in the x-direction.
-	 */
-	private int dx = 0;
-	/**
-	 * A variable registering the amount of cubes the unit needs to move in the y-direction.
-	 */
-	private int dy = 0;
-	/**
-	 * A variable registering the amount of cubes the unit needs to move in the z-direction.
-	 */
-	private int dz = 0;
+//	/**
+//	 * A variable registering the amount of cubes the unit needs to move in the x-direction.
+//	 */
+//	private int dx = 0;
+//	/**
+//	 * A variable registering the amount of cubes the unit needs to move in the y-direction.
+//	 */
+//	private int dy = 0;
+//	/**
+//	 * A variable registering the amount of cubes the unit needs to move in the z-direction.
+//	 */
+//	private int dz = 0;
 	/**
 	 * A variable registering the start position of this unit.
 	 */
@@ -941,8 +948,9 @@ public class Unit {
 	public void moveTo(double[] targetPosition) throws IllegalArgumentException {
 		if (!isValidPosition(targetPosition))
 			throw new IllegalArgumentException();
-
+		
 		if (canMove()) {
+			this.targetPosition = targetPosition;
 			status = Status.IN_CENTER;
 			int x = 0;
 			int y = 0;
@@ -970,6 +978,7 @@ public class Unit {
 
 		}
 	}
+
 
 	public void moveTo(int[] cubePosition) throws IllegalArgumentException {
 		moveTo(new double[] { (double) cubePosition[0] + 0.5, (double) cubePosition[1] + 0.5,
