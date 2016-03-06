@@ -350,6 +350,17 @@ public class TestSuite {
 		assertEquals(0.5,StandardUnit.getProgressWork(),Util.DEFAULT_EPSILON);
 	}
 	
+	@Test
+	public final void canWork_False(){
+		HitAndStaminaZeroUnit.status = Status.MOVING;
+		assertFalse(HitAndStaminaZeroUnit.canWork());
+	}
+	
+	@Test
+	public final void canWork_True(){
+		assertTrue(HitAndStaminaZeroUnit.canWork());
+	}
+	
 	@Test(expected = IllegalArgumentException.class)
 	public final void attack_IllegalArgument() throws IllegalArgumentException{
 		StandardUnit.attack(Aunit);
@@ -366,14 +377,122 @@ public class TestSuite {
 	public final void attack_EffectiveCase(){
 		StandardUnit.attack(NeighbourStandardUnit);
 		assertEquals(Status.ATTACKING,StandardUnit.status);
+		assertEquals(2 * Math.PI + Math.atan2(NeighbourStandardUnit.getPosition()[1] - StandardUnit.getPosition()[1],
+		NeighbourStandardUnit.getPosition()[0] - StandardUnit.getPosition()[0]) % (2 * Math.PI),
+		StandardUnit.getOrientation(),Util.DEFAULT_EPSILON);
+
 		assertEquals(Math.atan2(StandardUnit.getPosition()[1] - NeighbourStandardUnit.getPosition()[1],
 				StandardUnit.getPosition()[0] - NeighbourStandardUnit.getPosition()[0]),
 				NeighbourStandardUnit.getOrientation(),Util.DEFAULT_EPSILON);
-//		assertEquals((float)Math.atan2(NeighbourStandardUnit.getPosition()[1] - StandardUnit.getPosition()[1],
-//				NeighbourStandardUnit.getPosition()[0] - StandardUnit.getPosition()[0]),
-//				StandardUnit.getOrientation(),Util.DEFAULT_EPSILON);
 
 	}
 	
+	@Test
+	public final void canAttack_FalseCase(){
+		StandardUnit.status = Status.MOVING;
+		assertFalse(StandardUnit.canAttack());
+	}
+	
+	@Test
+	public final void canAttack_TrueCase(){
+		StandardUnit.status = Status.DONE;
+		assertTrue(StandardUnit.canAttack());
+	}
+	
+	@Test
+	public final void defend(){
+		NeighbourStandardUnit.defend(StandardUnit);
+		assertEquals((float)Math.atan2(StandardUnit.getPosition()[1] - NeighbourStandardUnit.getPosition()[1],
+				StandardUnit.getPosition()[0] - NeighbourStandardUnit.getPosition()[0]),
+				NeighbourStandardUnit.getOrientation(),Util.DEFAULT_EPSILON);
+		assertTrue((Util.fuzzyEquals(NeighbourStandardUnit.getHitpoints(), 25.0))||
+				(Util.fuzzyEquals(NeighbourStandardUnit.getHitpoints(), 25.0-StandardUnit.getStrength()/10.0)));
+		
+	}
+	
+	@Test
+	public final void rest_IneffectiveCase(){
+		HitMaxStaminaMaxUnit.rest();
+		assertEquals(Status.DONE,HitMaxStaminaMaxUnit.status);
+		StandardUnit.rest();
+		assertEquals(Status.DONE,StandardUnit.status);
+	}
+	
+	@Test
+	public final void rest_SkipInitialResting(){
+		HitMaxStaminaZeroUnit.rest();
+		assertEquals(Status.RESTING,HitMaxStaminaZeroUnit.status);
+	}
+	
+	@Test
+	public final void rest_StartInitialResting(){
+		HitAndStaminaZeroUnit.rest();
+		assertEquals(Status.INITIAL_RESTING,HitAndStaminaZeroUnit.status);
+	}
+	
+	@Test
+	public final void mustRest_FalseCase(){
+		assertFalse(StandardUnit.mustRest());
+	}
+	
+	@Test
+	public final void mustRest_TrueCase(){
+		advanceTimeFor(StandardUnit,180.0,0.1);
+		assertEquals(Status.INITIAL_RESTING,StandardUnit.status);
+		// mustRest() is always false, because as soon as mustRest becomes true, the unit starts resting and it becomes false again
+		}
+	
+	@Test
+	public final void canRest_FalseBecauseStaminaOrHitPointsNotZero(){
+		assertFalse(StandardUnit.canRest());
+	}
+	
+	@Test
+	public final void canRest_FalseBecauseWrongStatus(){
+		HitAndStaminaZeroUnit.status = Status.MOVING;
+		assertFalse(HitAndStaminaZeroUnit.canRest());
+	}
+	
+	@Test
+	public final void canRest_True(){
+		assertTrue(HitAndStaminaZeroUnit.canRest());
+	}
+	
+	@Test
+	public final void startDefaultBehaviour_Ineffective(){
+		StandardUnit.status = Status.ATTACKING;
+		StandardUnit.startDefaultBehaviour();
+		assertEquals(Status.ATTACKING,StandardUnit.status);
+		assertFalse(StandardUnit.isEnableDefaultBehaviour());
+		}
+	
+	@Test
+	public final void startDefaultBehaviour_Effective(){
+		StandardUnit.startDefaultBehaviour();
+		assertTrue(StandardUnit.isEnableDefaultBehaviour());
+		assertTrue(StandardUnit.status==Status.MOVING || StandardUnit.status == Status.INITIAL_RESTING ||StandardUnit.status==Status.WORKING);
+	}
+	
+	@Test
+	public final void stopDefaultBehaviour(){
+		DefaultEnabledUnit.stopDefaultBehaviour();
+		assertFalse(DefaultEnabledUnit.isEnableDefaultBehaviour());
+	}
+	
+	@Test
+	public final void isEnableDefaultBehaviour_True(){
+		assertTrue(DefaultEnabledUnit.isEnableDefaultBehaviour());
+	}
+	
+	@Test
+	public final void isEnableDefaultBehaviour_False(){
+		assertFalse(StandardUnit.isEnableDefaultBehaviour());
+	}
+	
+	@Test
+	public final void setEnableDefaultBehaviour(){
+		StandardUnit.setEnableDefaultBehaviour(true);
+		assertTrue(StandardUnit.isEnableDefaultBehaviour());
+	}
 	
 }

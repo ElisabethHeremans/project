@@ -1160,9 +1160,9 @@ public class Unit {
 				this.setHitPoints(newHitPoints);
 			else
 				this.setHitPoints(0.0);
+			status = Status.DONE;
 		}
 
-		status = Status.DONE;
 	}
 	
 	/**
@@ -1193,7 +1193,6 @@ public class Unit {
 	 * 		   | result == (restTimer >= 180 || this.getStaminaPoints() <= 0 || this.getHitpoints() <= 0)
 	 */
 	public boolean mustRest() {
-
 		if (restTimer >= 180 )
 			return true;
 		return false;
@@ -1301,11 +1300,12 @@ public class Unit {
 
 	/**
 	 * Makes the unit stop with his default behaviour.
-	 * @post enableDefaultBehaviour will be set to false and the unit's status will be set to done.
-	 * 		 | enableDefaultBehaviour = false && status = Status.DONE
+	 * @post enableDefaultBehaviour of this new unit is false and the new unit's status is set to done 
+	 * 			and the targetPosition and nextTargetPosition are null.
+	 * 		 | !new.isEnableDefaultBehaviour() && new.status = Status.DONE 
 	 */
 	public void stopDefaultBehaviour() {
-		enableDefaultBehaviour = false;
+		setEnableDefaultBehaviour(false);
 		targetPosition = null;
 		nextTargetPosition = null;
 		status = Status.DONE;
@@ -1329,7 +1329,7 @@ public class Unit {
 	 * @param enableDefaultBehaviour
 	 *          The new enableDefaultBehaviour for this unit.
 	 * @post The enableDefaultBehaviour of this new unit is equal to the given enableDefaultBehaviour.
-	 * 		 | this.enableDefaultBehaviour = enableDefaultBehaviour
+	 * 		 | new.enableDefaultBehaviour == enableDefaultBehaviour
 	 */
 	public void setEnableDefaultBehaviour(boolean enableDefaultBehaviour) {
 		this.enableDefaultBehaviour = enableDefaultBehaviour;
