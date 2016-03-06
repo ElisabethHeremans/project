@@ -1152,6 +1152,7 @@ public class Unit {
 
 	/**
 	 * Check whether it's possible for a unit to attack.
+	 * 
 	 * @return True if the unit is not currently moving.
 	 * 		   | result == (status != Status.MOVING)
 	 */
@@ -1162,19 +1163,20 @@ public class Unit {
 	}
 	
 	/**
-	 * Makes the unit attack an other unit.
+	 * Make the unit attack an other unit.
+	 * 
 	 * @param other
 	 * 		The unit that will be attacked.
-	 * @post If the unit can attack an other unit, his status will be updated to attacking
-	 * 			and the attackTimer will be set to zero.
+	 * @post If this unit can attack another unit, this new unit's status will be updated to attacking
+	 * 			and this unit's attackTimer will be set to zero.
 	 * 		 | if (canAttack())
-	 * 		 |	then status = Status.ATTACKING && attackTimer = 0.0
-	 * @effect If the unit can attack an other unit, 
-	 * 			the orientation of the attacking will be changed so that the units face eachother
-	 * 			and the other unit will try to defend himself.
+	 * 		 |	then new.status == Status.ATTACKING && new.attackTimer == 0.0
+	 * @effect If this unit can attack, the orientation of this new unit will be changed so that this unit faces the other unit.
+	 * 			The new other unit defends itself against this unit.
 	 * 		 | if (canAttack())
 	 * 		 |	then this.setOrientation((float) Math.atan2(other.getPosition()[1] - this.getPosition()[1],
-			 |		other.getPosition()[0] - this.getPosition()[0])) && other.defend(this).
+	 *		 |		other.getPosition()[0] - this.getPosition()[0])) && other.defend(this).
+	 *		 |		(new other).defend(this)
 	 * @throws IllegalArgumentException
 	 * 			If the unit that will be attacked isn't positioned in a neighboring cube.
 	 * 			| (!isNeighbouringCube(other.getCubePosition()))
@@ -1190,7 +1192,6 @@ public class Unit {
 			attackTimer = 0.0;
 		}
 	}
-	
 
 	/**
 	 * A variable registering the duration of the attack.
@@ -1198,29 +1199,32 @@ public class Unit {
 	private double attackTimer;
 
 	/**
-	 * Makes the unit defend itself against an attack of an other unit.
+	 * Make the unit defend itself against an attack of an other unit.
+	 * 
 	 * @param unit
 	 * 		The attacking unit.
-	 * @effect Change the orientation of the defending unit so that the two units are facing each other.
-	 * 		   | setOrientation((float) Math.atan2(unit.getPosition()[1] - this.getPosition()[1],
+	 * @effect Change the orientation of this unit so that this new unit faces the attacking unit.
+	 * 		   | this.setOrientation((float) Math.atan2(unit.getPosition()[1] - this.getPosition()[1],
 	 *		   |	unit.getPosition()[0] - this.getPosition()[0]))
-	 * @effect If the unit is able to dodge, he will jump to a random neighboring cube.
+	 * @effect If this unit is able to dodge, his position is set to a random neighbhouring cube.
 	 * 		   | if (new Random().nextDouble() <= 0.20 * (this.getAgility() / unit.getAgility()))
-	 * 		   |	then moveToAdjacent(-1 + (new Random().nextInt(3)), -1 + (new Random().nextInt(3)),
-	 * 		   |		-1 + (new Random().nextInt(3)))
-	 * @post If the unit wasn't able to dodge but he is able to block the attack,
-	 * 			the unit's status will be updated to done. 
-	 * 		 | if (new Random().nextDouble() <= 0.25*
-	 *	 	 |	((this.getStrength() + this.getAgility()) / (unit.getStrength() + unit.getAgility())))
-	 *		 |		then status = Status.DONE
-	 * @effect If the unit wasn't able to dodge or to block the attack, the unit will lose hitpoints equal to 
+	 * 		   |	this.setPosition(new double[] {this.getPosition()[0]+ (double)(-1 + (new Random().nextInt(3))),
+	 *		   |			this.getPosition()[1]+ (double)(-1 + (new Random().nextInt(3))),
+	 *		   |			this.getPosition()[2]+ (double)(-1 + (new Random().nextInt(3)))});
+	 * @effect If this unit isn't able to dodge or to block the attack, this unit will lose hitpoints equal to 
 	 * 			to the attacking unit's strength divided by 10. If the hitpoints would go under zero,
-	 * 			they will be set to zero. Afterwards the unit's status will be set to done.
-	 * 		   | double newHitPoints = this.getHitpoints() - unit.getStrength() / 10.0
-	 * 		   | if (newHitPoints > 0)
-	 * 		   |	then this.setHitPoints(newHitPoints)
-	 * 		   |	else this.setHitPoints(0.0)
-	 * 		   | status = Status.DONE;
+	 * 			they will be set to zero.
+	 * 		   | if (!(new Random().nextDouble() <= 0.20 * (this.getAgility() / unit.getAgility()))
+	 * 		   |	this.setPosition(new double[] {this.getPosition()[0]+ (double)(-1 + (new Random().nextInt(3))) &&
+	 * 		   | 	!(new Random().nextDouble() <= 0.25*
+	 *	 	   |	((this.getStrength() + this.getAgility()) / (unit.getStrength() + unit.getAgility())))){
+	 * 		   | 	if (this.getHitpoints() - unit.getStrength() / 10.0 > 0)
+	 * 		   |		then this.setHitPoints(this.getHitpoints() - unit.getStrength() / 10.0)
+	 * 		   | 	if (this.getHitpoints() - unit.getStrength() / 10.0 <=0)
+	 * 		   |		then this.setHitPoints(0.0)
+	 * 		   |	}
+	 * @post This new unit's status is DONE.
+	 * 		   | new.status == Status.DONE;
 	 */
 	public void defend(Unit unit) {
 		status = Status.DEFENDING;
@@ -1228,15 +1232,16 @@ public class Unit {
 				unit.getPosition()[0] - this.getPosition()[0]));
 		if (new Random().nextDouble() <= 0.20 * (this.getAgility() / unit.getAgility())) {
 			try {
-				moveToAdjacent(-1 + (new Random().nextInt(3)), -1 + (new Random().nextInt(3)),
-						-1 + (new Random().nextInt(3)));
-			} catch (IllegalArgumentException exc) {
+				this.setPosition(new double[] {this.getPosition()[0]+ (double)(-1 + (new Random().nextInt(3))),
+						this.getPosition()[1]+ (double)(-1 + (new Random().nextInt(3))),
+						this.getPosition()[2]+ (double)(-1 + (new Random().nextInt(3)))});
+			} 
+			catch (IllegalArgumentException exc) {
 				defend(unit);
 			}
 			status = Status.DONE;
 		}
-
-		if (new Random().nextDouble() <= 0.25
+		else if (new Random().nextDouble() <= 0.25
 				* ((this.getStrength() + this.getAgility()) / (unit.getStrength() + unit.getAgility())))
 			status = Status.DONE;
 		else {
@@ -1250,11 +1255,11 @@ public class Unit {
 
 	}
 
-	
 	/**
 	 * Checks whether the unit needs to rest.
-	 * @return True only if 3 minutes of game time have past or the stamina points or hitpoints or equal to zero.
-	 * 		   | result == (restTimer >= 180 || this.getStaminaPoints() <= 0 || this.getHitpoints() <= 0)
+	 * 
+	 * @return True if and only if 3 minutes of game time have passed or the stamina points or hitpoints or equal to zero.
+	 * 		   | result == (restTimer >= 180)
 	 */
 	public boolean mustRest() {
 		if (restTimer >= 180 )
@@ -1263,10 +1268,12 @@ public class Unit {
 	}
 	/**
 	 * Check whether it's possible for a unit to rest.
-	 * @return True only if the unit is currently doing nothing or is resting or 
-	 * 			working or is moving and is currently in the center of a cube.
-	 * 		   | result == (status == Status.DONE || status == Status.RESTING || 
-	 * 				status == Status.WORKING || status == Status.IN_CENTER)
+	 * @return True if and only if this unit's stamina points or hitpoints are equal to zero, 
+	 * 			and if this unit is currently doing nothing or is resting or 
+	 * 			working or is moving and currently in the center of a cube.
+	 * 		   | result == (this.getStaminaPoints() <= 0 || this.getHitpoints() <= 0)&&
+	 * 		   |		(status == Status.DONE || status == Status.RESTING || 
+	 * 		   | 		status == Status.WORKING || status == Status.IN_CENTER)
 	 */
 	public boolean canRest() {
 		if(this.getStaminaPoints() <= 0 || this.getHitpoints() <= 0)
@@ -1277,14 +1284,20 @@ public class Unit {
 	
 	/**
 	 * Makes the unit rest.
-	 * @post If a unit needs or can rest, the restTimer and recoveredHitpoints will be set to zero. 
-	 * 		 If a unit needs or can rest and his hitpoints are less then the maximum value of hitpoints,
-	 * 			the unit's status will be set to initial resting, otherwise the status will be set to resting.
+	 * 
+	 * @post If this unit needs or can rest, this new unit's restTimer and recoveredHitpoints will be set to zero.
 	 * 		 | if (mustRest() || canRest())
-	 * 		 |	then restTimer = 0.0 && recoveredHitpoints = 0.0
+	 * 		 |		then restTimer = 0.0 && recoveredHitpoints = 0.0
+	 * @post If this unit needs or can rest and its hitpoints are less than the maximum value of hitpoints,
+	 * 			this new unit's status will be set to initial resting.
+	 * 		 | if (mustRest() || canRest())
 	 * 		 |		if (this.getHitpoints() < max_nbPoints())
 	 * 	 	 |			then status = Status.INITIAL_RESTING
-	 * 		 |			else status = Status.RESTING
+	 * @post If this unit needs or can rest and its hitpoints are equal to the maximum number of hitpoints, 
+	 * 			this new unit's status will be set to resting.
+	 * 		 | if (mustRest() || canRest())
+	 * 		 |		if (this.getHitpoints() >= max_nbPoints())
+	 * 	 	 |			then status = Status.RESTING
 	 */
 	public void rest() {
 		if (mustRest() || canRest()) {
@@ -1301,14 +1314,17 @@ public class Unit {
 	 * Symbolic constant registering the recovered hitpoints of a unit.
 	 */
 	private double recoveredHitpoints = 0.0;
+	
 	/**
 	 * A variable registering the passed game time since the last rest.
 	 */
 	private double restTimer = 0.0;
+	
 	/**
-	 * Check whether the default behaviour is enabled.
-	 * @return True if the default behaviour is enabled.
-	 * 		   | result == enableDefaultBehaviour
+	 * Check whether the default behavior is enabled.
+	 * 
+	 * @return True if and only if this unit's default behavior is enabled.
+	 * 		   | result == this.enableDefaultBehaviour
 	 */
 	public boolean isEnableDefaultBehaviour() {
 		return enableDefaultBehaviour;
@@ -1316,10 +1332,11 @@ public class Unit {
 
 	/**
 	 * Set the enableDefaultBehaviour of this unit to the given enableDefaultBehaviour.
+	 * 
 	 * @param enableDefaultBehaviour
 	 *          The new enableDefaultBehaviour for this unit.
 	 * @post The enableDefaultBehaviour of this new unit is equal to the given enableDefaultBehaviour.
-	 * 		 | new.enableDefaultBehaviour == enableDefaultBehaviour
+	 * 		 | new.isEnableDefaultBehaviour() == enableDefaultBehaviour
 	 */
 	public void setEnableDefaultBehaviour(boolean enableDefaultBehaviour) {
 		this.enableDefaultBehaviour = enableDefaultBehaviour;
@@ -1327,45 +1344,40 @@ public class Unit {
 
 	/**
 	 * Makes the unit start with his default behaviour.
-	 * @post If a unit's status is done, enableDefaultBehaviour becomes true and 
-	 * 		 a random integer from 0 to 4 will be generated. Otherwise the enableDefaultBehaviour becomes false.
+	 * 
+	 * @effect If this unit's status is done, its enableDefaultBehaviour is set to true. 
 	 * 		 | if (status == Status.DONE)
-	 * 		 |	then enableDefaultBehaviour = true && int i = new Random().nextInt(4)
-	 * 		 |	else enableDefaultBehaviour = false
-	 * @effect If the random integer is equal to zero, the unit's status will be updated to moving and
-	 * 		   he will start sprinting to a random position.
-	 * 		   If the random integer is equal to one, the unit's status will be updated to moving and
-	 * 		   he will start moving(walking) to a random position.
-	 * 		   If the random integer is equal to two, the unit will start working.
-	 * 		   If the random integer is equal to three, the unit will start resting.
-	 * 		   | if (i == 0)
-	 * 		   |	then status = Status.MOVING && startSprinting() &&
-	 * 		   |		moveTo(new double[] { (new Random().nextDouble()) * 50, (new Random().nextDouble()) * 50,
-	 *		   |		 (new Random().nextDouble()) * 50 })
-	 *		   | if (i == 1)
-	 *		   |	then status = Status.MOVING && stopSprinting() &&
+	 * 		 |	then this.setEnableDefaultBehaviour(true)
+	 * @effect If this unit's status is not done, its enableDefaultBehaviour is set to false.
+	 * 		 | if !(status == Status.DONE)
+	 * 		 |	then this.setEnableDefaultBehaviour(false)
+	 * @effect If this unit's status is done, it will do randomly walks to a random position
+	 * 			 - this new unit's status is moving and this sprints to a random position
+	 * 			 - this unit starts working
+	 * 			 - this unit starts resting
+	 * 		   | (new.status == Status.MOVING && startSprinting() && moveTo(new double[] { (new Random().nextDouble()) * 50, (new Random().nextDouble()) * 50,
+	 *		   |		 (new Random().nextDouble()) * 50 }))
+	 *		   |OR (new.status = Status.MOVING && stopSprinting() &&
 	 *		   |		moveTo(new double[] { (new Random().nextDouble()) * 50, (new Random().nextDouble()) * 50,
-	 *		   |		 (new Random().nextDouble()) * 50 })
-	 *		   | if (i == 2)
-	 *		   |	then work()
-	 *		   | if (i == 3)
-	 *	  	   |	then rest()
+	 *		   |		 (new Random().nextDouble()) * 50 }))
+	 *		   |OR work()
+	 *		   |OR rest()	   
 	 */
 	public void startDefaultBehaviour() {
 		if (status == Status.DONE) {
-			enableDefaultBehaviour = true;
+			setEnableDefaultBehaviour(true);
 			int i = new Random().nextInt(4);
 			if (i == 0) {
 				status = Status.IN_CENTER;
-				startSprinting();
 				moveTo(new double[] { (new Random().nextDouble()) * X*L, (new Random().nextDouble()) * Y*L,
 						(new Random().nextDouble()) * Z*L });
+				startSprinting();
 			}
 			if (i == 1) {
 				status = Status.IN_CENTER;
-				stopSprinting();
 				moveTo(new double[] { (new Random().nextDouble()) * X*L, (new Random().nextDouble()) * Y*L,
 						(new Random().nextDouble()) * Z*L });
+				stopSprinting();
 			}
 			if (i == 2)
 				work();
@@ -1379,9 +1391,10 @@ public class Unit {
 
 	/**
 	 * Makes the unit stop with his default behaviour.
-	 * @post enableDefaultBehaviour of this new unit is false and the new unit's status is set to done 
-	 * 			and the targetPosition and nextTargetPosition are null.
-	 * 		 | !new.isEnableDefaultBehaviour() && new.status = Status.DONE 
+	 * 
+	 * @post enableDefaultBehaviour of this new unit is false and this new unit's status is set to done 
+	 * 			and this unit's targetPosition and nextTargetPosition are null.
+	 * 		 | !new.isEnableDefaultBehaviour() && new.status == Status.DONE && new.targetPosition == null && new.nextTargetPosition == null
 	 */
 	public void stopDefaultBehaviour() {
 		setEnableDefaultBehaviour(false);
@@ -1389,14 +1402,17 @@ public class Unit {
 		nextTargetPosition = null;
 		status = Status.DONE;
 	}
+	
 	/**
 	 * A boolean to check if the default behaviour is enabled.
 	 */
 	private boolean enableDefaultBehaviour;
+	
 	/**
 	 * A variable registering the status of this unit.
 	 */
 	public Status status = Status.DONE;
+	
 	/**
 	 * Symbolic constant registering the fixed number of cubes in direction x.
 	 */
