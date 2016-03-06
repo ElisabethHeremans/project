@@ -921,7 +921,7 @@ public class Unit {
 		if (status != Status.MOVING) {
 			return 0.0;
 		} else {
-			if (isSprinting)
+			if (isSprinting())
 				return 2.0 * getWalkingSpeed();
 			return getWalkingSpeed();
 		}
