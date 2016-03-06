@@ -350,11 +350,11 @@ public class Unit {
 	 * 
 	 * @param hitpoints
 	 *            The hitPoints to check.
-	 * @return | result == (hitpoints < max_nbHitpoints())
+	 * @return | result == (hitpoints <= max_nbHitpoints())
 	 */
 	@Raw
 	public boolean canHaveAsHitpoints(double hitpoints) {
-		return hitpoints < max_nbPoints();
+		return Util.fuzzyLessThanOrEqualTo(hitpoints,max_nbPoints(),Util.DEFAULT_EPSILON);
 	}
 
 	/**
@@ -382,7 +382,7 @@ public class Unit {
 	 *       number of hitpoints. | new.getHitpoints() == hitpoints
 	 */
 	@Raw
-	private void setHitPoints(double hitpoints) {
+	public void setHitPoints(double hitpoints) {
 		assert canHaveAsHitpoints(hitpoints);
 		this.hitpoints = hitpoints;
 	}
@@ -403,10 +403,10 @@ public class Unit {
 	 * @param the
 	 *            number of staminapoints The the number of staminapoints to
 	 *            check.
-	 * @return | result == (staminaPoints < max_nbPoints())
+	 * @return | result == (staminaPoints <= max_nbPoints())
 	 */
 	public boolean canHaveAsStaminaPoints(double staminaPoints) {
-		return staminaPoints < max_nbPoints();
+		return Util.fuzzyLessThanOrEqualTo(staminaPoints,max_nbPoints(),Util.DEFAULT_EPSILON);
 	}
 
 	/**
@@ -422,7 +422,7 @@ public class Unit {
 	 *       staminaPoints
 	 */
 	@Raw
-	private void setStaminaPoints(double staminaPoints) {
+	public void setStaminaPoints(double staminaPoints) {
 		assert canHaveAsStaminaPoints(staminaPoints);
 		this.staminaPoints = staminaPoints;
 	}
@@ -605,10 +605,10 @@ public class Unit {
 	 *       working time is increased with duration, and the progress is
 	 *       updated. Else if the unit is working and the task is completed, the
 	 *       new status is done.
-	 * @effect If the status of this unit is initial resting and if his recoveredHitpoints are equal to or 
-	 * 			greater then 1 or his hitpoints are equal to or greater then the maximum value, 
+	 * @effect If the status of this unit is initial resting, his new hitpoints are increased by (getToughness() / 200.0) * 5 * duration,
+	 * 			as well as the recovered hitpoints. If his recoveredHitpoints are equal to or 
+	 * 			greater than 1 or if his hitpoints are equal to or greater then the maximum value, 
 	 * 			the unit's status will be updated to resting and his hitpoints will be set to the maximum value. 
-	 * 			Else his hitpoints will be increased as well as the recovered hitpoints.
 	 * @effect If the status of this unit is resting and if his hitpoints are less then the maximum value, 
 	 * 			the unit will recover hitpoints. If his hitpoints are at the maximum value but 
 	 * 			the stamina points aren't, the unit will recover staminapoints. If both hitpoints and stamina points 
@@ -675,13 +675,11 @@ public class Unit {
 			}
 		} 
 		else if (status == Status.INITIAL_RESTING) {
-
+			this.setHitPoints((getToughness() / 200.0) * 5 * duration + getHitpoints());
+			recoveredHitpoints += (getToughness() / 200.0) * 5 * duration;
 			if (recoveredHitpoints >= 1.0 || this.getHitpoints() >= max_nbPoints()) {
 				this.setHitPoints(max_nbPoints());
 				status = Status.RESTING;
-			} else {
-				this.setHitPoints((getToughness() / 200.0) * 5 * duration + getHitpoints());
-				recoveredHitpoints += (getToughness() / 200.0) * 5 * duration;
 			}
 		}
 		else if (status == Status.RESTING) {
@@ -717,10 +715,10 @@ public class Unit {
 	 * 			his nextTargetPosition will be the center of the neighbouring cube the unit
 	 * 			needs to move to. The unit's status will also be updated to moving.
 	 * 		 | if (canMove())
-	 * 		 |	then startPosition = new double[] {this.getPosition()[0],this.getPosition()[1],this.getPosition()[2]}
-	 * 		 |		&& nextTargetPosition = getCubeCenter(new double[] {this.getCubePosition()[0] + (double) dx ,
+	 * 		 |	then new.startPosition == new double[] {this.getPosition()[0],this.getPosition()[1],this.getPosition()[2]}
+	 * 		 |		&& new.nextTargetPosition = getCubeCenter(new double[] {this.getCubePosition()[0] + (double) dx ,
 	 * 		 |		   this.getCubePosition()[1] + (double) dy , this.getCubePosition()[2] + (double) dz })
-	 * 		 |		&& status = Status.MOVING
+	 * 		 |		&& new.status == Status.MOVING
 	 * @effect The walkingSpeed of this unit is set to the given flag. 
 	 * 			| setWalkingspeed(dz)
 	 * @throws IllegalArgumentException
@@ -744,6 +742,8 @@ public class Unit {
 				+ (double) dy , this.getCubePosition()[2] + (double) dz });
 			status = Status.MOVING;
 			setWalkingSpeed(dz);
+			//System.out.println(this.getCurrentSpeed());
+
 		}
 	}
 
@@ -1055,6 +1055,15 @@ public class Unit {
 		totalWorkingTime = (float) 500.0 / this.getStrength();
 		progressWork = (float) 0.0;
 
+	}
+	
+	/**
+	 * Get the progress of the work of this unit, as a double between 0 and 1.
+	 * @return the value of progressWork
+	 * 			| result == this.progressWork
+	 */
+	public double getProgressWork(){
+		return progressWork;
 	}
 	
 	/**
