@@ -96,7 +96,9 @@ public class Unit {
 	 *       given the number of staminapoints. | new.getStaminaPoints() ==
 	 *       staminaPoints
 	 * @effect The orientation of this new unit is set to the given orientation
-	 *         | this.setOrientation(orientation)
+	 *         | setOrientation(orientation)
+	 * @effect The default behaviour of this new unit is set to the given value of enableDefaultBehaviour
+	 *         | setEnableDefaultBehaviour(enableDefaultBehaviour)
 	 */
 
 	@Raw
@@ -122,6 +124,7 @@ public class Unit {
 		this.setStaminaPoints(staminaPoints);
 		this.setName(name);
 		this.setPosition(position);
+		this.setEnableDefaultBehaviour(enableDefaultBehavior);
 
 	}
 
@@ -581,11 +584,11 @@ public class Unit {
 	 * 
 	 * @param duration
 	 *            The game time after which advanceTime is called.
-	 * @effect If this unit must rest, the new unit shall rest.
+	 * @effect If this unit must rest, this new unit shall rest and its rest timer is set on zero.
 	 * @effect If this unit is doing nothing, but he hasn't reached his
 	 *         targetPosition, he shall resume moving to the targetPosition.
-	 * @effect If this units default behaviour is enabled, and this unit is
-	 *         doing nothing, he shall start default behaviour.
+	 * @effect If this unit's default behaviour is enabled, and this unit is
+	 *         doing nothing, he shall start a default behaviour.
 	 * @effect If this unit is moving, set the position of this new unit to the
 	 *         updated position (the old position + this unit's speed *
 	 *         duration) and set the orientation of this new unit to the
@@ -620,11 +623,10 @@ public class Unit {
 			throw new IllegalArgumentException();
 		restTimer += duration;
 		if (mustRest())
-			restTimer = 0;
 			rest();
-		if (status == Status.DONE && targetPosition != null && !this.isEnableDefaultBehaviour())
+		else if (status == Status.DONE && targetPosition != null && !this.isEnableDefaultBehaviour())
 			moveTo(targetPosition);
-		if (this.isEnableDefaultBehaviour() && status == Status.DONE)
+		else if (this.isEnableDefaultBehaviour() && status == Status.DONE)
 			startDefaultBehaviour();
 		else if (status == Status.MOVING) {
 			double d = getDistance(nextTargetPosition,startPosition);
@@ -634,7 +636,7 @@ public class Unit {
 			
 			setPosition(new double[] {this.getPosition()[0]+v[0]*duration,this.getPosition()[1]+v[1]*duration,this.getPosition()[2]+v[2]*duration});
 			setOrientation((float) Math.atan2(v[1],v[0]));
-			if (isSprinting){
+			if (isSprinting()){
 	
 				if (Util.fuzzyLessThanOrEqualTo(this.getStaminaPoints()-10.0*duration,0.0)){
 			
@@ -867,7 +869,16 @@ public class Unit {
 	/**
 	 * A boolean to register if the unit is sprinting.
 	 */
-	public boolean isSprinting = false;
+	private boolean isSprinting = false;
+	
+	/**
+	 * Check if the unit is sprinting.
+	 * @return the value of isSprinting
+	 * 			| result == isSprinting
+	 */
+	public boolean isSprinting(){
+		return isSprinting;
+	}
 
 	/**
 	 * Enable sprinting mode for the given unit.
@@ -1028,14 +1039,14 @@ public class Unit {
 	
 	/**
 	 * Makes the unit work.
-	 * @post If a unit can work, his status will be updated to working.
+	 * @post If a unit can work, his new status will be updated to working.
 	 * 		 | if (canWork())
-	 *		 |	then status = Status.WORKING
-	 * @post The workingTime and the progressWork of the unit will be set on zero
+	 *		 |	then new.status == Status.WORKING
+	 * @post The workingTime and the progressWork of this new unit will be set on zero
 	 * 			and the totalWorkingTime will be calculated as 500 divided by the unit's strength.
-	 * 		 | workingTime = (float) 0.0
-	 *		 | totalWorkingTime = (float) 500.0 / this.getStrength()
-	 *	 	 | progressWork = (float) 0.0
+	 * 		 | new.workingTime == (float) 0.0
+	 *		 | new.totalWorkingTime == (float) 500.0 / this.getStrength()
+	 *	 	 | new.progressWork == (float) 0.0
 	 */
 	public void work() {
 		if (canWork())
@@ -1265,7 +1276,6 @@ public class Unit {
 			}
 			if (i == 1) {
 				status = Status.IN_CENTER;
-				status = Status.MOVING;
 				stopSprinting();
 				moveTo(new double[] { (new Random().nextDouble()) * X*L, (new Random().nextDouble()) * Y*L,
 						(new Random().nextDouble()) * Z*L });
@@ -1273,6 +1283,7 @@ public class Unit {
 			if (i == 2)
 				work();
 			if (i == 3)
+				restTimer = 180.01;
 				rest();
 		} else
 			enableDefaultBehaviour = false;

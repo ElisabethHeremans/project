@@ -30,8 +30,7 @@ public class TestSuite {
 	@Before
 	public final void setUpBefore(){
 		Bunit = new Unit("Bunit",new double[] {3.5,1.5,4.5},75,25,25,75,false,25.0,25.0,Math.PI/2);
-		//unit3 = new Unit();
-				
+		Cunit = new Unit("Cunit",new double[] {3.5,1.5,4.5},75,25,25,75,true,0.0,0.0,Math.PI/2);		
 	}
 	
 	@Test
@@ -42,21 +41,21 @@ public class TestSuite {
 	public final void startSprinting_Effective(){
 		Bunit.status = Status.MOVING;
 		Bunit.startSprinting();
-		Assert.assertTrue(Bunit.isSprinting);
+		Assert.assertTrue(Bunit.isSprinting());
 		
 	}
 	
 	@Test
 	public final void startSprinting_NonEffective(){
 		Bunit.startSprinting();
-		Assert.assertFalse(Bunit.isSprinting);
+		Assert.assertFalse(Bunit.isSprinting());
 	}
 	
 	@Test
 	public final void stopSprinting(){
-		Bunit.isSprinting = true;
+		Bunit.startSprinting();
 		Bunit.stopSprinting();
-		Assert.assertFalse(Bunit.isSprinting);
+		Assert.assertFalse(Bunit.isSprinting());
 	}
 	
 	
@@ -134,8 +133,90 @@ public class TestSuite {
 		assertDoublePositionEquals(1.5,2.5,3.5,Unit.getCubeCenter(new double[] {1.0,2.0,3.0}));
 	}
 	
+	@Test(expected=IllegalArgumentException.class)
+	public final void advanceTime_IllegalArgument(){
+		Bunit.advanceTime((float)0.3);
+	}
 	
+	@Test
+	public final void advanceTime_MustRest(){
+		advanceTimeFor(Bunit,180.1,0.05);
+		//System.out.println(Bunit.restTimer);
+		assertEquals(Status.INITIAL_RESTING,Bunit.status);
+	}
 	
+	@Test
+	public final void advanceTime_InterruptedMovement(){
+		Bunit.moveTo(new int[] {1,2,3});
+		Bunit.status = Status.DONE;
+		advanceTimeFor(Bunit,20.0,0.1);
+		assertIntegerPositionEquals(1,2,3,Bunit.getCubeCoordinate());
+	}
 	
+	@Test
+	public final void advanceTime_ActivateDefaultBehaviour(){
+		Cunit.advanceTime((float)0.05);
+		//System.out.println(Cunit.status);
+		assertTrue(Cunit.status== Status.INITIAL_RESTING||Cunit.status==Status.MOVING||Cunit.status==Status.WORKING);
 
+	}
+	
+	@Test
+	public final void advanceTime_MovingToNextCube(){
+		Bunit.moveTo(new int[]{4,1,4});
+		double speed = Bunit.getCurrentSpeed();
+		double time = 1.0 / speed;
+		Bunit.advanceTime((float) 0.1);
+		assertDoublePositionEquals(3.5+speed*0.1,1.5,4.5,Bunit.getPosition());
+		assertEquals(0.0, Bunit.getOrientation(),Util.DEFAULT_EPSILON);
+		advanceTimeFor(Bunit,time-0.1,0.1);
+		Assert.assertArrayEquals(new double[] {4.5,1.5,4.5}, Bunit.getPosition(), Util.DEFAULT_EPSILON);
+		Assert.assertEquals(Status.DONE, Bunit.status);
+		
+	}
+	
+	@Test
+	public final void advanceTime_Sprinting(){
+		Bunit.moveTo(new int[]{4,1,4});
+		Bunit.startSprinting();
+		double speed = Bunit.getCurrentSpeed();
+		double time = 1.0 / speed;
+		Bunit.advanceTime((float) 0.1);
+		assertDoublePositionEquals(3.5+speed*0.1,1.5,4.5,Bunit.getPosition());
+		assertEquals(0.0, Bunit.getOrientation(),Util.DEFAULT_EPSILON);
+		advanceTimeFor(Bunit,time-0.1,0.1);
+		Assert.assertArrayEquals(new double[] {4.5,1.5,4.5}, Bunit.getPosition(), Util.DEFAULT_EPSILON);
+		Assert.assertEquals(Status.DONE, Bunit.status);
+		Assert.assertEquals(25.0-10.0*time,Bunit.getStaminaPoints(),Util.DEFAULT_EPSILON);
+	}
+
+	@Test
+	public final void advanceTime_MovingTwoCubes(){
+		Bunit.moveTo(new int[]{5,1,4});
+		double speed = Bunit.getCurrentSpeed();
+		double time = 1.0 / speed;
+		Bunit.advanceTime((float) 0.1);
+		assertDoublePositionEquals(3.5+speed*0.1,1.5,4.5,Bunit.getPosition());
+		assertEquals(0.0, Bunit.getOrientation(),Util.DEFAULT_EPSILON);
+		advanceTimeFor(Bunit,time-0.1,0.1);
+		Assert.assertArrayEquals(new double[] {4.5,1.5,4.5}, Bunit.getPosition(), Util.DEFAULT_EPSILON);
+		Assert.assertEquals(Status.MOVING, Bunit.status);
+	}
+	
+	@Test
+	public final void advanceTime_Working(){
+		Bunit.work();
+		double totalWorkingTime =  500.0 /25.0;
+		advanceTimeFor(Bunit,totalWorkingTime, 0.1);
+		assertEquals(Bunit.status,Status.DONE);
+		
+	}
+	
+	@Test
+	public final void advanceTime_InitialResting(){
+		Cunit.rest();
+		Cunit.advanceTime((float) 0.1);
+		assertEquals((25/200.0)*5*0.1,Cunit.getHitpoints(),Util.DEFAULT_EPSILON);
+		
+	}
 }

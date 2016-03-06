@@ -265,7 +265,7 @@ public class Facade implements IFacade {
 	@Override
 	public boolean isSprinting(Unit unit) throws ModelException {
 		try{
-			return unit.isSprinting;
+			return unit.isSprinting();
 		}
 		catch (NullPointerException exc){
 			throw new ModelException();
