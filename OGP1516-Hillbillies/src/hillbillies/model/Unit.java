@@ -189,7 +189,7 @@ public class Unit {
 	 */
 	@Raw
 	public boolean canHaveAsWeight(int weight) {
-		return ((float) weight >= ((float) this.strength + (float) this.agility) / 2) && weight >=1 && weight <=200;
+		return ((float) weight >= ((float) this.getStrength() + (float) this.getAgility()) / 2) && weight >=1 && weight <=200;
 	}
 
 	/**
@@ -199,8 +199,8 @@ public class Unit {
 	 *            The new weight for this unit.
 	 * @post If the given weight is not a valid weight for any unit, the weight
 	 *       of this new unit is equal to the weight of this unit.
-	 *       |if(!canHaveAsWeight(weight)) | then new.getWeight() ==
-	 *       this.getWeight()
+	 *       |if(!canHaveAsWeight(weight))
+	 *       | then new.getWeight() == this.getWeight()
 	 */
 	@Raw
 	public void setWeight(int weight) {
@@ -244,7 +244,7 @@ public class Unit {
 	 * @post If the given strength is a valid strength for any unit, the
 	 *       strength of this new unit is equal to the given strength. 
 	 *       | if (isValidStrength(strength)) 
-	 *       | then new.getStrength() == strength
+	 *       | 	then new.getStrength() == strength
 	 */
 	@Raw
 	public void setStrength(int strength) {
@@ -254,7 +254,6 @@ public class Unit {
 	/**
 	 * Variable registering the strength of this unit.
 	 */
-
 	private int strength = 25;
 	
 	/**
@@ -329,9 +328,9 @@ public class Unit {
 	 * @param toughness
 	 *            The new toughness for this unit.
 	 * @post If the given toughness is a valid toughness for any unit, the
-	 *       toughness of this new unit is equal to the given toughness. | if
-	 *       (isValidToughness(toughness)) | then new.getToughness() ==
-	 *       toughness
+	 *       toughness of this new unit is equal to the given toughness.
+	 *       | if (isValidToughness(toughness)) 
+	 *       | 	then new.getToughness() == toughness
 	 */
 	@Raw
 	public void setToughness(int toughness) {
@@ -361,10 +360,10 @@ public class Unit {
 	 * @return True if and only if the given name is at least two characters long, 
 	 * 		   starts with an uppercase letter and only consists of letters, 
 	 * 		   quotes and spaces. 
-	 * 		   | result == !name.length()<2 && Character.isUpperCase(name.charAt(0)) 
-	 * 		   | && (Character.isLetter(name.charAt(index)) ||
-	 *         | name.charAt(index)=='"' || name.charAt(index)=='\'' ||
-	 *         | name.charAt(index)==' ')
+	 * 		   | result == (!name.length()<2 && Character.isUpperCase(name.charAt(0)) 
+	 * 		   | 			&& for (int index = 0; index < name.length(); index++)(Character.isLetter(name.charAt(index)) ||
+	 *         | 				name.charAt(index)=='"' || name.charAt(index)=='\'' ||
+	 *         | 				name.charAt(index)==' '))
 	 */
 	public static boolean isValidName(String name) {
 		if (name.length() < 2)
@@ -402,7 +401,10 @@ public class Unit {
 	 * A variable registering the name of this unit.
 	 */
 	private String name = "Unit";
-
+	
+	/**
+	 *Return the number of hitpoints of this unit.
+	 */
 	@Basic
 	@Raw
 	public double getHitpoints() {
@@ -413,10 +415,10 @@ public class Unit {
 	 * Check whether this unit can have the given hitpoints as its hitpoints.
 	 * 
 	 * @param hitpoints
-	 *            The hitPoints to check.
+	 *            The hitpoints to check.
 	 * @return  True if and only if the number of hitpoints is greater than or equal to 0,
 	 * 			but less than or equal to the maximum value.
-	 * 			| result == (hitpoints <= getMaxPoints() && 0<=hitpoints)
+	 * 			| result == (hitpoints <= this.getMaxPoints() && 0<=hitpoints)
 	 */
 	@Raw
 	public boolean canHaveAsHitpoints(double hitpoints) {
@@ -425,11 +427,11 @@ public class Unit {
 	}
 
 	/**
-	 * Return the maximum value of hitpoints and staminaPoints.
+	 * Return the maximum value of hitpoints and stamina points of this unit.
 	 * 
 	 * @return The maximum value of hitpoints and staminaPoints. 
-	 * 		   | result == Math.ceil(200.0*(this.getWeight()/100.0)*
-	 * 		   | (this.getToughness()/100.0))
+	 * 		   | result == (Math.ceil(200.0*(this.getWeight()/100.0)*
+	 * 		   | (this.getToughness()/100.0)))
 	 */
 	public double getMaxPoints() {
 		return Math.ceil(200.0 * (this.getWeight() / 100.0) * (this.getToughness() / 100.0));
@@ -441,10 +443,9 @@ public class Unit {
 	 * 
 	 * @param hitpoints
 	 *            The new the number of hitpoints for this unit.
-	 * @pre The given the number of hitpoints must be a valid the number of
-	 *      hitpoints for any unit. 
+	 * @pre This unit can have the given hitpoints as its hitpoints.
 	 *      | canHaveAsHitpoints(hitpoints)
-	 * @post The the number of hitpoints of this unit is equal to the given the
+	 * @post The the number of hitpoints of this new unit is equal to the given the
 	 *       number of hitpoints. 
 	 *      | new.getHitpoints() == hitpoints
 	 */
@@ -453,6 +454,11 @@ public class Unit {
 		assert canHaveAsHitpoints(hitpoints);
 		this.hitpoints = hitpoints;
 	}
+
+	/**
+	 * A variable registering the number of hitpoints of this unit.
+	 */
+	private double hitpoints = 0;
 
 	/**
 	 * Return the number of staminaPoints of this unit.
@@ -464,14 +470,13 @@ public class Unit {
 	}
 
 	/**
-	 * Check whether the given the number of staminaPoints is a valid the number
-	 * of staminapoints for any unit.
+	 * Check whether this unit can have the given number of stamina points as its stamina points.
 	 * 
 	 * @param staminaPoints
-	 *           The number of staminapoints.
-	 * @return  True if and only if the number of staminaPoints is greater than or equal to 0,
-	 * 			but less than or equal to the maximum value.
-	 * 			| result == (staminaPoints <= getMaxPoints && 0<= staminaPoints)
+	 *           The number of stamina points.
+	 * @return  True if and only if the number of stamina points is greater than or equal to 0,
+	 * 			but less than or equal to the maximum number of points for this unit.
+	 * 			| result == (staminaPoints <= this.getMaxPoints() && 0<= staminaPoints)
 	 */
 	public boolean canHaveAsStaminaPoints(double staminaPoints) {
 		return (Util.fuzzyLessThanOrEqualTo(staminaPoints,getMaxPoints(),Util.DEFAULT_EPSILON)
@@ -479,16 +484,15 @@ public class Unit {
 	}
 
 	/**
-	 * Set the the number of staminapoints of this unit to the given the number
-	 * of staminapoints.
+	 * Set the the number of stamina points of this unit to the given the number
+	 * of stamina points.
 	 * 
 	 * @param staminaPoints
-	 *            The new number of staminapoints for this unit.
-	 * @pre The given number of staminapoints must be a valid number of
-	 *      staminapoints for any unit. 
+	 *            The new number of stamina points for this unit.
+	 * @pre This unit can have the given number of stamina as its stamina points. 
 	 *      | canHaveAsStaminaPoints(staminaPoints)
-	 * @post The number of staminapoints of this unit is equal to the given
-	 *       number of staminapoints. 
+	 * @post The number of stamina points of this new unit is equal to the given
+	 *       number of stamina points. 
 	 *       | new.getStaminaPoints() == staminaPoints
 	 */
 	@Raw
@@ -496,6 +500,11 @@ public class Unit {
 		assert canHaveAsStaminaPoints(staminaPoints);
 		this.staminaPoints = staminaPoints;
 	}
+
+	/**
+	 * A variable registering the number of stamina points of this unit.
+	 */
+	private double staminaPoints = 0;
 
 	/**
 	 * Return the orientation of this unit.
@@ -514,15 +523,15 @@ public class Unit {
 	 * @post If the given orientation is in the range 0..2*PI, the orientation
 	 *       of this new unit is equal to the given orientation. 
 	 *       | if (0 <= orientation <= 2*PI) 
-	 *       | new.orientation = orientation
+	 *       | 	then new.orientation = orientation
 	 * @post If the given orientation exceeds 2*PI, the orientation for this new
 	 *       unit is equal to the given orientation modulo 2*PI. 
 	 *       | if (orientation > 2*PI) 
-	 *       | new.orientation = orientation % 2*PI
+	 *       | 	then new.orientation = orientation % 2*PI
 	 * @post If the given orientation is negative, the orientation for this new
 	 *       unit is equal to (2*PI + the given orientation modulo 2*PI). 
 	 *       | if (orientation < 0) 
-	 *       | new.orientation = 2*PI + orientation % (2*PI)
+	 *       | 	then new.orientation = 2*PI + orientation % (2*PI)
 	 */
 	@Raw
 	private void setOrientation(float orientation) {
@@ -531,6 +540,11 @@ public class Unit {
 		else
 			this.orientation = (float) (2 * Math.PI + orientation % (2 * Math.PI));
 	}
+
+	/**
+	 * A variable registering the orientation of this unit.
+	 */
+	private float orientation = (float) ((float) Math.PI / 2.0);
 
 	/**
 	 * Return the position of this unit. The position consists of an x, y and
@@ -546,29 +560,29 @@ public class Unit {
 	}
 	
 	/**
-	 * Return the position of the center of the given cube.
+	 * Return the position of the center of the cube with given integer coordinates.
+	 * 
 	 * @param cubePosition
 	 * 			The position of the cube.
-	 * @return the position of the center of the given cube.
-	 * 		   | result == { (double) cubePosition[0] + 0.5, 
-	 * 		   | (double) cubePosition[1] + 0.5,(double) cubePosition[2] + 0.5 }
+	 * @return the position of the center of the given cube, is each coordinate increased with the length of one cube /2.
+	 * 		   | result == new double [] { (double) cubePosition[0] + L/2, 
+	 * 		   | (double) cubePosition[1] + L/2,(double) cubePosition[2] + L/2 }
 	 */
 	public static double[] getPosition(int[] cubePosition) {
-		return new double[] { (double) cubePosition[0] + 0.5, (double) cubePosition[1] + 0.5,
-				(double) cubePosition[2] + 0.5 };
+		return new double[] { (double) cubePosition[0] + L/2, (double) cubePosition[1] + L/2,
+				(double) cubePosition[2] + L/2 };
 	}
 
 	/**
 	 * Return the position of the game world cube in which this unit is
-	 * positioned.
+	 * positioned, as an array of doubles.
 	 * 
 	 * @return The position of the game world cube in which this unit is
-	 *         positioned. 
-	 *         | result == {Math.floor(this.getPosition()[0]),
+	 *         positioned, which is an array of doubles containing x,y and z rounded down to integer numbers.
+	 *         | result == new double[] {Math.floor(this.getPosition()[0]),
 	 *         | Math.floor(this.getPosition()[1]),Math.floor(this.getPosition()[2])}
 	 */
 	public double[] getCubePosition() {
-
 		return new double[] { Math.floor(this.getPosition()[0]), Math.floor(this.getPosition()[1]),
 				Math.floor(this.getPosition()[2]) };
 	}
@@ -577,9 +591,9 @@ public class Unit {
 	 * Return the position of the game world cube in which this unit is
 	 * positioned, as an array if integers.
 	 * 
-	 * @effect Gives the position of the game world cube in which this unit is
-	 *         positioned.
-	 * 		| result == { (int) getCubePosition()[0], (int) getCubePosition()[1], (int) getCubePosition()[2] }
+	 * @return The position of the game world cube in which this unit is positioned,
+	 * 		   as an array of integers containing x,y and z rounded down to integer numbers.
+	 * 			| result == new int[] { (int) getCubePosition()[0], (int) getCubePosition()[1], (int) getCubePosition()[2] }
 	 */
 	public int[] getCubeCoordinate() {
 		return new int[] { (int) getCubePosition()[0], (int) getCubePosition()[1], (int) getCubePosition()[2] };
@@ -590,12 +604,13 @@ public class Unit {
 	 * 
 	 * @param cubePosition
 	 *            The position of the cube.
-	 * @return The center of the given cube. 
-	 * 		   | result == {cubePosition[0]+0.5,cubePosition[1]+0.5,cubePosition[2]+0.5}
+	 * @return The center of the given cube, a double array with 
+	 * 		   the x,y and z-coordinate of the cube position increased by half of the length of a cube. 
+	 * 		   | result == {cubePosition[0]+L/2,cubePosition[1]+L/2,cubePosition[2]+L/2}
 	 */
 
 	public static double[] getCubeCenter(double[] cubePosition) {
-		return new double[] { cubePosition[0] + 0.5, cubePosition[1] + 0.5, cubePosition[2] + 0.5 };
+		return new double[] { cubePosition[0] + L/2, cubePosition[1] + L/2, cubePosition[2] + L/2 };
 	}
 	
 	/**
@@ -611,8 +626,8 @@ public class Unit {
 	 *         | && (0<= position[2]) && (position[2] <= Z)
 	 */
 	public static boolean isValidPosition(double[] position) {
-		return 0 <= position[0] && position[0] <= X*L && 0 <= position[1] && position[1] <= Y*L && 0 <= position[2]
-				&& position[2] <= Z*L;
+		return (0 <= position[0]) && (position[0] <= X*L) && (0 <= position[1]) && (position[1] <= Y*L ) && (0 <= position[2])
+				&& (position[2] <= Z*L);
 	}
 
 	
@@ -621,9 +636,9 @@ public class Unit {
 	 * 
 	 * @param position
 	 *            The new position for this unit.
-	 * @post The new position for this unit is equal to the given position.
+	 * @post The position of this new unit is equal to the given position.
 	 *       |new.getPosition() == position
-	 * @throws IllegalPositionException(position,this)
+	 * @throws IllegalArgumentException
 	 *             The given position is not a valid position for any unit.
 	 *             |!isValidPosition(position)
 	 */
@@ -636,11 +651,12 @@ public class Unit {
 
 	/**
 	 * Return the distance between two positions.
+	 * 
 	 * @param Position1
 	 * 		The first position.
 	 * @param Position2
 	 * 		The second position.
-	 * @return the distance between the first and the second position.
+	 * @return the distance in meters between the first and the second position.
 	 * 		| result == Math.sqrt(Math.pow(Position1[0] - Position2[0], 2.0)
 	 *		|	+ Math.pow(Position1[1] - Position2[1], 2.0)
 	 *		|	+ Math.pow(Position1[2] - Position2[2], 2.0))
@@ -653,6 +669,7 @@ public class Unit {
 	
 	/**
 	 * Check whether the given cube is a neighboring cube of the unit's cubePosition.
+	 * 
 	 * @param cubePosition
 	 * 		The position of a cube. 
 	 * @return True if and only if the difference between the respective x, y and z -coordinates of the cubeCenters are equal to 0, 1 or -1,
@@ -676,58 +693,44 @@ public class Unit {
 	/**
 	 * A variable registering the position of this unit.
 	 */
-	private double[] position = { 10.0, 10.0, 0.5 };
-
-	/**
-	 * A variable registering the number of hitpoints of this unit.
-	 */
-	private double hitpoints = 0;
-
-	/**
-	 * A variable registering the number of stamina points of this unit.
-	 */
-	private double staminaPoints = 0;
-
-	/**
-	 * A variable registering the orientation of this unit.
-	 */
-	private float orientation = (float) ((float) Math.PI / 2.0);
+	private double[] position = {0.5,0.5,0.5};
 
 	/**
 	 * Update the position and activity status of a unit.
 	 * 
 	 * @param duration
-	 *            The game time after which advanceTime is called.
-	 * @effect If this unit must rest, this new unit shall rest and its rest timer is set on zero.
-	 * @effect If this unit is doing nothing, but he hasn't reached his
-	 *         targetPosition, he shall resume moving to the targetPosition.
+	 *         The game time after which advanceTime is called.
+	 * @effect If this unit must rest, this unit shall rest.
+	 * @effect If this unit is doing nothing, while default behaviour is not enabled, and the unit still has a
+	 *         targetPosition, this unit shall resume moving to the targetPosition.
 	 * @effect If this unit's default behaviour is enabled, and this unit is
 	 *         doing nothing, he shall start a default behaviour.
-	 * @effect If this unit is moving, set the position of this new unit to the
+	 * @effect If this unit is moving, the position of this  unit is set to the
 	 *         updated position (the old position + this unit's speed *
-	 *         duration) and set the orientation of this new unit to the
+	 *         duration) and the orientation of this new unit is set to the
 	 *         direction in which he is going. If this unit is sprinting,
-	 *         decrease the stamina points with one per 0.1 s. If the stamina
+	 *         the stamina points are decreased with one per 0.1 s. If the stamina
 	 *         points are equal to or less than zero, this unit stops sprinting
 	 *         and its stamina points are set to 0. If this unit has arrived to
 	 *         the target position, its new position is the target position, its
-	 *         status is DONE and its new target position is null. If this unit
+	 *         status is DONE and its target position is null. If this unit
 	 *         has arrived to the next target position (the center of the next
 	 *         cube), its new position is the next target position and it moves
 	 *         to the target position.
 	 * @post If this unit is working, and if his task is not completed, the new
-	 *       working time is increased with duration, and the progress is
-	 *       updated. Else if the unit is working and the task is completed, the
-	 *       new status is done.
+	 *       working time is increased with duration, and the progress of the work is
+	 *       updated. If the unit is working and the task is completed, the
+	 *       new status is DONE.
 	 * @effect If the status of this unit is initial resting, his new hitpoints are increased by (getToughness() / 200.0) * 5 * duration,
 	 * 			as well as the recovered hitpoints. If his recoveredHitpoints are equal to or 
 	 * 			greater than 1 or if his hitpoints are equal to or greater then the maximum value, 
 	 * 			the unit's status will be updated to resting and his hitpoints will be set to the maximum value. 
 	 * @effect If the status of this unit is resting and if his hitpoints are less then the maximum value, 
-	 * 			the unit will recover hitpoints. If his hitpoints are at the maximum value but 
-	 * 			the stamina points aren't, the unit will recover staminapoints. If both hitpoints and stamina points 
-	 * 			are at the maximum value, the unit's status will be updated to done.
-	 * @post If the unit's status is attacking, the attackTimer will be increased and if the attackTimer becomes 
+	 * 			the unit will increase its hitpoints by (getToughness() / 200.0) * 5 * duration. 
+	 * 			If his hitpoints are at the maximum value but the stamina points aren't, 
+	 * 			the unit will increase stamina points by (getToughness() / 100.0) * 5 * duration. 
+	 * 			If both hitpoints and stamina points are at the maximum value, the unit's status will be updated to done.
+	 * @post If the unit's status is attacking, the attackTimer will be increased with duration and if the attackTimer becomes 
 	 * 			equal or greater then one, the unit's status will be updated to done.
 	 * @throws IllegalArgumentException
 	 *             If the duration is less than zero or exceeds or equals 0.2 s.
@@ -817,8 +820,8 @@ public class Unit {
 
 
 	/**
-	 * Return the basespeed of the unit.
-	 * @return the basespeed of the unit.
+	 * Return the base speed of the unit.
+	 * @return the base speed of the unit.
 	 * 		| result == 1.5 * (this.getStrength() + this.getAgility()) / (200.0 * (this.getWeight() / 100.0))
 	 */
 	public double getBaseSpeed() {
@@ -826,32 +829,23 @@ public class Unit {
 	}
 	
 	/**
-	 * Check if the unit is sprinting.
-	 * @return the value of isSprinting
-	 * 			| result == isSprinting
-	 */
-	public boolean isSprinting(){
-		return isSprinting;
-	}
-
-	/**
 	 * Return the current speed of the given unit.
 	 * 
 	 * @return The speed at which the unit is moving is 0.0 if the unit isn't moving. 
 	 * 			| if (status != Status.MOVING){ 
-	 * 			| result == 0.0 
+	 * 			| 	then result == 0.0 
 	 * @return The speed at which the unit is moving is 2 times the walking speed if the unit is sprinting.
-	 * 			| if (status == Status.MOVING && isSprinting) 
-	 * 			| result == 2.0*getWalkingSpeed() 
+	 * 			| if (status == Status.MOVING && isSprinting()) 
+	 * 			| 	then result == 2.0*getWalkingSpeed() 
 	 * @return The speed at which the unit is moving is the walking speed if the unit is walking.
-	 * 			| if (status == Status.MOVING && !isSprinting) 
-	 * 			| result == getWalkingSpeed();
+	 * 			| if (status == Status.MOVING && !isSprinting()) 
+	 * 			| 	then result == getWalkingSpeed();
 	 */
 	public double getCurrentSpeed() {
 		if (status != Status.MOVING) {
 			return 0.0;
 		} else {
-			if (isSprinting)
+			if (isSprinting())
 				return 2.0 * getWalkingSpeed();
 			return getWalkingSpeed();
 		}
@@ -859,8 +853,9 @@ public class Unit {
 	
 	/**
 	 * Check whether it's possible for a unit to move.
+	 * 
 	 * @return True only if the unit is currently resting or doing nothing or 
-	 * 			is moving and is currently in the center of a cube.
+	 * 			is moving and currently in the center of a cube.
 	 * 		   | result == (status == Status.RESTING || status == Status.DONE || status == Status.IN_CENTER)
 	 */
 	public boolean canMove() {
@@ -872,11 +867,14 @@ public class Unit {
 	
 	/**
 	 * Enable sprinting mode for the given unit.
+	 * 
 	 * @post If the unit is currently moving and the unit's stamina points are greater then zero,
-	 * 		 	isSprinting will be set to true. Otherwise isSprinting will be set to false.
+	 * 		 this new unit is not sprinting.
 	 * 		 | if (status == Status.MOVING && getStaminaPoints() > 0)
-	 * 		 | 	then isSprinting = true
-	 * 		 |	else isSprinting = false
+	 * 		 | 	then new.isSprinting() == true
+	 * @post If the unit is not moving or its stamina is zero, this new unit is not sprinting.
+	 * 		 |if !(status == Status.MOVING && getStaminaPoints() > 0)
+	 * 		 |	then new.isSprinting() == false
 	 */
 	public void startSprinting() {
 		if (status == Status.MOVING && getStaminaPoints() > 0)
@@ -887,8 +885,9 @@ public class Unit {
 
 	/**
 	 * Disable sprinting mode for the given unit.
-	 * @post isSprinting will be set to false.
-	 * 		 | isSprinting = false
+	 * 
+	 * @post isSprinting() for this new unit is false.
+	 * 		 | new.isSprinting() == false
 	 */
 	public void stopSprinting() {
 		isSprinting = false;
@@ -897,26 +896,40 @@ public class Unit {
 
 
 	/**
-	 * Move a unit to the center of a neighboring cube.
+	 * Check if the unit is sprinting.
+	 * 
+	 * @return the value of isSprinting
+	 * 			| result == isSprinting
+	 */
+	public boolean isSprinting(){
+		return isSprinting;
+	}
+
+	/**
+	 * A boolean to register if the unit is sprinting.
+	 */
+	private boolean isSprinting = false;
+
+	/**
+	 * Start moving a unit to the center of a neighboring cube.
+	 * 
 	 * @param dx
-	 * 		The amount of cubes to move in the x-direction; should be -1,
-	 *            0 or 1. 		
+	 * 		The x-direction to which the cube has to move. 		
 	 * @param dy
-	 * 		The amount of cubes to move in the y-direction; should be -1,
-	 *            0 or 1.
+	 * 		The y-direction to which the cube has to move.
 	 * @param dz
-	 * 		The amount of cubes to move in the z-direction; should be -1,
-	 *            0 or 1.
-	 * @post If the unit can move, the startPosition will be the unit's current position and
-	 * 			his nextTargetPosition will be the center of the neighbouring cube the unit
-	 * 			needs to move to. The unit's status will also be updated to moving.
+	 * 		The z-direction to which the cube has to move.
+	 * @post If the unit can move, this new unit's startPosition is this unit's current position and
+	 * 			his new nextTargetPosition is the center of the neighboring cube to which this unit
+	 * 			has to move. This new unit's status is moving.
 	 * 		 | if (canMove())
 	 * 		 |	then new.startPosition == new double[] {this.getPosition()[0],this.getPosition()[1],this.getPosition()[2]}
-	 * 		 |		&& new.nextTargetPosition = getCubeCenter(new double[] {this.getCubePosition()[0] + (double) dx ,
+	 * 		 |		&& new.nextTargetPosition == getCubeCenter(new double[] {this.getCubePosition()[0] + (double) dx ,
 	 * 		 |		   this.getCubePosition()[1] + (double) dy , this.getCubePosition()[2] + (double) dz })
 	 * 		 |		&& new.status == Status.MOVING
-	 * @effect The walkingSpeed of this unit is set to the given flag. 
-	 * 			| setWalkingspeed(dz)
+	 * @effect If the unit can move, the walkingSpeed of this unit is set to the given flag. 
+	 * 			| if (canMove())
+	 * 			| 	then setWalkingspeed(dz)
 	 * @throws IllegalArgumentException
 	 * 			If the unit needs to move more than one cube in the x-, y- or z-direction.
 	 * 			| !((dx >= -1 && dx <= 1) && (dy >= -1 && dy <= 1) && (dz >= -1 && dz <= 1))
@@ -925,7 +938,6 @@ public class Unit {
 	 * 			| !isValidPosition(new double[] { getPosition()[0] + (double) dx, getPosition()[1] + (double) dy,
 					getPosition()[2] + (double) dz })
 	 */
-	
 	public void moveToAdjacent(int dx, int dy, int dz) throws IllegalArgumentException {
 		if (!((dx >= -1 && dx <= 1) && (dy >= -1 && dy <= 1) && (dz >= -1 && dz <= 1)))
 			throw new IllegalArgumentException();
@@ -938,7 +950,6 @@ public class Unit {
 				+ (double) dy , this.getCubePosition()[2] + (double) dz });
 			status = Status.MOVING;
 			setWalkingSpeed(dz);
-			//System.out.println(this.getCurrentSpeed());
 		}
 	}
 
@@ -946,34 +957,39 @@ public class Unit {
 	 * Start moving the given unit to the given cube.
 	 * 
 	 * @param targetPosition
-	 *            The coordinate of the cube to move to.
-	 * @effect If the unit can move, the variables x, y and z will register
-	 * 			if the unit needs to go further (=1) in the x-, y-, z-direction or
-	 * 			if the unit needs to go back (=-1) in the x-, y-, z-direction or 
-	 * 			if the unit needs to stay (=0) at the same x-, y-, z-coordinate. 
-	 * 			The unit will then move to the neighbouringcube.
+	 *         the position to move to
+	 * @post If this unit can move, this new unit's target position is targetPosition and this units new status is in-center
 	 * 		   | if (canMove())
-	 * 		   |	then this.targetPosition = targetPosition && status = Status.IN_CENTER 
-	 * 		   |		&& int x = 0 && int y = 0 && int z = 0 
-	 * 		   |		&& if (Util.fuzzyEquals(targetPosition[0] - this.getPosition()[0], 0))
+	 * 		   |	then new.targetPosition == targetPosition && new.status == Status.IN_CENTER
+	 * @effect If this unit can move, the variables x, y and z  register
+	 * 			if this unit needs to go further (=1) in the x-, y-, z-direction or
+	 * 			if this unit needs to go back (=-1) in the x-, y-, z-direction or 
+	 * 			if this unit needs to stay (=0) at the same x-, y-, z-coordinate. 
+	 * 			The unit will move to the appropriate neighboring cube.
+	 * 		   | if (canMove()) 
+	 * 		   |		 if (Util.fuzzyEquals(targetPosition[0] - this.getPosition()[0], 0))
 	 * 		   |			then x = 0
-	 * 		   |		   else if (Math.signum(targetPosition[0] - this.getPosition()[0]) == -1)
+	 * 		   |		 if (Math.signum(targetPosition[0] - this.getPosition()[0]) == -1)
 	 * 		   |		 	then x = -1
-	 * 		   |		   else x = 1
-	 * 		   |		&& if (Util.fuzzyEquals(targetPosition[1] - this.getPosition()[1], 0))
+	 * 		   |		 if (Math.signum(targetPosition[0] - this.getPosition()[0]) == 1)
+	 * 		   |			then x = 1
+	 * 		   |		 if (Util.fuzzyEquals(targetPosition[1] - this.getPosition()[1], 0))
 	 * 		   |			then y = 0
-	 * 		   |		   else if (Math.signum(targetPosition[1] - this.getPosition()[1]) == -1)
+	 * 		   |		 if (Math.signum(targetPosition[1] - this.getPosition()[1]) == -1)		
 	 * 		   |			then y = -1
-	 * 		   |           else y = 1
-	 * 		   |		&& if (Util.fuzzyEquals(targetPosition[2] - this.getPosition()[2], 0))
+	 * 		   |		 if (Math.signum(targetPosition[1] - this.getPosition()[1]) == 1)		
+	 * 		   |			then y = 1
+	 * 		   |		 if (Util.fuzzyEquals(targetPosition[2] - this.getPosition()[2], 0))
 	 * 		   |			then z = 0
-	 * 		   |		   else if (Math.signum(targetPosition[2] - this.getPosition()[2]) == -1)
+	 * 		   |		 if (Math.signum(targetPosition[2] - this.getPosition()[2]) == -1)
 	 * 		   |			then z = -1
-	 * 		   |		   else z = 1
-	 * 		   |		&& moveToAdjacent(x,y,z)
+ 	 * 		   |		 if (Math.signum(targetPosition[2] - this.getPosition()[2]) == 1)
+	 * 		   |		 	then z = 1
+	 * 		   |		moveToAdjacent(x,y,z)
 	 * @throws IllegalArgumentException
 	 *             The given targetPosition is not a valid targetPosition for a
-	 *             unit. | ! isValidPosition(targetPosition)
+	 *             unit. 
+	 *             | ! isValidPosition(targetPosition)
 	 */
 	public void moveTo(double[] targetPosition) throws IllegalArgumentException {
 		if (!isValidPosition(targetPosition))
@@ -1014,35 +1030,32 @@ public class Unit {
 	 * @param cubePosition
 	 * 			The coordinate of the cube to move to.
 	 * @effect The new position of the unit is the center of the given cube.
-	 * 		   | moveTo(new double[] { (double) cubePosition[0] + 0.5, (double) cubePosition[1] + 0.5,
-	 * 		   |	(double) cubePosition[2] + 0.5 })  			
+	 * 		   | moveTo(new double[] { (double) cubePosition[0] + L/2, (double) cubePosition[1] + L/2,
+	 * 		   |	(double) cubePosition[2] + L/2 })  			
 	 */
-	// ik heb hier de illegalargumentexception verwijderd.
-	public void moveTo(int[] cubePosition){
-		moveTo(new double[] { (double) cubePosition[0] + 0.5, (double) cubePosition[1] + 0.5,
-				(double) cubePosition[2] + 0.5 });
+	public void moveTo(int[] cubePosition) throws IllegalArgumentException{
+		moveTo(new double[] { (double) cubePosition[0] + L/2, (double) cubePosition[1] + L/2,
+				(double) cubePosition[2] + L/2});
 	}
 
 	
 	/**
-	 * Return the walkingspeed of this unit.
+	 * Return the walking speed of this unit.
 	 */
-
 	private double getWalkingSpeed() {
 		return this.walkingSpeed;
 	}
 	
 	/**
-	 * Set the walkingspeed of this unit to the given walkingspeed.
+	 * Set the walking speed of this unit to the given walking speed.
 	 * 
 	 * @param dz
-	 *            The amount of cubes to move in the z-direction; should be -1,
-	 *            0 or 1.
-	 * @effect If the unit is moving to a higher cube, the walkingspeed will be
+	 *         The direction in which this unit is moving in the z-direction.
+	 * @effect If the unit is moving to a lower cube, the walkingspeed will be
 	 *         1.2 times the unit's basespeed.
 	 *         | if (dz == -1)
 	 *         | 	then walkingSpeed = 1.2 * getBaseSpeed()
-	 * @effect If the unit is moving to a lower cube, the walkingspeed will be
+	 * @effect If the unit is moving to a higher cube, the walkingspeed will be
 	 *         0.5 times the unit's basespeed.
 	 *         | if (dz == 1)
 	 *         | 	then walkingSpeed = 0.5 * getBaseSpeed()
@@ -1064,46 +1077,26 @@ public class Unit {
 	 * A variable registering the walkingspeed of this unit.
 	 */
 	private double walkingSpeed = 0;
-	/**
-	 * A boolean to register if the unit is sprinting.
-	 */
-	private boolean isSprinting = false;	
+	
 	/**
 	 * A variable registering the start position of this unit.
 	 */
 	private double[] startPosition;
+	
 	/**
 	 * A variable registering the target position of this unit.
 	 */
 	private double[] targetPosition;
+	
 	/**
 	 * A variable registering the next cube this unit will move to.
 	 */
 	private double[] nextTargetPosition;
-	/**
-	 * A variable registering the status of this unit.
-	 */
-	public Status status = Status.DONE;	
-	/**
-	 * A variable registering the passed game time since the last rest.
-	 */
-	private double restTimer = 0.0;
-	/**
-	 * A variable registering the duration that the unit is working.
-	 */
-	private float workingTime;
-	/**
-	 * A variable registering the duration that the unit must work to complete a task.
-	 */
-	private float totalWorkingTime;
-	/**
-	 * A variable registering the progress of a unit's work.
-	 */
-	private float progressWork;
 	
 	/**
 	 * Check whether it's possible for a unit to work.
-	 * @return True only if the unit wasn't currently moving or 
+	 * 
+	 * @return True if and only if the unit wasn't currently moving or 
 	 * 			wasn't initial resting or wasn't attacking an other unit.
 	 * 		   | result == (status != Status.MOVING && status != Status.INITIAL_RESTING && status != Status.ATTACKING)
 	 */
@@ -1115,6 +1108,7 @@ public class Unit {
 	
 	/**
 	 * Get the progress of the work of this unit, as a double between 0 and 1.
+	 * 
 	 * @return the value of progressWork
 	 * 			| result == this.progressWork
 	 */
@@ -1122,7 +1116,8 @@ public class Unit {
 		return progressWork;
 	}
 	/**
-	 * Makes the unit work.
+	 * Make the unit work.
+	 * 
 	 * @post If a unit can work, his new status will be updated to working.
 	 * 		 | if (canWork())
 	 *		 |	then new.status == Status.WORKING
@@ -1141,6 +1136,21 @@ public class Unit {
 
 	}
 	/**
+	 * A variable registering the progress of a unit's work.
+	 */
+	private float progressWork;
+
+	/**
+	 * A variable registering the duration that the unit is working.
+	 */
+	private float workingTime;
+
+	/**
+	 * A variable registering the duration that the unit must work to complete a task.
+	 */
+	private float totalWorkingTime;
+
+	/**
 	 * Check whether it's possible for a unit to attack.
 	 * @return True if the unit is not currently moving.
 	 * 		   | result == (status != Status.MOVING)
@@ -1149,7 +1159,6 @@ public class Unit {
 		if (status != Status.MOVING)
 			return true;
 		return false;
-
 	}
 	
 	/**
@@ -1289,10 +1298,13 @@ public class Unit {
 	}	
 
 	/**
-	 * A boolean to check if the default behaviour is enabled.
+	 * Symbolic constant registering the recovered hitpoints of a unit.
 	 */
-	private boolean enableDefaultBehaviour;
-
+	private double recoveredHitpoints = 0.0;
+	/**
+	 * A variable registering the passed game time since the last rest.
+	 */
+	private double restTimer = 0.0;
 	/**
 	 * Check whether the default behaviour is enabled.
 	 * @return True if the default behaviour is enabled.
@@ -1378,9 +1390,13 @@ public class Unit {
 		status = Status.DONE;
 	}
 	/**
-	 * Symbolic constant registering the recovered hitpoints of a unit.
+	 * A boolean to check if the default behaviour is enabled.
 	 */
-	private double recoveredHitpoints = 0.0;
+	private boolean enableDefaultBehaviour;
+	/**
+	 * A variable registering the status of this unit.
+	 */
+	public Status status = Status.DONE;
 	/**
 	 * Symbolic constant registering the fixed number of cubes in direction x.
 	 */
