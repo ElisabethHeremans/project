@@ -13,6 +13,8 @@ import hillbillies.model.Unit;
 
 public class TestSuite {
 	
+	private static Unit NegativeUnit;
+	
 	private static Unit Aunit;
 	
 	private Unit StandardUnit;
@@ -33,6 +35,7 @@ public class TestSuite {
 	@BeforeClass
 	public static void setUpBeforeClass(){
 		Aunit = new Unit("Aunit",new double[] {1.5,4,5,3.5},50,50,50,50,false,25.0,25.0,Math.PI/2);
+		NegativeUnit = new Unit("NegativeUnit", new double[] {1.5,4,5,3.5}, -25,-25,-25,-25,false,25.0,25.0,Math.PI/2);
 	}
 	
 	@Before
@@ -41,14 +44,140 @@ public class TestSuite {
 		DefaultEnabledUnit = new Unit("Cunit",new double[] {3.5,1.5,4.5},75,25,25,75,true,0.0,0.0,Math.PI/2);
 		HitAndStaminaZeroUnit = new Unit("Dunit",new double[] {3.5,1.5,4.5},75,25,25,75,false,0.0,0.0,Math.PI/2);
 		HitMaxStaminaZeroUnit = new Unit("Eunit",new double[] {3.5,1.5,4.5},75,25,25,75,false,0.0,0.0,Math.PI/2);
-		HitMaxStaminaZeroUnit.setHitPoints(HitMaxStaminaZeroUnit.max_nbPoints());
+		HitMaxStaminaZeroUnit.setHitPoints(HitMaxStaminaZeroUnit.getMaxPoints());
 		HitMaxStaminaMaxUnit = new Unit("Funit",new double[] {3.5,1.5,4.5},75,25,25,75,false,0.0,0.0,Math.PI/2);
-		HitMaxStaminaMaxUnit.setHitPoints(HitMaxStaminaMaxUnit.max_nbPoints());
-		HitMaxStaminaMaxUnit.setStaminaPoints(HitMaxStaminaMaxUnit.max_nbPoints());
+		HitMaxStaminaMaxUnit.setHitPoints(HitMaxStaminaMaxUnit.getMaxPoints());
+		HitMaxStaminaMaxUnit.setStaminaPoints(HitMaxStaminaMaxUnit.getMaxPoints());
 		NeighbourStandardUnit = new Unit("Bunit",new double[] {4.5,0.5,4.5},75,25,25,75,false,25.0,25.0,Math.PI/2);
 
 	}
-	
+	@Test
+	public void getWeight() {
+		Assert.assertEquals(75, StandardUnit.getWeight());
+	}
+	@Test
+	public void setWeight_NegativeNumber() {
+		StandardUnit.setWeight(-25);
+		Assert.assertEquals(25, StandardUnit.getWeight());
+	}
+	@Test
+	public void setWeight_LegalCase(){
+		StandardUnit.setWeight(75);
+		Assert.assertEquals(75, StandardUnit.getWeight());
+	}
+	@Test
+	public void setWeight_Overflow() {
+		StandardUnit.setWeight(300);
+		Assert.assertEquals(25, StandardUnit.getWeight());
+	}
+	@Test
+	public void getStrength() {
+		Assert.assertEquals(25, StandardUnit.getStrength());
+	}
+	@Test
+	public void setStrength_NegativeNumber() {
+		StandardUnit.setStrength(-25);
+		Assert.assertEquals(25, StandardUnit.getStrength());
+	}
+	@Test
+	public void setStrength_LegalCase(){
+		StandardUnit.setStrength(75);
+		Assert.assertEquals(75, StandardUnit.getStrength());
+	}
+	@Test
+	public void setStrength_Overflow() {
+		StandardUnit.setStrength(300);
+		Assert.assertEquals(25, StandardUnit.getStrength());
+	}
+	@Test
+	public void getAgility() {
+		Assert.assertEquals(25, StandardUnit.getAgility());
+	}
+	@Test
+	public void setAgility_NegativeNumber() {
+		StandardUnit.setAgility(-25);
+		Assert.assertEquals(25, StandardUnit.getAgility());
+	}
+	@Test
+	public void setAgility_LegalCase(){
+		StandardUnit.setAgility(75);
+		Assert.assertEquals(75, StandardUnit.getAgility());
+	}
+	@Test
+	public void setAgility_Overflow() {
+		StandardUnit.setAgility(300);
+		Assert.assertEquals(25, StandardUnit.getAgility());
+	}
+	@Test
+	public void getToughness() {
+		Assert.assertEquals(75, StandardUnit.getToughness());
+	}
+	@Test
+	public void setToughness_NegativeNumber() {
+		StandardUnit.setToughness(-25);
+		Assert.assertEquals(25, StandardUnit.getToughness());
+	}
+	@Test
+	public void setToughness_LegalCase(){
+		StandardUnit.setToughness(75);
+		Assert.assertEquals(75, StandardUnit.getToughness());
+	}
+	@Test
+	public void setToughness_Overflow() {
+		StandardUnit.setToughness(300);
+		Assert.assertEquals(25, StandardUnit.getToughness());
+	}
+
+	@Test
+	public void getHitpoints() {
+		Assert.assertEquals(25.0, StandardUnit.getHitpoints(),Util.DEFAULT_EPSILON);
+	}
+	@Test
+	public void setHitpoints() {
+		StandardUnit.setHitPoints(30.0);
+		Assert.assertEquals(30.0, StandardUnit.getHitpoints(),Util.DEFAULT_EPSILON);
+	}
+	public void getMaxPoints() {
+		Assert.assertEquals(Math.ceil(200.0 * (75.0 / 100.0) * (75.0/ 100.0)), StandardUnit.getMaxPoints(),Util.DEFAULT_EPSILON);
+	}
+	@Test
+	public void getStaminaPoints() {
+		Assert.assertEquals(25.0, StandardUnit.getStaminaPoints(),Util.DEFAULT_EPSILON);
+	}
+	@Test
+	public void setStaminaPoints() {
+		StandardUnit.setStaminaPoints(30.0);
+		Assert.assertEquals(30.0, StandardUnit.getStaminaPoints(),Util.DEFAULT_EPSILON);
+	}
+	@Test
+	public void getName() {
+		Assert.assertEquals("Bunit", StandardUnit.getName());
+	}
+	@Test
+	public void setName_LegalCase() {
+		StandardUnit.setName("B\'unit b\"uNit");
+	}
+	@Test (expected = IllegalArgumentException.class)
+	public void setName_InvalidToken() throws IllegalArgumentException{
+		StandardUnit.setName("Bunit1");
+	}
+	@Test (expected = IllegalArgumentException.class) 
+	public void setName_InvalidLength() throws IllegalArgumentException{
+		StandardUnit.setName("A");
+	}
+	@Test (expected = IllegalArgumentException.class)
+	public void setName_NoUppercase() throws IllegalArgumentException{
+		StandardUnit.setName("bunit");
+	}
+	@Test
+	public void getOrientation() {
+		Assert.assertEquals(Math.PI/2,StandardUnit.getOrientation(),Util.DEFAULT_EPSILON);
+	}
+	@Test
+	public void setOrientation_NormalCase() {
+		StandardUnit.setOrientation((float) (Math.PI/4));
+		
+	}
 	@Test
 	public final void getBaseSpeed(){
 		Assert.assertEquals(1.5*(50+50)/(200.0*50/100.0), Aunit.getBaseSpeed(), Util.DEFAULT_EPSILON);
@@ -57,10 +186,8 @@ public class TestSuite {
 	public final void startSprinting_Effective(){
 		StandardUnit.status = Status.MOVING;
 		StandardUnit.startSprinting();
-		Assert.assertTrue(StandardUnit.isSprinting());
-		
+		Assert.assertTrue(StandardUnit.isSprinting());	
 	}
-	
 	@Test
 	public final void startSprinting_NonEffective(){
 		StandardUnit.startSprinting();
@@ -270,8 +397,8 @@ public class TestSuite {
 	public final void advanceTime_RestingDone(){
 		HitMaxStaminaMaxUnit.status = Status.RESTING;
 		HitMaxStaminaMaxUnit.advanceTime((float)0.01);
-		assertEquals(HitMaxStaminaMaxUnit.max_nbPoints(),HitMaxStaminaMaxUnit.getStaminaPoints(),Util.DEFAULT_EPSILON);
-		assertEquals(HitMaxStaminaMaxUnit.max_nbPoints(),HitMaxStaminaMaxUnit.getHitpoints(),Util.DEFAULT_EPSILON);
+		assertEquals(HitMaxStaminaMaxUnit.getMaxPoints(),HitMaxStaminaMaxUnit.getStaminaPoints(),Util.DEFAULT_EPSILON);
+		assertEquals(HitMaxStaminaMaxUnit.getMaxPoints(),HitMaxStaminaMaxUnit.getHitpoints(),Util.DEFAULT_EPSILON);
 		assertEquals(Status.DONE,HitMaxStaminaMaxUnit.status);
 		
 	}

@@ -534,7 +534,7 @@ public class Unit {
 	 *       | 	then new.orientation = 2*PI + orientation % (2*PI)
 	 */
 	@Raw
-	private void setOrientation(float orientation) {
+	public void setOrientation(float orientation) {
 		if (orientation >= 0.0)
 			this.orientation = (float) (orientation % (2 * Math.PI));
 		else
