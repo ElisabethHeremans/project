@@ -152,7 +152,7 @@ public class Facade implements IFacade {
 	@Override
 	public int getMaxHitPoints(Unit unit) throws ModelException {
 		try{
-			return (int) unit.max_nbPoints();
+			return (int) unit.getMaxPoints();
 		}
 		catch (NullPointerException exc){
 			throw new ModelException();
@@ -172,7 +172,7 @@ public class Facade implements IFacade {
 	@Override
 	public int getMaxStaminaPoints(Unit unit) throws ModelException {
 		try{
-			return (int) unit.max_nbPoints();
+			return (int) unit.getMaxPoints();
 		}
 		catch (NullPointerException exc){
 			throw new ModelException();
