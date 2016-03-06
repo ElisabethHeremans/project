@@ -13,8 +13,6 @@ import hillbillies.model.Unit;
 
 public class TestSuite {
 	
-	private static Unit NegativeUnit;
-	
 	private static Unit Aunit;
 	
 	private Unit StandardUnit;
@@ -35,7 +33,6 @@ public class TestSuite {
 	@BeforeClass
 	public static void setUpBeforeClass(){
 		Aunit = new Unit("Aunit",new double[] {1.5,4,5,3.5},50,50,50,50,false,25.0,25.0,Math.PI/2);
-		NegativeUnit = new Unit("NegativeUnit", new double[] {1.5,4,5,3.5}, -25,-25,-25,-25,false,25.0,25.0,Math.PI/2);
 	}
 	
 	@Before
@@ -154,8 +151,9 @@ public class TestSuite {
 		Assert.assertEquals("Bunit", StandardUnit.getName());
 	}
 	@Test
-	public void setName_LegalCase() {
+	public void setName_LegalCase() throws IllegalArgumentException{
 		StandardUnit.setName("B\'unit b\"uNit");
+		Assert.assertEquals("B\'unit b\"uNit", StandardUnit.getName());
 	}
 	@Test (expected = IllegalArgumentException.class)
 	public void setName_InvalidToken() throws IllegalArgumentException{
@@ -176,7 +174,67 @@ public class TestSuite {
 	@Test
 	public void setOrientation_NormalCase() {
 		StandardUnit.setOrientation((float) (Math.PI/4));
-		
+		Assert.assertEquals(Math.PI/4, StandardUnit.getOrientation(),Util.DEFAULT_EPSILON);
+	}
+	@Test
+	public void setOrientation_ExceedingCase() {
+		StandardUnit.setOrientation((float) (3*Math.PI));
+		Assert.assertEquals(Math.PI, StandardUnit.getOrientation(), Util.DEFAULT_EPSILON);
+	}
+	@Test
+	public void setOrientation_NegativeCase() {
+		StandardUnit.setOrientation((float) (-5*Math.PI/2)); 
+		Assert.assertEquals(3*Math.PI/4, StandardUnit.getOrientation(), Util.DEFAULT_EPSILON);
+	}
+	@Test
+	public void getPosition() {
+		assertDoublePositionEquals(3.5,1.5,4.5,StandardUnit.getPosition());
+	}
+	@Test
+	public void getPosition(int[] cubePosition) {
+		Assert.assertArrayEquals(new double[] {3,4,5}, Unit.getPosition(new int[] {3,4,5}), Util.DEFAULT_EPSILON);
+	}
+	@Test 
+	public void getCubePosition() {
+		Assert.assertArrayEquals(new double[] {Math.floor(3.5),Math.floor(1.5),Math.floor(4.5)}, StandardUnit.getCubePosition(), Util.DEFAULT_EPSILON);
+	}
+	@Test
+	public void getCubeCoordinate() {
+		Assert.assertArrayEquals(new int[] {(int) Math.floor(3.5),(int) Math.floor(1.5),(int) Math.floor(4.5)}, 
+				new int[] {(int) StandardUnit.getCubePosition()[0],(int) StandardUnit.getCubePosition()[1],(int) StandardUnit.getCubePosition()[2]});
+	}
+	@Test
+	public void setPosition_LegalCase() throws IllegalArgumentException{
+		StandardUnit.setPosition(new double[]{20.5,6.5,8.5});
+		Assert.assertArrayEquals(new double[]{20.5,6.5,8.5},  StandardUnit.getPosition(), Util.DEFAULT_EPSILON);
+	}
+	@Test (expected = IllegalArgumentException.class)
+	public void setPosition_NegativeXPosition() throws IllegalArgumentException {
+		StandardUnit.setPosition(new double[]{-20.5,6.5,8.5});
+	}
+	@Test (expected = IllegalArgumentException.class)
+	public void setPosition_NegativeYPosition() throws IllegalArgumentException {
+		StandardUnit.setPosition(new double[]{20.5,-6.5,8.5});
+	}
+	@Test (expected = IllegalArgumentException.class)
+	public void setPosition_NegativeZPosition() throws IllegalArgumentException {
+		StandardUnit.setPosition(new double[]{20.5,6.5,-8.5});
+	}
+	@Test (expected = IllegalArgumentException.class)
+	public void setPosition_ExcedingXPosition() throws IllegalArgumentException {
+		StandardUnit.setPosition(new double[] {59.0,6.5,8.5});
+	}
+	@Test (expected = IllegalArgumentException.class)
+	public void setPosition_ExcedingPosition() throws IllegalArgumentException {
+		StandardUnit.setPosition(new double[] {20.0,60.5,8.5});
+	}
+	@Test (expected = IllegalArgumentException.class)
+	public void setPosition_ExcedingZPosition() throws IllegalArgumentException {
+		StandardUnit.setPosition(new double[] {30.0,6.5,80.5});
+	}
+	@Test
+	public void getCubeCenter() {
+		Assert.assertArrayEquals(new double[] {3.5,4.5,5.5}, Unit.getCubeCenter(new double[] {3.0,4.0,5.0}), Util.DEFAULT_EPSILON);
 	}
 	@Test
 	public final void getBaseSpeed(){
