@@ -40,7 +40,7 @@ public class TestSuite {
 	 * Set up a mutable test fixture.
 	 */
 	@Before
-	public final void setUpBefore(){
+	public void setUpBefore(){
 		StandardUnit = new Unit("Bunit",new double[] {3.5,1.5,4.5},75,25,25,75,false,25.0,25.0,Math.PI/2);
 		DefaultEnabledUnit = new Unit("Cunit",new double[] {3.5,1.5,4.5},75,25,25,75,true,0.0,0.0,Math.PI/2);
 		HitAndStaminaZeroUnit = new Unit("Dunit",new double[] {3.5,1.5,4.5},75,25,25,75,false,0.0,0.0,Math.PI/2);
@@ -52,192 +52,214 @@ public class TestSuite {
 		NeighbourStandardUnit = new Unit("Bunit",new double[] {4.5,0.5,4.5},75,25,25,75,false,25.0,25.0,Math.PI/2);
 
 	}
+	
 	@Test
-	public void getWeight() {
+	public final void extendConstructor_LegalCase(){
+		Unit NewUnit = new Unit("Bunit",new double[] {3.5,1.5,4.5},75,25,25,75,false,25.0,25.0,Math.PI/2);
+		Assert.assertEquals("Bunit", NewUnit.getName());
+		Assert.assertArrayEquals(new double[] {3.5,1.5,4.5}, NewUnit.getPosition(),Util.DEFAULT_EPSILON);
+		Assert.assertEquals(75,NewUnit.getWeight());
+		Assert.assertEquals(25,NewUnit.getAgility());
+		Assert.assertEquals(75,NewUnit.getToughness());
+		Assert.assertEquals(25,NewUnit.getStrength());
+		Assert.assertEquals(false, NewUnit.isEnableDefaultBehaviour());
+		Assert.assertEquals(25.0, NewUnit.getStaminaPoints(),Util.DEFAULT_EPSILON);
+		Assert.assertEquals(25.0, NewUnit.getHitpoints(),Util.DEFAULT_EPSILON);
+		Assert.assertEquals(Math.PI/2, NewUnit.getOrientation(),Util.DEFAULT_EPSILON);
+	}
+	
+	@Test
+	public final void extendedConstructor_InvalidAgility(){
+		Unit NewUnit = new Unit("Bunit",new double[] {3.5,1.5,4.5},75,25,10,75,false,25.0,25.0,Math.PI/2);
+		Assert.assertEquals(25, NewUnit.getAgility());
+	}
+	
+	@Test
+	public final void getWeight() {
 		Assert.assertEquals(75, StandardUnit.getWeight());
 	}
 	@Test
-	public void setWeight_NegativeNumber() {
+	public final void setWeight_NegativeNumber() {
 		StandardUnit.setWeight(-25);
 		Assert.assertEquals(75, StandardUnit.getWeight());
 	}
 	@Test
-	public void setWeight_LegalCase(){
+	public final void setWeight_LegalCase(){
 		StandardUnit.setWeight(25);
 		Assert.assertEquals(25, StandardUnit.getWeight());
 	}
 	@Test
-	public void setWeight_Overflow() {
+	public final void setWeight_Overflow() {
 		StandardUnit.setWeight(300);
 		Assert.assertEquals(75, StandardUnit.getWeight());
 	}
 	@Test
-	public void getStrength() {
+	public final void getStrength() {
 		Assert.assertEquals(25, StandardUnit.getStrength());
 	}
 	@Test
-	public void setStrength_NegativeNumber() {
+	public final void setStrength_NegativeNumber() {
 		StandardUnit.setStrength(-25);
 		Assert.assertEquals(25, StandardUnit.getStrength());
 	}
 	@Test
-	public void setStrength_LegalCase(){
+	public final void setStrength_LegalCase(){
 		StandardUnit.setStrength(75);
 		Assert.assertEquals(75, StandardUnit.getStrength());
 	}
 	@Test
-	public void setStrength_Overflow() {
+	public final void setStrength_Overflow() {
 		StandardUnit.setStrength(300);
 		Assert.assertEquals(25, StandardUnit.getStrength());
 	}
 	@Test
-	public void getAgility() {
+	public final void getAgility() {
 		Assert.assertEquals(25, StandardUnit.getAgility());
 	}
 	@Test
-	public void setAgility_NegativeNumber() {
+	public final void setAgility_NegativeNumber() {
 		StandardUnit.setAgility(-25);
 		Assert.assertEquals(25, StandardUnit.getAgility());
 	}
 	@Test
-	public void setAgility_LegalCase(){
+	public final void setAgility_LegalCase(){
 		StandardUnit.setAgility(75);
 		Assert.assertEquals(75, StandardUnit.getAgility());
 	}
 	@Test
-	public void setAgility_Overflow() {
+	public final void setAgility_Overflow() {
 		StandardUnit.setAgility(300);
 		Assert.assertEquals(25, StandardUnit.getAgility());
 	}
 	@Test
-	public void getToughness() {
+	public final void getToughness() {
 		Assert.assertEquals(75, StandardUnit.getToughness());
 	}
 	@Test
-	public void setToughness_NegativeNumber() {
+	public final void setToughness_NegativeNumber() {
 		StandardUnit.setToughness(-25);
 		Assert.assertEquals(75, StandardUnit.getToughness());
 	}
 	@Test
-	public void setToughness_LegalCase(){
+	public final void setToughness_LegalCase(){
 		StandardUnit.setToughness(75);
 		Assert.assertEquals(75, StandardUnit.getToughness());
 	}
 	@Test
-	public void setToughness_Overflow() {
+	public final void setToughness_Overflow() {
 		StandardUnit.setToughness(300);
 		Assert.assertEquals(75, StandardUnit.getToughness());
 	}
 
 	@Test
-	public void getHitpoints() {
+	public final void getHitpoints() {
 		Assert.assertEquals(25.0, StandardUnit.getHitpoints(),Util.DEFAULT_EPSILON);
 	}
 	@Test
-	public void setHitpoints() {
+	public final void setHitpoints() {
 		StandardUnit.setHitPoints(30.0);
 		Assert.assertEquals(30.0, StandardUnit.getHitpoints(),Util.DEFAULT_EPSILON);
 	}
-	public void getMaxPoints() {
+	public final void getMaxPoints() {
 		Assert.assertEquals(Math.ceil(200.0 * (75.0 / 100.0) * (75.0/ 100.0)), StandardUnit.getMaxPoints(),Util.DEFAULT_EPSILON);
 	}
 	@Test
-	public void getStaminaPoints() {
+	public final void getStaminaPoints() {
 		Assert.assertEquals(25.0, StandardUnit.getStaminaPoints(),Util.DEFAULT_EPSILON);
 	}
 	@Test
-	public void setStaminaPoints() {
+	public final void setStaminaPoints() {
 		StandardUnit.setStaminaPoints(30.0);
 		Assert.assertEquals(30.0, StandardUnit.getStaminaPoints(),Util.DEFAULT_EPSILON);
 	}
 	@Test
-	public void getName() {
+	public final void getName() {
 		Assert.assertEquals("Bunit", StandardUnit.getName());
 	}
 	@Test
-	public void setName_LegalCase() throws IllegalArgumentException{
+	public final void setName_LegalCase() throws IllegalArgumentException{
 		StandardUnit.setName("B\'unit b\"uNit");
 		Assert.assertEquals("B\'unit b\"uNit", StandardUnit.getName());
 	}
 	@Test (expected = IllegalArgumentException.class)
-	public void setName_InvalidToken() throws IllegalArgumentException{
+	public final void setName_InvalidToken() throws IllegalArgumentException{
 		StandardUnit.setName("Bunit1");
 	}
 	@Test (expected = IllegalArgumentException.class) 
-	public void setName_InvalidLength() throws IllegalArgumentException{
+	public final void setName_InvalidLength() throws IllegalArgumentException{
 		StandardUnit.setName("A");
 	}
 	@Test (expected = IllegalArgumentException.class)
-	public void setName_NoUppercase() throws IllegalArgumentException{
+	public final void setName_NoUppercase() throws IllegalArgumentException{
 		StandardUnit.setName("bunit");
 	}
 	@Test
-	public void getOrientation() {
+	public final void getOrientation() {
 		Assert.assertEquals(Math.PI/2,StandardUnit.getOrientation(),Util.DEFAULT_EPSILON);
 	}
 	@Test
-	public void setOrientation_NormalCase() {
+	public final void setOrientation_NormalCase() {
 		StandardUnit.setOrientation((float) (Math.PI/4));
 		Assert.assertEquals(Math.PI/4, StandardUnit.getOrientation(),Util.DEFAULT_EPSILON);
 	}
 	@Test
-	public void setOrientation_ExceedingCase() {
+	public final void setOrientation_ExceedingCase() {
 		StandardUnit.setOrientation((float) (3*Math.PI));
 		Assert.assertEquals(Math.PI, StandardUnit.getOrientation(), Util.DEFAULT_EPSILON);
 	}
 	@Test
-	public void setOrientation_NegativeCase() {
+	public final void setOrientation_NegativeCase() {
 		StandardUnit.setOrientation((float) (-5*Math.PI/2)); 
 		Assert.assertEquals(3*Math.PI/2, StandardUnit.getOrientation(), Util.DEFAULT_EPSILON);
 	}
 	@Test
-	public void getPosition() {
+	public final void getPosition() {
 		assertDoublePositionEquals(3.5,1.5,4.5,StandardUnit.getPosition());
 	}
 	@Test
-	public void getPosition_IntegerCubePositionAsParameter() {
+	public final void getPosition_IntegerCubePositionAsParameter() {
 		Assert.assertArrayEquals(new double[] {3.5,4.5,5.5}, Unit.getPosition(new int[] {3,4,5}), Util.DEFAULT_EPSILON);
 	}
 	@Test 
-	public void getCubePosition() {
+	public final void getCubePosition() {
 		Assert.assertArrayEquals(new double[] {Math.floor(3.5),Math.floor(1.5),Math.floor(4.5)}, StandardUnit.getCubePosition(), Util.DEFAULT_EPSILON);
 	}
 	@Test
-	public void getCubeCoordinate() {
+	public final void getCubeCoordinate() {
 		Assert.assertArrayEquals(new int[] {(int) Math.floor(3.5),(int) Math.floor(1.5),(int) Math.floor(4.5)}, 
 				new int[] {(int) StandardUnit.getCubePosition()[0],(int) StandardUnit.getCubePosition()[1],(int) StandardUnit.getCubePosition()[2]});
 	}
 	@Test
-	public void setPosition_LegalCase() throws IllegalArgumentException{
+	public final void setPosition_LegalCase() throws IllegalArgumentException{
 		StandardUnit.setPosition(new double[]{20.5,6.5,8.5});
 		Assert.assertArrayEquals(new double[]{20.5,6.5,8.5},  StandardUnit.getPosition(), Util.DEFAULT_EPSILON);
 	}
 	@Test (expected = IllegalArgumentException.class)
-	public void setPosition_NegativeXPosition() throws IllegalArgumentException {
+	public final void setPosition_NegativeXPosition() throws IllegalArgumentException {
 		StandardUnit.setPosition(new double[]{-20.5,6.5,8.5});
 	}
 	@Test (expected = IllegalArgumentException.class)
-	public void setPosition_NegativeYPosition() throws IllegalArgumentException {
+	public final void setPosition_NegativeYPosition() throws IllegalArgumentException {
 		StandardUnit.setPosition(new double[]{20.5,-6.5,8.5});
 	}
 	@Test (expected = IllegalArgumentException.class)
-	public void setPosition_NegativeZPosition() throws IllegalArgumentException {
+	public final void setPosition_NegativeZPosition() throws IllegalArgumentException {
 		StandardUnit.setPosition(new double[]{20.5,6.5,-8.5});
 	}
 	@Test (expected = IllegalArgumentException.class)
-	public void setPosition_ExcedingXPosition() throws IllegalArgumentException {
+	public final void setPosition_ExcedingXPosition() throws IllegalArgumentException {
 		StandardUnit.setPosition(new double[] {59.0,6.5,8.5});
 	}
 	@Test (expected = IllegalArgumentException.class)
-	public void setPosition_ExcedingPosition() throws IllegalArgumentException {
+	public final void setPosition_ExcedingPosition() throws IllegalArgumentException {
 		StandardUnit.setPosition(new double[] {20.0,60.5,8.5});
 	}
 	@Test (expected = IllegalArgumentException.class)
-	public void setPosition_ExcedingZPosition() throws IllegalArgumentException {
+	public final void setPosition_ExcedingZPosition() throws IllegalArgumentException {
 		StandardUnit.setPosition(new double[] {30.0,6.5,80.5});
 	}
 	@Test
-	public void getCubeCenter() {
+	public final void getCubeCenter() {
 		Assert.assertArrayEquals(new double[] {3.5,4.5,5.5}, Unit.getCubeCenter(new double[] {3.0,4.0,5.0}), Util.DEFAULT_EPSILON);
 	}
 	@Test
@@ -296,7 +318,7 @@ public class TestSuite {
 	}
 	
 	@Test
-	public void moveToAdjacent_LegalCase(){
+	public final void moveToAdjacent_LegalCase(){
 		StandardUnit.moveToAdjacent(1,0,-1);
 		double speed = StandardUnit.getCurrentSpeed();
 		double distance = Math.sqrt(2);
