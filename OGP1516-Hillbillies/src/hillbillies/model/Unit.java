@@ -3,7 +3,6 @@ package hillbillies.model;
 import java.util.Random;
 
 import be.kuleuven.cs.som.annotate.*;
-import ogp.framework.util.ModelException;
 import ogp.framework.util.Util;
 
 /**
@@ -14,8 +13,8 @@ import ogp.framework.util.Util;
  *        |isValidPosition(this.getPosition())
  * @invar The name of each unit must be a valid name for any unit.
  *        |isValidName(this.getName())
- * @invar Each unit can have its strength as strength . |
- *        canHaveAsStrength(this.getStrength())
+ * @invar Each unit can have its strength as strength .
+ *        |canHaveAsStrength(this.getStrength())
  * @invar Each unit has a valid agility (for any unit).
  *        |isValidAgility(this.getAgility())
  * @invar Each unit has a valid toughness (for any unit).
@@ -23,23 +22,24 @@ import ogp.framework.util.Util;
  * @invar Each unit can have its weight as its weight.
  *        |canHaveAsWeight(this.getWeight())
  * @invar Each unit can have its number of stamina- and hitpoints as its number
- *        of stamina- and hitpoints. |canHaveAsPoints(this.getHitpoints()) &&
- *        canHaveAsPoints(this.getStaminaPoints())
- * @invar Each unit has an orientation that is valid for any unit.
- *        |isValidOrientation(this.getOrientation()) //we gaan zeggen dat tss 0
- *        en PI*2 moet liggen
- * @invar The duration is a valid duration for any unit.
- *        |isValidDuration(this.getDuration())
- * @invar The targetPosition of each unit must be a valid targetPosition for any
- *        unit. | isValidTargetPosition(getTargetPosition())
- * @version 1.0
+ *        of stamina- and hitpoints. 
+ *        |canHaveAsPoints(this.getHitpoints()) && canHaveAsPoints(this.getStaminaPoints())
+ * @invar Each unit has an orientation between 0 and 2*PI.
+ *        |0<=(this.getOrientation()) <= 2*PI
+ * @invar The startPosition is a position inside the game world.
+ *        |isValidPosition(startPosition)
+ * @invar The targetPosition is a position inside the game world.
+ *        |isValidPosition(targetPosition)
+ * @invar The nextTargetPosition is a position in a neighbouring cube of this units position, and a position inside the game world.
+ * 		  |isValidPosition(nextTargetPosition) && this.isNeighbouringCube(getCubePosition(nextTargetPosition))
+ * @version 2.0
  * @author adminheremans
  */
 public class Unit {
 
 	/**
 	 * Initialize this new unit with a given name, position, weight, strength,
-	 * agility, toughness, state of default behaviour, hitpoints, staminapoints
+	 * agility, toughness, state of default behaviour, hitpoints, stamina points
 	 * and an orientation.
 	 * 
 	 * @param name
@@ -58,71 +58,80 @@ public class Unit {
 	 *            The position of this new Unit.
 	 * @param hitpoints
 	 *            The hitpoints for this new Unit.
-	 * @param staminapoints
-	 *            The staminapoints for this new Unit.
+	 * @param staminaPoints
+	 *            The stamina points for this new Unit.
 	 * @param orientation
 	 *            The orientation of this new Unit.
-	 * @effect The name of this new unit is set to the given name. |
-	 *         this.setName(name)
-	 * @post If the given weight is a valid weight for any Unit, the weight of
-	 *       this new Unit is equal to the given weight. Otherwise, the weight
-	 *       of this new unit is equal to 25. | if (isValidWeight(Weight)) |
-	 *       then new.getWeight() == Weight | else new.getWeight() == 25
-	 * @post If the given strength is a valid strength for any unit, the
+	 * @effect The name of this new unit is set to the given name. 
+	 * 			|this.setName(name)
+	 * @post If the given strength is an integer in the range of 25 to 100, the
 	 *       strength of this new unit is equal to the given strength.
-	 *       Otherwise, the strength of this new unit is equal to 25. | if
-	 *       (isValidStrength(strength)) | then new.getStrength() == strength |
-	 *       else new.getStrength() == 25
-	 * @post If the given agility is a valid agility for any unit, the agility
+	 *       Otherwise, the strength of this new unit is equal to 25. 
+	 *       | if (25<=strength<=100) 
+	 *       | 	then new.getStrength() == strength 
+	 *       |if !(25<=strength<=100) 
+	 *       |	then new.getStrength() == 25
+	 * @post If the given agility is an integer in the range of 25 to 100, the agility
 	 *       of this new unit is equal to the given agility. Otherwise, the
-	 *       agility of this new unit is equal to 25. | if
-	 *       (isValidAgility(agility)) | then new.getAgility() == agility | else
-	 *       new.getAgility() == 25
-	 * @post If the given toughness is a valid toughness for any unit, the
+	 *       agility of this new unit is equal to 25. 
+	 *       | if (25<=agility<=100) 
+	 *       | 	then new.getAgility() == agility 
+	 *       |if !(25<=agility<=100) 
+	 *       |	then new.getAgility() == 25
+	 * @post If the given toughness is an integer in the range of 25 to 100, the
 	 *       toughness of this new unit is equal to the given toughness.
-	 *       Otherwise, the toughness of this new unit is equal to 25. | if
-	 *       (isValidToughness(toughness)) | then new.getToughness() ==
-	 *       toughness | else new.getToughness() == 25
-	 * @effect The position of this new unit is set to the given position. |
-	 *         this.setPosition(position)
-	 * @pre This new unit can have the given hitpoints as its hitpoints. |
-	 *      canHaveAsHitpoints(hitpoints)
-	 * @post The hitpoints of this new unit is equal to the given hitpoints. |
-	 *       new.getHitpoints() == hitpoints
+	 *       Otherwise, the toughness of this new unit is equal to 25. 
+	 *       | if (25<=toughness<=100) 
+	 *       | 	then new.getToughness() == toughness 
+	 *       | if !(25<=toughness<=100) 
+	 *       |	then new.getStrength() == 25
+	 * @post If the given weight is an integer in the range of 25 to 100 
+	 * 		 and at least this Unit's (strength+agility)/2, the weight of
+	 *       this new Unit is equal to the given weight. Otherwise, the weight
+	 *       of this new Unit is equal to 25. 
+	 *       	| if (25<= weight <=100) && (this.getStrength+this.getAgility)/2 <= weight)
+	 *       	|	then new.getWeight() == weight 
+	 *       	| if !(25<= weight <=100) || !(this.getStrength+this.getAgility)/2 <= weight)
+	 *       	|	new.getWeight() == 25
+	 * @effect The position of this new unit is set to the given position. 
+	 * 			|this.setPosition(position)
+	 * @pre This new unit can have the given hitpoints as its hitpoints. 
+	 * 			|canHaveAsHitpoints(hitpoints)
+	 * @post The hitpoints of this new unit is equal to the given hitpoints. 
+	 * 			|new.getHitpoints() == hitpoints
 	 * @pre The given the number of staminapoints must be a valid the number of
-	 *      staminapoints for any unit. | canHaveAsStaminaPoints(the number of
-	 *      staminapoints)
+	 *      staminapoints for any unit.
+	 *      | canHaveAsStaminaPoints(staminaPoints)
 	 * @post The the number of staminapoints of this new unit is equal to the
-	 *       given the number of staminapoints. | new.getStaminaPoints() ==
-	 *       staminaPoints
+	 *       given the number of staminapoints.
+	 *       | new.getStaminaPoints() == staminaPoints
 	 * @effect The orientation of this new unit is set to the given orientation
 	 *         | setOrientation(orientation)
 	 * @effect The default behavior of this new unit is set to the given value of enableDefaultBehaviour
 	 *         | setEnableDefaultBehavior(enableDefaultBehavior)
 	 */
-
 	@Raw
 	public Unit(String name, double[] position, int weight, int strength, int agility, int toughness,
 			boolean enableDefaultBehavior, double hitpoints, double staminaPoints, double orientation)
 					throws IllegalArgumentException {
-
-		if (!isValidStrength(strength))
+		this.setName(name);
+		if (!(25<=strength&&strength<=100))
 			strength = 25;
 		setStrength(strength);
-		if (!isValidAgility(agility))
+		if (!(25<=agility && agility<=100))
 			agility = 25;
 		setAgility(agility);
-		if (!isValidToughness(toughness))
+		if(! (25<=toughness && toughness<=100))
 			toughness = 25;
 		setToughness(toughness);
-		if (!canHaveAsWeight(weight))
+		if (!(25<=weight && weight<=100 && (this.getStrength()+this.getAgility())/2.0 <= weight))
 			weight = 25;
 		setWeight(weight);
 		setOrientation((float) orientation);
 		assert this.canHaveAsHitpoints(hitpoints);
+		assert this.canHaveAsStaminaPoints(staminaPoints);
 		this.setHitPoints(hitpoints);
 		this.setStaminaPoints(staminaPoints);
-		this.setName(name);
 		this.setPosition(position);
 		this.setEnableDefaultBehaviour(enableDefaultBehavior);
 
@@ -149,13 +158,13 @@ public class Unit {
 	 * 		   the given position as its position, the given weight as its weight,
 	 * 		   the given strength as its strength, the given agility as its agility,
 	 * 		   the given toughness as its toughness and the given state of default behavior
-	 * 		   as its state of default behavior.
+	 * 		   as its state of default behavior, and with 0.0 as its stamina- and hitpoints, and PI/2 as its orientation.
 	 * 		   | this(name, position, weight, strength, agility, toughness, enableDefaultBehavior, 0.0, 0.0,
 	 * 		   |	float) Math.PI / 2.0)
 	 */
 	@Raw
 	public Unit(String name, double[] position, int weight, int strength, int agility, int toughness,
-			boolean enableDefaultBehavior) {
+			boolean enableDefaultBehavior) throws IllegalArgumentException{
 		this(name, position, weight, strength, agility, toughness, enableDefaultBehavior, 0.0, 0.0,
 				(float) Math.PI / 2.0);
 	}
@@ -175,12 +184,12 @@ public class Unit {
 	 * @param Weight
 	 *            The weight to check.
 	 * @return  True if and only if the weight is equal to or greater than half of
-	 * 			the unit's strength increased with his agility.
-	 * 			| result == (weight >= (strength + agility)/2)
+	 * 			the unit's strength increased with his agility, and a number from 1 to 200.
+	 * 			| result == (weight >= (this.getStrength() + this.getAgility())/2 && weight >=1 && weight <=200)
 	 */
 	@Raw
 	public boolean canHaveAsWeight(int weight) {
-		return (float) weight >= ((float) this.strength + (float) this.agility) / 2;
+		return ((float) weight >= ((float) this.strength + (float) this.agility) / 2) && weight >=1 && weight <=200;
 	}
 
 	/**
@@ -218,13 +227,13 @@ public class Unit {
 	 * 
 	 * @param strength
 	 *            The strength to check.
-	 * @return  True if and only if the unit's strength is greater than or equal to 25,
-	 * 			but less than or equal to 100.
-	 * 			| result == ((25<= strength) && (strength<=100))
+	 * @return  True if and only if the unit's strength is greater than or equal to 1,
+	 * 			but less than or equal to 200.
+	 * 			| result == ((1<= strength) && (strength<=200))
 	 */
 	@Raw
 	public static boolean isValidStrength(int strength) {
-		return (25 <= strength) && (strength <= 100);
+		return (1 <= strength) && (strength <= 200);
 	}
 
 	/**
@@ -262,13 +271,13 @@ public class Unit {
 	 * 
 	 * @param agility
 	 *            The agility to check.
-	 * @return  True if and only if the unit's agility is greater than or equal to 25,
-	 * 			but less than or equal to 100.
-	 * 			| result == ((25<=agility) && (agility<=100))
+	 * @return  True if and only if the unit's agility is greater than or equal to 1,
+	 * 			but less than or equal to 200.
+	 * 			| result == ((1<=agility) && (agility<=200))
 	 */
 	@Raw
 	public static boolean isValidAgility(int agility) {
-		return ((25 <= agility) && (agility <= 100));
+		return ((1 <= agility) && (agility <= 200));
 	}
 
 	/**
@@ -306,12 +315,12 @@ public class Unit {
 	 * 
 	 * @param toughness
 	 *            The toughness to check.
-	 * @return  True if and only if the unit's toughness is greater than or equal to 25,
-	 * 			but less than or equal to 100.
-	 * 			| result == ((25<=toughness) && (toughness<=100))
+	 * @return  True if and only if the unit's toughness is greater than or equal to 1,
+	 * 			but less than or equal to 200.
+	 * 			| result == ((1<=toughness) && (toughness<=200))
 	 */
 	public static boolean isValidToughness(int toughness) {
-		return ((25 <= toughness) && (toughness <= 100));
+		return ((1 <= toughness) && (toughness <= 200));
 	}
 
 	/**
