@@ -13,6 +13,7 @@ import hillbillies.model.Unit;
 
 public class TestSuite {
 	
+	
 	private static Unit Aunit;
 	
 	private Unit StandardUnit;
@@ -27,14 +28,17 @@ public class TestSuite {
 	
 	private Unit NeighbourStandardUnit;
 
-	
-	
-	
+	/**
+	 * Set up an immutable test fixture
+	 */
 	@BeforeClass
 	public static void setUpBeforeClass(){
 		Aunit = new Unit("Aunit",new double[] {1.5,4,5,3.5},50,50,50,50,false,25.0,25.0,Math.PI/2);
 	}
 	
+	/**
+	 * Set up a mutable test fixture.
+	 */
 	@Before
 	public final void setUpBefore(){
 		StandardUnit = new Unit("Bunit",new double[] {3.5,1.5,4.5},75,25,25,75,false,25.0,25.0,Math.PI/2);
