@@ -709,7 +709,7 @@ public class Unit {
 	 *         updated position (the old position + this unit's speed *
 	 *         duration) and the orientation of this new unit is set to the
 	 *         direction in which he is going. If this unit is sprinting,
-	 *         the stamina points are decreased with one per 0.1 s. If the stamina
+	 *         the stamina points are decreased with one per 0.1 s. If its stamina
 	 *         points are equal to or less than zero, this unit stops sprinting
 	 *         and its stamina points are set to 0. If this unit has arrived to
 	 *         the target position, its new position is the target position, its
@@ -717,21 +717,21 @@ public class Unit {
 	 *         has arrived to the next target position (the center of the next
 	 *         cube), its new position is the next target position and it moves
 	 *         to the target position.
-	 * @post If this unit is working, and if his task is not completed, the new
-	 *       working time is increased with duration, and the progress of the work is
-	 *       updated. If the unit is working and the task is completed, the
+	 * @post If this unit is working, and if his task is not completed, the new unit's
+	 *       working time is increased with duration, and the progress of its work is
+	 *       updated. If this unit is working and its task is completed, the
 	 *       new status is DONE.
 	 * @effect If the status of this unit is initial resting, his new hitpoints are increased by (getToughness() / 200.0) * 5 * duration,
-	 * 			as well as the recovered hitpoints. If his recoveredHitpoints are equal to or 
-	 * 			greater than 1 or if his hitpoints are equal to or greater then the maximum value, 
-	 * 			the unit's status will be updated to resting and his hitpoints will be set to the maximum value. 
+	 * 			as well as the recovered hitpoints. If his hitpoints are equal to or greater then the maximum value, 
+	 * 			this unit's status will be updated to resting and his hitpoints will be set to the maximum value.
+	 * 			If his recoveredHitpoints are equal to or greater than 1, this unit's status is updated to resting.
 	 * @effect If the status of this unit is resting and if his hitpoints are less then the maximum value, 
-	 * 			the unit will increase its hitpoints by (getToughness() / 200.0) * 5 * duration. 
+	 * 			this unit will increase its hitpoints by (getToughness() / 200.0) * 5 * duration. 
 	 * 			If his hitpoints are at the maximum value but the stamina points aren't, 
 	 * 			the unit will increase stamina points by (getToughness() / 100.0) * 5 * duration. 
 	 * 			If both hitpoints and stamina points are at the maximum value, the unit's status will be updated to done.
-	 * @post If the unit's status is attacking, the attackTimer will be increased with duration and if the attackTimer becomes 
-	 * 			equal or greater then one, the unit's status will be updated to done.
+	 * @post If this unit's status is attacking, this new unit's attackTimer will be increased with duration and if the attackTimer becomes 
+	 * 			equal or greater then one, this new unit's status will be updated to done.
 	 * @throws IllegalArgumentException
 	 *             If the duration is less than zero or exceeds or equals 0.2 s.
 	 */
@@ -794,8 +794,11 @@ public class Unit {
 		else if (status == Status.INITIAL_RESTING) {
 			this.setHitPoints((getToughness() / 200.0) * 5 * duration + getHitpoints());
 			recoveredHitpoints += (getToughness() / 200.0) * 5 * duration;
-			if (recoveredHitpoints >= 1.0 || this.getHitpoints() >= getMaxPoints()) {
+			if (this.getHitpoints() >= getMaxPoints()) {
 				this.setHitPoints(getMaxPoints());
+				status = Status.RESTING;
+			}
+			else if (recoveredHitpoints >= 1.0){
 				status = Status.RESTING;
 			}
 		}
