@@ -95,16 +95,11 @@ public class Unit {
 	 *       	|	new.getWeight() == 25
 	 * @effect The position of this new unit is set to the given position. 
 	 * 			|this.setPosition(position)
-	 * @pre This new unit can have the given hitpoints as its hitpoints. 
-	 * 			|canHaveAsHitpoints(hitpoints)
-	 * @post The hitpoints of this new unit is equal to the given hitpoints. 
-	 * 			|new.getHitpoints() == hitpoints
-	 * @pre The given the number of staminapoints must be a valid the number of
-	 *      staminapoints for any unit.
-	 *      | canHaveAsStaminaPoints(staminaPoints)
-	 * @post The the number of staminapoints of this new unit is equal to the
-	 *       given the number of staminapoints.
-	 *       | new.getStaminaPoints() == staminaPoints
+	 * @effect The hitpoints of this new unit is set to the given number of hitpoints. 
+	 * 			|this.setHitpoints(hitpoints
+	 * @effect The the number of staminapoints of this new unit is set to the
+	 *       	given the number of staminapoints.
+	 *       	|this.setStaminaPoints(staminaPoints)
 	 * @effect The orientation of this new unit is set to the given orientation
 	 *         | setOrientation(orientation)
 	 * @effect The default behavior of this new unit is set to the given value of enableDefaultBehaviour
@@ -128,8 +123,6 @@ public class Unit {
 			weight = 25;
 		setWeight(weight);
 		setOrientation((float) orientation);
-		assert this.canHaveAsHitpoints(hitpoints);
-		assert this.canHaveAsStaminaPoints(staminaPoints);
 		this.setHitPoints(hitpoints);
 		this.setStaminaPoints(staminaPoints);
 		this.setPosition(position);
@@ -450,7 +443,7 @@ public class Unit {
 	 *      | new.getHitpoints() == hitpoints
 	 */
 	@Raw
-	public void setHitPoints(double hitpoints) {
+	private void setHitPoints(double hitpoints) {
 		assert canHaveAsHitpoints(hitpoints);
 		this.hitpoints = hitpoints;
 	}
@@ -496,7 +489,7 @@ public class Unit {
 	 *       | new.getStaminaPoints() == staminaPoints
 	 */
 	@Raw
-	public void setStaminaPoints(double staminaPoints) {
+	private void setStaminaPoints(double staminaPoints) {
 		assert canHaveAsStaminaPoints(staminaPoints);
 		this.staminaPoints = staminaPoints;
 	}

@@ -155,22 +155,12 @@ public class TestSuite {
 	public final void getHitpoints() {
 		Assert.assertEquals(25.0, StandardUnit.getHitpoints(),Util.DEFAULT_EPSILON);
 	}
-	@Test
-	public final void setHitpoints() {
-		StandardUnit.setHitPoints(30.0);
-		Assert.assertEquals(30.0, StandardUnit.getHitpoints(),Util.DEFAULT_EPSILON);
-	}
 	public final void getMaxPoints() {
 		Assert.assertEquals(Math.ceil(200.0 * (75.0 / 100.0) * (75.0/ 100.0)), StandardUnit.getMaxPoints(),Util.DEFAULT_EPSILON);
 	}
 	@Test
 	public final void getStaminaPoints() {
 		Assert.assertEquals(25.0, StandardUnit.getStaminaPoints(),Util.DEFAULT_EPSILON);
-	}
-	@Test
-	public final void setStaminaPoints() {
-		StandardUnit.setStaminaPoints(30.0);
-		Assert.assertEquals(30.0, StandardUnit.getStaminaPoints(),Util.DEFAULT_EPSILON);
 	}
 	@Test
 	public final void getName() {
