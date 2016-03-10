@@ -1,10 +1,5 @@
 package hillbillies.model;
 
-/**
-	 * @invar  The doubleArray of each vector must be a valid doubleArray for any
-	 *         vector.
-	 *       | isValidDoubleArray(getDoubleArray())
-	 */
 public class Vector {
 	
 public double getDistance(double[] vector1, double[] vector2){
