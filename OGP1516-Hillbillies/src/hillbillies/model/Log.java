@@ -3,6 +3,8 @@ import hillbillies.model.World.*;
 
 import java.util.Random;
 
+import be.kuleuven.cs.som.annotate.*;
+
 
 /** TO BE ADDED TO CLASS HEADING
  * @invar  The position of each log must be a valid position for any

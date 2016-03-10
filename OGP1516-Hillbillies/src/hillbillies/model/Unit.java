@@ -620,7 +620,8 @@ public class Unit {
 	 */
 	public static boolean isValidPosition(double[] position) {
 		return (0 <= position[0]) && (position[0] <= X*L) && (0 <= position[1]) && (position[1] <= Y*L ) && (0 <= position[2])
-				&& (position[2] <= Z*L);
+				&& (position[2] <= Z*L) &&(world.getTerrain(position).getPassable());
+		
 	}
 
 	
@@ -732,6 +733,20 @@ public class Unit {
 		if (duration < 0 || duration >= 0.2)
 			throw new IllegalArgumentException();
 		restTimer += duration;
+		if (experiencePoints >=10){
+			// eventueel nog aanpassen!!!
+			//int randomInt = new Random().nextInt(3);
+			if (isValidStrength(this.getStrength()+1))
+				this.setStrength(this.getStrength()+1);
+			else if (isValidAgility(this.getAgility()+1))
+				this.setAgility(this.getAgility()+1);
+			else if (isValidToughness(this.getToughness()+1))
+				this.setToughness(this.getToughness()+1);
+		}
+		if (isFalling()){
+			
+		}
+		// moet nog documentatie van experience points
 		if (mustRest())
 			rest();
 		else if (status == Status.DONE && targetPosition != null && !this.isEnableDefaultBehaviour())
@@ -814,6 +829,19 @@ public class Unit {
 
 	}
 
+
+	private boolean isFalling() {
+		for (int i = -1; i <2 ; i ++){
+			for (int j = -1; j<2 ; j++){
+				for (int k = -1; k <2; k++){
+					double[] ijk = new double[] {(double) i, (double) j, (double) k};
+					double[] neighbouring = vectorAdd(this.getPosition(),ijk);
+					if (world.getTerrain(neighbouring))
+				}
+			}
+		}
+		
+	}
 
 	/**
 	 * Return the base speed of the unit.
@@ -1403,6 +1431,13 @@ public class Unit {
 	 * A boolean to check if the default behaviour is enabled.
 	 */
 	private boolean enableDefaultBehaviour;
+	
+	
+	
+	/**
+	 * An integer registering the experience points of a unit.
+	 */
+	private int experiencePoints= 0;
 	
 	/**
 	 * A variable registering the status of this unit.
