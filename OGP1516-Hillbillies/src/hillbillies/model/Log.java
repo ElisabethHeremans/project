@@ -87,7 +87,7 @@ public class Log {
 	 * @return the weight
 	 */
 	public final int getWeight() {
-		return weight;
+		return this.weight;
 	}
 	
 	public void advanceTime(){
