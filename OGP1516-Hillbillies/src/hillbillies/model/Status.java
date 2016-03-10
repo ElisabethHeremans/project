@@ -11,6 +11,7 @@ public enum Status {
 	INITIAL_RESTING,
 	RESTING,
 	IN_CENTER,
+	FALLING,
 	DONE
 	
 	

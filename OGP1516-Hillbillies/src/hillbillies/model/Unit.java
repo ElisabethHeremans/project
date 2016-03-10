@@ -743,10 +743,24 @@ public class Unit {
 			else if (isValidToughness(this.getToughness()+1))
 				this.setToughness(this.getToughness()+1);
 		}
-		if (isFalling()){
-			
+		if (status != Status.FALLING && mustFall()){
+			fall();
 		}
-		// moet nog documentatie van experience points
+		if (status == Status.FALLING){
+			double[] v = new double[] {0.0,0.0,-3.0};
+			setPosition(Vector.vectorAdd(this.getPosition(), Vector.scalarMultiplication(v, duration)));
+			if (getDistance(nextTargetPosition, startPosition)-getDistance(startPosition, this.getPosition())<=0.0){
+				setPosition(nextTargetPosition);
+				setHitPoints(this.getHitpoints() - 10);
+				double[] nextPosition = Vector.vectorAdd(this.getPosition(), new double[] {0.0,0.0,-1.0});
+				if (!world.getTerrain(nextPosition).getPassable() ||nextPosition[2]<1.0){
+					status = Status.DONE;
+				}
+				else
+					fall();
+			}
+		}	
+		// moet nog documentatie van experience points en falling
 		if (mustRest())
 			rest();
 		else if (status == Status.DONE && targetPosition != null && !this.isEnableDefaultBehaviour())
@@ -759,7 +773,7 @@ public class Unit {
 					getCurrentSpeed()*(nextTargetPosition[1]-startPosition[1])/d,
 					getCurrentSpeed()*(nextTargetPosition[2]-startPosition[2])/d};
 			
-			setPosition(new double[] {this.getPosition()[0]+v[0]*duration,this.getPosition()[1]+v[1]*duration,this.getPosition()[2]+v[2]*duration});
+			setPosition(Vector.vectorAdd(this.getPosition(), Vector.scalarMultiplication(v, duration)));
 			setOrientation((float) Math.atan2(v[1],v[0]));
 			if (isSprinting()){
 	
@@ -830,7 +844,13 @@ public class Unit {
 	}
 
 
-	private boolean isFalling() {
+	private void fall() {
+		this.status = Status.FALLING;
+		this.nextTargetPosition = Vector.vectorAdd(this.getCubePosition(), new double[] {0.0,0.0,-0.5});
+		this.startPosition = this.getPosition();
+	}
+
+	private boolean mustFall() {
 		for (int i = -1; i <2 ; i ++){
 			for (int j = -1; j<2 ; j++){
 				for (int k = -1; k <2; k++){
@@ -844,6 +864,15 @@ public class Unit {
 		}
 		return true;
 	}
+	
+//	private boolean isFalling(){
+//		return this.isFalling;
+//	}
+	
+//	private void setFalling(boolean falling){
+//		this.isFalling = falling;
+//	}
+	
 
 	/**
 	 * Return the base speed of the unit.
@@ -885,7 +914,7 @@ public class Unit {
 	 * 		   | result == (status == Status.RESTING || status == Status.DONE || status == Status.IN_CENTER)
 	 */
 	public boolean canMove() {
-		if (status == Status.RESTING || status == Status.DONE || status == Status.IN_CENTER)
+		if (status == Status.RESTING || status == Status.DONE || status == Status.IN_CENTER || isFalling())
 			return true;
 		return false;
 	}
