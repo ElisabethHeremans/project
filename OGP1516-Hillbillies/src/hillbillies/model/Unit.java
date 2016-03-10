@@ -835,12 +835,14 @@ public class Unit {
 			for (int j = -1; j<2 ; j++){
 				for (int k = -1; k <2; k++){
 					double[] ijk = new double[] {(double) i, (double) j, (double) k};
-					double[] neighbouring = vectorAdd(this.getPosition(),ijk);
-					if (world.getTerrain(neighbouring))
+					double[] neighbouring = Vector.vectorAdd(this.getPosition(),ijk);
+					if (!world.getTerrain(neighbouring).getPassable()){
+						return false;
+					}
 				}
 			}
 		}
-		
+		return true;
 	}
 
 	/**
