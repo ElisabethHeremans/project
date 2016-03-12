@@ -688,6 +688,10 @@ public class Unit {
 	 * A variable registering the position of this unit.
 	 */
 	private double[] position = {0.5,0.5,0.5};
+	
+	private Status getStatus() {
+		return status;
+	}
 
 	/**
 	 * Update the position and activity status of a unit.
@@ -743,10 +747,10 @@ public class Unit {
 			else if (isValidToughness(this.getToughness()+1))
 				this.setToughness(this.getToughness()+1);
 		}
-		if (status != Status.FALLING && mustFall()){
+		if (getStatus() != Status.FALLING && mustFall()){
 			fall();
 		}
-		if (status == Status.FALLING){
+		if (getStatus() == Status.FALLING){
 			double[] v = new double[] {0.0,0.0,-3.0};
 			setPosition(Vector.vectorAdd(this.getPosition(), Vector.scalarMultiplication(v, duration)));
 			if (getDistance(nextTargetPosition, startPosition)-getDistance(startPosition, this.getPosition())<=0.0){
@@ -763,11 +767,11 @@ public class Unit {
 		// moet nog documentatie van experience points en falling
 		if (mustRest())
 			rest();
-		else if (status == Status.DONE && targetPosition != null && !this.isEnableDefaultBehaviour())
+		else if (getStatus() == Status.DONE && targetPosition != null && !this.isEnableDefaultBehaviour())
 			moveTo(targetPosition);
-		else if (this.isEnableDefaultBehaviour() && status == Status.DONE)
+		else if (this.isEnableDefaultBehaviour() && getStatus() == Status.DONE)
 			startDefaultBehaviour();
-		else if (status == Status.MOVING) {
+		else if (getStatus() == Status.MOVING) {
 			double d = getDistance(nextTargetPosition,startPosition);
 			double[] v = new double[] {getCurrentSpeed()*(nextTargetPosition[0]-startPosition[0])/d,
 					getCurrentSpeed()*(nextTargetPosition[1]-startPosition[1])/d,
@@ -804,7 +808,7 @@ public class Unit {
 					status = Status.DONE;
 			}
 		}
-		else if (status == Status.WORKING) {
+		else if (getStatus() == Status.WORKING) {
 			if (workingTime < totalWorkingTime) {
 				workingTime += duration;
 				progressWork = workingTime / totalWorkingTime;
@@ -813,7 +817,7 @@ public class Unit {
 				status = Status.DONE;
 			}
 		} 
-		else if (status == Status.INITIAL_RESTING) {
+		else if (getStatus() == Status.INITIAL_RESTING) {
 			this.setHitPoints((getToughness() / 200.0) * 5 * duration + getHitpoints());
 			recoveredHitpoints += (getToughness() / 200.0) * 5 * duration;
 			if (this.getHitpoints() >= getMaxPoints()) {
@@ -824,7 +828,7 @@ public class Unit {
 				status = Status.RESTING;
 			}
 		}
-		else if (status == Status.RESTING) {
+		else if (getStatus() == Status.RESTING) {
 			if (this.getHitpoints() < getMaxPoints())
 				this.setHitPoints((getToughness() / 200.0) * 5 * duration + getHitpoints());
 			else if (this.getStaminaPoints() < getMaxPoints()) {
@@ -835,7 +839,7 @@ public class Unit {
 				status = Status.DONE;
 			}
 		} 
-		else if (status == Status.ATTACKING) {
+		else if (getStatus() == Status.ATTACKING) {
 			attackTimer += duration;
 			if (attackTimer >= 1.0)
 				status = Status.DONE;
@@ -914,7 +918,7 @@ public class Unit {
 	 * 		   | result == (status == Status.RESTING || status == Status.DONE || status == Status.IN_CENTER)
 	 */
 	public boolean canMove() {
-		if (status == Status.RESTING || status == Status.DONE || status == Status.IN_CENTER || isFalling())
+		if (getStatus() == Status.RESTING || getStatus() == Status.DONE || getStatus() == Status.IN_CENTER || getStatus() == Status.FALLING)
 			return true;
 		return false;
 	}
@@ -932,7 +936,7 @@ public class Unit {
 	 * 		 |	then new.isSprinting() == false
 	 */
 	public void startSprinting() {
-		if (status == Status.MOVING && getStaminaPoints() > 0)
+		if (getStatus() == Status.MOVING && getStaminaPoints() > 0)
 			isSprinting = true;
 		else
 			isSprinting = false;
@@ -1156,7 +1160,7 @@ public class Unit {
 	 * 		   | result == (status != Status.MOVING && status != Status.INITIAL_RESTING && status != Status.ATTACKING)
 	 */
 	public boolean canWork() {
-		if (status != Status.MOVING && status != Status.INITIAL_RESTING && status != Status.ATTACKING)
+		if (getStatus() != Status.MOVING && getStatus() != Status.INITIAL_RESTING && getStatus() != Status.ATTACKING)
 			return true;
 		return false;
 	}
@@ -1212,7 +1216,7 @@ public class Unit {
 	 * 		   | result == (status != Status.MOVING)
 	 */
 	public boolean canAttack() {
-		if (status != Status.MOVING)
+		if (getStatus() != Status.MOVING)
 			return true;
 		return false;
 	}
@@ -1332,7 +1336,7 @@ public class Unit {
 	 */
 	public boolean canRest() {
 		if(this.getStaminaPoints() <= 0 || this.getHitpoints() <= 0)
-			if (status == Status.DONE || status == Status.RESTING || status == Status.WORKING || status == Status.IN_CENTER)
+			if (getStatus() == Status.DONE || getStatus() == Status.RESTING || getStatus() == Status.WORKING || getStatus() == Status.IN_CENTER)
 				return true;
 		return false;
 	}
@@ -1419,7 +1423,7 @@ public class Unit {
 	 *		   |OR rest()	   
 	 */
 	public void startDefaultBehaviour() {
-		if (status == Status.DONE) {
+		if (getStatus() == Status.DONE) {
 			setEnableDefaultBehaviour(true);
 			int i = new Random().nextInt(4);
 			if (i == 0) {
@@ -1473,7 +1477,7 @@ public class Unit {
 	/**
 	 * A variable registering the status of this unit.
 	 */
-	public Status status = Status.DONE;
+	private Status status = Status.DONE;
 	
 	/**
 	 * Symbolic constant registering the fixed number of cubes in direction x.

@@ -176,6 +176,10 @@ public class World {
 	TerrainType getTerrain(double[] position) {
 		return TerrainType.AIR;
 	}
+	
+	public Unit spawnUnit(){
+		new unit = Unit
+	}
 
 	private int X;
 	private int Y;
