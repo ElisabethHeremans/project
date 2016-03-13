@@ -1,15 +1,11 @@
 package hillbillies.model;
 
-/**
- * @invar The number of units of each world must be a valid number of units for
- *        any world.	
- * @invar  The number of boulders of each world must be a valid number of boulders for any
- *         world.
- * @invar  The number of logs of each world must be a valid number of logs for any
- *         world.
- */
- */
+import java.util.Random;
+
+import hillbillies.part2.listener.TerrainChangeListener;
+
 public class World {
+
 
 	/**
 	 * Initialize this new world with given number of units.
@@ -33,7 +29,7 @@ public class World {
 	 *       number of logs. Otherwise, the number of logs of this new world is equal
 	 *       to 0.
 	 */
-	public World(int[] dimensions, int Units, int Boulders, int Logs) {
+	public World(int[] dimensions, int Units, int Boulders, int Logs, int[][][] terrainTypes, TerrainChangeListener Listener) {
 		if (!isValidNumberUnits(Units))
 			Units = 0;
 		setNumberUnits(Units);
@@ -43,6 +39,7 @@ public class World {
 		if (! isValidNumberLogs(Logs))
 			Logs = 0;
 		setNumberLogs(Logs);
+		this.terrainType = terrainTypes;
 	}
 
 	/**
@@ -168,22 +165,38 @@ public class World {
 	 */
 	private int Logs;
 
-
-	TerrainType getTerrain(int[] position) {
-		return TerrainType.AIR;
+	public int getTerrain (double[] position){
+		int[] cube = new int[] {(int) Math.floor(position[0]), 
+				(int) Math.floor(position[1]), (int) Math.floor(position[2])};
+		return getTerrain(cube);
 	}
-
-	TerrainType getTerrain(double[] position) {
-		return TerrainType.AIR;
+	public int getTerrain(int[] position) {
+		return this.terrainType[position[0]][position[1]][position[2]];
 	}
+	private int[][][] terrainType;
 	
 	public Unit spawnUnit(){
-		new unit = Unit
+	
+		return new Unit(randomName(), new double[] { (new Random().nextDouble()) * X*L, 
+				(new Random().nextDouble()) * Y*L,(new Random().nextDouble()) * Z*L }, 
+				new Random().nextInt(201)+1,new Random().nextInt(201)+1, new Random().nextInt(201)+1
+				,new Random().nextInt(201)+1,new Random().nextBoolean(),(double) new Random().nextInt(),
+				(double)new Random().nextInt(),new Random().nextDouble()*360);
 	}
-
+	
+	private String randomName(){
+		Char = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz \'\"";
+		int Length = new Random().nextInt(9)+2;
+		for( int i = 0; i < Length; i++ ) 
+		      Name.append( Char.charAt(new Random().nextInt(Char.length()) ) );
+		   return Name.toString();
+	}
+	private String Char;
+	private StringBuilder Name;
 	private int X;
 	private int Y;
 	private int Z;
+	private int L;
 	private int[] dimensions = new int[] { X, Y, Z };
 	private int maxUnits = 100;
 	private int maxFactions = 5;

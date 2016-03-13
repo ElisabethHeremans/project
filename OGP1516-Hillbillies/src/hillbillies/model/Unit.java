@@ -127,9 +127,9 @@ public class Unit {
 		this.setStaminaPoints(staminaPoints);
 		this.setPosition(position);
 		this.setEnableDefaultBehaviour(enableDefaultBehavior);
-
+		NbUnits = NbUnits +1;
 	}
-	
+	private int NbUnits =0;
 	/**
 	 * Initialize this new unit with a given name, position, weight, strength,
 	 * agility, toughness, state of default behavior.
@@ -161,7 +161,10 @@ public class Unit {
 		this(name, position, weight, strength, agility, toughness, enableDefaultBehavior, 0.0, 0.0,
 				(float) Math.PI / 2.0);
 	}
-
+	
+	public int getNbUnits(){
+		return NbUnits;
+	}
 	/**
 	 * Return the weight of this Unit.
 	 */

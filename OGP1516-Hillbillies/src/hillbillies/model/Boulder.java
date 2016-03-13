@@ -26,9 +26,14 @@ public class Boulder {
 			throws IllegalArgumentException {
 		this.setPosition(position);
 		this.weight = new Random().nextInt(41)+ 10;
+		NbBoulder = NbBoulder + 1;
 	}
 	
+	private int NbBoulder = 0;
 	
+	public int getNbBoulder(){
+		return NbBoulder;
+	}
 	/**
 	 * Return the position of this boulder.
 	 */

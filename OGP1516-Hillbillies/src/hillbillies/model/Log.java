@@ -28,9 +28,12 @@ public class Log {
 			throws IllegalArgumentException {
 		this.setPosition(position);
 		this.weight = new Random().nextInt(41)+ 10;
+		NbLogs = NbLogs +1;
 	}
-	
-	
+	private int NbLogs =0;
+	public int getNbLogs(){
+		return NbLogs;
+	}
 	/**
 	 * Return the position of this log.
 	 */
@@ -48,8 +51,8 @@ public class Log {
 	 * @return True if and only if the terrain type of this cube is passable and 
 	 * 			the z-position is 0 or the position is located directly above a solid cube.
 	*/
-	public static boolean isValidPosition(double[] position) {
-		if (world.getTerrain(position).getPassable())
+	public static boolean isValidPosition(int[][][] position) {
+		if (World.getTerrain(position).getPassable())
 				return true;
 		return false;
 	}
