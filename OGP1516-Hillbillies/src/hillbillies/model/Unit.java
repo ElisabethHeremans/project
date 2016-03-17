@@ -692,7 +692,7 @@ public class Unit {
 	 */
 	private double[] position = {0.5,0.5,0.5};
 	
-	private Status getStatus() {
+	public Status getStatus() {
 		return status;
 	}
 

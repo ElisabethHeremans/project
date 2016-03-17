@@ -2,6 +2,8 @@ package hillbillies.model;
 
 import java.util.Random;
 
+import be.kuleuven.cs.som.annotate.Basic;
+import be.kuleuven.cs.som.annotate.Raw;
 import hillbillies.part2.listener.TerrainChangeListener;
 
 public class World {
@@ -183,6 +185,7 @@ public class World {
 				,new Random().nextInt(201)+1,new Random().nextBoolean(),(double) new Random().nextInt(),
 				(double)new Random().nextInt(),new Random().nextDouble()*360);
 	}
+	// ik denk foutje : 201-> 200 & nieuwe faction starten en zo: hoe?
 	
 	private String randomName(){
 		Char = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz \'\"";

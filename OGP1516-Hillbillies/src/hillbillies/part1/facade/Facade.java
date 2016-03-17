@@ -232,7 +232,7 @@ public class Facade implements IFacade {
 	@Override
 	public boolean isMoving(Unit unit) throws ModelException {
 		try{
-			return unit.status == Status.MOVING;
+			return unit.getStatus() == Status.MOVING;
 		}
 		catch (NullPointerException exc){
 			throw new ModelException();
@@ -310,7 +310,7 @@ public class Facade implements IFacade {
 	@Override
 	public boolean isWorking(Unit unit) throws ModelException {
 		try{
-			return unit.status == Status.WORKING;
+			return unit.getStatus() == Status.WORKING;
 		}
 		catch (NullPointerException exc){
 			throw new ModelException();
@@ -334,7 +334,7 @@ public class Facade implements IFacade {
 	@Override
 	public boolean isAttacking(Unit unit) throws ModelException {
 		try{
-			return unit.status == Status.ATTACKING;
+			return unit.getStatus() == Status.ATTACKING;
 		}
 		catch (NullPointerException exc){
 			throw new ModelException();
@@ -357,7 +357,7 @@ public class Facade implements IFacade {
 	@Override
 	public boolean isResting(Unit unit) throws ModelException {
 		try{
-			return unit.status == Status.RESTING;
+			return unit.getStatus() == Status.RESTING;
 		}
 		catch (NullPointerException exc){
 			throw new ModelException();
