@@ -51,7 +51,7 @@ public class Log {
 	 * @return True if and only if the terrain type of this cube is passable and 
 	 * 			the z-position is 0 or the position is located directly above a solid cube.
 	*/
-	public static boolean isValidPosition(int[][][] position) {
+	public static boolean isValidPosition(double[] position) {
 		if (World.getTerrain(position).getPassable())
 				return true;
 		return false;

@@ -1,6 +1,11 @@
 package hillbillies.model;
 
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Raw;
@@ -31,7 +36,7 @@ public class World {
 	 *       number of logs. Otherwise, the number of logs of this new world is equal
 	 *       to 0.
 	 */
-	public World(int[] dimensions, int Units, int Boulders, int Logs, int[][][] terrainTypes, TerrainChangeListener Listener) {
+	public World(int[] dimensions, int Units, int[][][] terrainTypes, TerrainChangeListener Listener) {
 		if (!isValidNumberUnits(Units))
 			Units = 0;
 		setNumberUnits(Units);
@@ -178,7 +183,7 @@ public class World {
 	private int[][][] terrainType;
 	
 	public Unit spawnUnit(){
-	
+		int 
 		return new Unit(randomName(), new double[] { (new Random().nextDouble()) * X*L, 
 				(new Random().nextDouble()) * Y*L,(new Random().nextDouble()) * Z*L }, 
 				new Random().nextInt(201)+1,new Random().nextInt(201)+1, new Random().nextInt(201)+1
@@ -190,10 +195,73 @@ public class World {
 	private String randomName(){
 		Char = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz \'\"";
 		int Length = new Random().nextInt(9)+2;
-		for( int i = 0; i < Length; i++ ) 
+		Name.append(Char.charAt(new Random().nextInt(26)));
+		for( int i = 1; i < Length; i++ ) 
 		      Name.append( Char.charAt(new Random().nextInt(Char.length()) ) );
 		   return Name.toString();
 	}
+	
+	@Basic @Raw
+	public int getNbFactions(){
+		return factions.size();
+	}
+	
+	@Basic @Raw
+	public Faction getFactionAt(int index) throws IllegalArgumentException{
+		if (index > getNbFactions() || index <1)
+			throw new IllegalArgumentException();
+		return factions.get(index);
+	}
+	
+	@Raw
+	public boolean canHaveAsFaction(Faction faction){
+		return (faction != null && (!this.isTerminated || faction.isTerminated) &&faction.getNbUnits() <=50 && faction.getNbUnits() > 0);
+	}
+	
+	@Raw
+	public boolean canHaveAsFactionAt(Faction faction, int index){
+		if (!canHaveAsFaction(faction))
+			return false;
+		if (index <1 || index > getNbFactions()+1)
+			return false;
+		for (int i = 1; i<=getNbFactions(); i++)
+			if (i != index && getFactionAt(i) == faction)
+				return false;
+		return true;
+	}
+	
+	@Raw
+	public boolean hasProperFactions(){
+		for (int i = 1; i<=getNbFactions(); i++){
+			if (!canHaveAsFactionAt(getFactionAt(i),i))
+				return false;
+			if (getFactionAt(i).getWorld() != this)
+				return false;
+		}
+		return true;
+	}
+	
+	public void addAsFaction(Faction faction)throws IllegalArgumentException{
+		if (! canHaveAsFactionAt(faction, getNbFactions()+1))
+			throw new IllegalArgumentException();
+		if (faction.getWorld() != null)
+			throw new IllegalArgumentException();
+		factions.add(getNbFactions()+1, faction);
+		faction.setWorld(this);
+	}
+	
+	public void removeAsFaction(Faction faction){
+		if (hasAsFaction())
+	}
+	
+	
+	private final List<Faction> factions = new ArrayList<Faction>();
+	
+	private final Set<Boulder> boulders = new HashSet<Boulder>();
+	
+	private final Set<Log> logs = new HashSet<Log>();
+
+	
 	private String Char;
 	private StringBuilder Name;
 	private int X;
