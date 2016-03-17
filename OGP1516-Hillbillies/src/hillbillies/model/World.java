@@ -36,16 +36,7 @@ public class World {
 	 *       number of logs. Otherwise, the number of logs of this new world is equal
 	 *       to 0.
 	 */
-	public World(int[] dimensions, int Units, int[][][] terrainTypes, TerrainChangeListener Listener) {
-		if (!isValidNumberUnits(Units))
-			Units = 0;
-		setNumberUnits(Units);
-		if (! isValidNumberBoulders(Boulders))
-			Boulders = 0;
-		setNumberBoulders(Boulders);
-		if (! isValidNumberLogs(Logs))
-			Logs = 0;
-		setNumberLogs(Logs);
+	public World(int[] dimensions,int[][][] terrainTypes, TerrainChangeListener Listener) {
 		this.terrainType = terrainTypes;
 	}
 
@@ -183,12 +174,12 @@ public class World {
 	private int[][][] terrainType;
 	
 	public Unit spawnUnit(){
-		int 
+	 
 		return new Unit(randomName(), new double[] { (new Random().nextDouble()) * X*L, 
 				(new Random().nextDouble()) * Y*L,(new Random().nextDouble()) * Z*L }, 
 				new Random().nextInt(201)+1,new Random().nextInt(201)+1, new Random().nextInt(201)+1
 				,new Random().nextInt(201)+1,new Random().nextBoolean(),(double) new Random().nextInt(),
-				(double)new Random().nextInt(),new Random().nextDouble()*360);
+				(double)new Random().nextInt(),new Random().nextDouble()*360, addToFaction());
 	}
 	// ik denk foutje : 201-> 200 & nieuwe faction starten en zo: hoe?
 	
@@ -235,8 +226,8 @@ public class World {
 		for (int i = 1; i<=getNbFactions(); i++){
 			if (!canHaveAsFactionAt(getFactionAt(i),i))
 				return false;
-			if (getFactionAt(i).getWorld() != this)
-				return false;
+//			if (getFactionAt(i).getWorld() != this)
+//				return false;
 		}
 		return true;
 	}
@@ -244,14 +235,20 @@ public class World {
 	public void addAsFaction(Faction faction)throws IllegalArgumentException{
 		if (! canHaveAsFactionAt(faction, getNbFactions()+1))
 			throw new IllegalArgumentException();
-		if (faction.getWorld() != null)
-			throw new IllegalArgumentException();
+//		if (faction.getWorld() != null)
+//			throw new IllegalArgumentException();
 		factions.add(getNbFactions()+1, faction);
-		faction.setWorld(this);
+		//faction.setWorld(this);
 	}
 	
 	public void removeAsFaction(Faction faction){
-		if (hasAsFaction())
+		int pos = 6;
+		for (int i = 1; i <= getNbFactions(); i++){
+			if (factions.get(i-1) == faction)
+				pos = i-1;
+		}
+		if (pos != 6)
+			factions.remove(pos);	
 	}
 	
 	

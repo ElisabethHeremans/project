@@ -107,7 +107,7 @@ public class Unit {
 	 */
 	@Raw
 	public Unit(String name, double[] position, int weight, int strength, int agility, int toughness,
-			boolean enableDefaultBehavior, double hitpoints, double staminaPoints, double orientation)
+			boolean enableDefaultBehavior, double hitpoints, double staminaPoints, double orientation, Faction faction)
 					throws IllegalArgumentException {
 		this.setName(name);
 		if (!(25<=strength&&strength<=100))
@@ -127,9 +127,8 @@ public class Unit {
 		this.setStaminaPoints(staminaPoints);
 		this.setPosition(position);
 		this.setEnableDefaultBehaviour(enableDefaultBehavior);
-		NbUnits = NbUnits +1;
+		this.setFaction(faction);
 	}
-	private int NbUnits =0;
 	/**
 	 * Initialize this new unit with a given name, position, weight, strength,
 	 * agility, toughness, state of default behavior.

@@ -1,5 +1,8 @@
 package hillbillies.model;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import be.kuleuven.cs.som.annotate.*;
 
 public class Faction {
@@ -28,7 +31,7 @@ public class Faction {
 	 * @return | result ==
 	 */
 	public static boolean isValidNumberUnits(int Units) {
-		return (Units <= 50);
+		return (0<= Units && Units<= 50);
 	}
 
 	/**
@@ -50,4 +53,42 @@ public class Faction {
 	private String Name;
 	private int NbUnits;
 	private boolean Active;
+	private Set<Unit> units = new HashSet<Unit>();
+	
+	@Basic
+	@Raw
+	public boolean hasAsUnit(Unit unit){
+		return this.units.contains(unit);
+	}
+	@Raw
+	public boolean canHaveAsUnit(Unit unit){
+		return (unit != null) && (! this.isTerminated() || unit.isTerminated());
+	}
+	@Raw
+	public boolean hasProperUnits(){
+		for (Unit unit: this.units){
+			if (! canHaveAsUnit(unit))
+				return false;
+			if (unit.getFaction() != this)
+				return false;
+		}
+		return true;
+	}
+	public void addAsUnit(Unit unit) throws IllegalArgumentException{
+		if(! canHaveAsUnit(unit) || getNbUnits()>50)
+			throw new IllegalArgumentException();	
+		if( unit.getFaction() != null )
+			// check of unit van faction kan veranderen.
+			this.units.add(unit);
+			unit.setFaction(this);
+	}
+	public void removeAsUnit(Unit unit) throws IllegalArgumentException{
+		if( unit == null)
+			throw new IllegalArgumentException();
+		if (hasAsUnit(unit))
+			this.units.remove(unit);
+			unit.setFaction(null);
+			// Wat als... geen units meer.
+	}
+	
 }
