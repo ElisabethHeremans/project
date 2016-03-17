@@ -71,6 +71,8 @@ public class Faction {
 				return false;
 			if (unit.getFaction() != this)
 				return false;
+			if (this.getNbUnits() >50)
+				return false;
 		}
 		return true;
 	}

@@ -206,7 +206,7 @@ public class World {
 	
 	@Raw
 	public boolean canHaveAsFaction(Faction faction){
-		return (faction != null && (!this.isTerminated || faction.isTerminated) &&faction.getNbUnits() <=50 && faction.getNbUnits() > 0);
+		return (faction != null && (!this.isTerminated() || faction.isTerminated()) &&faction.getNbUnits() <=50 && faction.getNbUnits() > 0);
 	}
 	
 	@Raw
@@ -252,12 +252,52 @@ public class World {
 	}
 	
 	
+	
 	private final List<Faction> factions = new ArrayList<Faction>();
 	
 	private final Set<Boulder> boulders = new HashSet<Boulder>();
 	
 	private final Set<Log> logs = new HashSet<Log>();
-
+	
+	@Basic
+	@Raw
+	public boolean hasAsUnit(Unit unit){
+		return this.units.contains(unit);
+	}
+	@Raw
+	public boolean canHaveAsUnit(Unit unit){
+		return (unit != null) && (! this.isTerminated() || unit.isTerminated());
+	}
+	@Raw
+	public boolean hasProperUnits(){
+		for (Unit unit: this.units){
+			if (! canHaveAsUnit(unit))
+				return false;
+			if (unit.getWorld() != this)
+				return false;
+			if (this.getNbUnits() >100)
+				return false;
+		}
+		return true;
+	}
+	public void addAsUnit(Unit unit) throws IllegalArgumentException{
+		if(! canHaveAsUnit(unit) || getNbUnits()>50)
+			throw new IllegalArgumentException();	
+		if( unit.getFaction() != null )
+			// check of unit van faction kan veranderen.
+			this.units.add(unit);
+			unit.setWorld(this);
+	}
+	public void removeAsUnit(Unit unit) throws IllegalArgumentException{
+		if( unit == null)
+			throw new IllegalArgumentException();
+		if (hasAsUnit(unit))
+			this.units.remove(unit);
+			unit.setWorld(null);
+			// Wat als... geen units meer.
+	}
+	
+	private final Set<Unit> units = new HashSet<Unit>();
 	
 	private String Char;
 	private StringBuilder Name;

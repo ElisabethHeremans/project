@@ -694,6 +694,42 @@ public class Unit {
 	public Status getStatus() {
 		return status;
 	}
+	
+	public void setFaction(@Raw Faction faction){
+		assert (faction.hasAsUnit(this));
+		// nog condities?
+		this.faction = faction;
+	}
+	
+	@Raw
+	public boolean hasProperFaction(){
+		return (getFaction().hasAsUnit(this));
+	}
+	
+	@Basic @Raw
+	public Faction getFaction(){
+		return faction;
+	}
+	
+	private Faction faction;
+	
+	public void setWorld(@Raw World world){
+		assert (world.hasAsUnit(this));
+		// nog condities?
+		this.world = world;
+	}
+	
+	@Raw
+	public boolean hasProperWorld(){
+		return (getWorld().hasAsUnit(this));
+	}
+	
+	@Basic @Raw
+	public World getWorld(){
+		return world;
+	}
+	
+	private World world;
 
 	/**
 	 * Update the position and activity status of a unit.
