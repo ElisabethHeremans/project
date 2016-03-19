@@ -255,11 +255,82 @@ public class World {
 	
 	private final List<Faction> factions = new ArrayList<Faction>();
 	
+	@Basic
+	@Raw
+	public boolean hasAsBoulder(Boulder boulder){
+		return this.boulders.contains(boulder);
+	}
+	
+	@Raw
+	public boolean canHaveAsBoulder(Boulder boulder){
+		return (boulder != null) && (! this.isTerminated() || boulder.isTerminated());
+	}
+	() 
+	@Raw
+	public boolean hasProperBoulders(){
+		for (Boulder boulder: this.boulders){
+			if(! canHaveAsBoulder(boulder))
+				return false;
+			if(boulder.getWorld() != this)
+				return false;
+		}
+		return true;
+	}
+	public void addAsBoulder(Boulder boulder) throws IllegalArgumentException{
+		if(! canHaveAsBoulder(boulder))
+				throw new IllegalArgumentException();
+		this.boulders.add(boulder);
+		boulder.setWorld(this);
+	}
+	public void removeAsBoulder(Boulder boulder) throws IllegalArgumentException {
+		if (boulder == null)
+			throw new IllegalArgumentException();
+		// Hier moet nog rekening gehouden worden of de boulder gedragen wordt of niet.
+		if (hasAsBoulder(boulder))
+			this.boulders.remove(boulder);
+			boulder.setWorld(null);
+	}
 	private final Set<Boulder> boulders = new HashSet<Boulder>();
+	
+	@Basic
+	@Raw
+	public boolean hasAsLog(Log log){
+		return this.logs.contains(log);
+	}
+	
+	@Raw
+	public boolean canHaveAsLog(Log log){
+		return (log != null) && (! this.isTerminated() || log.isTerminated());
+	}
+	() 
+	@Raw
+	public boolean hasProperLog(){
+		for (Log log:  this.logs){
+			if(! canHaveAsLog(log))
+				return false;
+			if(log.getWorld() != this)
+				return false;
+		}
+		return true;
+	}
+	public void addAsLog(Log log) throws IllegalArgumentException{
+		if(! canHaveAsLog(log))
+				throw new IllegalArgumentException();
+		this.logs.add(log);
+		log.setWorld(this);
+	}
+	public void removeAsLog(Log log) throws IllegalArgumentException {
+		if (log == null)
+			throw new IllegalArgumentException();
+		// Hier moet nog rekening gehouden worden of de boulder gedragen wordt of niet.
+		if (hasAsLog(log))
+			this.logs.remove(log);
+			log.setWorld(null);
+	}
 	
 	private final Set<Log> logs = new HashSet<Log>();
 	
-	@Basic
+	@Basic 
 	@Raw
 	public boolean hasAsUnit(Unit unit){
 		return this.units.contains(unit);
@@ -308,4 +379,31 @@ public class World {
 	private int[] dimensions = new int[] { X, Y, Z };
 	private int maxUnits = 100;
 	private int maxFactions = 5;
+	
+	/**
+	 * Terminate this world.
+	 *
+	 * @post   This world  is terminated.
+	 *       | new.isTerminated()
+	 * @post   ...
+	 *       | ...
+	 */
+	 public void terminate() {
+		 this.isTerminated = true;
+	 }
+	 
+	 /**
+	  * Return a boolean indicating whether or not this world
+	  * is terminated.
+	  */
+	 @Basic @Raw
+	 public boolean isTerminated() {
+		 return this.isTerminated;
+	 }
+	 
+	 /**
+	  * Variable registering whether this world is terminated.
+	  */
+	 private boolean isTerminated = false;
+	 
 }

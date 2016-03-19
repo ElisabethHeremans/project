@@ -3,6 +3,9 @@ import hillbillies.model.World.*;
 
 import java.util.Random;
 
+import be.kuleuven.cs.som.annotate.Basic;
+import be.kuleuven.cs.som.annotate.Raw;
+
 
 /** 
  * @invar  The position of each boulder must be a valid position for any
@@ -27,6 +30,7 @@ public class Boulder {
 		this.setPosition(position);
 		this.weight = new Random().nextInt(41)+ 10;
 		NbBoulder = NbBoulder + 1;
+		setWeight();
 	}
 	
 	private int NbBoulder = 0;
@@ -84,7 +88,7 @@ public class Boulder {
 	private double[] position;
 
 	
-	final private int weight;
+	private int weight;
 
 	/**
 	 * 
@@ -95,9 +99,56 @@ public class Boulder {
 		return this.weight;
 	}
 	
+	private void setWeight() {
+		this.weight = new Random().nextInt(41)+10;
+	}
+	
 	public void advanceTime(){
 		if (position[2] != 0 || world.getTerrain(position[2]-1).getPassable())
 			moveToAdjacent(0,0,-1);
 	}
-
+	public void setWorld(@Raw World world){
+		assert (world.hasAsBoulder(this));
+		// nog condities?
+		this.world = world;
+	}
+	
+	@Raw
+	public boolean hasProperWorld(){
+		return (getWorld().hasAsBoulder(this));
+	}
+	
+	@Basic @Raw
+	public World getWorld(){
+		return world;
+	}
+	
+	private World world;
+	
+	/**
+	 * Terminate this boulder.
+	 *
+	 * @post   This boulder  is terminated.
+	 *       | new.isTerminated()
+	 * @post   ...
+	 *       | ...
+	 */
+	 public void terminate() {
+		 this.isTerminated = true;
+	 }
+	 
+	 /**
+	  * Return a boolean indicating whether or not this boulder
+	  * is terminated.
+	  */
+	 @Basic @Raw
+	 public boolean isTerminated() {
+		 return this.isTerminated;
+	 }
+	 
+	 /**
+	  * Variable registering whether this boulder is terminated.
+	  */
+	 private boolean isTerminated = false;
+	 
 }

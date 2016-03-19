@@ -93,4 +93,30 @@ public class Faction {
 			// Wat als... geen units meer.
 	}
 	
+	/**
+	 * Terminate this faction.
+	 *
+	 * @post   This faction  is terminated.
+	 *       | new.isTerminated()
+	 * @post   ...
+	 *       | ...
+	 */
+	 public void terminate() {
+		 this.isTerminated = true;
+	 }
+	 
+	 /**
+	  * Return a boolean indicating whether or not this faction
+	  * is terminated.
+	  */
+	 @Basic @Raw
+	 public boolean isTerminated() {
+		 return this.isTerminated;
+	 }
+	 
+	 /**
+	  * Variable registering whether this faction is terminated.
+	  */
+	 private boolean isTerminated = false;
+	 
 }

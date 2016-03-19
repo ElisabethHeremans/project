@@ -29,6 +29,7 @@ public class Log {
 		this.setPosition(position);
 		this.weight = new Random().nextInt(41)+ 10;
 		NbLogs = NbLogs +1;
+		setWeight();
 	}
 	private int NbLogs =0;
 	public int getNbLogs(){
@@ -84,7 +85,7 @@ public class Log {
 	private double[] position;
 
 	
-	final private int weight;
+	private int weight;
 
 	/**
 	 * 
@@ -94,10 +95,58 @@ public class Log {
 	public final int getWeight() {
 		return this.weight;
 	}
+	// variabele moest hiervoor niet meer final zijn.
+	private void setWeight() {
+		this.weight = new Random().nextInt(41)+10;
+	}
 	
 	public void advanceTime(){
 		if (position[2] != 0 || world.getTerrain(position[2]-1).getPassable())
 			moveToAdjacent(0,0,-1);
 	}
-
+	
+	public void setWorld(@Raw World world){
+		assert (world.hasAsLog(this));
+		// nog condities?
+		this.world = world;
+	}
+	
+	@Raw
+	public boolean hasProperWorld(){
+		return (getWorld().hasAsLog(this));
+	}
+	
+	@Basic @Raw
+	public World getWorld(){
+		return world;
+	}
+	
+	private World world;
+	
+	/**
+	 * Terminate this log.
+	 *
+	 * @post   This log  is terminated.
+	 *       | new.isTerminated()
+	 * @post   ...
+	 *       | ...
+	 */
+	 public void terminate() {
+		 this.isTerminated = true;
+	 }
+	 
+	 /**
+	  * Return a boolean indicating whether or not this log
+	  * is terminated.
+	  */
+	 @Basic @Raw
+	 public boolean isTerminated() {
+		 return this.isTerminated;
+	 }
+	 
+	 /**
+	  * Variable registering whether this log is terminated.
+	  */
+	 private boolean isTerminated = false;
+	 
 }

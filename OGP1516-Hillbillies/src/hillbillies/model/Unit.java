@@ -1,6 +1,10 @@
 package hillbillies.model;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import be.kuleuven.cs.som.annotate.*;
 import ogp.framework.util.Util;
@@ -1505,7 +1509,32 @@ public class Unit {
 	 */
 	private boolean enableDefaultBehaviour;
 	
-	
+	/**
+	 * Terminate this unit.
+	 *
+	 * @post   This unit  is terminated.
+	 *       | new.isTerminated()
+	 * @post   ...
+	 *       | ...
+	 */
+	 public void terminate() {
+		 this.isTerminated = true;
+	 }
+	 
+	 /**
+	  * Return a boolean indicating whether or not this unit
+	  * is terminated.
+	  */
+	 @Basic @Raw
+	 public boolean isTerminated() {
+		 return this.isTerminated;
+	 }
+	 
+	 /**
+	  * Variable registering whether this unit is terminated.
+	  */
+	 private boolean isTerminated = false;
+	 
 	
 	/**
 	 * An integer registering the experience points of a unit.
@@ -1536,6 +1565,42 @@ public class Unit {
 	 * Symbolic constant registering the side length of cubes, expressed in meters.
 	 */
 	private static double L = 1.0;
-
 	
+	@Basic @Raw
+	public Boulder getBoulder() {
+		return this.boulder;
+	}
+	// Hier de voorwaarde dat de boulder in dezelfde cube als de unit moet zijn. Maakt de methode wel niet 
+	// meer static. 
+	public boolean isValidBoulder(Boulder boulder){
+		return (boulder != null) && (boulder.getPosition() == this.getPosition());
+	}
+	
+	@Raw
+	public void setBoulder(Boulder boulder) throws IllegalArgumentException{
+		if(! isValidBoulder(boulder))
+			throw new IllegalArgumentException();
+		this.boulder = boulder;
+	}
+	
+	private Boulder boulder;
+	
+	@Basic @Raw
+	public Log getLog() {
+		return this.log;
+	}
+	// Hier de voorwaarde dat de log in dezelfde cube als de unit moet zijn. Maakt de methode wel niet 
+	// meer static. 
+	public boolean isValidLog(Log log){
+		return (log != null) && (log.getPosition() == this.getPosition());
+	}
+	
+	@Raw
+	public void setLog(Log log) throws IllegalArgumentException{
+		if(! isValidLog(log))
+			throw new IllegalArgumentException();
+		this.log = log;
+	}
+	
+	private Log log;
 }
