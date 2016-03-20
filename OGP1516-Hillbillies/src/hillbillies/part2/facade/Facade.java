@@ -1,5 +1,6 @@
 package hillbillies.part2.facade;
 
-public class Facade {
+public class Facade implements IFacade{
+	
 
 }

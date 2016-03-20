@@ -1,10 +1,6 @@
 package hillbillies.model;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
 import be.kuleuven.cs.som.annotate.*;
 import ogp.framework.util.Util;
@@ -162,12 +158,9 @@ public class Unit {
 	public Unit(String name, double[] position, int weight, int strength, int agility, int toughness,
 			boolean enableDefaultBehavior) throws IllegalArgumentException{
 		this(name, position, weight, strength, agility, toughness, enableDefaultBehavior, 0.0, 0.0,
-				(float) Math.PI / 2.0);
+				(float) Math.PI / 2.0, voegtoeaanfaction);
 	}
 	
-	public int getNbUnits(){
-		return NbUnits;
-	}
 	/**
 	 * Return the weight of this Unit.
 	 */
@@ -597,6 +590,11 @@ public class Unit {
 	public int[] getCubeCoordinate() {
 		return new int[] { (int) getCubePosition()[0], (int) getCubePosition()[1], (int) getCubePosition()[2] };
 	}
+	
+	public int[] getCubeCoordinate(double[] position){
+		return new int[] { (int) Math.floor(position[0]), (int) Math.floor(position[1]),
+				(int) Math.floor(position[2]) };
+	}
 
 	/**
 	 * Return the center of a cube.
@@ -624,9 +622,9 @@ public class Unit {
 	 *         | && (position[0] <= X) | && (0<= position[1]) && (position[1] <=Y)
 	 *         | && (0<= position[2]) && (position[2] <= Z)
 	 */
-	public static boolean isValidPosition(double[] position) {
-		return (0 <= position[0]) && (position[0] <= X*L) && (0 <= position[1]) && (position[1] <= Y*L ) && (0 <= position[2])
-				&& (position[2] <= Z*L) &&(world.getTerrain(position).getPassable());
+	public boolean isValidPosition(double[] position) {
+		return (getWorld().isCubeInWorld(getCubeCoordinate(position)) && getWorld().getPassable(getCubeCoordinate(position)));
+		
 		
 	}
 
@@ -1509,32 +1507,7 @@ public class Unit {
 	 */
 	private boolean enableDefaultBehaviour;
 	
-	/**
-	 * Terminate this unit.
-	 *
-	 * @post   This unit  is terminated.
-	 *       | new.isTerminated()
-	 * @post   ...
-	 *       | ...
-	 */
-	 public void terminate() {
-		 this.isTerminated = true;
-	 }
-	 
-	 /**
-	  * Return a boolean indicating whether or not this unit
-	  * is terminated.
-	  */
-	 @Basic @Raw
-	 public boolean isTerminated() {
-		 return this.isTerminated;
-	 }
-	 
-	 /**
-	  * Variable registering whether this unit is terminated.
-	  */
-	 private boolean isTerminated = false;
-	 
+	
 	
 	/**
 	 * An integer registering the experience points of a unit.
@@ -1546,61 +1519,7 @@ public class Unit {
 	 */
 	private Status status = Status.DONE;
 	
-	/**
-	 * Symbolic constant registering the fixed number of cubes in direction x.
-	 */
-	private static int X = 50;
-
-	/**
-	 * Symbolic constant registering the fixed number of cubes in direction y.
-	 */
-	private static int Y = 50;
-
-	/**
-	 * Symbolic constant registering the fixed number of cubes in direction z.
-	 */ 
-	private static int Z = 50;
 	
-	/**
-	 * Symbolic constant registering the side length of cubes, expressed in meters.
-	 */
-	private static double L = 1.0;
 	
-	@Basic @Raw
-	public Boulder getBoulder() {
-		return this.boulder;
-	}
-	// Hier de voorwaarde dat de boulder in dezelfde cube als de unit moet zijn. Maakt de methode wel niet 
-	// meer static. 
-	public boolean isValidBoulder(Boulder boulder){
-		return (boulder != null) && (boulder.getPosition() == this.getPosition());
-	}
 	
-	@Raw
-	public void setBoulder(Boulder boulder) throws IllegalArgumentException{
-		if(! isValidBoulder(boulder))
-			throw new IllegalArgumentException();
-		this.boulder = boulder;
-	}
-	
-	private Boulder boulder;
-	
-	@Basic @Raw
-	public Log getLog() {
-		return this.log;
-	}
-	// Hier de voorwaarde dat de log in dezelfde cube als de unit moet zijn. Maakt de methode wel niet 
-	// meer static. 
-	public boolean isValidLog(Log log){
-		return (log != null) && (log.getPosition() == this.getPosition());
-	}
-	
-	@Raw
-	public void setLog(Log log) throws IllegalArgumentException{
-		if(! isValidLog(log))
-			throw new IllegalArgumentException();
-		this.log = log;
-	}
-	
-	private Log log;
 }
