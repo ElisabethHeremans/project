@@ -33,6 +33,10 @@ public class Boulder {
 		setWeight();
 	}
 	
+	public Boulder(int[] cubePosition){
+		this(Unit.getPosition(cubePosition));
+	}
+	
 	private int NbBoulder = 0;
 	
 	public int getNbBoulder(){

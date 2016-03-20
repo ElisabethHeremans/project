@@ -7,9 +7,9 @@ import be.kuleuven.cs.som.annotate.*;
 
 public class Faction {
 
-	public Faction(String name, boolean Active) {
-		this.Name = name;
-		this.Active = Active;
+	public Faction() {
+		//this.Name = name;
+		//this.Active = Active;
 	}
 
 
@@ -20,6 +20,10 @@ public class Faction {
 	@Raw
 	public int getNbUnits() {
 		return NbUnits;
+	}
+	
+	public boolean isActive(){
+		return getNbUnits() > 0;
 	}
 
 	/**
@@ -71,9 +75,10 @@ public class Faction {
 				return false;
 			if (unit.getFaction() != this)
 				return false;
-			if (this.getNbUnits() >50)
-				return false;
 		}
+		if (this.getNbUnits() >50)
+			return false;
+		
 		return true;
 	}
 	public void addAsUnit(Unit unit) throws IllegalArgumentException{

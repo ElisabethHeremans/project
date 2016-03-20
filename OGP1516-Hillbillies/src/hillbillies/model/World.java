@@ -50,7 +50,7 @@ public class World {
 	@Basic
 	@Raw
 	public int getNumberUnits() {
-		return this.Units;
+		return this.units.size();
 	}
 
 	/**
@@ -66,106 +66,24 @@ public class World {
 		return (Units >= 0 && Units <= 100);
 	}
 
-	/**
-	 * Set the number of units of this world to the given number of units.
-	 * 
-	 * @param Units
-	 *            The new number of units for this world.
-	 * @post If the given number of units is a valid number of units for any
-	 *       world, the number of units of this new world is equal to the given
-	 *       number of units.
-	 */
-	@Raw
-	public void setNumberUnits(int Units) {
-		if (isValidNumberUnits(Units))
-			this.Units = Units;
-	}
-
-	/**
-	 * Variable registering the number of units of this world.
-	 */
-	private int Units;
-
 
 	/**
 	 * Return the number of boulders of this world.
 	 */
 	@Basic @Raw
 	public int getNumberBoulders() {
-		return this.Boulders;
+		return this.boulders.size();
 	}
 	
-	/**
-	 * Check whether the given number of boulders is a valid number of boulders for
-	 * any world.
-	 *  
-	 * @param  Boulders
-	 *         The number of boulders to check.
-	 * @return True if and only if the number of bounders is greater than or equal 0.
-	*/
-	public static boolean isValidNumberBoulders(int Boulders) {
-		return Boulders >=0;
-	}
-	
-	/**
-	 * Set the number of boulders of this world to the given number of boulders.
-	 * 
-	 * @param  Boulders
-	 *         The new number of boulders for this world.
-	 * @post   If the given number of boulders is a valid number of boulders for any world,
-	 *         the number of boulders of this new world is equal to the given
-	 *         number of boulders.
-	 */
-	@Raw
-	public void setNumberBoulders(int Boulders) {
-		if (isValidNumberBoulders(Boulders))
-			this.Boulders = Boulders;
-	}
-	
-	/**
-	 * Variable registering the number of boulders of this world.
-	 */
-	private int Boulders;
-	
+
 	/**
 	 * Return the number of logs of this world.
 	 */
 	@Basic @Raw
 	public int getNumberLogs() {
-		return this.Logs;
+		return this.logs.size();
 	}
 	
-	/**
-	 * Check whether the given number of logs is a valid number of logs for
-	 * any world.
-	 *  
-	 * @param  Logs
-	 *         The number of logs to check.
-	 * @return True if and only if the number of logs is greater than or equal to zero.
-	*/
-	public static boolean isValidNumberLogs(int Logs) {
-		return Logs>=0;
-	}
-	
-	/**
-	 * Set the number of logs of this world to the given number of logs.
-	 * 
-	 * @param  Logs
-	 *         The new number of logs for this world.
-	 * @post   If the given number of logs is a valid number of logs for any world,
-	 *         the number of logs of this new world is equal to the given
-	 *         number of logs.
-	 */
-	@Raw
-	public void setNumberLogs(int Logs) {
-		if (isValidNumberLogs(Logs))
-			this.Logs = Logs;
-	}
-	
-	/**
-	 * Variable registering the number of logs of this world.
-	 */
-	private int Logs;
 
 	public TerrainType getTerrain (double[] position){
 		int[] cube = getCubePosition(position);
@@ -220,10 +138,8 @@ public class World {
 	}
 	
 	@Basic @Raw
-	public Faction getFactionAt(int index) throws IllegalArgumentException{
-		if (index > getNbFactions() || index <1)
-			throw new IllegalArgumentException();
-		return factions.get(index);
+	public boolean hasAsFaction(Faction faction) throws IllegalArgumentException{
+		return factions.contains(faction);
 	}
 	
 	@Raw
@@ -231,53 +147,117 @@ public class World {
 		return (faction != null && (!this.isTerminated() || faction.isTerminated()) &&faction.getNbUnits() <=50 && faction.getNbUnits() > 0);
 	}
 	
-	@Raw
-	public boolean canHaveAsFactionAt(Faction faction, int index){
-		if (!canHaveAsFaction(faction))
-			return false;
-		if (index <1 || index > getNbFactions()+1)
-			return false;
-		for (int i = 1; i<=getNbFactions(); i++)
-			if (i != index && getFactionAt(i) == faction)
-				return false;
-		return true;
-	}
 	
 	@Raw
 	public boolean hasProperFactions(){
-		for (int i = 1; i<=getNbFactions(); i++){
-			if (!canHaveAsFactionAt(getFactionAt(i),i))
+		
+		for (Faction faction: this.factions){
+			if (! canHaveAsFaction(faction))
 				return false;
-//			if (getFactionAt(i).getWorld() != this)
-//				return false;
+			if (faction.getWorld() != this)
+				return false;
+			if (getNbFactions()>50)
+				return false;
+			
 		}
 		return true;
 	}
 	
 	public void addAsFaction(Faction faction)throws IllegalArgumentException{
-		if (! canHaveAsFactionAt(faction, getNbFactions()+1))
+		if (! canHaveAsFaction(faction))
 			throw new IllegalArgumentException();
+		if (getNbFactions()!=5)
+			factions.add( faction);
 //		if (faction.getWorld() != null)
 //			throw new IllegalArgumentException();
-		factions.add(getNbFactions()+1, faction);
 		//faction.setWorld(this);
+		
 	}
 	
 	public void removeAsFaction(Faction faction){
-		int pos = 6;
-		for (int i = 1; i <= getNbFactions(); i++){
-			if (factions.get(i-1) == faction)
-				pos = i-1;
+			
+		if( faction == null)
+			throw new IllegalArgumentException();
+		if (hasAsFaction(faction))
+			this.factions.remove(faction);
+	}
+	
+	private final Set<Faction> factions = new HashSet<Faction>();
+	
+	@Basic
+	@Raw
+	public boolean hasAsBoulder(Boulder boulder){
+		return this.boulders.contains(boulder);
+	}
+	@Raw
+	public boolean canHaveAsBoulder(Boulder boulder){
+		return (boulder != null) && (! this.isTerminated() || unit.isTerminated());
+	}
+	@Raw
+	public boolean hasProperBoulders(){
+		for (Boulder boulder: this.boulders){
+			if (! canHaveAsBoulder(boulder))
+				return false;
+			if (boulder.getWorld() != this)
+				return false;
+			
 		}
-		if (pos != 6)
-			factions.remove(pos);	
+		return true;
+	}
+	
+	public void addAsBoulder(Boulder boulder) throws IllegalArgumentException{
+		if(! canHaveAsBoulder(boulder))
+			throw new IllegalArgumentException();	
+		
+		this.boulders.add(boulder);
+		boulder.setWorld(this);
+	}
+	public void removeAsBoulder(Boulder boulder) throws IllegalArgumentException{
+		if( boulder == null)
+			throw new IllegalArgumentException();
+		if (hasAsBoulder(boulder))
+			this.boulders.remove(boulder);
+			boulder.setWorld(null);
+	}
+	
+	private final Set<Boulder> boulders = new HashSet<Boulder>();
+	
+	@Basic
+	@Raw
+	public boolean hasAsLog(Log log){
+		return this.logs.contains(log);
+	}
+	@Raw
+	public boolean canHaveAsLog(Log log){
+		return (log != null) && (! this.isTerminated() || log.isTerminated());
+	}
+	@Raw
+	public boolean hasProperLogs(){
+		for (Log log: this.logs){
+			if (! canHaveAsLog(logs))
+				return false;
+			if (log.getWorld() != this)
+				return false;
+			
+		}
+		return true;
+	}
+	
+	public void addAsLog(Log log) throws IllegalArgumentException{
+		if(! canHaveAsLog(log))
+			throw new IllegalArgumentException();	
+		this.logs.add(log);
+		log.setWorld(this);
 	}
 	
 	
-	
-	private final List<Faction> factions = new ArrayList<Faction>();
-	
-	private final Set<Boulder> boulders = new HashSet<Boulder>();
+	public void removeAsLog(Log log) throws IllegalArgumentException{
+		if( log == null)
+			throw new IllegalArgumentException();
+		if (hasAsLog(log))
+			this.logs.remove(log);
+			log.setWorld(null);
+	}
 	
 	private final Set<Log> logs = new HashSet<Log>();
 	
@@ -297,18 +277,40 @@ public class World {
 				return false;
 			if (unit.getWorld() != this)
 				return false;
-			if (this.getNbUnits() >100)
+			if (this.getNumberUnits() >100)
 				return false;
 		}
 		return true;
 	}
+	
 	public void addAsUnit(Unit unit) throws IllegalArgumentException{
-		if(! canHaveAsUnit(unit) || getNbUnits()>50)
+		if(! canHaveAsUnit(unit) || getNumberUnits()>1)
 			throw new IllegalArgumentException();	
-		if( unit.getFaction() != null )
+		if (getNumberUnits() <100 && !hasAsUnit(unit)){
+		//if( unit.getFaction() != null )
 			// check of unit van faction kan veranderen.
 			this.units.add(unit);
 			unit.setWorld(this);
+			if (getNbFactions()<5){
+				Faction faction = new Faction();
+				faction.addAsUnit(unit);
+				unit.setFaction(faction);
+			}
+			else{
+				int minNbUnits = 50;
+				Faction minNbUnitsFaction = null;
+				for (Faction faction: factions){
+					if (faction.isActive() && faction.getNbUnits()< minNbUnits){
+						minNbUnits = faction.getNbUnits();
+						minNbUnitsFaction = faction;
+					}
+					
+				}
+				if (minNbUnitsFaction != null){
+					minNbUnitsFaction.addAsUnit(unit);
+				}
+			}
+		}
 	}
 	public void removeAsUnit(Unit unit) throws IllegalArgumentException{
 		if( unit == null)
@@ -355,6 +357,7 @@ public class World {
 	private final int zDimension;
 	
 	private ConnectedToBorder connectedToBorder = new ConnectedToBorder(this.getxDimension(),this.getyDimension(),this.getzDimension());
+
 	
 	public void advanceTime(){
 		for (int x=0; x < getxDimension(); x ++){
@@ -363,14 +366,26 @@ public class World {
 					if (! connectedToBorder.isSolidConnectedToBorder(x, y, z)){
 						List<int[]> positionsToChange = new ArrayList<int[]>(); connectedToBorder.changeSolidToPassable(x,y,z);
 						for (int[] position: positionsToChange){
+							if (new Random().nextDouble() <= 0.25){
+								if (getTerrain(position) == TerrainType.ROCK){
+									Boulder boulder = new Boulder(position);
+									addAsBoulder(boulder);
+								}
+								if (getTerrain(position) == TerrainType.TREE){
+									Log log = new Log(position);
+									addAsLog(log);
+								}
+							}
 							setTerrain(position,TerrainType.AIR);
+
+							}
 						}
 					}
 				}
 			}
 		}
 		
-	}
+
 	
 	
 	

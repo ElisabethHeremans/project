@@ -591,7 +591,7 @@ public class Unit {
 		return new int[] { (int) getCubePosition()[0], (int) getCubePosition()[1], (int) getCubePosition()[2] };
 	}
 	
-	public int[] getCubeCoordinate(double[] position){
+	public static int[] getCubeCoordinate(double[] position){
 		return new int[] { (int) Math.floor(position[0]), (int) Math.floor(position[1]),
 				(int) Math.floor(position[2]) };
 	}
