@@ -123,6 +123,34 @@ public class World {
 				(int) Math.floor(position[2]) };
 	}
 	
+	/**
+	 * Return the position of the center of the cube with given integer coordinates.
+	 * 
+	 * @param cubePosition
+	 * 			The position of the cube.
+	 * @return the position of the center of the given cube, is each coordinate increased with the length of one cube /2.
+	 * 		   | result == new double [] { (double) cubePosition[0] + L/2, 
+	 * 		   | (double) cubePosition[1] + L/2,(double) cubePosition[2] + L/2 }
+	 */
+	public static double[] getCubeCenter(int[] cubePosition) {
+		return new double[] { (double) cubePosition[0] + L/2, (double) cubePosition[1] + L/2,
+				(double) cubePosition[2] + L/2 };
+	}
+	
+	/**
+	 * Return the center of a cube.
+	 * 
+	 * @param cubePosition
+	 *            The position of the cube.
+	 * @return The center of the given cube, a double array with 
+	 * 		   the x,y and z-coordinate of the cube position increased by half of the length of a cube. 
+	 * 		   | result == {cubePosition[0]+L/2,cubePosition[1]+L/2,cubePosition[2]+L/2}
+	 */
+
+	public static double[] getCubeCenter(double[] cubePosition) {
+		return new double[] { cubePosition[0] + L/2, cubePosition[1] + L/2, cubePosition[2] + L/2 };
+	}
+	
 	public boolean isCubeInWorld(int[] cubePosition){
 		return (0 <= cubePosition[0]) && (cubePosition[0] < getxDimension()*L) && (0 <= cubePosition[1]) 
 				&& (cubePosition[1] < getyDimension()*L ) && (0 <= cubePosition[2]) && (cubePosition[2] < getzDimension()*L);
@@ -135,6 +163,16 @@ public class World {
 	@Basic @Raw
 	public int getNbFactions(){
 		return factions.size();
+	}
+	
+	@Raw
+	public int getNbActiveFactions(){
+		int nbActiveFactions = 0;
+		for (Faction faction: factions){
+			if (faction.isActive())
+				nbActiveFactions +=1;
+		}
+		return nbActiveFactions;
 	}
 	
 	@Basic @Raw
@@ -154,11 +192,10 @@ public class World {
 		for (Faction faction: this.factions){
 			if (! canHaveAsFaction(faction))
 				return false;
-			if (faction.getWorld() != this)
+//			if (faction.getWorld() != this)
+//				return false;
+			if (getNbActiveFactions()>5)
 				return false;
-			if (getNbFactions()>50)
-				return false;
-			
 		}
 		return true;
 	}
@@ -166,7 +203,7 @@ public class World {
 	public void addAsFaction(Faction faction)throws IllegalArgumentException{
 		if (! canHaveAsFaction(faction))
 			throw new IllegalArgumentException();
-		if (getNbFactions()!=5)
+		if (getNbActiveFactions()!=5)
 			factions.add( faction);
 //		if (faction.getWorld() != null)
 //			throw new IllegalArgumentException();
@@ -284,7 +321,7 @@ public class World {
 	}
 	
 	public void addAsUnit(Unit unit) throws IllegalArgumentException{
-		if(! canHaveAsUnit(unit) || getNumberUnits()>1)
+		if(! canHaveAsUnit(unit))
 			throw new IllegalArgumentException();	
 		if (getNumberUnits() <100 && !hasAsUnit(unit)){
 		//if( unit.getFaction() != null )
@@ -319,6 +356,18 @@ public class World {
 			this.units.remove(unit);
 			unit.setWorld(null);
 			// Wat als... geen units meer.
+	}
+	
+	public List<Unit> listAllUnits(){
+		List<Unit> units = List<>;
+		for (Unit unit:units){
+			units.add(unit);
+		}
+		return units;
+	}
+	
+	public List<TerrainType,List<Boulder>,List<Log>,List<Unit>> inspectCube(){
+		
 	}
 	
 	private final Set<Unit> units = new HashSet<Unit>();

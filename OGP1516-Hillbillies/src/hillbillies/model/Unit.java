@@ -107,7 +107,7 @@ public class Unit {
 	 */
 	@Raw
 	public Unit(String name, double[] position, int weight, int strength, int agility, int toughness,
-			boolean enableDefaultBehavior, double hitpoints, double staminaPoints, double orientation, Faction faction)
+			boolean enableDefaultBehavior, double hitpoints, double staminaPoints, double orientation)
 					throws IllegalArgumentException {
 		this.setName(name);
 		if (!(25<=strength&&strength<=100))
@@ -127,7 +127,7 @@ public class Unit {
 		this.setStaminaPoints(staminaPoints);
 		this.setPosition(position);
 		this.setEnableDefaultBehaviour(enableDefaultBehavior);
-		this.setFaction(faction);
+		//this.setFaction(faction);
 	}
 	/**
 	 * Initialize this new unit with a given name, position, weight, strength,
@@ -158,7 +158,7 @@ public class Unit {
 	public Unit(String name, double[] position, int weight, int strength, int agility, int toughness,
 			boolean enableDefaultBehavior) throws IllegalArgumentException{
 		this(name, position, weight, strength, agility, toughness, enableDefaultBehavior, 0.0, 0.0,
-				(float) Math.PI / 2.0, voegtoeaanfaction);
+				(float) Math.PI / 2.0);
 	}
 	
 	/**
@@ -551,19 +551,7 @@ public class Unit {
 		return this.position;
 	}
 	
-	/**
-	 * Return the position of the center of the cube with given integer coordinates.
-	 * 
-	 * @param cubePosition
-	 * 			The position of the cube.
-	 * @return the position of the center of the given cube, is each coordinate increased with the length of one cube /2.
-	 * 		   | result == new double [] { (double) cubePosition[0] + L/2, 
-	 * 		   | (double) cubePosition[1] + L/2,(double) cubePosition[2] + L/2 }
-	 */
-	public static double[] getPosition(int[] cubePosition) {
-		return new double[] { (double) cubePosition[0] + L/2, (double) cubePosition[1] + L/2,
-				(double) cubePosition[2] + L/2 };
-	}
+	
 
 	/**
 	 * Return the position of the game world cube in which this unit is
@@ -596,19 +584,7 @@ public class Unit {
 				(int) Math.floor(position[2]) };
 	}
 
-	/**
-	 * Return the center of a cube.
-	 * 
-	 * @param cubePosition
-	 *            The position of the cube.
-	 * @return The center of the given cube, a double array with 
-	 * 		   the x,y and z-coordinate of the cube position increased by half of the length of a cube. 
-	 * 		   | result == {cubePosition[0]+L/2,cubePosition[1]+L/2,cubePosition[2]+L/2}
-	 */
-
-	public static double[] getCubeCenter(double[] cubePosition) {
-		return new double[] { cubePosition[0] + L/2, cubePosition[1] + L/2, cubePosition[2] + L/2 };
-	}
+	
 	
 	/**
 	 * Check whether the given position is a position inside the game world, a
@@ -797,7 +773,7 @@ public class Unit {
 				setPosition(nextTargetPosition);
 				setHitPoints(this.getHitpoints() - 10);
 				double[] nextPosition = Vector.vectorAdd(this.getPosition(), new double[] {0.0,0.0,-1.0});
-				if (!world.getTerrain(nextPosition).getPassable() ||nextPosition[2]<1.0){
+				if (!world.getTerrain(nextPosition).isPassable() ||nextPosition[2]<1.0){
 					status = Status.DONE;
 				}
 				else
@@ -835,9 +811,10 @@ public class Unit {
 				setPosition(targetPosition);
 				status = Status.DONE;
 				targetPosition = null;
+				setExperiencePoints(this.getExperiencePoints()+1);
 			}
 			else if (nextTargetPosition != null && getDistance(nextTargetPosition, startPosition)-getDistance(startPosition, this.getPosition())<=0.0){
-
+				setExperiencePoints(this.getExperiencePoints()+1);
 				setPosition(nextTargetPosition);
 				if (targetPosition != null){
 					//System.out.println("moveto" + targetPosition +"huidige loc" + this.getPosition());
@@ -900,7 +877,7 @@ public class Unit {
 				for (int k = -1; k <2; k++){
 					double[] ijk = new double[] {(double) i, (double) j, (double) k};
 					double[] neighbouring = Vector.vectorAdd(this.getPosition(),ijk);
-					if (!world.getTerrain(neighbouring).getPassable()){
+					if (!world.getTerrain(neighbouring).isPassable()){
 						return false;
 					}
 				}
@@ -941,12 +918,15 @@ public class Unit {
 	 * 			| 	then result == getWalkingSpeed();
 	 */
 	public double getCurrentSpeed() {
-		if (status != Status.MOVING) {
-			return 0.0;
-		} else {
+		if (status == Status.MOVING) {
 			if (isSprinting())
 				return 2.0 * getWalkingSpeed();
 			return getWalkingSpeed();
+		}
+		if (getStatus() == Status.FALLING)
+			return 3.0;
+		else{
+			return 0.0;
 		}
 	}
 	
@@ -1045,7 +1025,7 @@ public class Unit {
 			throw new IllegalArgumentException();
 		if (canMove()) {
 			startPosition = new double[] {this.getPosition()[0],this.getPosition()[1],this.getPosition()[2]};
-			nextTargetPosition = getCubeCenter(new double[] {this.getCubePosition()[0] + (double) dx , this.getCubePosition()[1] 
+			nextTargetPosition = World.getCubeCenter(new double[] {this.getCubePosition()[0] + (double) dx , this.getCubePosition()[1] 
 				+ (double) dy , this.getCubePosition()[2] + (double) dz });
 			status = Status.MOVING;
 			setWalkingSpeed(dz);
@@ -1133,8 +1113,7 @@ public class Unit {
 	 * 		   |	(double) cubePosition[2] + L/2 })  			
 	 */
 	public void moveTo(int[] cubePosition) throws IllegalArgumentException{
-		moveTo(new double[] { (double) cubePosition[0] + L/2, (double) cubePosition[1] + L/2,
-				(double) cubePosition[2] + L/2});
+		moveTo(World.getCubeCenter(cubePosition));
 	}
 
 	
@@ -1200,7 +1179,7 @@ public class Unit {
 	 * 		   | result == (status != Status.MOVING && status != Status.INITIAL_RESTING && status != Status.ATTACKING)
 	 */
 	public boolean canWork() {
-		if (getStatus() != Status.MOVING && getStatus() != Status.INITIAL_RESTING && getStatus() != Status.ATTACKING)
+		if (getStatus() != Status.MOVING && getStatus() != Status.INITIAL_RESTING && getStatus() != Status.ATTACKING && getStatus() != Status.FALLING)
 			return true;
 		return false;
 	}
@@ -1256,7 +1235,7 @@ public class Unit {
 	 * 		   | result == (status != Status.MOVING)
 	 */
 	public boolean canAttack() {
-		if (getStatus() != Status.MOVING)
+		if (getStatus() != Status.MOVING && getStatus() != Status.FALLING)
 			return true;
 		return false;
 	}
@@ -1326,32 +1305,33 @@ public class Unit {
 	 * 		   | new.status == Status.DONE;
 	 */
 	public void defend(Unit unit) {
-		status = Status.DEFENDING;
-		setOrientation((float) Math.atan2(unit.getPosition()[1] - this.getPosition()[1],
-				unit.getPosition()[0] - this.getPosition()[0]));
-		if (new Random().nextDouble() <= 0.20 * (this.getAgility() / unit.getAgility())) {
-			try {
-				this.setPosition(new double[] {this.getPosition()[0]+ (double)(-1 + (new Random().nextInt(3))),
-						this.getPosition()[1]+ (double)(-1 + (new Random().nextInt(3))),
-						this.getPosition()[2]+ (double)(-1 + (new Random().nextInt(3)))});
-			} 
-			catch (IllegalArgumentException exc) {
-				defend(unit);
+		if (this.getStatus() != Status.FALLING){
+			status = Status.DEFENDING;
+			setOrientation((float) Math.atan2(unit.getPosition()[1] - this.getPosition()[1],
+					unit.getPosition()[0] - this.getPosition()[0]));
+			if (new Random().nextDouble() <= 0.20 * (this.getAgility() / unit.getAgility())) {
+				try {
+					this.setPosition(new double[] {this.getPosition()[0]+ (double)(-1 + (new Random().nextInt(3))),
+							this.getPosition()[1]+ (double)(-1 + (new Random().nextInt(3))),
+							this.getPosition()[2]+ (double)(-1 + (new Random().nextInt(3)))});
+				} 
+				catch (IllegalArgumentException exc) {
+					defend(unit);
+				}
+				status = Status.DONE;
 			}
-			status = Status.DONE;
+			else if (new Random().nextDouble() <= 0.25
+					* ((this.getStrength() + this.getAgility()) / (unit.getStrength() + unit.getAgility())))
+				status = Status.DONE;
+			else {
+				double newHitPoints = this.getHitpoints() - unit.getStrength() / 10.0;
+				if (newHitPoints > 0)
+					this.setHitPoints(newHitPoints);
+				else
+					this.setHitPoints(0.0);
+				status = Status.DONE;
+			}
 		}
-		else if (new Random().nextDouble() <= 0.25
-				* ((this.getStrength() + this.getAgility()) / (unit.getStrength() + unit.getAgility())))
-			status = Status.DONE;
-		else {
-			double newHitPoints = this.getHitpoints() - unit.getStrength() / 10.0;
-			if (newHitPoints > 0)
-				this.setHitPoints(newHitPoints);
-			else
-				this.setHitPoints(0.0);
-			status = Status.DONE;
-		}
-
 	}
 
 	/**
@@ -1507,7 +1487,13 @@ public class Unit {
 	 */
 	private boolean enableDefaultBehaviour;
 	
+	public int getExperiencePoints(){
+		return this.experiencePoints;
+	}
 	
+	private void setExperiencePoints(int points){
+		experiencePoints = points;
+	}
 	
 	/**
 	 * An integer registering the experience points of a unit.
