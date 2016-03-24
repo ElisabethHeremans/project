@@ -13,8 +13,5 @@ public enum Status {
 	IN_CENTER,
 	FALLING,
 	DONE
-	
-	
-	
 
 }

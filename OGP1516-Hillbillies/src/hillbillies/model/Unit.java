@@ -867,7 +867,7 @@ public class Unit {
 
 	private void fall() {
 		this.status = Status.FALLING;
-		this.nextTargetPosition = Vector.vectorAdd(this.getCubePosition(), new double[] {0.0,0.0,-0.5});
+		this.nextTargetPosition = Vector.vectorAdd(this.getPosition(), new double[] {0.0,0.0,-1.0});
 		this.startPosition = this.getPosition();
 	}
 
@@ -1213,6 +1213,64 @@ public class Unit {
 		progressWork = (float) 0.0;
 
 	}
+	
+	public void endWork() {
+		if (this.getBoulder() !=null) {
+			this.getWorld().addAsBoulder(this.getBoulder());
+			this.getBoulder().setWorld(this.getWorld());
+			this.setBoulder(null);
+		}
+		if (this.getLog() !=null) {
+			this.getWorld().addAsLog(this.getLog());
+			this.getLog().setWorld(this.getWorld());
+			this.setLog(null);
+		}
+		else if (this.getWorld().getElements(this.getPosition().contains(isInstance(Boulder))) && 
+				this.getWorld().getElements(this.getPosition().contains(isInstance(Log)))) {
+			boolean boulderConsumed = false;
+			boolean logConsumed = false;
+			for (Element element: this.getWorld().getElements(this.getPosition()){
+				if (!boulderConsumed && element instanceof Boulder){
+					this.getWorld().removeAsBoulder(element);
+					element.terminate();
+					boulderConsumed = true;
+				}
+				if (!logConsumed && element instanceof Log){
+					this.getWorld().removeAsLog(element);
+					element.terminate();
+					logConsumed = true;
+				}
+			}
+			this.setWeight(this.getWeight()+1);
+			this.setToughness(this.getToughness()+1);
+		}
+		else if (this.getWorld().getElements(this.getPosition().contains(isInstance(Boulder)))){
+			boolean boulderFound = false;
+			for (Element element: this.getWorld().getElements(this.getPosition())){
+				if (!boulderFound && element instanceof Boulder){
+					this.getWorld().removeAsBoulder(this.getBoulder());
+					this.getBoulder().setWorld(null);
+					this.setBoulder(element);
+					boulderFound = true;
+				}
+			}
+		}
+		else if (this.getWorld().getElements(this.getPosition().contains(isInstance(Log)))){
+			boolean logFound = false;
+			for (Element element: this.getWorld().getElements(this.getPosition())){
+				if (!logFound && element instanceof Log){
+					this.getWorld().removeAsLog(this.getLog());
+					this.getLog().setWorld(null);
+					this.setLog(element);
+					logFound = true;
+				}
+			}
+		}
+		
+				
+				
+				
+	}
 	/**
 	 * A variable registering the progress of a unit's work.
 	 */
@@ -1486,6 +1544,77 @@ public class Unit {
 	 * A boolean to check if the default behaviour is enabled.
 	 */
 	private boolean enableDefaultBehaviour;
+	
+	/**
+ +	 * Terminate this unit.
+ +	 *
+ +	 * @post   This unit  is terminated.
+ +	 *       | new.isTerminated()
+ +	 * @post   ...
+ +	 *       | ...
+ +	 */
+ +	 public void terminate() {
+ +		 this.isTerminated = true;
+ +	 }
+ +	 
+ +	 /**
+ +	  * Return a boolean indicating whether or not this unit
+ +	  * is terminated.
+ +	  */
+ +	 @Basic @Raw
+ +	 public boolean isTerminated() {
+ +		 return this.isTerminated;
+ +	 }
+ +	 
+ +	 /**
+ +	  * Variable registering whether this unit is terminated.
+ +	  */
+ +	 private boolean isTerminated = false;
+ +	 
+  	
+  	/**
+  	 * Symbolic constant registering the side length of cubes, expressed in meters.
+  	 */
+  	private static double L = 1.0;
+ 
+  	
+ 	@Basic @Raw
+ 	public Boulder getBoulder() {
+ 		return this.boulder;
+ 	}
+ 	// Hier de voorwaarde dat de boulder in dezelfde cube als de unit moet zijn. Maakt de methode wel niet 
+ 	// meer static. 
+ 	public boolean isValidBoulder(Boulder boulder){
+ 		return (boulder != null) && (boulder.getPosition() == this.getPosition());
+ 	}
+ 	
+ 	@Raw
+ 	public void setBoulder(Boulder boulder) throws IllegalArgumentException{
+ 		if(! isValidBoulder(boulder))
+ 			throw new IllegalArgumentException();
+ 		this.boulder = boulder;
+ 	}
+ 	
+ 	private Boulder boulder;
+ 	
+ 	@Basic @Raw
+ 	public Log getLog() {
+ 		return this.log;
+ 	}
+ 	// Hier de voorwaarde dat de log in dezelfde cube als de unit moet zijn. Maakt de methode wel niet 
+ 	// meer static. 
+ 	public boolean isValidLog(Log log){
+ 		return (log != null) && (log.getPosition() == this.getPosition());
+ 	}
+ 
+	@Raw
+ public void setLog(Log log) throws IllegalArgumentException{
+ 		if(! isValidLog(log))
+ 			throw new IllegalArgumentException();
+ 		this.log = log;
+ 	}
+ 	
+ 	private Log log;
 	
 	public int getExperiencePoints(){
 		return this.experiencePoints;
