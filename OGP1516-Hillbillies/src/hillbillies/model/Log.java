@@ -24,10 +24,9 @@ public class Log extends RawMaterial {
 	 * @post The weight of this new log is an integer in the range of 10 to 40.
 	 */
 	public Log(double[] position) throws IllegalArgumentException {
-		this.setPosition(position);
+		super(position);
 		this.weight = new Random().nextInt(41) + 10;
 		NbLogs = NbLogs + 1;
-		this.weight = new Random().nextInt(41) + 10;
 	}
 
 	private int NbLogs = 0;

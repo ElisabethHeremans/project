@@ -2,8 +2,10 @@ package hillbillies.model;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -328,6 +330,8 @@ public class World {
 			// check of unit van faction kan veranderen.
 			this.units.add(unit);
 			unit.setWorld(this);
+			addUnitToUnitsAtCubeMap(unit);
+			
 			if (getNbFactions()<5){
 				Faction faction = new Faction();
 				faction.addAsUnit(unit);
@@ -359,16 +363,35 @@ public class World {
 	}
 	
 	public List<Unit> listAllUnits(){
-		List<Unit> units = List<>;
+		List<Unit> units = new ArrayList<Unit>();
 		for (Unit unit:units){
 			units.add(unit);
 		}
 		return units;
 	}
 	
-	public List<TerrainType,List<Boulder>,List<Log>,List<Unit>> inspectCube(){
+	public List<TerrainType,List<Boulder>,List<Log>,List<Unit>> inspectCube(int[] position){
 		
+	
+		return new List<this.getTerrain(position) ,occupyingCubeMap.get(position)>();
 	}
+	
+
+	
+	private Map<int[],Set<Unit>> unitsAtCubeMap = new HashMap<int[], Set<Unit>>();
+	
+	private void addUnitToUnitsAtCubeMap(Unit unit){
+		Set<Unit> unitsAtCube = this.unitsAtCubeMap.get(unit.getCubeCoordinate());
+		if ( unitsAtCube != null){
+			this.unitsAtCubeMap.put(unit.getCubeCoordinate(),unitsAtCube.add(unit));
+		}
+		else{
+			unitsAtCube = new HashSet<Unit>();
+			this.unitsAtCubeMap.put(unit.getCubeCoordinate(),unitsAtCube.add(unit));
+		}
+	}
+
+
 	
 	private final Set<Unit> units = new HashSet<Unit>();
 	

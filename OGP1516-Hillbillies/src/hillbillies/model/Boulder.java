@@ -12,7 +12,7 @@ import be.kuleuven.cs.som.annotate.Raw;
  *         boulder.
  *       | isValidPosition(getPosition())
  */
-public class Boulder {
+public class Boulder extends RawMaterial {
 	
 	
 	/**
@@ -27,10 +27,9 @@ public class Boulder {
 	 */
 	public Boulder(double[] position)
 			throws IllegalArgumentException {
-		this.setPosition(position);
+		super(position);
 		this.weight = new Random().nextInt(41)+ 10;
 		NbBoulder = NbBoulder + 1;
-		setWeight();
 	}
 	
 	public Boulder(int[] cubePosition){
@@ -92,7 +91,7 @@ public class Boulder {
 	private double[] position;
 
 	
-	private int weight;
+	private final int weight;
 
 	/**
 	 * 
@@ -102,11 +101,7 @@ public class Boulder {
 	public final int getWeight() {
 		return this.weight;
 	}
-	
-	private void setWeight() {
-		this.weight = new Random().nextInt(41)+10;
-	}
-	
+		
 	public void advanceTime(){
 		if (position[2] != 0 || world.getTerrain(position[2]-1).getPassable())
 			moveToAdjacent(0,0,-1);
@@ -154,5 +149,17 @@ public class Boulder {
 	  * Variable registering whether this boulder is terminated.
 	  */
 	 private boolean isTerminated = false;
+
+	@Override
+	public boolean isValidPosition(double[] position) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void advanceTime(float duration) {
+		// TODO Auto-generated method stub
+		
+	}
 	 
 }

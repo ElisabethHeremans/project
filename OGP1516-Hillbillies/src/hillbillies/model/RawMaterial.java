@@ -6,6 +6,8 @@ import be.kuleuven.cs.som.annotate.Raw;
 public abstract class RawMaterial {
 
 	public RawMaterial(double[] position) {
+		this.setPosition(position);
+
 	}
 	
 	public abstract double[] getPosition();
@@ -16,7 +18,9 @@ public abstract class RawMaterial {
 	
 	public abstract int getWeight();
 	
-	protected abstract void setWeight(int weight);
+	
+	
+	//protected abstract void setWeight(int weight); geen setter want final?
 	
 	public abstract void advanceTime(float duration);
 	
