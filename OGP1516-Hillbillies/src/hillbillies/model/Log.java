@@ -28,6 +28,11 @@ public class Log extends RawMaterial {
 		this.weight = new Random().nextInt(41) + 10;
 		NbLogs = NbLogs + 1;
 	}
+	
+	public Log(int[] position){
+		super(position);
+		this.weight = new Random().nextInt(41) + 10;
+	}
 
 	private int NbLogs = 0;
 

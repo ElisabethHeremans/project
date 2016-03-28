@@ -10,6 +10,9 @@ public abstract class RawMaterial {
 
 	}
 	
+	public RawMaterial(int[] position){
+		this(new double[] { position[0], position[1],position[2]});
+	}
 	public abstract double[] getPosition();
 	
 	public abstract void setPosition(double[] position);

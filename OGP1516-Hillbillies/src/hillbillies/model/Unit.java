@@ -181,7 +181,18 @@ public class Unit {
 	 */
 	@Raw
 	public boolean canHaveAsWeight(int weight) {
-		return ((float) weight >= ((float) this.getStrength() + (float) this.getAgility()) / 2) && weight >=1 && weight <=200;
+			if( (this.getLog() == null && this.getBoulder() == null)){
+				return ((float) weight >= ((float) this.getStrength() + (float) this.getAgility()) / 2) 
+						&& weight >=1 && weight <=200;}
+			else if(this.getLog() != null){
+				return ((float) weight >= ((float) this.getStrength() + (float) this.getAgility()) / 2) 
+						&& weight >=1 && weight <=200+this.getLog().getWeight();}
+			else if(this.getBoulder() != null){
+				return ((float) weight >= ((float) this.getStrength() + (float) this.getAgility()) / 2) 
+						&& weight >=1 && weight <=200+this.getLog().getWeight();
+			}
+			else
+				return false;					
 	}
 
 	/**
@@ -749,6 +760,8 @@ public class Unit {
 			else if (isValidToughness(this.getToughness()+1))
 				this.setToughness(this.getToughness()+1);
 		}
+		if (this.getHitpoints() <= 0)
+			setStatus(Status.DEATH);
 		if (this.getStatus() != Status.FALLING && mustFall()){
 			fall();
 		}
@@ -1175,9 +1188,10 @@ public class Unit {
 	 *		 | new.totalWorkingTime == (float) 500.0 / this.getStrength()
 	 *	 	 | new.progressWork == (float) 0.0
 	 */
-	public void work() {
+	public void workAt(int x, int y, int z) {
 		if (canWork())
 			setStatus(Status.WORKING);
+		workTargetPosition = new int[] {x,y,z};
 		workingTime = (float) 0.0;
 		totalWorkingTime = (float) 500.0 / this.getStrength();
 		progressWork = (float) 0.0;
@@ -1190,26 +1204,29 @@ public class Unit {
 			progressWork = workingTime / totalWorkingTime;
 		} else {
 			progressWork = (float) 1.0;
-			setStatus(Status.DONE);
+			//setStatus(Status.DONE);
+			endWork();
 		}
 	}
 	
-	public void endWork() {
+	public void endWork(int[] targetPosition) {
 		if (this.getBoulder() !=null) {
 			this.getWorld().addAsBoulder(this.getBoulder());
 			this.getBoulder().setWorld(this.getWorld());
 			this.setBoulder(null);
+			this.setWeight(this.getWeight()-boulder.getWeight());
 		}
 		if (this.getLog() !=null) {
 			this.getWorld().addAsLog(this.getLog());
 			this.getLog().setWorld(this.getWorld());
 			this.setLog(null);
+			this.setWeight(this.getWeight()-log.getWeight());
 		}
-		else if (this.getWorld().getElements(this.getPosition().contains(isInstance(Boulder))) && 
-				this.getWorld().getElements(this.getPosition().contains(isInstance(Log)))) {
+		else if (this.getWorld().getElements(targetPosition.contains(isInstance(Boulder))) && 
+				this.getWorld().getElements(targetPosition.contains(isInstance(Log))) && this.getWorld().getTerrain(targetPosition) == TerrainType.WORKSHOP) {
 			boolean boulderConsumed = false;
 			boolean logConsumed = false;
-			for (Element element: this.getWorld().getElements(this.getPosition()){
+			for (Element element: this.getWorld().getElements(targetPosition){
 				if (!boulderConsumed && element instanceof Boulder){
 					this.getWorld().removeAsBoulder(element);
 					element.terminate();
@@ -1232,6 +1249,7 @@ public class Unit {
 					this.getBoulder().setWorld(null);
 					this.setBoulder(element);
 					boulderFound = true;
+					this.setWeight(this.getWeight()+boulder.getWeight());
 				}
 			}
 		}
@@ -1243,13 +1261,32 @@ public class Unit {
 					this.getLog().setWorld(null);
 					this.setLog(element);
 					logFound = true;
+					this.setWeight(this.getWeight()+log.getWeight());
 				}
 			}
 		}
-		
-				
-				
-				
+		else if (this.getWorld().getTerrain(targetPosition)== TerrainType.TREE){
+			this.getWorld().setTerrain(targetPosition, TerrainType.AIR);
+			if( new Random().nextDouble()<=0.25){
+				// nieuwe log creeeren en verbinden met de wereld. Weet niet of dit helemaal correct is.
+				// targetPosition in het centrum van een cube? 
+				Log log = new Log(targetPosition);
+				this.getWorld().addAsLog(log);
+				log.setWorld(this.getWorld());
+			}
+		}
+		else if (this.getWorld().getTerrain(targetPosition)== TerrainType.ROCK){
+			this.getWorld().setTerrain(targetPosition, TerrainType.AIR);
+			if( new Random().nextDouble()<=0.25){
+				// nieuwe boulder creeeren en verbinden met de wereld. Weet niet of dit helemaal correct is.
+				// targetPosition in het centrum van een cube? 
+				Boulder boulder = new Boulder(targetPosition);
+				this.getWorld().addAsBoulder(boulder);
+				boulder.setWorld(this.getWorld());
+			}
+		}
+		setStatus(Status.DONE);
+		setExperiencePoints(this.getExperiencePoints()+10);
 	}
 	/**
 	 * A variable registering the progress of a unit's work.
@@ -1265,6 +1302,8 @@ public class Unit {
 	 * A variable registering the duration that the unit must work to complete a task.
 	 */
 	private float totalWorkingTime;
+	
+	private int[] workTargetPosition;
 
 	/**
 	 * Check whether it's possible for a unit to attack.
@@ -1357,12 +1396,17 @@ public class Unit {
 					defend(unit);
 				}
 				setStatus(Status.DONE);
+				// experience points stijgen, try-catch, kom je altijd opnieuw in defend terug, zijn kansen dan
+				//nog dezelfde?
+				this.setExperiencePoints(this.getExperiencePoints()+20);
 			}
 			else if (new Random().nextDouble() <= 0.25
 					* ((this.getStrength() + this.getAgility()) / (unit.getStrength() + unit.getAgility())))
 				setStatus(Status.DONE);
+				this.setExperiencePoints(this.getExperiencePoints()+20);
 			else {
 				double newHitPoints = this.getHitpoints() - unit.getStrength() / 10.0;
+				unit.setExperiencePoints(unit.getExperiencePoints()+20);
 				if (newHitPoints > 0)
 					this.setHitPoints(newHitPoints);
 				else

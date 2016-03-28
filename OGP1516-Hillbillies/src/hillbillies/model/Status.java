@@ -12,6 +12,7 @@ public enum Status {
 	RESTING,
 	IN_CENTER,
 	FALLING,
-	DONE
+	DONE,
+	DEATH
 
 }

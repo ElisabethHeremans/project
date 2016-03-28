@@ -29,6 +29,10 @@ public class Boulder extends RawMaterial {
 		this.weight = new Random().nextInt(41)+ 10;
 		NbBoulder = NbBoulder + 1;
 	}
+	public Boulder (int[] position){
+		super(position);
+		this.weight = new Random().nextInt(41)+ 10;
+	}
 
 	private int NbBoulder = 0;
 	

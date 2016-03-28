@@ -92,14 +92,14 @@ public class World {
 		return getTerrain(cube);
 	}
 	public TerrainType getTerrain(int[] position) {
-		return TerrainType.getTerrain(this.terrainTypes[position[0]][position[1]][position[2]]);
+		return TerrainType.getTerrain(terrainTypes[position[0]][position[1]][position[2]]);
 	}
 	
-	private void setTerrain(int[] position, TerrainType terrain){
+	void setTerrain(int[] position, TerrainType terrain){
 		terrainTypes[position[0]][position[1]][position[2]] = terrain.getType();
 	}
 	
-	private int[][][] terrainTypes;
+	private static int[][][] terrainTypes;
 	
 	public Unit spawnUnit(){
 	 
@@ -273,7 +273,7 @@ public class World {
 	@Raw
 	public boolean hasProperLogs(){
 		for (Log log: this.logs){
-			if (! canHaveAsLog(logs))
+			if (! canHaveAsLog(log))
 				return false;
 			if (log.getWorld() != this)
 				return false;
