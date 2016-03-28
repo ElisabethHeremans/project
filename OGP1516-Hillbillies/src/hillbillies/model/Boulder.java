@@ -3,9 +3,7 @@ import hillbillies.model.World.*;
 
 import java.util.Random;
 
-import be.kuleuven.cs.som.annotate.Basic;
-import be.kuleuven.cs.som.annotate.Raw;
-
+import be.kuleuven.cs.som.annotate.*;
 
 /** 
  * @invar  The position of each boulder must be a valid position for any
@@ -31,11 +29,7 @@ public class Boulder extends RawMaterial {
 		this.weight = new Random().nextInt(41)+ 10;
 		NbBoulder = NbBoulder + 1;
 	}
-	
-	public Boulder(int[] cubePosition){
-		this(Unit.getPosition(cubePosition));
-	}
-	
+
 	private int NbBoulder = 0;
 	
 	public int getNbBoulder(){
@@ -44,7 +38,7 @@ public class Boulder extends RawMaterial {
 	/**
 	 * Return the position of this boulder.
 	 */
-	@Basic @Raw
+	@Basic @Raw @Override
 	public double[] getPosition() {
 		return this.position;
 	}
@@ -58,8 +52,8 @@ public class Boulder extends RawMaterial {
 	 * @return True if and only if the terrain type of this cube is passable and 
 	 * 			the z-position is 0 or the position is located directly above a solid cube.
 	*/
-	public static boolean isValidPosition(double[] position) {
-		if (world.getTerrain(position).getPassable())
+	public boolean isValidPosition(double[] position) {
+		if (this.getWorld().getTerrain(position).isPassable())
 				return true;
 		return false;
 	}
@@ -77,7 +71,7 @@ public class Boulder extends RawMaterial {
 	 *         log.
 	 *       | ! isValidPosition(getPosition())
 	 */
-	@Raw
+	@Raw @Override
 	public void setPosition(double[] position) 
 			throws IllegalArgumentException {
 		if (! isValidPosition(position))
@@ -90,8 +84,12 @@ public class Boulder extends RawMaterial {
 	 */
 	private double[] position;
 
-	
 	private final int weight;
+	
+	private double[] nextTargetPosition;
+
+	private double[] startPosition;
+
 
 	/**
 	 * 
@@ -102,10 +100,49 @@ public class Boulder extends RawMaterial {
 		return this.weight;
 	}
 		
-	public void advanceTime(){
-		if (position[2] != 0 || world.getTerrain(position[2]-1).getPassable())
-			moveToAdjacent(0,0,-1);
+	@Override
+	public void advanceTime(float duration) {
+		 if (mustFall() && this.getStatus()!= Status.FALLING)
+			 fall();
+		 if (getStatus() == Status.FALLING){
+				double[] v = new double[] {0.0,0.0,-3.0};
+				setPosition(Vector.vectorAdd(this.getPosition(), Vector.scalarMultiplication(v, duration)));
+				if (Vector.getDistance(nextTargetPosition, startPosition)-Vector.getDistance(startPosition, this.getPosition())<=0.0){
+					setPosition(nextTargetPosition);
+					double[] nextPosition = Vector.vectorAdd(this.getPosition(), new double[] {0.0,0.0,-1.0});
+					if (!this.getWorld().getTerrain(nextPosition).isPassable() ||nextPosition[2]<1.0){
+						status = Status.DONE;
+					}
+					else
+						fall();
+				}
+			}	
+
 	}
+
+	public boolean mustFall() {
+
+		double[] ijk = new double[] { 0.0, 0.0, -1.0 };
+		double[] neighbouring = Vector.vectorAdd(this.getPosition(), ijk);
+		if (!world.getTerrain(neighbouring).isPassable()) {
+			return false;
+		}
+
+		return true;
+	}
+	
+	public void fall() {
+		setStatus(Status.FALLING);
+		this.nextTargetPosition = Vector.vectorAdd(this.getPosition(), new double[] {0.0,0.0,-1.0});
+		this.startPosition = this.getPosition();
+	}
+	public Status getStatus(){
+		return this.status;
+	}
+	public void setStatus(Status status) {
+		this.status = status;
+	}
+	@Override
 	public void setWorld(@Raw World world){
 		assert (world.hasAsBoulder(this));
 		// nog condities?
@@ -113,13 +150,9 @@ public class Boulder extends RawMaterial {
 	}
 	
 	@Raw
+	@Override
 	public boolean hasProperWorld(){
 		return (getWorld().hasAsBoulder(this));
-	}
-	
-	@Basic @Raw
-	public World getWorld(){
-		return world;
 	}
 	
 	private World world;
@@ -132,6 +165,7 @@ public class Boulder extends RawMaterial {
 	 * @post   ...
 	 *       | ...
 	 */
+	@Override
 	 public void terminate() {
 		 this.isTerminated = true;
 	 }
@@ -140,7 +174,7 @@ public class Boulder extends RawMaterial {
 	  * Return a boolean indicating whether or not this boulder
 	  * is terminated.
 	  */
-	 @Basic @Raw
+	 @Basic @Raw @Override
 	 public boolean isTerminated() {
 		 return this.isTerminated;
 	 }
@@ -149,17 +183,6 @@ public class Boulder extends RawMaterial {
 	  * Variable registering whether this boulder is terminated.
 	  */
 	 private boolean isTerminated = false;
-
-	@Override
-	public boolean isValidPosition(double[] position) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void advanceTime(float duration) {
-		// TODO Auto-generated method stub
-		
-	}
+	 private Status status= Status.DONE;
 	 
 }

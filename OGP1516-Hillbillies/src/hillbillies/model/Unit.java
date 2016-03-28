@@ -624,24 +624,6 @@ public class Unit {
 	}
 
 	/**
-	 * Return the distance between two positions.
-	 * 
-	 * @param Position1
-	 * 		The first position.
-	 * @param Position2
-	 * 		The second position.
-	 * @return the distance in meters between the first and the second position.
-	 * 		| result == Math.sqrt(Math.pow(Position1[0] - Position2[0], 2.0)
-	 *		|	+ Math.pow(Position1[1] - Position2[1], 2.0)
-	 *		|	+ Math.pow(Position1[2] - Position2[2], 2.0))
-	 */
-	private static double getDistance(double[] Position1, double[] Position2) {
-		return Math.sqrt(Math.pow(Position1[0] - Position2[0], 2.0)
-				+ Math.pow(Position1[1] - Position2[1], 2.0)
-				+ Math.pow(Position1[2] - Position2[2], 2.0));
-	}
-	
-	/**
 	 * Check whether the given cube is a neighboring cube of the unit's cubePosition.
 	 * 
 	 * @param cubePosition
@@ -671,6 +653,10 @@ public class Unit {
 	
 	public Status getStatus() {
 		return status;
+	}
+	
+	public void setStatus(Status status) {
+		this.status = status;
 	}
 	
 	public void setFaction(@Raw Faction faction){
@@ -763,110 +749,40 @@ public class Unit {
 			else if (isValidToughness(this.getToughness()+1))
 				this.setToughness(this.getToughness()+1);
 		}
-		if (getStatus() != Status.FALLING && mustFall()){
+		if (this.getStatus() != Status.FALLING && mustFall()){
 			fall();
 		}
-		if (getStatus() == Status.FALLING){
-			double[] v = new double[] {0.0,0.0,-3.0};
-			setPosition(Vector.vectorAdd(this.getPosition(), Vector.scalarMultiplication(v, duration)));
-			if (getDistance(nextTargetPosition, startPosition)-getDistance(startPosition, this.getPosition())<=0.0){
-				setPosition(nextTargetPosition);
-				setHitPoints(this.getHitpoints() - 10);
-				double[] nextPosition = Vector.vectorAdd(this.getPosition(), new double[] {0.0,0.0,-1.0});
-				if (!world.getTerrain(nextPosition).isPassable() ||nextPosition[2]<1.0){
-					status = Status.DONE;
-				}
-				else
-					fall();
-			}
+		if (this.getStatus() == Status.FALLING){
+			falling(duration);
 		}	
 		// moet nog documentatie van experience points en falling
 		if (mustRest())
 			rest();
-		else if (getStatus() == Status.DONE && targetPosition != null && !this.isEnableDefaultBehaviour())
+		else if (this.getStatus() == Status.DONE && targetPosition != null && !this.isEnableDefaultBehaviour())
 			moveTo(targetPosition);
-		else if (this.isEnableDefaultBehaviour() && getStatus() == Status.DONE)
+		else if (this.isEnableDefaultBehaviour() && this.getStatus() == Status.DONE)
 			startDefaultBehaviour();
-		else if (getStatus() == Status.MOVING) {
-			double d = getDistance(nextTargetPosition,startPosition);
-			double[] v = new double[] {getCurrentSpeed()*(nextTargetPosition[0]-startPosition[0])/d,
-					getCurrentSpeed()*(nextTargetPosition[1]-startPosition[1])/d,
-					getCurrentSpeed()*(nextTargetPosition[2]-startPosition[2])/d};
-			
-			setPosition(Vector.vectorAdd(this.getPosition(), Vector.scalarMultiplication(v, duration)));
-			setOrientation((float) Math.atan2(v[1],v[0]));
-			if (isSprinting()){
-	
-				if (Util.fuzzyLessThanOrEqualTo(this.getStaminaPoints()-10.0*duration,0.0)){
-			
-					setStaminaPoints(0.0);
-					stopSprinting();
-				} else {
-					setStaminaPoints(this.getStaminaPoints() - 10.0 * duration);
-					startSprinting();
-				}
-			}
-			if (targetPosition != null && startPosition != null
-					&& getDistance(targetPosition, startPosition)-getDistance(startPosition, this.getPosition())<=0.0){
-				setPosition(targetPosition);
-				status = Status.DONE;
-				targetPosition = null;
-				setExperiencePoints(this.getExperiencePoints()+1);
-			}
-			else if (nextTargetPosition != null && getDistance(nextTargetPosition, startPosition)-getDistance(startPosition, this.getPosition())<=0.0){
-				setExperiencePoints(this.getExperiencePoints()+1);
-				setPosition(nextTargetPosition);
-				if (targetPosition != null){
-					//System.out.println("moveto" + targetPosition +"huidige loc" + this.getPosition());
-					status = Status.IN_CENTER;
-					moveTo(targetPosition);
-				}
-				else
-					status = Status.DONE;
-			}
+		else if (this.getStatus() == Status.MOVING) {
+			moving(duration);
 		}
-		else if (getStatus() == Status.WORKING) {
-			if (workingTime < totalWorkingTime) {
-				workingTime += duration;
-				progressWork = workingTime / totalWorkingTime;
-			} else {
-				progressWork = (float) 1.0;
-				status = Status.DONE;
-			}
+		else if (this.getStatus() == Status.WORKING) {
+			working(duration);
 		} 
 		else if (getStatus() == Status.INITIAL_RESTING) {
-			this.setHitPoints((getToughness() / 200.0) * 5 * duration + getHitpoints());
-			recoveredHitpoints += (getToughness() / 200.0) * 5 * duration;
-			if (this.getHitpoints() >= getMaxPoints()) {
-				this.setHitPoints(getMaxPoints());
-				status = Status.RESTING;
-			}
-			else if (recoveredHitpoints >= 1.0){
-				status = Status.RESTING;
-			}
+			initialResting(duration);
 		}
 		else if (getStatus() == Status.RESTING) {
-			if (this.getHitpoints() < getMaxPoints())
-				this.setHitPoints((getToughness() / 200.0) * 5 * duration + getHitpoints());
-			else if (this.getStaminaPoints() < getMaxPoints()) {
-				this.setHitPoints(getMaxPoints());
-				this.setStaminaPoints((getToughness() / 100.0) * 5 * duration + getStaminaPoints());
-			} else {
-				this.setStaminaPoints(getMaxPoints());
-				status = Status.DONE;
-			}
+			resting(duration);
 		} 
 		else if (getStatus() == Status.ATTACKING) {
 			attackTimer += duration;
 			if (attackTimer >= 1.0)
-				status = Status.DONE;
+				setStatus(Status.DONE);
 		}
-
 	}
-
-
+	
 	private void fall() {
-		this.status = Status.FALLING;
+		setStatus(Status.FALLING);
 		this.nextTargetPosition = Vector.vectorAdd(this.getPosition(), new double[] {0.0,0.0,-1.0});
 		this.startPosition = this.getPosition();
 	}
@@ -877,13 +793,28 @@ public class Unit {
 				for (int k = -1; k <2; k++){
 					double[] ijk = new double[] {(double) i, (double) j, (double) k};
 					double[] neighbouring = Vector.vectorAdd(this.getPosition(),ijk);
-					if (!world.getTerrain(neighbouring).isPassable()){
+					if (!this.getWorld().getTerrain(neighbouring).isPassable()){
 						return false;
 					}
 				}
 			}
 		}
 		return true;
+	}
+	
+	private void falling(double duration){
+		double[] v = new double[] {0.0,0.0,-3.0};
+		setPosition(Vector.vectorAdd(this.getPosition(), Vector.scalarMultiplication(v, duration)));
+		if (Vector.getDistance(nextTargetPosition, startPosition)-Vector.getDistance(startPosition, this.getPosition())<=0.0){
+			setPosition(nextTargetPosition);
+			setHitPoints(this.getHitpoints() - 10);
+			double[] nextPosition = Vector.vectorAdd(this.getPosition(), new double[] {0.0,0.0,-1.0});
+			if (!this.getWorld().getTerrain(nextPosition).isPassable() ||nextPosition[2]<1.0){
+				setStatus(Status.DONE);
+			}
+			else
+				fall();
+		}
 	}
 	
 //	private boolean isFalling(){
@@ -918,12 +849,12 @@ public class Unit {
 	 * 			| 	then result == getWalkingSpeed();
 	 */
 	public double getCurrentSpeed() {
-		if (status == Status.MOVING) {
+		if (this.getStatus() == Status.MOVING) {
 			if (isSprinting())
 				return 2.0 * getWalkingSpeed();
 			return getWalkingSpeed();
 		}
-		if (getStatus() == Status.FALLING)
+		if (this.getStatus() == Status.FALLING)
 			return 3.0;
 		else{
 			return 0.0;
@@ -938,7 +869,7 @@ public class Unit {
 	 * 		   | result == (status == Status.RESTING || status == Status.DONE || status == Status.IN_CENTER)
 	 */
 	public boolean canMove() {
-		if (getStatus() == Status.RESTING || getStatus() == Status.DONE || getStatus() == Status.IN_CENTER || getStatus() == Status.FALLING)
+		if (this.getStatus() == Status.RESTING || this.getStatus() == Status.DONE || this.getStatus() == Status.IN_CENTER || this.getStatus() == Status.FALLING)
 			return true;
 		return false;
 	}
@@ -956,7 +887,7 @@ public class Unit {
 	 * 		 |	then new.isSprinting() == false
 	 */
 	public void startSprinting() {
-		if (getStatus() == Status.MOVING && getStaminaPoints() > 0)
+		if (this.getStatus() == Status.MOVING && getStaminaPoints() > 0)
 			isSprinting = true;
 		else
 			isSprinting = false;
@@ -1027,7 +958,7 @@ public class Unit {
 			startPosition = new double[] {this.getPosition()[0],this.getPosition()[1],this.getPosition()[2]};
 			nextTargetPosition = World.getCubeCenter(new double[] {this.getCubePosition()[0] + (double) dx , this.getCubePosition()[1] 
 				+ (double) dy , this.getCubePosition()[2] + (double) dz });
-			status = Status.MOVING;
+			setStatus(Status.MOVING);
 			setWalkingSpeed(dz);
 		}
 	}
@@ -1076,7 +1007,7 @@ public class Unit {
 		
 		if (canMove()) {
 			this.targetPosition = targetPosition;
-			status = Status.IN_CENTER;
+			setStatus(Status.IN_CENTER);
 			int x = 0;
 			int y = 0;
 			int z = 0;
@@ -1115,7 +1046,46 @@ public class Unit {
 	public void moveTo(int[] cubePosition) throws IllegalArgumentException{
 		moveTo(World.getCubeCenter(cubePosition));
 	}
+	
+	public void moving(double duration){
+		double d = Vector.getDistance(nextTargetPosition,startPosition);
+		double[] v = new double[] {getCurrentSpeed()*(nextTargetPosition[0]-startPosition[0])/d,
+				getCurrentSpeed()*(nextTargetPosition[1]-startPosition[1])/d,
+				getCurrentSpeed()*(nextTargetPosition[2]-startPosition[2])/d};
+		//double[] v1 = new double[] Vector.scalarMultiplication(Vector.vectorReduction(nextTargetPosition, startPosition), getCurrentSpeed()/d);
+		
+		setPosition(Vector.vectorAdd(this.getPosition(), Vector.scalarMultiplication(v, duration)));
+		setOrientation((float) Math.atan2(v[1],v[0]));
+		if (isSprinting()){
 
+			if (Util.fuzzyLessThanOrEqualTo(this.getStaminaPoints()-10.0*duration,0.0)){
+		
+				setStaminaPoints(0.0);
+				stopSprinting();
+			} else {
+				setStaminaPoints(this.getStaminaPoints() - 10.0 * duration);
+				startSprinting();
+			}
+		}
+		if (targetPosition != null && startPosition != null
+				&& Vector.getDistance(targetPosition, startPosition)-Vector.getDistance(startPosition, this.getPosition())<=0.0){
+			setPosition(targetPosition);
+			setStatus(Status.DONE);
+			targetPosition = null;
+			setExperiencePoints(this.getExperiencePoints()+1);
+		}
+		else if (nextTargetPosition != null && Vector.getDistance(nextTargetPosition, startPosition)-Vector.getDistance(startPosition, this.getPosition())<=0.0){
+			setExperiencePoints(this.getExperiencePoints()+1);
+			setPosition(nextTargetPosition);
+			if (targetPosition != null){
+				//System.out.println("moveto" + targetPosition +"huidige loc" + this.getPosition());
+				setStatus(Status.IN_CENTER);
+				moveTo(targetPosition);
+			}
+			else
+				setStatus(Status.DONE);
+		}
+	}
 	
 	/**
 	 * Return the walking speed of this unit.
@@ -1179,7 +1149,7 @@ public class Unit {
 	 * 		   | result == (status != Status.MOVING && status != Status.INITIAL_RESTING && status != Status.ATTACKING)
 	 */
 	public boolean canWork() {
-		if (getStatus() != Status.MOVING && getStatus() != Status.INITIAL_RESTING && getStatus() != Status.ATTACKING && getStatus() != Status.FALLING)
+		if (this.getStatus() != Status.MOVING && this.getStatus() != Status.INITIAL_RESTING && this.getStatus() != Status.ATTACKING && this.getStatus() != Status.FALLING)
 			return true;
 		return false;
 	}
@@ -1207,11 +1177,21 @@ public class Unit {
 	 */
 	public void work() {
 		if (canWork())
-			status = Status.WORKING;
+			setStatus(Status.WORKING);
 		workingTime = (float) 0.0;
 		totalWorkingTime = (float) 500.0 / this.getStrength();
 		progressWork = (float) 0.0;
 
+	}
+	
+	public void working(double duration) {
+		if (workingTime < totalWorkingTime) {
+			workingTime += duration;
+			progressWork = workingTime / totalWorkingTime;
+		} else {
+			progressWork = (float) 1.0;
+			setStatus(Status.DONE);
+		}
 	}
 	
 	public void endWork() {
@@ -1293,7 +1273,7 @@ public class Unit {
 	 * 		   | result == (status != Status.MOVING)
 	 */
 	public boolean canAttack() {
-		if (getStatus() != Status.MOVING && getStatus() != Status.FALLING)
+		if (this.getStatus() != Status.MOVING && this.getStatus() != Status.FALLING)
 			return true;
 		return false;
 	}
@@ -1321,7 +1301,7 @@ public class Unit {
 		if (!isNeighbouringCube(other.getCubePosition()))
 			throw new IllegalArgumentException();
 		if (canAttack()) {
-			status = Status.ATTACKING;
+			setStatus(Status.ATTACKING);
 			this.setOrientation((float) Math.atan2(other.getPosition()[1] - this.getPosition()[1],
 					other.getPosition()[0] - this.getPosition()[0]));
 			other.defend(this);
@@ -1364,7 +1344,7 @@ public class Unit {
 	 */
 	public void defend(Unit unit) {
 		if (this.getStatus() != Status.FALLING){
-			status = Status.DEFENDING;
+			setStatus(Status.DEFENDING);
 			setOrientation((float) Math.atan2(unit.getPosition()[1] - this.getPosition()[1],
 					unit.getPosition()[0] - this.getPosition()[0]));
 			if (new Random().nextDouble() <= 0.20 * (this.getAgility() / unit.getAgility())) {
@@ -1376,18 +1356,18 @@ public class Unit {
 				catch (IllegalArgumentException exc) {
 					defend(unit);
 				}
-				status = Status.DONE;
+				setStatus(Status.DONE);
 			}
 			else if (new Random().nextDouble() <= 0.25
 					* ((this.getStrength() + this.getAgility()) / (unit.getStrength() + unit.getAgility())))
-				status = Status.DONE;
+				setStatus(Status.DONE);
 			else {
 				double newHitPoints = this.getHitpoints() - unit.getStrength() / 10.0;
 				if (newHitPoints > 0)
 					this.setHitPoints(newHitPoints);
 				else
 					this.setHitPoints(0.0);
-				status = Status.DONE;
+				setStatus(Status.DONE);
 			}
 		}
 	}
@@ -1414,7 +1394,7 @@ public class Unit {
 	 */
 	public boolean canRest() {
 		if(this.getStaminaPoints() <= 0 || this.getHitpoints() <= 0)
-			if (getStatus() == Status.DONE || getStatus() == Status.RESTING || getStatus() == Status.WORKING || getStatus() == Status.IN_CENTER)
+			if (this.getStatus() == Status.DONE || this.getStatus() == Status.RESTING || this.getStatus() == Status.WORKING || this.getStatus() == Status.IN_CENTER)
 				return true;
 		return false;
 	}
@@ -1441,11 +1421,35 @@ public class Unit {
 			restTimer = 0.0;
 			recoveredHitpoints = 0.0;
 			if (this.getHitpoints() < getMaxPoints())
-				status = Status.INITIAL_RESTING;
+				setStatus(Status.INITIAL_RESTING);
 			else
-				status = Status.RESTING;
+				setStatus(Status.RESTING);
 		}
-	}	
+	}
+	
+	public void initialResting(double duration) {
+		this.setHitPoints((getToughness() / 200.0) * 5 * duration + getHitpoints());
+		recoveredHitpoints += (getToughness() / 200.0) * 5 * duration;
+		if (this.getHitpoints() >= getMaxPoints()) {
+			this.setHitPoints(getMaxPoints());
+			setStatus(Status.RESTING);
+		}
+		else if (recoveredHitpoints >= 1.0){
+			setStatus(Status.RESTING);
+		}
+	}
+	
+	public void resting(double duration){
+		if (this.getHitpoints() < getMaxPoints())
+			this.setHitPoints((getToughness() / 200.0) * 5 * duration + getHitpoints());
+		else if (this.getStaminaPoints() < getMaxPoints()) {
+			this.setHitPoints(getMaxPoints());
+			this.setStaminaPoints((getToughness() / 100.0) * 5 * duration + getStaminaPoints());
+		} else {
+			this.setStaminaPoints(getMaxPoints());
+			setStatus(Status.DONE);
+		}
+	}
 
 	/**
 	 * Symbolic constant registering the recovered hitpoints of a unit.
@@ -1501,17 +1505,17 @@ public class Unit {
 	 *		   |OR rest()	   
 	 */
 	public void startDefaultBehaviour() {
-		if (getStatus() == Status.DONE) {
+		if (this.getStatus() == Status.DONE) {
 			setEnableDefaultBehaviour(true);
 			int i = new Random().nextInt(4);
 			if (i == 0) {
-				status = Status.IN_CENTER;
+				setStatus(Status.IN_CENTER);
 				moveTo(new double[] { (new Random().nextDouble()) * X*L, (new Random().nextDouble()) * Y*L,
 						(new Random().nextDouble()) * Z*L });
 				startSprinting();
 			}
 			if (i == 1) {
-				status = Status.IN_CENTER;
+				setStatus(Status.IN_CENTER);
 				moveTo(new double[] { (new Random().nextDouble()) * X*L, (new Random().nextDouble()) * Y*L,
 						(new Random().nextDouble()) * Z*L });
 				stopSprinting();
@@ -1537,7 +1541,7 @@ public class Unit {
 		setEnableDefaultBehaviour(false);
 		targetPosition = null;
 		nextTargetPosition = null;
-		status = Status.DONE;
+		setStatus(Status.DONE);
 	}
 	
 	/**
@@ -1546,31 +1550,31 @@ public class Unit {
 	private boolean enableDefaultBehaviour;
 	
 	/**
- +	 * Terminate this unit.
- +	 *
- +	 * @post   This unit  is terminated.
- +	 *       | new.isTerminated()
- +	 * @post   ...
- +	 *       | ...
- +	 */
- +	 public void terminate() {
- +		 this.isTerminated = true;
- +	 }
- +	 
- +	 /**
- +	  * Return a boolean indicating whether or not this unit
- +	  * is terminated.
- +	  */
- +	 @Basic @Raw
- +	 public boolean isTerminated() {
- +		 return this.isTerminated;
- +	 }
- +	 
- +	 /**
- +	  * Variable registering whether this unit is terminated.
- +	  */
- +	 private boolean isTerminated = false;
- +	 
+ 	 * Terminate this unit.
+ 	 *
+ 	 * @post   This unit  is terminated.
+ 	 *       | new.isTerminated()
+ 	 * @post   ...
+ 	 *       | ...
+ 	 */
+ 	 public void terminate() {
+ 		 this.isTerminated = true;
+ 	 }
+ 	 
+ 	 /**
+ 	  * Return a boolean indicating whether or not this unit
+ 	  * is terminated.
+	  */
+ 	 @Basic @Raw
+ 	 public boolean isTerminated() {
+ 		 return this.isTerminated;
+ 	 }
+ 	 
+ 	 /**
+ 	  * Variable registering whether this unit is terminated.
+ 	  */
+ 	 private boolean isTerminated = false;
+ 	 
   	
   	/**
   	 * Symbolic constant registering the side length of cubes, expressed in meters.
@@ -1608,7 +1612,7 @@ public class Unit {
  	}
  
 	@Raw
- public void setLog(Log log) throws IllegalArgumentException{
+	public void setLog(Log log) throws IllegalArgumentException{
  		if(! isValidLog(log))
  			throw new IllegalArgumentException();
  		this.log = log;

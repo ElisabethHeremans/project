@@ -55,8 +55,8 @@ public class Log extends RawMaterial {
 	 *         solid cube.
 	 */
 	@Override
-	public static boolean isValidPosition(double[] position) {
-		if (World.getTerrain(position).getPassable())
+	public boolean isValidPosition(double[] position) {
+		if (this.getWorld().getTerrain(position).isPassable())
 			return true;
 		return false;
 	}
@@ -111,7 +111,7 @@ public class Log extends RawMaterial {
 				if (Vector.getDistance(nextTargetPosition, startPosition)-Vector.getDistance(startPosition, this.getPosition())<=0.0){
 					setPosition(nextTargetPosition);
 					double[] nextPosition = Vector.vectorAdd(this.getPosition(), new double[] {0.0,0.0,-1.0});
-					if (!world.getTerrain(nextPosition).isPassable() ||nextPosition[2]<1.0){
+					if (!this.getWorld().getTerrain(nextPosition).isPassable() ||nextPosition[2]<1.0){
 						status = Status.DONE;
 					}
 					else

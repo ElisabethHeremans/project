@@ -468,7 +468,34 @@ public class World {
 	 * Symbolic constant registering the side length of cubes, expressed in meters.
 	 */
 	private static final double L = 1.0;
-
+	
+	/**
+ 	 * Terminate this world.
+ 	 *
+ 	 * @post   This world  is terminated.
+ 	 *       | new.isTerminated()
+ 	 * @post   ...
+ 	 *       | ...
+ 	 */
+ 	 public void terminate() {
+ 		 this.isTerminated = true;
+ 	 }
+ 	 
+ 	 /**
+ 	  * Return a boolean indicating whether or not this world
+ 	  * is terminated.
+ 	  */
+ 	 @Basic @Raw
+ 	 public boolean isTerminated() {
+ 		 return this.isTerminated;
+ 	 }
+ 	 
+ 	 /**
+ 	  * Variable registering whether this world is terminated.
+ 	  */
+ 	 private boolean isTerminated = false;
+ 	 
+  }
 
 
 	
