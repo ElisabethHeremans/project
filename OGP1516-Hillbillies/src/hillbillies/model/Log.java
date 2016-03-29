@@ -49,6 +49,12 @@ public class Log extends RawMaterial {
 	public double[] getPosition() {
 		return this.position;
 	}
+	
+	public int[] getCubeCoordinate() {
+		return new int[] { (int) Math.floor(this.getPosition()[0]), (int) Math.floor(this.getPosition()[1]),
+				(int) Math.floor(this.getPosition()[2]) };
+	}
+
 
 	/**
 	 * Check whether the given position is a valid position for any log.
@@ -161,6 +167,11 @@ public class Log extends RawMaterial {
 		return (getWorld().hasAsLog(this));
 	}
 
+	@Basic @Raw
+	public World getWorld(){
+		return world;
+	}
+	
 	private World world;
 
 	/**

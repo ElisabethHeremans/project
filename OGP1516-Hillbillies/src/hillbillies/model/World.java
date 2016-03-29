@@ -363,36 +363,120 @@ public class World {
 	}
 	
 	public List<Unit> listAllUnits(){
-		List<Unit> units = new ArrayList<Unit>();
+		List<Unit> unitList= new ArrayList<Unit>();
 		for (Unit unit:units){
-			units.add(unit);
+			unitList.add(unit);
 		}
-		return units;
+		return unitList;
 	}
 	
-	public List<TerrainType,List<Boulder>,List<Log>,List<Unit>> inspectCube(int[] position){
+	public List<List<?>> inspectCube(int[] position){
+		List<List<?>> list = new ArrayList<>();
+		List<TerrainType> terrainType= new ArrayList<TerrainType>();
+		terrainType.add(this.getTerrain(position));
+		list.add(terrainType);
 		
+		List<Unit> unitList= new ArrayList<Unit>();
+		if(unitsAtCubeMap.get(position) !=null){
+		for (Unit unit:unitsAtCubeMap.get(position)){
+			unitList.add(unit);
+		}
+		}
+		list.add(unitList);
+
+		
+		List<Log> logList= new ArrayList<Log>();
+		if(logsAtCubeMap.get(position) !=null){
+
+		for (Log log:logsAtCubeMap.get(position)){
+			logList.add(log);
+		}
+		]
+		list.add(logList);
+
+		
+		List<Boulder> boulderList= new ArrayList<Boulder>();
+		if(bouldersAtCubeMap.get(position) !=null){
+
+		for (Boulder boulder:bouldersAtCubeMap.get(position)){
+			boulderList.add(boulder);
+		}
+		}
+		list.add(boulderList);
 	
-		return new List<this.getTerrain(position) ,occupyingCubeMap.get(position)>();
+		return list;
 	}
 	
-
+	public Set<Unit> getUnits(int[] position){
+		if (unitsAtCubeMap.get(position)==null)
+			return new HashSet<>();
+		else{
+			return unitsAtCubeMap.get(position);
+		}
+	}
 	
-	private Map<int[],Set<Unit>> unitsAtCubeMap = new HashMap<int[], Set<Unit>>();
+	public Set<Log> getLogs(int[] position){
+		if (logsAtCubeMap.get(position)==null)
+			return new HashSet<>();
+		else{
+			return logsAtCubeMap.get(position);
+		}
+	}
+	
+	public Set<Boulder> getBoulders(int[] position){
+		if (bouldersAtCubeMap.get(position)==null)
+			return new HashSet<>();
+		else{
+			return bouldersAtCubeMap.get(position);
+		}
+	}
+	
 	
 	private void addUnitToUnitsAtCubeMap(Unit unit){
 		Set<Unit> unitsAtCube = this.unitsAtCubeMap.get(unit.getCubeCoordinate());
 		if ( unitsAtCube != null){
-			this.unitsAtCubeMap.put(unit.getCubeCoordinate(),unitsAtCube.add(unit));
+			unitsAtCube.add(unit);
+			this.unitsAtCubeMap.put(unit.getCubeCoordinate(),unitsAtCube);
 		}
 		else{
 			unitsAtCube = new HashSet<Unit>();
 			this.unitsAtCubeMap.put(unit.getCubeCoordinate(),unitsAtCube.add(unit));
 		}
 	}
-
+	private Map<int[],Set<Unit>> unitsAtCubeMap = new HashMap<int[], Set<Unit>>();
 
 	
+	
+	private void addBoulderToBouldersAtCubeMap(Boulder boulder){
+		Set<Boulder> bouldersAtCube = this.bouldersAtCubeMap.get(boulder.getCubeCoordinate());
+		if ( bouldersAtCube != null){
+			bouldersAtCube.add(boulder);
+			this.bouldersAtCubeMap.put(boulder.getCubeCoordinate(),bouldersAtCube);
+		}
+		else{
+			bouldersAtCube = new HashSet<Boulder>();
+			this.bouldersAtCubeMap.put(boulder.getCubeCoordinate(),bouldersAtCube.add(boulder));
+		}
+	}
+	
+	private Map<int[],Set<Boulder>> bouldersAtCubeMap = new HashMap<int[],Set<Boulder>>();
+
+	
+	private void addLogToLogsAtCubeMap(Log log){
+		Set<Log> logsAtCube = this.logsAtCubeMap.get(log.getCubeCoordinate());
+		if ( logsAtCube != null){
+			logsAtCube.add(log);
+			this.logsAtCubeMap.put(log.getCubeCoordinate(),logsAtCube);
+		}
+		else{
+			logsAtCube = new HashSet<Log>();
+			this.logsAtCubeMap.put(log.getCubeCoordinate(),logsAtCube.add(log));
+		}
+	}
+	
+	private Map<int[],Set<Log>> logsAtCubeMap = new HashMap<int[],Set<Log>>();
+
+		
 	private final Set<Unit> units = new HashSet<Unit>();
 	
 	private String Char;
@@ -499,4 +583,4 @@ public class World {
 
 
 	
-}
+

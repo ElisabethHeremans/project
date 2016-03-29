@@ -15,6 +15,9 @@ public abstract class RawMaterial {
 	}
 	public abstract double[] getPosition();
 	
+	public abstract int[] getCubeCoordinate();
+
+	
 	public abstract void setPosition(double[] position);
 	
 	public abstract boolean isValidPosition(double[] position);
@@ -36,6 +39,7 @@ public abstract class RawMaterial {
 	
 	@Raw
 	public abstract boolean hasProperWorld();
+	
 	private World world;
 	
 	public abstract void terminate();

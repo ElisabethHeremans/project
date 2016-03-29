@@ -1212,58 +1212,47 @@ public class Unit {
 	public void endWork(int[] targetPosition) {
 		if (this.getBoulder() !=null) {
 			this.getWorld().addAsBoulder(this.getBoulder());
+			this.getBoulder().setPosition(World.getCubeCenter(targetPosition));
+			this.setWeight(this.getWeight()-this.getBoulder().getWeight());
 			this.getBoulder().setWorld(this.getWorld());
 			this.setBoulder(null);
-			this.setWeight(this.getWeight()-boulder.getWeight());
 		}
 		if (this.getLog() !=null) {
 			this.getWorld().addAsLog(this.getLog());
 			this.getLog().setWorld(this.getWorld());
+			this.getLog().setPosition(World.getCubeCenter(targetPosition));
+			this.setWeight(this.getWeight()-this.getLog().getWeight());
 			this.setLog(null);
-			this.setWeight(this.getWeight()-log.getWeight());
 		}
-		else if (this.getWorld().getElements(targetPosition.contains(isInstance(Boulder))) && 
-				this.getWorld().getElements(targetPosition.contains(isInstance(Log))) && this.getWorld().getTerrain(targetPosition) == TerrainType.WORKSHOP) {
-			boolean boulderConsumed = false;
-			boolean logConsumed = false;
-			for (Element element: this.getWorld().getElements(targetPosition){
-				if (!boulderConsumed && element instanceof Boulder){
-					this.getWorld().removeAsBoulder(element);
-					element.terminate();
-					boulderConsumed = true;
-				}
-				if (!logConsumed && element instanceof Log){
-					this.getWorld().removeAsLog(element);
-					element.terminate();
-					logConsumed = true;
-				}
-			}
+		else if (this.getWorld().getTerrain(targetPosition) == TerrainType.WORKSHOP 
+				&& !this.getWorld().getBoulders(targetPosition).isEmpty() 
+				&& !this.getWorld().getLogs(targetPosition).isEmpty()) {
+			Log log = (Log) this.getWorld().inspectCube(targetPosition).get(2).get(0);
+			Boulder boulder = (Boulder) this.getWorld().inspectCube(targetPosition).get(3).get(0);
+			this.getWorld().removeAsBoulder(boulder);
+			boulder.terminate();
+			this.getWorld().removeAsLog(log);
+			log.terminate();
 			this.setWeight(this.getWeight()+1);
 			this.setToughness(this.getToughness()+1);
 		}
-		else if (this.getWorld().getElements(this.getPosition().contains(isInstance(Boulder)))){
-			boolean boulderFound = false;
-			for (Element element: this.getWorld().getElements(this.getPosition())){
-				if (!boulderFound && element instanceof Boulder){
-					this.getWorld().removeAsBoulder(this.getBoulder());
-					this.getBoulder().setWorld(null);
-					this.setBoulder(element);
-					boulderFound = true;
-					this.setWeight(this.getWeight()+boulder.getWeight());
-				}
-			}
+		
+		else if (!this.getWorld().getBoulders(targetPosition).isEmpty()){
+			Boulder boulder = (Boulder) this.getWorld().inspectCube(targetPosition).get(3).get(0);
+			this.setBoulder(boulder);
+			this.getWorld().removeAsBoulder(boulder);
+			boulder.setWorld(null);
+			this.setWeight(this.getWeight()+boulder.getWeight());
+
 		}
-		else if (this.getWorld().getElements(this.getPosition().contains(isInstance(Log)))){
-			boolean logFound = false;
-			for (Element element: this.getWorld().getElements(this.getPosition())){
-				if (!logFound && element instanceof Log){
-					this.getWorld().removeAsLog(this.getLog());
-					this.getLog().setWorld(null);
-					this.setLog(element);
-					logFound = true;
-					this.setWeight(this.getWeight()+log.getWeight());
-				}
-			}
+
+		else if (!this.getWorld().getLogs(targetPosition).isEmpty()){
+			Log log = (Log) this.getWorld().inspectCube(targetPosition).get(2).get(0);
+			this.getWorld().removeAsLog(log);
+			log.setWorld(null);
+			this.setLog(log);
+			this.setWeight(this.getWeight()+log.getWeight());
+			
 		}
 		else if (this.getWorld().getTerrain(targetPosition)== TerrainType.TREE){
 			this.getWorld().setTerrain(targetPosition, TerrainType.AIR);

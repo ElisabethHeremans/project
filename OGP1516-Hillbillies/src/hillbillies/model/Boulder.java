@@ -47,6 +47,11 @@ public class Boulder extends RawMaterial {
 		return this.position;
 	}
 	
+	public int[] getCubeCoordinate() {
+		return new int[] { (int) Math.floor(this.getPosition()[0]), (int) Math.floor(this.getPosition()[1]),
+				(int) Math.floor(this.getPosition()[2]) };
+	}
+	
 	/**
 	 * Check whether the given position is a valid position for
 	 * any boulder.
@@ -100,6 +105,7 @@ public class Boulder extends RawMaterial {
 	 * 
 	 * @return the weight
 	 */
+	@Override
 	public final int getWeight() {
 		return this.weight;
 	}
@@ -140,12 +146,15 @@ public class Boulder extends RawMaterial {
 		this.nextTargetPosition = Vector.vectorAdd(this.getPosition(), new double[] {0.0,0.0,-1.0});
 		this.startPosition = this.getPosition();
 	}
+	
 	public Status getStatus(){
 		return this.status;
 	}
+	
 	public void setStatus(Status status) {
 		this.status = status;
 	}
+	
 	@Override
 	public void setWorld(@Raw World world){
 		assert (world.hasAsBoulder(this));
@@ -158,6 +167,11 @@ public class Boulder extends RawMaterial {
 	public boolean hasProperWorld(){
 		return (getWorld().hasAsBoulder(this));
 	}
+	
+	@Basic @Raw
+ 	public World getWorld(){
+ 		return world;
+ 	}
 	
 	private World world;
 	
