@@ -1,6 +1,10 @@
 package hillbillies.model;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Queue;
 import java.util.Random;
+import java.util.Set;
 
 import be.kuleuven.cs.som.annotate.*;
 import ogp.framework.util.Util;
@@ -1045,6 +1049,85 @@ public class Unit {
 				z = 1;
 			moveToAdjacent(x, y, z);
 
+		}
+	}
+	
+	public ArrayList getNeighboringCubes( int[] position){
+		ArrayList l = new ArrayList();
+		for(int i =-1; i < 2; i++){
+			for (int j =-1; i<2; i++){
+				for (int k =-1; i<2; i++){
+					if(( i!= 0 || j!=0 || k!=0) && 
+							isValidPosition(new int[] {position[0]+i, position[1]+j, position[2]+k}))
+						l.add(new int[] {position[0]+i, position[1]+j, position[2]+k});
+				}
+			}
+		}
+		return l;
+	}
+	ArrayList Q =  new ArrayList();
+	public void search(int[] position, int n){
+		for (int l = 0; l< getNeighboringCubes(position).size(); l++){
+			if( this.getWorld().getPassable((int[]) getNeighboringCubes(position).get(l)) && 
+					(this.getWorld().getTerrain((double[]) getNeighboringCubes(position).get(l)) 
+							== TerrainType.ROCK 
+					|| this.getWorld().getTerrain((double[]) getNeighboringCubes(position).get(l)) 
+					== TerrainType.TREE) && !Q.contains(getNeighboringCubes(position).get(l)))
+				Q.add(n+1, getNeighboringCubes(position).get(l));
+				n= n+1;
+		}
+	}
+	
+	public void moveTo1(double[] targetPosition){
+		if (!isValidPosition(targetPosition))
+			throw new IllegalArgumentException();
+		if (canMove()) {
+			while (this.getPosition() != targetPosition){
+				Q.add(0,targetPosition);
+				while(!Q.contains(this.getPosition()) && Q.size()>1){
+					
+				}
+}
+		}	
+	}
+	
+	public void moving1(double duration){
+		double d = Vector.getDistance(nextTargetPosition,startPosition);
+		double[] v = new double[] {getCurrentSpeed()*(nextTargetPosition[0]-startPosition[0])/d,
+				getCurrentSpeed()*(nextTargetPosition[1]-startPosition[1])/d,
+				getCurrentSpeed()*(nextTargetPosition[2]-startPosition[2])/d};
+		//double[] v1 = new double[] Vector.scalarMultiplication(Vector.vectorReduction(nextTargetPosition, startPosition), getCurrentSpeed()/d);
+		
+		setPosition(Vector.vectorAdd(this.getPosition(), Vector.scalarMultiplication(v, duration)));
+		setOrientation((float) Math.atan2(v[1],v[0]));
+		if (isSprinting()){
+
+			if (Util.fuzzyLessThanOrEqualTo(this.getStaminaPoints()-10.0*duration,0.0)){
+		
+				setStaminaPoints(0.0);
+				stopSprinting();
+			} else {
+				setStaminaPoints(this.getStaminaPoints() - 10.0 * duration);
+				startSprinting();
+			}
+		}
+		if (targetPosition != null && startPosition != null
+				&& Vector.getDistance(targetPosition, startPosition)-Vector.getDistance(startPosition, this.getPosition())<=0.0){
+			setPosition(targetPosition);
+			setStatus(Status.DONE);
+			targetPosition = null;
+			setExperiencePoints(this.getExperiencePoints()+1);
+		}
+		else if (nextTargetPosition != null && Vector.getDistance(nextTargetPosition, startPosition)-Vector.getDistance(startPosition, this.getPosition())<=0.0){
+			setExperiencePoints(this.getExperiencePoints()+1);
+			setPosition(nextTargetPosition);
+			if (targetPosition != null){
+				//System.out.println("moveto" + targetPosition +"huidige loc" + this.getPosition());
+				setStatus(Status.IN_CENTER);
+				moveTo(targetPosition);
+			}
+			else
+				setStatus(Status.DONE);
 		}
 	}
 
