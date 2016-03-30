@@ -1,9 +1,11 @@
 package hillbillies.model;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
@@ -1053,8 +1055,9 @@ public class Unit {
 
 		}
 	}
-	Queue<int[]> neighboringCubes = (Queue<int[]>) new ArrayList<int[]>();
-	public void getNeighboringCubes( int[] position){
+	
+	public ArrayList getNeighboringCubes( int[] position){
+		ArrayList neighboringCubes = new ArrayList<int[]>();
 		for(int i =-1; i < 2; i++){
 			for (int j =-1; i<2; i++){
 				for (int k =-1; i<2; i++){
@@ -1065,17 +1068,33 @@ public class Unit {
 				}
 			}
 		}
+		return neighboringCubes;
 	}
-	Queue<int[]> queue = (Queue<int[]>) new ArrayList<int[]>();
-	public void search(int[] position){
-		for (int l = 0; l< ((ArrayList<int[]>) neighboringCubes).size(); l++){
-			if( this.getWorld().getPassable(((ArrayList<int[]>) neighboringCubes).get(l)) && 
-					(this.getWorld().getTerrain(((ArrayList<int[]>) neighboringCubes).get(l)) 
-							== TerrainType.ROCK 
-					|| this.getWorld().getTerrain(((ArrayList<int[]>) neighboringCubes).get(l)) 
-					== TerrainType.TREE) && !queue.contains(((ArrayList<int[]>) neighboringCubes).get(l)))
-				queue.add(new int[] {((ArrayList<int[]>) neighboringCubes).get(l)[0],
-						((ArrayList<int[]>) neighboringCubes).get(l)[1], ((ArrayList<int[]>) neighboringCubes).get(l)[2], n+1});
+	
+	public boolean isNeighboringSolidTerrain( int[] position){
+		ArrayList neighboringCubes = getNeighboringCubes(position);
+		for(int index=0; index<=neighboringCubes.size(); index++){
+			if(this.getWorld().getTerrain((double[]) neighboringCubes.get(index)) == TerrainType.ROCK 
+					|| this.getWorld().getTerrain((double[]) neighboringCubes.get(index)) == TerrainType.TREE)
+				return true;
+		}
+		return false;
+	}
+	
+	Queue<int[]> queue =  new LinkedList<int[]>();
+	Queue<int[]> queuePos = new LinkedList<int[]>();
+	
+	public void search(int[] array){
+		int[] position = {array[0], array[1], array[2]};
+		int n = array[3];
+		ArrayList neighboringCubes = getNeighboringCubes(position);
+		for (int index= 0; index< neighboringCubes.size(); index++){
+			if( this.getWorld().getPassable((int[]) neighboringCubes.get(index)) && 
+					isNeighboringSolidTerrain(position) && !queuePos.contains(neighboringCubes.get(index)))
+				queuePos.add((int[]) neighboringCubes.get(index));
+				int[] nextPos = {((int[])(neighboringCubes.get(index)))[0],((int[])(neighboringCubes.get(index)))[1],
+						((int[])(neighboringCubes.get(index)))[2],n+1};
+				queue.add(nextPos);
 		}
 	}
 	
@@ -1086,13 +1105,18 @@ public class Unit {
 			int index = 0;
 			int[] nextPosition;
 			while (this.getPosition() != targetPosition){
-				int[] position = {(int) targetPosition[0], (int) targetPosition[1], (int) targetPosition[2], 0};
-				queue.add(position);
+				int[] position = {(int) targetPosition[0], (int) targetPosition[1], (int) targetPosition[2]};
+				int[] positionn = {(int) targetPosition[0], (int) targetPosition[1], (int) targetPosition[2], 0};
+				queue.add(positionn);
+				queuePos.add(position);
 				while(!queue.contains(this.getPosition()) && queue.size()>=index){
-					nextPosition = ((ArrayList<int[]>) queue).get(index);
+					nextPosition = ((LinkedList<int[]>) queue).get(index);
 					search(nextPosition);
+					index = index+1;
 				}
-			if( queue.contains(targetPosition))
+			if( queuePos.contains(targetPosition)){
+				
+			}
 			}
 		}	
 	}
