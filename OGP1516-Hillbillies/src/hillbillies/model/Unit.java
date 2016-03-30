@@ -1,7 +1,9 @@
 package hillbillies.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
@@ -1051,30 +1053,29 @@ public class Unit {
 
 		}
 	}
-	
-	public ArrayList getNeighboringCubes( int[] position){
-		ArrayList l = new ArrayList();
+	Queue<int[]> neighboringCubes = (Queue<int[]>) new ArrayList<int[]>();
+	public void getNeighboringCubes( int[] position){
 		for(int i =-1; i < 2; i++){
 			for (int j =-1; i<2; i++){
 				for (int k =-1; i<2; i++){
+					int[] newPosition = {position[0]+i, position[1]+j, position[2]+k};
 					if(( i!= 0 || j!=0 || k!=0) && 
-							isValidPosition(new int[] {position[0]+i, position[1]+j, position[2]+k}))
-						l.add(new int[] {position[0]+i, position[1]+j, position[2]+k});
+							isValidPosition(new double[] {position[0]+i, position[1]+j, position[2]+k}))
+						neighboringCubes.add(newPosition);
 				}
 			}
 		}
-		return l;
 	}
-	ArrayList Q =  new ArrayList();
-	public void search(int[] position, int n){
-		for (int l = 0; l< getNeighboringCubes(position).size(); l++){
-			if( this.getWorld().getPassable((int[]) getNeighboringCubes(position).get(l)) && 
-					(this.getWorld().getTerrain((double[]) getNeighboringCubes(position).get(l)) 
+	Queue<int[]> queue = (Queue<int[]>) new ArrayList<int[]>();
+	public void search(int[] position){
+		for (int l = 0; l< ((ArrayList<int[]>) neighboringCubes).size(); l++){
+			if( this.getWorld().getPassable(((ArrayList<int[]>) neighboringCubes).get(l)) && 
+					(this.getWorld().getTerrain(((ArrayList<int[]>) neighboringCubes).get(l)) 
 							== TerrainType.ROCK 
-					|| this.getWorld().getTerrain((double[]) getNeighboringCubes(position).get(l)) 
-					== TerrainType.TREE) && !Q.contains(getNeighboringCubes(position).get(l)))
-				Q.add(n+1, getNeighboringCubes(position).get(l));
-				n= n+1;
+					|| this.getWorld().getTerrain(((ArrayList<int[]>) neighboringCubes).get(l)) 
+					== TerrainType.TREE) && !queue.contains(((ArrayList<int[]>) neighboringCubes).get(l)))
+				queue.add(new int[] {((ArrayList<int[]>) neighboringCubes).get(l)[0],
+						((ArrayList<int[]>) neighboringCubes).get(l)[1], ((ArrayList<int[]>) neighboringCubes).get(l)[2], n+1});
 		}
 	}
 	
@@ -1082,12 +1083,17 @@ public class Unit {
 		if (!isValidPosition(targetPosition))
 			throw new IllegalArgumentException();
 		if (canMove()) {
+			int index = 0;
+			int[] nextPosition;
 			while (this.getPosition() != targetPosition){
-				Q.add(0,targetPosition);
-				while(!Q.contains(this.getPosition()) && Q.size()>1){
-					
+				int[] position = {(int) targetPosition[0], (int) targetPosition[1], (int) targetPosition[2], 0};
+				queue.add(position);
+				while(!queue.contains(this.getPosition()) && queue.size()>=index){
+					nextPosition = ((ArrayList<int[]>) queue).get(index);
+					search(nextPosition);
 				}
-}
+			if( queue.contains(targetPosition))
+			}
 		}	
 	}
 	
