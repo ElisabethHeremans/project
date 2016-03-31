@@ -370,6 +370,8 @@ public class World {
 		return unitList;
 	}
 	
+	
+	
 	public List<List<?>> inspectCube(int[] position){
 		List<List<?>> list = new ArrayList<>();
 		List<TerrainType> terrainType= new ArrayList<TerrainType>();
@@ -378,12 +380,11 @@ public class World {
 		
 		List<Unit> unitList= new ArrayList<Unit>();
 		if(unitsAtCubeMap.get(position) !=null){
-		for (Unit unit:unitsAtCubeMap.get(position)){
-			unitList.add(unit);
-		}
+			for (Unit unit:unitsAtCubeMap.get(position)){
+				unitList.add(unit);
+			}
 		}
 		list.add(unitList);
-
 		
 		List<Log> logList= new ArrayList<Log>();
 		if(logsAtCubeMap.get(position) !=null){
@@ -440,9 +441,11 @@ public class World {
 		}
 		else{
 			unitsAtCube = new HashSet<Unit>();
-			this.unitsAtCubeMap.put(unit.getCubeCoordinate(),unitsAtCube.add(unit));
+			unitsAtCube.addAll(unit);
+			this.unitsAtCubeMap.put(unit.getCubeCoordinate(),unitsAtCube);
 		}
 	}
+	
 	private Map<int[],Set<Unit>> unitsAtCubeMap = new HashMap<int[], Set<Unit>>();
 
 	
@@ -515,7 +518,7 @@ public class World {
 	private ConnectedToBorder connectedToBorder = new ConnectedToBorder(this.getxDimension(),this.getyDimension(),this.getzDimension());
 
 	
-	public void advanceTime(){
+	public void advanceTime(float duration){
 		for (int x=0; x < getxDimension(); x ++){
 			for (int y=0; y< getyDimension(); y++){
 				for (int z=0; z < getzDimension() ; z ++){
@@ -539,13 +542,16 @@ public class World {
 					}
 				}
 			}
+		for (Unit unit : this.listAllUnits()){
+			unit.advanceTime(duration);
 		}
-		
-
-	
-	
-	
-
+		for (Boulder boulder: boulders){
+			boulder.advanceTime(duration);
+		}
+		for (Log log: logs){
+			log.advanceTime(duration);
+		}
+	}
 
 	
 	/**

@@ -622,6 +622,8 @@ public class Unit {
 		
 		
 	}
+	
+	
 
 	
 	/**
@@ -759,8 +761,6 @@ public class Unit {
 			throw new IllegalArgumentException();
 		restTimer += duration;
 		if (experiencePoints >=10){
-			// eventueel nog aanpassen!!!
-			//int randomInt = new Random().nextInt(3);
 			if (isValidStrength(this.getStrength()+1))
 				this.setStrength(this.getStrength()+1);
 			else if (isValidAgility(this.getAgility()+1))
@@ -769,7 +769,7 @@ public class Unit {
 				this.setToughness(this.getToughness()+1);
 		}
 		if (this.getHitpoints() <= 0)
-			setStatus(Status.DEATH);
+			this.terminate();
 		if (this.getStatus() != Status.FALLING && mustFall()){
 			fall();
 		}
@@ -1062,8 +1062,7 @@ public class Unit {
 			for (int j =-1; i<2; i++){
 				for (int k =-1; i<2; i++){
 					int[] newPosition = {position[0]+i, position[1]+j, position[2]+k};
-					if(( i!= 0 || j!=0 || k!=0)){// && 
-							//isValidPosition(new double[] {position[0]+i, position[1]+j, position[2]+k}))
+					if(( i!= 0 || j!=0 || k!=0) && getWorld().isCubeInWorld(newPosition)){
 						neighboringCubes.add(newPosition);
 					}
 				}
@@ -1119,7 +1118,7 @@ public class Unit {
 				int[] positionn = {(int) targetPosition[0], (int) targetPosition[1], (int) targetPosition[2], 0};
 				queue.add(positionn);
 				queuePos.add(position);
-				while(!queuePos.contains(this.getPosition()) && queue.size()>index){ //?
+				while(!queuePos.contains(this.getPosition()) && queue.size()>index){ 
  					nextPosition = ((LinkedList<int[]>) queue).get(index);
 					search(nextPosition);
 					index = index+1;
@@ -1133,7 +1132,8 @@ public class Unit {
 						if (candidateNextArray == null || candidateNextArray[3]> n)
 							candidateNextArray = array;
 				}
-				moveToAdjacent(candidateNextArray[0],candidateNextArray[1],candidateNextArray[2]);
+				moveToAdjacent(candidateNextArray[0]-this.getCubeCoordinate()[0],
+						candidateNextArray[1]-this.getCubeCoordinate()[1],candidateNextArray[2]-this.getCubeCoordinate()[2]);
 			}
 			}
 		}	
@@ -1163,6 +1163,8 @@ public class Unit {
 				&& Vector.getDistance(targetPosition, startPosition)-Vector.getDistance(startPosition, this.getPosition())<=0.0){
 			setPosition(targetPosition);
 			setStatus(Status.DONE);
+			queue = new LinkedList<>();
+			queuePos = new LinkedList<>();
 			targetPosition = null;
 			setExperiencePoints(this.getExperiencePoints()+1);
 		}
@@ -1293,7 +1295,9 @@ public class Unit {
 	 * 		   | result == (status != Status.MOVING && status != Status.INITIAL_RESTING && status != Status.ATTACKING)
 	 */
 	public boolean canWork() {
-		if (this.getStatus() != Status.MOVING && this.getStatus() != Status.INITIAL_RESTING && this.getStatus() != Status.ATTACKING && this.getStatus() != Status.FALLING)
+		if (!this.isTerminated() && this.getStatus() != Status.MOVING 
+				&& this.getStatus() != Status.INITIAL_RESTING && this.getStatus() != Status.ATTACKING 
+				&& this.getStatus() != Status.FALLING)
 			return true;
 		return false;
 	}
@@ -1335,8 +1339,7 @@ public class Unit {
 			progressWork = workingTime / totalWorkingTime;
 		} else {
 			progressWork = (float) 1.0;
-			//setStatus(Status.DONE);
-			endWork();
+			endWork(workTargetPosition);
 		}
 	}
 	
@@ -1432,7 +1435,7 @@ public class Unit {
 	 * 		   | result == (status != Status.MOVING)
 	 */
 	public boolean canAttack() {
-		if (this.getStatus() != Status.MOVING && this.getStatus() != Status.FALLING)
+		if (this.getStatus() != Status.MOVING && this.getStatus() != Status.FALLING && !this.isTerminated())
 			return true;
 		return false;
 	}
@@ -1457,7 +1460,7 @@ public class Unit {
 	 * 			| (!isNeighbouringCube(other.getCubePosition()))
 	 */
 	public void attack(Unit other) throws IllegalArgumentException {
-		if (!isNeighbouringCube(other.getCubePosition()))
+		if (!isNeighbouringCube(other.getCubePosition()) || other.isTerminated()|| other.getFaction() == this.getFaction())
 			throw new IllegalArgumentException();
 		if (canAttack()) {
 			setStatus(Status.ATTACKING);
@@ -1559,8 +1562,9 @@ public class Unit {
 	 */
 	public boolean canRest() {
 		if(this.getStaminaPoints() <= 0 || this.getHitpoints() <= 0)
-			if (this.getStatus() == Status.DONE || this.getStatus() == Status.RESTING || this.getStatus() == Status.WORKING || this.getStatus() == Status.IN_CENTER)
-				return true;
+			if (!isTerminated())
+				if (this.getStatus() == Status.DONE || this.getStatus() == Status.RESTING || this.getStatus() == Status.WORKING || this.getStatus() == Status.IN_CENTER)
+					return true;
 		return false;
 	}
 	
@@ -1672,7 +1676,19 @@ public class Unit {
 	public void startDefaultBehaviour() {
 		if (this.getStatus() == Status.DONE) {
 			setEnableDefaultBehaviour(true);
-			int i = new Random().nextInt(4);
+			Set<Unit> potentialEnemies = new HashSet<>();
+			for (int[] neighbouringCube: getNeighboringCubes(this.getCubeCoordinate()))
+				for(Unit other: this.getWorld().getUnits(neighbouringCube)){
+					if (other.getFaction() != this.getFaction())
+						potentialEnemies.add(other);
+				}
+			int i = 0;
+			if (potentialEnemies.size()==0){
+				i = new Random().nextInt(5);
+			}
+			else{
+				i = new Random().nextInt(4);
+			} 
 			if (i == 0) {
 				setStatus(Status.IN_CENTER);
 				moveTo(new double[] { (new Random().nextDouble()) * X*L, (new Random().nextDouble()) * Y*L,
@@ -1687,9 +1703,14 @@ public class Unit {
 			}
 			if (i == 2)
 				work();
-			if (i == 3)
+			if (i == 3){
 				restTimer = 180.01;
 				rest();
+			}
+			if (i==4){
+				attack(potentialEnemies.iterator().next());
+			}
+				
 		} else
 			enableDefaultBehaviour = false;
 
@@ -1723,6 +1744,12 @@ public class Unit {
  	 *       | ...
  	 */
  	 public void terminate() {
+ 		 this.getWorld().removeAsUnit(this);
+ 		 this.setWorld(null);
+ 		 this.setBoulder(null);
+ 		 this.setLog(null);
+ 		 this.getFaction().removeAsUnit(this);
+ 		 this.setFaction(null);
  		 this.isTerminated = true;
  	 }
  	 
@@ -1739,13 +1766,6 @@ public class Unit {
  	  * Variable registering whether this unit is terminated.
  	  */
  	 private boolean isTerminated = false;
- 	 
-  	
-  	/**
-  	 * Symbolic constant registering the side length of cubes, expressed in meters.
-  	 */
-  	private static double L = 1.0;
- 
   	
  	@Basic @Raw
  	public Boulder getBoulder() {

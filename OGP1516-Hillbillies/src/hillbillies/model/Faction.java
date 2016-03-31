@@ -19,7 +19,7 @@ public class Faction {
 	@Basic
 	@Raw
 	public int getNbUnits() {
-		return NbUnits;
+		return this.getUnits().size();
 	}
 	
 	public boolean isActive(){
@@ -38,24 +38,8 @@ public class Faction {
 		return (0<= Units && Units<= 50);
 	}
 
-	/**
-	 * Set the number of units of this factions to the given number of units.
-	 * 
-	 * @param Units
-	 *            The new number of units for this factions.
-	 * @post If the given number of units is a valid number of units for any
-	 *       factions, the number of units of this new factions is equal to the
-	 *       given number of units. | if (isValidNumberUnits(Units)) | then
-	 *       new.getNumberUnits() == Units
-	 */
-	@Raw
-	public void setNumberUnits(int Units) {
-		if (isValidNumberUnits(Units))
-			NbUnits = Units;
-	}
 
 	private String Name;
-	private int NbUnits;
 	private boolean Active;
 	private Set<Unit> units = new HashSet<Unit>();
 	
@@ -96,6 +80,10 @@ public class Faction {
 			this.units.remove(unit);
 			unit.setFaction(null);
 			// Wat als... geen units meer.
+	}
+	
+	public Set<Unit> getUnits(){
+		return units;
 	}
 	
 	/**
