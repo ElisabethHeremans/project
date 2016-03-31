@@ -1521,9 +1521,10 @@ public class Unit {
 				this.setExperiencePoints(this.getExperiencePoints()+20);
 			}
 			else if (new Random().nextDouble() <= 0.25
-					* ((this.getStrength() + this.getAgility()) / (unit.getStrength() + unit.getAgility())))
+					* ((this.getStrength() + this.getAgility()) / (unit.getStrength() + unit.getAgility()))){
 				setStatus(Status.DONE);
 				this.setExperiencePoints(this.getExperiencePoints()+20);
+			}
 			else {
 				double newHitPoints = this.getHitpoints() - unit.getStrength() / 10.0;
 				unit.setExperiencePoints(unit.getExperiencePoints()+20);
