@@ -1056,15 +1056,16 @@ public class Unit {
 		}
 	}
 	
-	public ArrayList getNeighboringCubes( int[] position){
-		ArrayList neighboringCubes = new ArrayList<int[]>();
+	public List<int[]> getNeighboringCubes( int[] position){
+		List<int[]> neighboringCubes = new ArrayList<int[]>();
 		for(int i =-1; i < 2; i++){
 			for (int j =-1; i<2; i++){
 				for (int k =-1; i<2; i++){
 					int[] newPosition = {position[0]+i, position[1]+j, position[2]+k};
-					if(( i!= 0 || j!=0 || k!=0) && 
-							isValidPosition(new double[] {position[0]+i, position[1]+j, position[2]+k}))
+					if(( i!= 0 || j!=0 || k!=0)){// && 
+							//isValidPosition(new double[] {position[0]+i, position[1]+j, position[2]+k}))
 						neighboringCubes.add(newPosition);
+					}
 				}
 			}
 		}
@@ -1072,29 +1073,38 @@ public class Unit {
 	}
 	
 	public boolean isNeighboringSolidTerrain( int[] position){
-		ArrayList neighboringCubes = getNeighboringCubes(position);
+		List<int[]> neighboringCubes = getNeighboringCubes(position);
 		for(int index=0; index<=neighboringCubes.size(); index++){
-			if(this.getWorld().getTerrain((double[]) neighboringCubes.get(index)) == TerrainType.ROCK 
-					|| this.getWorld().getTerrain((double[]) neighboringCubes.get(index)) == TerrainType.TREE)
+			if(this.getWorld().getTerrain(neighboringCubes.get(index)) == TerrainType.ROCK 
+					|| this.getWorld().getTerrain(neighboringCubes.get(index)) == TerrainType.TREE)
 				return true;
 		}
 		return false;
 	}
 	
-	Queue<int[]> queue =  new LinkedList<int[]>();
-	Queue<int[]> queuePos = new LinkedList<int[]>();
+	private Queue<int[]> queue =  new LinkedList<int[]>();
+	private Queue<int[]> queuePos = new LinkedList<int[]>();
 	
 	public void search(int[] array){
 		int[] position = {array[0], array[1], array[2]};
 		int n = array[3];
-		ArrayList neighboringCubes = getNeighboringCubes(position);
+		List<int[]> neighboringCubes = getNeighboringCubes(position);
 		for (int index= 0; index< neighboringCubes.size(); index++){
-			if( this.getWorld().getPassable((int[]) neighboringCubes.get(index)) && 
-					isNeighboringSolidTerrain(position) && !queuePos.contains(neighboringCubes.get(index)))
-				queuePos.add((int[]) neighboringCubes.get(index));
-				int[] nextPos = {((int[])(neighboringCubes.get(index)))[0],((int[])(neighboringCubes.get(index)))[1],
-						((int[])(neighboringCubes.get(index)))[2],n+1};
-				queue.add(nextPos);
+			int[] currentNeighbour = neighboringCubes.get(index);
+			if( this.getWorld().getPassable(currentNeighbour) && 
+					isNeighboringSolidTerrain(currentNeighbour)){
+				boolean toAdd = true;
+				for (int[] queueArray: queue){
+					if (queueArray[0]==currentNeighbour[0]&& queueArray[1] == currentNeighbour[1] 
+							&& queueArray[2] == currentNeighbour[2] && queueArray[3]<n)
+						toAdd = false;
+				}
+				if (toAdd){
+					queuePos.add(currentNeighbour);
+					queue.add(new int[] {currentNeighbour[0],currentNeighbour[1],currentNeighbour[2],n+1});
+				}
+				
+			}
 		}
 	}
 	
@@ -1109,13 +1119,21 @@ public class Unit {
 				int[] positionn = {(int) targetPosition[0], (int) targetPosition[1], (int) targetPosition[2], 0};
 				queue.add(positionn);
 				queuePos.add(position);
-				while(!queue.contains(this.getPosition()) && queue.size()>=index){
-					nextPosition = ((LinkedList<int[]>) queue).get(index);
+				while(!queuePos.contains(this.getPosition()) && queue.size()>index){ //?
+ 					nextPosition = ((LinkedList<int[]>) queue).get(index);
 					search(nextPosition);
 					index = index+1;
 				}
-			if( queuePos.contains(targetPosition)){
-				
+			if( queuePos.contains(this.getPosition())){
+				int[] candidateNextArray = null;
+				for (int[] array: queue){
+					double[] nextPos = {(double)array[0], (double)array[1], (double)array[2]};
+					int n = array[3];
+					if (this.isNeighbouringCube(nextPos))
+						if (candidateNextArray == null || candidateNextArray[3]> n)
+							candidateNextArray = array;
+				}
+				moveToAdjacent(candidateNextArray[0],candidateNextArray[1],candidateNextArray[2]);
 			}
 			}
 		}	
