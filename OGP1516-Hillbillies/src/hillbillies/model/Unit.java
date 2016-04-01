@@ -572,37 +572,7 @@ public class Unit {
 	
 	
 
-	/**
-	 * Return the position of the game world cube in which this unit is
-	 * positioned, as an array of doubles.
-	 * 
-	 * @return The position of the game world cube in which this unit is
-	 *         positioned, which is an array of doubles containing x,y and z rounded down to integer numbers.
-	 *         | result == new double[] {Math.floor(this.getPosition()[0]),
-	 *         | Math.floor(this.getPosition()[1]),Math.floor(this.getPosition()[2])}
-	 */
-	public double[] getCubePosition() {
-		return new double[] { Math.floor(this.getPosition()[0]), Math.floor(this.getPosition()[1]),
-				Math.floor(this.getPosition()[2]) };
-	}
-
-	/**
-	 * Return the position of the game world cube in which this unit is
-	 * positioned, as an array if integers.
-	 * 
-	 * @return The position of the game world cube in which this unit is positioned,
-	 * 		   as an array of integers containing x,y and z rounded down to integer numbers.
-	 * 			| result == new int[] { (int) getCubePosition()[0], (int) getCubePosition()[1], (int) getCubePosition()[2] }
-	 */
-	public int[] getCubeCoordinate() {
-		return new int[] { (int) getCubePosition()[0], (int) getCubePosition()[1], (int) getCubePosition()[2] };
-	}
 	
-	public static int[] getCubeCoordinate(double[] position){
-		return new int[] { (int) Math.floor(position[0]), (int) Math.floor(position[1]),
-				(int) Math.floor(position[2]) };
-	}
-
 	
 	
 	/**
@@ -618,12 +588,35 @@ public class Unit {
 	 *         | && (0<= position[2]) && (position[2] <= Z)
 	 */
 	public boolean isValidPosition(double[] position) {
-		return (getWorld().isCubeInWorld(getCubeCoordinate(position)) && getWorld().getPassable(getCubeCoordinate(position)));
+		return (getWorld().isCubeInWorld(this.getWorld().getCubeCoordinate(position)) && getWorld().getPassable(this.getWorld().getCubeCoordinate(position)));
 		
 		
 	}
 	
-	
+	/** 
+	 * Return the position of the game world cube in which this unit is
+	 * positioned, as an array of doubles.
+	 * 
+	 * @return The position of the game world cube in which this unit is
+	 *         positioned, which is an array of doubles containing x,y and z rounded down to integer numbers.
+	 *         | result == new double[] {Math.floor(this.getPosition()[0]),
+	 *         | Math.floor(this.getPosition()[1]),Math.floor(this.getPosition()[2])}
+	 */
+	public double[] getCubePosition() {
+		return new double[] { Math.floor(this.getPosition()[0]), Math.floor(this.getPosition()[1]),
+				Math.floor(this.getPosition()[2]) };
+	}
+	/**
+	 * Return the position of the game world cube in which this unit is
+	 * positioned, as an array if integers.
+	 * 
+	 * @return The position of the game world cube in which this unit is positioned,
+	 * 		   as an array of integers containing x,y and z rounded down to integer numbers.
+	 * 			| result == new int[] { (int) getCubePosition()[0], (int) getCubePosition()[1], (int) getCubePosition()[2] }
+	 */
+	public int[] getCubeCoordinate() {
+		return new int[] { (int) getCubePosition()[0], (int) getCubePosition()[1], (int) getCubePosition()[2] };
+	}
 
 	
 	/**
@@ -1055,31 +1048,7 @@ public class Unit {
 
 		}
 	}
-	
-	public List<int[]> getNeighboringCubes( int[] position){
-		List<int[]> neighboringCubes = new ArrayList<int[]>();
-		for(int i =-1; i < 2; i++){
-			for (int j =-1; i<2; i++){
-				for (int k =-1; i<2; i++){
-					int[] newPosition = {position[0]+i, position[1]+j, position[2]+k};
-					if(( i!= 0 || j!=0 || k!=0) && getWorld().isCubeInWorld(newPosition)){
-						neighboringCubes.add(newPosition);
-					}
-				}
-			}
-		}
-		return neighboringCubes;
-	}
-	
-	public boolean isNeighboringSolidTerrain( int[] position){
-		List<int[]> neighboringCubes = getNeighboringCubes(position);
-		for(int index=0; index<=neighboringCubes.size(); index++){
-			if(this.getWorld().getTerrain(neighboringCubes.get(index)) == TerrainType.ROCK 
-					|| this.getWorld().getTerrain(neighboringCubes.get(index)) == TerrainType.TREE)
-				return true;
-		}
-		return false;
-	}
+
 	
 	private Queue<int[]> queue =  new LinkedList<int[]>();
 	private Queue<int[]> queuePos = new LinkedList<int[]>();
@@ -1087,11 +1056,11 @@ public class Unit {
 	public void search(int[] array){
 		int[] position = {array[0], array[1], array[2]};
 		int n = array[3];
-		List<int[]> neighboringCubes = getNeighboringCubes(position);
+		List<int[]> neighboringCubes = this.getWorld().getNeighboringCubes(position);
 		for (int index= 0; index< neighboringCubes.size(); index++){
 			int[] currentNeighbour = neighboringCubes.get(index);
 			if( this.getWorld().getPassable(currentNeighbour) && 
-					isNeighboringSolidTerrain(currentNeighbour)){
+					this.getWorld().isNeighboringSolidTerrain(currentNeighbour)){
 				boolean toAdd = true;
 				for (int[] queueArray: queue){
 					if (queueArray[0]==currentNeighbour[0]&& queueArray[1] == currentNeighbour[1] 
@@ -1677,7 +1646,7 @@ public class Unit {
 		if (this.getStatus() == Status.DONE) {
 			setEnableDefaultBehaviour(true);
 			Set<Unit> potentialEnemies = new HashSet<>();
-			for (int[] neighbouringCube: getNeighboringCubes(this.getCubeCoordinate()))
+			for (int[] neighbouringCube: this.getWorld().getNeighboringCubes(this.getCubeCoordinate()))
 				for(Unit other: this.getWorld().getUnits(neighbouringCube)){
 					if (other.getFaction() != this.getFaction())
 						potentialEnemies.add(other);

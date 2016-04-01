@@ -65,6 +65,11 @@ public class Faction {
 		
 		return true;
 	}
+	
+	public boolean canAddAsUnit(Unit unit){
+		return canHaveAsUnit(unit) && getNbUnits()<50;
+	}
+	
 	public void addAsUnit(Unit unit) throws IllegalArgumentException{
 		if(! canHaveAsUnit(unit) || getNbUnits()>50)
 			throw new IllegalArgumentException();	

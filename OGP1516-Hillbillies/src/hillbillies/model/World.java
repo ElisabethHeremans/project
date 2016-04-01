@@ -17,6 +17,7 @@ import hillbillies.util.ConnectedToBorder;
 public class World {
 
 
+	
 	/**
 	 * Initialize this new world with given number of units.
 	 * 
@@ -86,31 +87,62 @@ public class World {
 		return this.logs.size();
 	}
 	
-
+	/**
+	 * Return the terraintype of a cube.
+	 * @param position
+	 * 		The position of the cube.
+	 */
+	public TerrainType getTerrain(int[] position) {
+		return TerrainType.getTerrain(terrainTypes[position[0]][position[1]][position[2]]);
+	}
+	/**
+	 * Return the terraintype of a cube.
+	 * @param position
+	 * 		The position of the cube.
+	 * @effect Returns the terraintype of a cube.
+	 */
 	public TerrainType getTerrain (double[] position){
 		int[] cube = getCubePosition(position);
 		return getTerrain(cube);
 	}
-	public TerrainType getTerrain(int[] position) {
-		return TerrainType.getTerrain(terrainTypes[position[0]][position[1]][position[2]]);
-	}
-	
+
+	/**
+	 * Set the terraintype of the given cube to the given terraintype.
+	 * @param position
+	 * 		The position of the cube.
+	 * @param terrain
+	 * 		The new terraintype for this cube.
+	 */
 	void setTerrain(int[] position, TerrainType terrain){
 		terrainTypes[position[0]][position[1]][position[2]] = terrain.getType();
 	}
 	
 	private static int[][][] terrainTypes;
-	
+	/**
+	 * Initialize this new unit with a random name, position, weight, strength,
+	 * agility, toughness, state of default behaviour, hitpoints, stamina points
+	 * and an orientation.
+	 * @return
+	 */
 	public Unit spawnUnit(){
-	 
-		return new Unit(randomName(), new double[] { (new Random().nextDouble()) * X*L, 
+		Unit spawnUnit = new Unit(randomName(), new double[] { (new Random().nextDouble()) * X*L, 
 				(new Random().nextDouble()) * Y*L,(new Random().nextDouble()) * Z*L }, 
 				new Random().nextInt(201)+1,new Random().nextInt(201)+1, new Random().nextInt(201)+1
 				,new Random().nextInt(201)+1,new Random().nextBoolean(),(double) new Random().nextInt(),
-				(double)new Random().nextInt(),new Random().nextDouble()*360, addToFaction());
+				(double)new Random().nextInt(),new Random().nextDouble()*360);
+		 addAsUnit(spawnUnit);
+		 addUnitToUnitsAtCubeMap(spawnUnit);
+		 spawnUnit.setWorld(this);
+		 addToFaction(spawnUnit);
+		return spawnUnit;
 	}
 	// ik denk foutje : 201-> 200 & nieuwe faction starten en zo: hoe?
-	
+	/**
+	 * Creates a random name.
+	 * @return A random name that is at least two characters long,
+	 * 		starts with an uppercase letter and only contains letters (uppercase and lowercase),
+	 * 		quotes (single and double) and spaces.
+	 */
 	private String randomName(){
 		Char = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz \'\"";
 		int Length = new Random().nextInt(9)+2;
@@ -119,7 +151,33 @@ public class World {
 		      Name.append( Char.charAt(new Random().nextInt(Char.length()) ) );
 		   return Name.toString();
 	}
-	
+	/**
+	 * Adds a given unit to a faction and creates a new faction in which the unit is added
+	 * if no legal faction is available.
+	 * @param unit
+	 * 		The given unit.
+	 */
+	public void addToFaction(Unit unit){
+		for(Faction faction: this.factions){
+			if(faction.canHaveAsUnit(unit) && unit.getFaction()==null && faction.canAddAsUnit(unit))
+				unit.setFaction(faction);
+			// in addAsUnit moet getFaction al verschillend zijn van nul.
+				faction.addAsUnit(unit);
+		}
+		if(unit.getFaction()== null && getNbActiveFactions()<5)
+			 newFaction = new Faction();
+			 unit.setFaction(newFaction);
+			 newFaction.addAsUnit(unit);
+	}
+	// we moeten misschien ook eens nadenken hier hoe we die request stilzwijgend gaan beeindigen. Misschien gewoon een nullwaarde teruggeven? 
+	// ik kon ook geen locale variabele maken van newFaction en ik vraag mij af of we die dan altijd ook terug op null moeten zetten 
+	private Faction newFaction;
+	/**
+	 * Returns the coordinates of the cube in which the given position is located.
+	 * @param position
+	 * 		A position in the gameworld.
+	 * @return the coordinates of the cube in which the given position is located.
+	 */
 	public static int[] getCubePosition(double[] position){
 		return new int[] { (int) Math.floor(position[0]), (int) Math.floor(position[1]),
 				(int) Math.floor(position[2]) };
@@ -152,15 +210,70 @@ public class World {
 	public static double[] getCubeCenter(double[] cubePosition) {
 		return new double[] { cubePosition[0] + L/2, cubePosition[1] + L/2, cubePosition[2] + L/2 };
 	}
-	
+	/**
+	 * Checks whether the cube is located inside the gameworld.
+	 * @param cubePosition
+	 * 		The position of the cube.
+	 * @return True if and only if the given x-, y-, z-coordinate is between 0 and the x-, y-,z-dimension of the gameworld. 
+	 */
 	public boolean isCubeInWorld(int[] cubePosition){
 		return (0 <= cubePosition[0]) && (cubePosition[0] < getxDimension()*L) && (0 <= cubePosition[1]) 
 				&& (cubePosition[1] < getyDimension()*L ) && (0 <= cubePosition[2]) && (cubePosition[2] < getzDimension()*L);
 	}
-	
+	/**
+	 * Checks whether a given cube is passable for a unit.
+	 * @param cubePosition
+	 * 		the position of the cube.
+	 * @return True if and only if the terraintype is air or workshop.
+	 */
+	// misschien hier ipv return effect gebruiken?
 	public boolean getPassable(int[] cubePosition){
 		return this.getTerrain(cubePosition).isPassable();
 	}
+	/**
+	 * Find all neighboring cubes of a given position.
+	 * @param position
+	 * 		A position in the gameworld.
+	 * @return a list with all the neighboring cubes of the given position.
+	 */
+	public List<int[]> getNeighboringCubes( int[] position){
+		List<int[]> neighboringCubes = new ArrayList<int[]>();
+		for(int i =-1; i < 2; i++){
+			for (int j =-1; i<2; i++){
+				for (int k =-1; i<2; i++){
+					int[] newPosition = {position[0]+i, position[1]+j, position[2]+k};
+					if(( i!= 0 || j!=0 || k!=0) && this.isCubeInWorld(newPosition)){
+						neighboringCubes.add(newPosition);
+					}
+				}
+			}
+		}
+		return neighboringCubes;
+	}
+	/**
+	 * Checks if all the neighboring cubes of a position are solid.
+	 * @param position
+	 * 		A position in the gameworld.
+	 * @return True if and only if there is at least one neigboring cube which 
+	 * 		terraintype is rock or tree.
+	 */
+	public boolean isNeighboringSolidTerrain( int[] position){
+		List<int[]> neighboringCubes = getNeighboringCubes(position);
+		for(int index=0; index<=neighboringCubes.size(); index++){
+			if(this.getTerrain(neighboringCubes.get(index)) == TerrainType.ROCK 
+					|| this.getTerrain(neighboringCubes.get(index)) == TerrainType.TREE)
+				return true;
+		}
+		return false;
+	}
+	
+
+	
+	public int[] getCubeCoordinate(double[] position){
+		return new int[] { (int) Math.floor(position[0]), (int) Math.floor(position[1]),
+				(int) Math.floor(position[2]) };
+	}
+
 	
 	@Basic @Raw
 	public int getNbFactions(){
