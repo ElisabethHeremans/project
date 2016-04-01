@@ -38,9 +38,6 @@ public class Faction {
 		return (0<= Units && Units<= 50);
 	}
 
-
-	private String Name;
-	private boolean Active;
 	private Set<Unit> units = new HashSet<Unit>();
 	
 	@Basic
@@ -84,7 +81,8 @@ public class Faction {
 		if (hasAsUnit(unit))
 			this.units.remove(unit);
 			unit.setFaction(null);
-			// Wat als... geen units meer.
+			if (units.isEmpty())
+				this.terminate();
 	}
 	
 	public Set<Unit> getUnits(){
@@ -100,6 +98,10 @@ public class Faction {
 	 *       | ...
 	 */
 	 public void terminate() {
+		 for (Unit unit:this.getUnits()){
+			 this.units.remove(unit);
+			 unit.setFaction(null);
+		 }
 		 this.isTerminated = true;
 	 }
 	 

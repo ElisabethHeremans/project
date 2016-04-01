@@ -1292,13 +1292,16 @@ public class Unit {
 	 *		 | new.totalWorkingTime == (float) 500.0 / this.getStrength()
 	 *	 	 | new.progressWork == (float) 0.0
 	 */
-	public void workAt(int x, int y, int z) {
-		if (canWork())
+	public void work(int[] position) {
+		if(!this.isNeighbouringCube(World.getCubeCenter(position)))
+			throw new IllegalArgumentException();
+		else if (canWork()){
 			setStatus(Status.WORKING);
-		workTargetPosition = new int[] {x,y,z};
-		workingTime = (float) 0.0;
-		totalWorkingTime = (float) 500.0 / this.getStrength();
-		progressWork = (float) 0.0;
+			workTargetPosition = position;
+			workingTime = (float) 0.0;
+			totalWorkingTime = (float) 500.0 / this.getStrength();
+			progressWork = (float) 0.0;
+		}
 
 	}
 	
@@ -1319,13 +1322,17 @@ public class Unit {
 			this.setWeight(this.getWeight()-this.getBoulder().getWeight());
 			this.getBoulder().setWorld(this.getWorld());
 			this.setBoulder(null);
+			setExperiencePoints(this.getExperiencePoints()+10);
+
 		}
-		if (this.getLog() !=null) {
+		else if (this.getLog() !=null) {
 			this.getWorld().addAsLog(this.getLog());
 			this.getLog().setWorld(this.getWorld());
 			this.getLog().setPosition(World.getCubeCenter(targetPosition));
 			this.setWeight(this.getWeight()-this.getLog().getWeight());
 			this.setLog(null);
+			setExperiencePoints(this.getExperiencePoints()+10);
+
 		}
 		else if (this.getWorld().getTerrain(targetPosition) == TerrainType.WORKSHOP 
 				&& !this.getWorld().getBoulders(targetPosition).isEmpty() 
@@ -1338,6 +1345,8 @@ public class Unit {
 			log.terminate();
 			this.setWeight(this.getWeight()+1);
 			this.setToughness(this.getToughness()+1);
+			setExperiencePoints(this.getExperiencePoints()+10);
+
 		}
 		
 		else if (!this.getWorld().getBoulders(targetPosition).isEmpty()){
@@ -1346,6 +1355,8 @@ public class Unit {
 			this.getWorld().removeAsBoulder(boulder);
 			boulder.setWorld(null);
 			this.setWeight(this.getWeight()+boulder.getWeight());
+			setExperiencePoints(this.getExperiencePoints()+10);
+
 
 		}
 
@@ -1355,6 +1366,8 @@ public class Unit {
 			log.setWorld(null);
 			this.setLog(log);
 			this.setWeight(this.getWeight()+log.getWeight());
+			setExperiencePoints(this.getExperiencePoints()+10);
+
 			
 		}
 		else if (this.getWorld().getTerrain(targetPosition)== TerrainType.TREE){
@@ -1365,6 +1378,8 @@ public class Unit {
 				Log log = new Log(targetPosition);
 				this.getWorld().addAsLog(log);
 				log.setWorld(this.getWorld());
+				setExperiencePoints(this.getExperiencePoints()+10);
+
 			}
 		}
 		else if (this.getWorld().getTerrain(targetPosition)== TerrainType.ROCK){
@@ -1375,10 +1390,11 @@ public class Unit {
 				Boulder boulder = new Boulder(targetPosition);
 				this.getWorld().addAsBoulder(boulder);
 				boulder.setWorld(this.getWorld());
+				setExperiencePoints(this.getExperiencePoints()+10);
+
 			}
 		}
 		setStatus(Status.DONE);
-		setExperiencePoints(this.getExperiencePoints()+10);
 	}
 	/**
 	 * A variable registering the progress of a unit's work.
@@ -1646,7 +1662,7 @@ public class Unit {
 		if (this.getStatus() == Status.DONE) {
 			setEnableDefaultBehaviour(true);
 			Set<Unit> potentialEnemies = new HashSet<>();
-			for (int[] neighbouringCube: this.getWorld().getNeighboringCubes(this.getCubeCoordinate()))
+			for (int[] neighbouringCube: World.getNeighboringCubes(this.getCubeCoordinate()))
 				for(Unit other: this.getWorld().getUnits(neighbouringCube)){
 					if (other.getFaction() != this.getFaction())
 						potentialEnemies.add(other);
@@ -1660,18 +1676,24 @@ public class Unit {
 			} 
 			if (i == 0) {
 				setStatus(Status.IN_CENTER);
-				moveTo(new double[] { (new Random().nextDouble()) * X*L, (new Random().nextDouble()) * Y*L,
-						(new Random().nextDouble()) * Z*L });
+				moveTo(new double[] { (new Random().nextDouble()) * this.getWorld().getxDimension(), 
+						(new Random().nextDouble()) * this.getWorld().getyDimension(),
+						(new Random().nextDouble()) * this.getWorld().getzDimension() });
 				startSprinting();
 			}
 			if (i == 1) {
 				setStatus(Status.IN_CENTER);
-				moveTo(new double[] { (new Random().nextDouble()) * X*L, (new Random().nextDouble()) * Y*L,
-						(new Random().nextDouble()) * Z*L });
+				moveTo(new double[] { (new Random().nextDouble()) * this.getWorld().getxDimension(), 
+						(new Random().nextDouble()) * this.getWorld().getyDimension(),
+						(new Random().nextDouble()) * this.getWorld().getzDimension() });
 				stopSprinting();
 			}
-			if (i == 2)
-				work();
+			if (i == 2){
+				List<int[]> neighbouring = World.getNeighboringCubes(this.getCubeCoordinate());
+				neighbouring.add(this.getCubeCoordinate());
+				i = new Random().nextInt(neighbouring.size());
+				work(neighbouring.get(i));
+			}
 			if (i == 3){
 				restTimer = 180.01;
 				rest();

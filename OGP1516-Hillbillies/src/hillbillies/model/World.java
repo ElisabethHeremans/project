@@ -125,13 +125,12 @@ public class World {
 	 * @return
 	 */
 	public Unit spawnUnit(){
-		Unit spawnUnit = new Unit(randomName(), new double[] { (new Random().nextDouble()) * X*L, 
-				(new Random().nextDouble()) * Y*L,(new Random().nextDouble()) * Z*L }, 
+		Unit spawnUnit = new Unit(randomName(), new double[] { (new Random().nextDouble()) * getxDimension()*L, 
+				(new Random().nextDouble()) * this.getyDimension()*L,(new Random().nextDouble()) * getzDimension()*L }, 
 				new Random().nextInt(201)+1,new Random().nextInt(201)+1, new Random().nextInt(201)+1
 				,new Random().nextInt(201)+1,new Random().nextBoolean(),(double) new Random().nextInt(),
 				(double)new Random().nextInt(),new Random().nextDouble()*360);
 		 addAsUnit(spawnUnit);
-		 addUnitToUnitsAtCubeMap(spawnUnit);
 		 spawnUnit.setWorld(this);
 		 addToFaction(spawnUnit);
 		return spawnUnit;
@@ -236,14 +235,15 @@ public class World {
 	 * 		A position in the gameworld.
 	 * @return a list with all the neighboring cubes of the given position.
 	 */
-	public List<int[]> getNeighboringCubes( int[] position){
+	public static List<int[]> getNeighboringCubes( int[] position){
 		List<int[]> neighboringCubes = new ArrayList<int[]>();
 		for(int i =-1; i < 2; i++){
 			for (int j =-1; i<2; i++){
 				for (int k =-1; i<2; i++){
 					int[] newPosition = {position[0]+i, position[1]+j, position[2]+k};
-					if(( i!= 0 || j!=0 || k!=0) && this.isCubeInWorld(newPosition)){
-						neighboringCubes.add(newPosition);
+					if(( i!= 0 || j!=0 || k!=0)){
+						if (isCubeInWorld(newPosition))
+							neighboringCubes.add(newPosition);
 					}
 				}
 			}
@@ -343,7 +343,7 @@ public class World {
 	}
 	@Raw
 	public boolean canHaveAsBoulder(Boulder boulder){
-		return (boulder != null) && (! this.isTerminated() || unit.isTerminated());
+		return (boulder != null) && (! this.isTerminated() || boulder.isTerminated());
 	}
 	@Raw
 	public boolean hasProperBoulders(){
@@ -362,14 +362,17 @@ public class World {
 			throw new IllegalArgumentException();	
 		
 		this.boulders.add(boulder);
+		this.addBoulderToBouldersAtCubeMap(boulder);
 		boulder.setWorld(this);
 	}
 	public void removeAsBoulder(Boulder boulder) throws IllegalArgumentException{
 		if( boulder == null)
 			throw new IllegalArgumentException();
-		if (hasAsBoulder(boulder))
+		if (hasAsBoulder(boulder)){
 			this.boulders.remove(boulder);
+			this.removeBoulderFromBouldersAtCubeMap(boulder);
 			boulder.setWorld(null);
+		}
 	}
 	
 	private final Set<Boulder> boulders = new HashSet<Boulder>();
@@ -399,6 +402,7 @@ public class World {
 		if(! canHaveAsLog(log))
 			throw new IllegalArgumentException();	
 		this.logs.add(log);
+		this.addLogToLogsAtCubeMap(log);
 		log.setWorld(this);
 	}
 	
@@ -406,9 +410,11 @@ public class World {
 	public void removeAsLog(Log log) throws IllegalArgumentException{
 		if( log == null)
 			throw new IllegalArgumentException();
-		if (hasAsLog(log))
+		if (hasAsLog(log)){
 			this.logs.remove(log);
+			this.removeLogFromLogsAtCubeMap(log);
 			log.setWorld(null);
+		}
 	}
 	
 	private final Set<Log> logs = new HashSet<Log>();
@@ -442,8 +448,8 @@ public class World {
 		//if( unit.getFaction() != null )
 			// check of unit van faction kan veranderen.
 			this.units.add(unit);
+			this.addUnitToUnitsAtCubeMap(unit);
 			unit.setWorld(this);
-			addUnitToUnitsAtCubeMap(unit);
 			
 			if (getNbFactions()<5){
 				Faction faction = new Faction();
@@ -469,10 +475,13 @@ public class World {
 	public void removeAsUnit(Unit unit) throws IllegalArgumentException{
 		if( unit == null)
 			throw new IllegalArgumentException();
-		if (hasAsUnit(unit))
+		if (hasAsUnit(unit)){
 			this.units.remove(unit);
+			this.removeUnitFromUnitsAtCubeMap(unit);
 			unit.setWorld(null);
-			// Wat als... geen units meer.
+			unit.getFaction().removeAsUnit(unit);
+			unit.setFaction(null);
+		}
 	}
 	
 	public List<Unit> listAllUnits(){
@@ -483,6 +492,33 @@ public class World {
 		return unitList;
 	}
 	
+	public List<List<Unit>> listAllUnitsPerFaction(){
+		List<List<Unit>> list = new ArrayList<List<Unit>>();
+		for (Faction faction:factions){
+			List<Unit> listUnits = new ArrayList<Unit>();
+			for (Unit unit:faction.getUnits()){
+				listUnits.add(unit);
+			}
+			list.add(listUnits);
+		}
+		return list;
+	}
+	
+	public List<Boulder> listAllBoulders(){
+		List<Boulder> boulderList= new ArrayList<Boulder>();
+		for (Boulder b:boulders){
+			boulderList.add(boulder);
+		}
+		return boulderList;
+	}
+	
+	public List<Log> listAllLogs(){
+		List<Log> logList= new ArrayList<Log>();
+		for (Log log:logs){
+			logList.add(log);
+		}
+		return logList;
+	}
 	
 	
 	public List<List<?>> inspectCube(int[] position){
@@ -505,7 +541,8 @@ public class World {
 		for (Log log:logsAtCubeMap.get(position)){
 			logList.add(log);
 		}
-		]
+		}
+		
 		list.add(logList);
 
 		
@@ -554,8 +591,20 @@ public class World {
 		}
 		else{
 			unitsAtCube = new HashSet<Unit>();
-			unitsAtCube.addAll(unit);
+			unitsAtCube.add(unit);
 			this.unitsAtCubeMap.put(unit.getCubeCoordinate(),unitsAtCube);
+		}
+	}
+	
+	private void removeUnitFromUnitsAtCubeMap(Unit unit){
+		Set<Unit> unitsAtCube = this.unitsAtCubeMap.get(unit.getCubeCoordinate());
+		if (unitsAtCube.contains(unit)){
+			unitsAtCube.remove(unit);
+			if (unitsAtCube.isEmpty())
+				unitsAtCubeMap.remove(unit.getCubeCoordinate());
+			else{
+				unitsAtCubeMap.replace(unit.getCubeCoordinate(), unitsAtCube);
+			}
 		}
 	}
 	
@@ -571,7 +620,19 @@ public class World {
 		}
 		else{
 			bouldersAtCube = new HashSet<Boulder>();
-			this.bouldersAtCubeMap.put(boulder.getCubeCoordinate(),bouldersAtCube.add(boulder));
+			bouldersAtCube.add(boulder);
+			this.bouldersAtCubeMap.put(boulder.getCubeCoordinate(),bouldersAtCube);
+		}
+	}
+	private void removeBoulderFromBouldersAtCubeMap(Boulder boulder){
+		Set<Boulder> bouldersAtCube = this.bouldersAtCubeMap.get(boulder.getCubeCoordinate());
+		if (bouldersAtCube.contains(boulder)){
+			bouldersAtCube.remove(boulder);
+			if (bouldersAtCube.isEmpty())
+				bouldersAtCubeMap.remove(boulder.getCubeCoordinate());
+			else{
+				bouldersAtCubeMap.replace(boulder.getCubeCoordinate(), bouldersAtCube);
+			}
 		}
 	}
 	
@@ -586,13 +647,25 @@ public class World {
 		}
 		else{
 			logsAtCube = new HashSet<Log>();
-			this.logsAtCubeMap.put(log.getCubeCoordinate(),logsAtCube.add(log));
+			logsAtCube.add(log);
+			this.logsAtCubeMap.put(log.getCubeCoordinate(),logsAtCube);
+		}
+	}
+	
+	private void removeLogFromLogsAtCubeMap(Log log){
+		Set<Log> logsAtCube = this.logsAtCubeMap.get(log.getCubeCoordinate());
+		if (logsAtCube.contains(log)){
+			logsAtCube.remove(log);
+			if (logsAtCube.isEmpty())
+				logsAtCubeMap.remove(log.getCubeCoordinate());
+			else{
+				logsAtCubeMap.replace(log.getCubeCoordinate(), logsAtCube);
+			}
 		}
 	}
 	
 	private Map<int[],Set<Log>> logsAtCubeMap = new HashMap<int[],Set<Log>>();
 
-		
 	private final Set<Unit> units = new HashSet<Unit>();
 	
 	private String Char;
