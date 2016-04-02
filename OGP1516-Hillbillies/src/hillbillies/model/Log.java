@@ -56,21 +56,6 @@ public class Log extends RawMaterial {
 	}
 
 
-	/**
-	 * Check whether the given position is a valid position for any log.
-	 * 
-	 * @param position
-	 *            The position to check.
-	 * @return True if and only if the terrain type of this cube is passable and
-	 *         the z-position is 0 or the position is located directly above a
-	 *         solid cube.
-	 */
-	@Override
-	public boolean isValidPosition(double[] position) {
-		if (this.getWorld().getTerrain(position).isPassable())
-			return true;
-		return false;
-	}
 
 	/**
 	 * Set the position of this log to the given position.
@@ -86,7 +71,7 @@ public class Log extends RawMaterial {
 	@Raw
 	@Override
 	public void setPosition(double[] position) throws IllegalArgumentException {
-		if (!isValidPosition(position))
+		if (!canHaveAsPosition(position))
 			throw new IllegalArgumentException();
 		this.position = position;
 	}
@@ -156,7 +141,8 @@ public class Log extends RawMaterial {
 	}
 	@Override
 	public void setWorld(@Raw World world) {
-		assert (world.hasAsLog(this));
+		if (world != null)
+			assert (world.hasAsLog(this));
 		// nog condities?
 		this.world = world;
 	}
@@ -167,12 +153,12 @@ public class Log extends RawMaterial {
 		return (getWorld().hasAsLog(this));
 	}
 
-	@Basic @Raw
-	public World getWorld(){
-		return world;
-	}
+//	@Basic @Raw
+//	public World getWorld(){
+//		return world;
+//	}
 	
-	private World world;
+//	private World world;
 
 	/**
 	 * Terminate this log.
@@ -182,6 +168,8 @@ public class Log extends RawMaterial {
 	 */
 	@Override
 	public void terminate() {
+		this.getWorld().removeAsLog(this);
+		this.setWorld(null);
 		this.isTerminated = true;
 	}
 

@@ -68,7 +68,7 @@ public class Faction {
 	}
 	
 	public void addAsUnit(Unit unit) throws IllegalArgumentException{
-		if(! canHaveAsUnit(unit) || getNbUnits()>50)
+		if(! canAddAsUnit(unit))
 			throw new IllegalArgumentException();	
 		if( unit.getFaction() != null )
 			// check of unit van faction kan veranderen.
@@ -81,8 +81,8 @@ public class Faction {
 		if (hasAsUnit(unit))
 			this.units.remove(unit);
 			unit.setFaction(null);
-			if (units.isEmpty())
-				this.terminate();
+//			if (units.isEmpty())
+//				this.terminate();
 	}
 	
 	public Set<Unit> getUnits(){

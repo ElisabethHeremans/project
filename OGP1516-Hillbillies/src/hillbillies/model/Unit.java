@@ -135,7 +135,6 @@ public class Unit {
 		this.setStaminaPoints(staminaPoints);
 		this.setPosition(position);
 		this.setEnableDefaultBehaviour(enableDefaultBehavior);
-		//this.setFaction(faction);
 	}
 	/**
 	 * Initialize this new unit with a given name, position, weight, strength,
@@ -190,17 +189,20 @@ public class Unit {
 	@Raw
 	public boolean canHaveAsWeight(int weight) {
 			if( (this.getLog() == null && this.getBoulder() == null)){
-				return ((float) weight >= ((float) this.getStrength() + (float) this.getAgility()) / 2) 
-						&& weight >=1 && weight <=200;}
+				return (((float) weight >= ((float) this.getStrength() + (float) this.getAgility()) / 2) 
+						&& weight >=1 && weight <=200);
+				}
 			else if(this.getLog() != null){
-				return ((float) weight >= ((float) this.getStrength() + (float) this.getAgility()) / 2) 
-						&& weight >=1 && weight <=200+this.getLog().getWeight();}
+				return (((float) weight >= ((float) this.getStrength() + (float) this.getAgility()) / 2) 
+						&& weight >=1 && weight <=200+this.getLog().getWeight());
+				}
 			else if(this.getBoulder() != null){
-				return ((float) weight >= ((float) this.getStrength() + (float) this.getAgility()) / 2) 
-						&& weight >=1 && weight <=200+this.getLog().getWeight();
+				return (((float) weight >= ((float) this.getStrength() + (float) this.getAgility()) / 2) 
+						&& weight >=1 && weight <=200+this.getBoulder().getWeight());
 			}
-			else
-				return false;					
+			else{
+				return false;
+			}
 	}
 
 	/**
@@ -588,7 +590,8 @@ public class Unit {
 	 *         | && (0<= position[2]) && (position[2] <= Z)
 	 */
 	public boolean isValidPosition(double[] position) {
-		return (getWorld().isCubeInWorld(this.getWorld().getCubeCoordinate(position)) && getWorld().getPassable(this.getWorld().getCubeCoordinate(position)));
+		return (getWorld().isCubeInWorld(this.getWorld().getCubeCoordinate(position)) 
+				&& getWorld().getPassable(this.getWorld().getCubeCoordinate(position)));
 		
 		
 	}
@@ -674,7 +677,8 @@ public class Unit {
 	}
 	
 	public void setFaction(@Raw Faction faction){
-		assert (faction.hasAsUnit(this));
+		if (faction != null)
+			assert (faction.hasAsUnit(this));
 		// nog condities?
 		this.faction = faction;
 	}
@@ -692,7 +696,8 @@ public class Unit {
 	private Faction faction;
 	
 	public void setWorld(@Raw World world){
-		assert (world.hasAsUnit(this));
+		if (world != null)
+			assert (world.hasAsUnit(this));
 		// nog condities?
 		this.world = world;
 	}
@@ -1293,7 +1298,7 @@ public class Unit {
 	 *	 	 | new.progressWork == (float) 0.0
 	 */
 	public void work(int[] position) {
-		if(!this.isNeighbouringCube(World.getCubeCenter(position)))
+		if(!(this.isNeighbouringCube(World.getCubeCenter(position))||this.getCubeCoordinate()==position))
 			throw new IllegalArgumentException();
 		else if (canWork()){
 			setStatus(Status.WORKING);
@@ -1320,14 +1325,12 @@ public class Unit {
 			this.getWorld().addAsBoulder(this.getBoulder());
 			this.getBoulder().setPosition(World.getCubeCenter(targetPosition));
 			this.setWeight(this.getWeight()-this.getBoulder().getWeight());
-			this.getBoulder().setWorld(this.getWorld());
 			this.setBoulder(null);
 			setExperiencePoints(this.getExperiencePoints()+10);
 
 		}
 		else if (this.getLog() !=null) {
 			this.getWorld().addAsLog(this.getLog());
-			this.getLog().setWorld(this.getWorld());
 			this.getLog().setPosition(World.getCubeCenter(targetPosition));
 			this.setWeight(this.getWeight()-this.getLog().getWeight());
 			this.setLog(null);
@@ -1377,7 +1380,6 @@ public class Unit {
 				// targetPosition in het centrum van een cube? 
 				Log log = new Log(targetPosition);
 				this.getWorld().addAsLog(log);
-				log.setWorld(this.getWorld());
 				setExperiencePoints(this.getExperiencePoints()+10);
 
 			}
@@ -1389,7 +1391,6 @@ public class Unit {
 				// targetPosition in het centrum van een cube? 
 				Boulder boulder = new Boulder(targetPosition);
 				this.getWorld().addAsBoulder(boulder);
-				boulder.setWorld(this.getWorld());
 				setExperiencePoints(this.getExperiencePoints()+10);
 
 			}
@@ -1445,7 +1446,8 @@ public class Unit {
 	 * 			| (!isNeighbouringCube(other.getCubePosition()))
 	 */
 	public void attack(Unit other) throws IllegalArgumentException {
-		if (!isNeighbouringCube(other.getCubePosition()) || other.isTerminated()|| other.getFaction() == this.getFaction())
+		if (!(isNeighbouringCube(other.getCubePosition())|| other.getCubeCoordinate() == this.getCubeCoordinate()) 
+				|| other.isTerminated()|| other.getFaction() == this.getFaction())
 			throw new IllegalArgumentException();
 		if (canAttack()) {
 			setStatus(Status.ATTACKING);
@@ -1490,22 +1492,24 @@ public class Unit {
 	 * 		   | new.status == Status.DONE;
 	 */
 	public void defend(Unit unit) {
-		if (this.getStatus() != Status.FALLING){
+		if (this.canDefend()){
 			setStatus(Status.DEFENDING);
 			setOrientation((float) Math.atan2(unit.getPosition()[1] - this.getPosition()[1],
 					unit.getPosition()[0] - this.getPosition()[0]));
 			if (new Random().nextDouble() <= 0.20 * (this.getAgility() / unit.getAgility())) {
 				try {
-					this.setPosition(new double[] {this.getPosition()[0]+ (double)(-1 + (new Random().nextInt(3))),
+					double[] newPos = new double[] {this.getPosition()[0]+ (double)(-1 + (new Random().nextInt(3))),
 							this.getPosition()[1]+ (double)(-1 + (new Random().nextInt(3))),
-							this.getPosition()[2]+ (double)(-1 + (new Random().nextInt(3)))});
+							this.getPosition()[2]};
+					if (newPos == this.getPosition())
+						defend(unit);
+					else
+						this.setPosition(newPos);
 				} 
 				catch (IllegalArgumentException exc) {
 					defend(unit);
 				}
 				setStatus(Status.DONE);
-				// experience points stijgen, try-catch, kom je altijd opnieuw in defend terug, zijn kansen dan
-				//nog dezelfde?
 				this.setExperiencePoints(this.getExperiencePoints()+20);
 			}
 			else if (new Random().nextDouble() <= 0.25
@@ -1515,14 +1519,19 @@ public class Unit {
 			}
 			else {
 				double newHitPoints = this.getHitpoints() - unit.getStrength() / 10.0;
-				unit.setExperiencePoints(unit.getExperiencePoints()+20);
+				unit.setExperiencePoints(unit.getExperiencePoints() +20);
 				if (newHitPoints > 0)
 					this.setHitPoints(newHitPoints);
 				else
 					this.setHitPoints(0.0);
 				setStatus(Status.DONE);
+				
 			}
 		}
+	}
+	
+	public boolean canDefend(){
+		return (this.getStatus() != Status.FALLING && !this.isTerminated());
 	}
 
 	/**
@@ -1546,7 +1555,7 @@ public class Unit {
 	 * 		   | 		status == Status.WORKING || status == Status.IN_CENTER)
 	 */
 	public boolean canRest() {
-		if(this.getStaminaPoints() <= 0 || this.getHitpoints() <= 0)
+		if(this.getStaminaPoints() <= this.getMaxPoints() || this.getHitpoints() <= this.getMaxPoints())
 			if (!isTerminated())
 				if (this.getStatus() == Status.DONE || this.getStatus() == Status.RESTING || this.getStatus() == Status.WORKING || this.getStatus() == Status.IN_CENTER)
 					return true;
@@ -1662,7 +1671,9 @@ public class Unit {
 		if (this.getStatus() == Status.DONE) {
 			setEnableDefaultBehaviour(true);
 			Set<Unit> potentialEnemies = new HashSet<>();
-			for (int[] neighbouringCube: World.getNeighboringCubes(this.getCubeCoordinate()))
+			List<int[]> potEnemyPos = World.getNeighboringCubes(this.getCubeCoordinate());
+			potEnemyPos.add(this.getCubeCoordinate());		
+			for (int[] neighbouringCube: potEnemyPos)
 				for(Unit other: this.getWorld().getUnits(neighbouringCube)){
 					if (other.getFaction() != this.getFaction())
 						potentialEnemies.add(other);
@@ -1695,7 +1706,6 @@ public class Unit {
 				work(neighbouring.get(i));
 			}
 			if (i == 3){
-				restTimer = 180.01;
 				rest();
 			}
 			if (i==4){
@@ -1735,12 +1745,20 @@ public class Unit {
  	 *       | ...
  	 */
  	 public void terminate() {
- 		 this.getWorld().removeAsUnit(this);
- 		 this.setWorld(null);
+ 		 
+ 		 if (this.getBoulder() != null)
+ 			 this.getBoulder().setPosition(this.getPosition());
+ 			 getWorld().addAsBoulder(this.getBoulder());
  		 this.setBoulder(null);
+ 		 if (this.getLog()!= null)
+ 			 this.getLog().setPosition(this.getPosition());
+ 			 getWorld().addAsLog(this.getLog());
  		 this.setLog(null);
+ 		 this.getWorld().removeAsUnit(this);
+		 this.setWorld(null);
  		 this.getFaction().removeAsUnit(this);
  		 this.setFaction(null);
+ 		 this.setStatus(Status.DONE);
  		 this.isTerminated = true;
  	 }
  	 
@@ -1765,7 +1783,7 @@ public class Unit {
  	// Hier de voorwaarde dat de boulder in dezelfde cube als de unit moet zijn. Maakt de methode wel niet 
  	// meer static. 
  	public boolean isValidBoulder(Boulder boulder){
- 		return (boulder != null) && (boulder.getPosition() == this.getPosition());
+ 		return (boulder == null) || (boulder.getPosition() == this.getPosition());
  	}
  	
  	@Raw
@@ -1784,7 +1802,7 @@ public class Unit {
  	// Hier de voorwaarde dat de log in dezelfde cube als de unit moet zijn. Maakt de methode wel niet 
  	// meer static. 
  	public boolean isValidLog(Log log){
- 		return (log != null) && (log.getPosition() == this.getPosition());
+ 		return (log == null) || (log.getPosition() == this.getPosition());
  	}
  
 	@Raw

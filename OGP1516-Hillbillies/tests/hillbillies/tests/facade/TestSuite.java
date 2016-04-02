@@ -425,7 +425,7 @@ public class TestSuite {
 		StandardUnit.work();
 		double totalWorkingTime =  500.0 /25.0;
 		advanceTimeFor(StandardUnit,totalWorkingTime, 0.1);
-		assertEquals(StandardUnit.status,Status.DONE);
+		assertEquals(StandardUnit.getStatus(),Status.DONE);
 		
 	}
 	
@@ -435,7 +435,7 @@ public class TestSuite {
 		HitAndStaminaZeroUnit.advanceTime((float) 0.1);
 		HitAndStaminaZeroUnit.work();
 		assertEquals((75/200.0)*5*0.1,HitAndStaminaZeroUnit.getHitpoints(),Util.DEFAULT_EPSILON);
-		assertEquals(Status.INITIAL_RESTING,HitAndStaminaZeroUnit.status);
+		assertEquals(Status.INITIAL_RESTING,HitAndStaminaZeroUnit.getStatus());
 		
 	}
 	
@@ -444,44 +444,44 @@ public class TestSuite {
 		HitAndStaminaZeroUnit.rest();
 		double step = (200.0/(75*5))/7.0;
 		advanceTimeFor(HitAndStaminaZeroUnit,200.0/(75*5),step);
-		assertEquals(Status.RESTING,HitAndStaminaZeroUnit.status);
+		assertEquals(Status.RESTING,HitAndStaminaZeroUnit.getStatus());
 		
 	}
 	
 	@Test
 	public final void advanceTime_RestingRecoverHitpoints(){
-		HitAndStaminaZeroUnit.status = Status.RESTING;
+		HitAndStaminaZeroUnit.setStatus(Status.RESTING);
 		double step = (200.0/(75*5))/7.0;
 		advanceTimeFor(HitAndStaminaZeroUnit,200.0/(75*5),step);
-		assertEquals(Status.RESTING,HitAndStaminaZeroUnit.status);
+		assertEquals(Status.RESTING,HitAndStaminaZeroUnit.getStatus());
 		
 	}
 	
 	@Test
 	public final void advanceTime_RestingRecoverStamina(){
-		HitMaxStaminaZeroUnit.status = Status.RESTING;
+		HitMaxStaminaZeroUnit.setStatus(Status.RESTING);
 		double step = (100.0/(75*5))/7.0;
 		advanceTimeFor(HitMaxStaminaZeroUnit,100.0/(75*5),step);
 		assertEquals(1.0,HitMaxStaminaZeroUnit.getStaminaPoints(),Util.DEFAULT_EPSILON);
-		assertEquals(Status.RESTING,HitMaxStaminaZeroUnit.status);
+		assertEquals(Status.RESTING,HitMaxStaminaZeroUnit.getStatus());
 
 	}
 	
 	@Test
 	public final void advanceTime_RestingDone(){
-		HitMaxStaminaMaxUnit.status = Status.RESTING;
+		HitMaxStaminaMaxUnit.setStatus(Status.RESTING);
 		HitMaxStaminaMaxUnit.advanceTime((float)0.01);
 		assertEquals(HitMaxStaminaMaxUnit.getMaxPoints(),HitMaxStaminaMaxUnit.getStaminaPoints(),Util.DEFAULT_EPSILON);
 		assertEquals(HitMaxStaminaMaxUnit.getMaxPoints(),HitMaxStaminaMaxUnit.getHitpoints(),Util.DEFAULT_EPSILON);
-		assertEquals(Status.DONE,HitMaxStaminaMaxUnit.status);
+		assertEquals(Status.DONE,HitMaxStaminaMaxUnit.getStatus());
 		
 	}
 	
 	@Test
 	public final void advanceTime_Attacking(){
-		StandardUnit.status = Status.ATTACKING;
+		StandardUnit.setStatus(Status.ATTACKING);
 		advanceTimeFor(StandardUnit,1.0,0.1);
-		assertEquals(Status.DONE,StandardUnit.status);
+		assertEquals(Status.DONE,StandardUnit.getStatus());
 	}
 	
 	@Test(expected = IllegalArgumentException.class)
@@ -491,10 +491,10 @@ public class TestSuite {
 	
 	@Test
 	public final void moveTo_CannotMove(){
-		StandardUnit.status = Status.ATTACKING;
+		StandardUnit.setStatus(Status.ATTACKING);
 		StandardUnit.moveTo(new double[] {10.5,10.5,10.5});
 		StandardUnit.advanceTime((float) 0.1);
-		assertEquals(Status.ATTACKING,StandardUnit.status);
+		assertEquals(Status.ATTACKING,StandardUnit.getStatus());
 
 	}
 	
@@ -516,37 +516,37 @@ public class TestSuite {
 	
 	@Test
 	public final void canMove_TrueCase(){
-		StandardUnit.status = Status.RESTING;
+		StandardUnit.setStatus(Status.RESTING);
 		assertTrue(StandardUnit.canMove());
 	}
 	
 	@Test
 	public final void canMove_FalseCase(){
-		StandardUnit.status = Status.MOVING;
+		StandardUnit.setStatus(Status.MOVING);
 		assertFalse(StandardUnit.canMove());
 	}
 	
 	@Test
 	public final void work_EffectiveCase(){
-		StandardUnit.status = Status.DONE;
+		StandardUnit.setStatus(Status.DONE);
 		StandardUnit.work();
-		assertEquals(Status.WORKING,StandardUnit.status);
+		assertEquals(Status.WORKING,StandardUnit.getStatus());
 		advanceTimeFor(StandardUnit,500.0/25,0.1);
-		assertEquals(Status.DONE,StandardUnit.status);
+		assertEquals(Status.DONE,StandardUnit.getStatus());
 	}
 	
 	@Test
 	public final void work_IneffectiveCase(){
 		StandardUnit.status = Status.MOVING;
 		StandardUnit.work();
-		assertEquals(Status.MOVING,StandardUnit.status);
+		assertEquals(Status.MOVING,StandardUnit.getStatus());
 	}
 	
 	@Test
 	public final void getProgressWork(){
 		StandardUnit.status = Status.DONE;
 		StandardUnit.work();
-		assertEquals(Status.WORKING,StandardUnit.status);
+		assertEquals(Status.WORKING,StandardUnit.getStatus());
 		advanceTimeFor(StandardUnit,250.0/25,0.1);
 		assertEquals(0.5,StandardUnit.getProgressWork(),Util.DEFAULT_EPSILON);
 	}
@@ -571,13 +571,13 @@ public class TestSuite {
 	public final void attack_CannotAttack(){
 		StandardUnit.status = Status.MOVING;
 		StandardUnit.attack(NeighbourStandardUnit);
-		assertEquals(Status.MOVING,StandardUnit.status);
+		assertEquals(Status.MOVING,StandardUnit.getStatus());
 	}
 	
 	@Test
 	public final void attack_EffectiveCase(){
 		StandardUnit.attack(NeighbourStandardUnit);
-		assertEquals(Status.ATTACKING,StandardUnit.status);
+		assertEquals(Status.ATTACKING,StandardUnit.getStatus());
 		
 //		assertEquals(2 * Math.PI + Math.atan2(NeighbourStandardUnit.getPosition()[1] - StandardUnit.getPosition()[1],
 //		NeighbourStandardUnit.getPosition()[0] - StandardUnit.getPosition()[0]) % (2 * Math.PI),
@@ -615,21 +615,21 @@ public class TestSuite {
 	@Test
 	public final void rest_IneffectiveCase(){
 		HitMaxStaminaMaxUnit.rest();
-		assertEquals(Status.DONE,HitMaxStaminaMaxUnit.status);
+		assertEquals(Status.DONE,HitMaxStaminaMaxUnit.getStatus());
 		StandardUnit.rest();
-		assertEquals(Status.DONE,StandardUnit.status);
+		assertEquals(Status.DONE,StandardUnit.getStatus());
 	}
 	
 	@Test
 	public final void rest_SkipInitialResting(){
 		HitMaxStaminaZeroUnit.rest();
-		assertEquals(Status.RESTING,HitMaxStaminaZeroUnit.status);
+		assertEquals(Status.RESTING,HitMaxStaminaZeroUnit.getStatus());
 	}
 	
 	@Test
 	public final void rest_StartInitialResting(){
 		HitAndStaminaZeroUnit.rest();
-		assertEquals(Status.INITIAL_RESTING,HitAndStaminaZeroUnit.status);
+		assertEquals(Status.INITIAL_RESTING,HitAndStaminaZeroUnit.getStatus());
 	}
 	
 	@Test
@@ -640,7 +640,7 @@ public class TestSuite {
 	@Test
 	public final void mustRest_TrueCase(){
 		advanceTimeFor(StandardUnit,180.0,0.1);
-		assertEquals(Status.INITIAL_RESTING,StandardUnit.status);
+		assertEquals(Status.INITIAL_RESTING,StandardUnit.getStatus());
 		// mustRest() is always false, because as soon as mustRest becomes true, the unit starts resting and it becomes false again
 		}
 	
@@ -664,7 +664,7 @@ public class TestSuite {
 	public final void startDefaultBehaviour_Ineffective(){
 		StandardUnit.status = Status.ATTACKING;
 		StandardUnit.startDefaultBehaviour();
-		assertEquals(Status.ATTACKING,StandardUnit.status);
+		assertEquals(Status.ATTACKING,StandardUnit.getStatus());
 		assertFalse(StandardUnit.isEnableDefaultBehaviour());
 		}
 	

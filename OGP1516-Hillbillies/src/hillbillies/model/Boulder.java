@@ -52,20 +52,6 @@ public class Boulder extends RawMaterial {
 				(int) Math.floor(this.getPosition()[2]) };
 	}
 	
-	/**
-	 * Check whether the given position is a valid position for
-	 * any boulder.
-	 *  
-	 * @param  position
-	 *         The position to check.
-	 * @return True if and only if the terrain type of this cube is passable and 
-	 * 			the z-position is 0 or the position is located directly above a solid cube.
-	*/
-	public boolean isValidPosition(double[] position) {
-		if (this.getWorld().getTerrain(position).isPassable())
-				return true;
-		return false;
-	}
 	
 	/**
 	 * Set the position of this boulder to the given position.
@@ -83,7 +69,7 @@ public class Boulder extends RawMaterial {
 	@Raw @Override
 	public void setPosition(double[] position) 
 			throws IllegalArgumentException {
-		if (! isValidPosition(position))
+		if (! canHaveAsPosition(position))
 			throw new IllegalArgumentException();
 		this.position = position;
 	}
@@ -157,7 +143,8 @@ public class Boulder extends RawMaterial {
 	
 	@Override
 	public void setWorld(@Raw World world){
-		assert (world.hasAsBoulder(this));
+		if (world != null)
+			assert (world.hasAsBoulder(this));
 		// nog condities?
 		this.world = world;
 	}
@@ -165,15 +152,15 @@ public class Boulder extends RawMaterial {
 	@Raw
 	@Override
 	public boolean hasProperWorld(){
-		return (getWorld().hasAsBoulder(this));
+		return (getWorld() == null || getWorld().hasAsBoulder(this));
 	}
 	
-	@Basic @Raw
- 	public World getWorld(){
- 		return world;
- 	}
+//	@Basic @Raw
+// 	public World getWorld(){
+// 		return world;
+// 	}
 	
-	private World world;
+//	private World world;
 	
 	/**
 	 * Terminate this boulder.
@@ -185,7 +172,9 @@ public class Boulder extends RawMaterial {
 	 */
 	@Override
 	 public void terminate() {
-		 this.isTerminated = true;
+		this.getWorld().removeAsBoulder(this);
+		this.setWorld(null);
+		this.isTerminated = true;
 	 }
 	 
 	 /**

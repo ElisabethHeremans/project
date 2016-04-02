@@ -20,14 +20,22 @@ public abstract class RawMaterial {
 	
 	public abstract void setPosition(double[] position);
 	
-	public abstract boolean isValidPosition(double[] position);
+	/**
+	 * Check whether the given position is a valid position for any raw material.
+	 * 
+	 * @param position
+	 *            The position to check.
+	 * @return True if and only if the terrain type of this cube is passable and
+	 *         the z-position is 0 or the position is located directly above a
+	 *         solid cube.
+	 */
+	public boolean canHaveAsPosition(double[] position){
+		return (getWorld().isCubeInWorld(this.getWorld().getCubeCoordinate(position)) &&
+				this.getWorld().getTerrain(position).isPassable());
+	}
 	
 	public abstract int getWeight();
-	
-	
-	
-	//protected abstract void setWeight(int weight); geen setter want final?
-	
+			
 	public abstract void advanceTime(float duration);
 	
 	@Basic @Raw
@@ -40,7 +48,7 @@ public abstract class RawMaterial {
 	@Raw
 	public abstract boolean hasProperWorld();
 	
-	private World world;
+	protected World world;
 	
 	public abstract void terminate();
 	

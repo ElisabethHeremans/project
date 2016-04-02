@@ -133,7 +133,7 @@ public class World {
 		 addAsUnit(spawnUnit);
 		 spawnUnit.setWorld(this);
 		 addToFaction(spawnUnit);
-		return spawnUnit;
+		 return spawnUnit;
 	}
 	// ik denk foutje : 201-> 200 & nieuwe faction starten en zo: hoe?
 	/**
@@ -191,7 +191,7 @@ public class World {
 	 * 		   | result == new double [] { (double) cubePosition[0] + L/2, 
 	 * 		   | (double) cubePosition[1] + L/2,(double) cubePosition[2] + L/2 }
 	 */
-	public static double[] getCubeCenter(int[] cubePosition) {
+	public double[] getCubeCenter(int[] cubePosition) {
 		return new double[] { (double) cubePosition[0] + L/2, (double) cubePosition[1] + L/2,
 				(double) cubePosition[2] + L/2 };
 	}
@@ -206,18 +206,8 @@ public class World {
 	 * 		   | result == {cubePosition[0]+L/2,cubePosition[1]+L/2,cubePosition[2]+L/2}
 	 */
 
-	public static double[] getCubeCenter(double[] cubePosition) {
+	public double[] getCubeCenter(double[] cubePosition) {
 		return new double[] { cubePosition[0] + L/2, cubePosition[1] + L/2, cubePosition[2] + L/2 };
-	}
-	/**
-	 * Checks whether the cube is located inside the gameworld.
-	 * @param cubePosition
-	 * 		The position of the cube.
-	 * @return True if and only if the given x-, y-, z-coordinate is between 0 and the x-, y-,z-dimension of the gameworld. 
-	 */
-	public boolean isCubeInWorld(int[] cubePosition){
-		return (0 <= cubePosition[0]) && (cubePosition[0] < getxDimension()*L) && (0 <= cubePosition[1]) 
-				&& (cubePosition[1] < getyDimension()*L ) && (0 <= cubePosition[2]) && (cubePosition[2] < getzDimension()*L);
 	}
 	/**
 	 * Checks whether a given cube is passable for a unit.
@@ -235,7 +225,7 @@ public class World {
 	 * 		A position in the gameworld.
 	 * @return a list with all the neighboring cubes of the given position.
 	 */
-	public static List<int[]> getNeighboringCubes( int[] position){
+	public List<int[]> getNeighboringCubes( int[] position){
 		List<int[]> neighboringCubes = new ArrayList<int[]>();
 		for(int i =-1; i < 2; i++){
 			for (int j =-1; i<2; i++){
@@ -273,11 +263,26 @@ public class World {
 		return new int[] { (int) Math.floor(position[0]), (int) Math.floor(position[1]),
 				(int) Math.floor(position[2]) };
 	}
+	/**
+	 * Checks whether the cube is located inside the gameworld.
+	 * @param cubePosition
+	 * 		The position of the cube.
+	 * @return True if and only if the given x-, y-, z-coordinate is between 0 and the x-, y-,z-dimension of the gameworld. 
+	 */
+	public boolean isCubeInWorld(int[] cubePosition){
+		return ((0 <= cubePosition[0]) && (cubePosition[0] < getxDimension()*L) && (0 <= cubePosition[1]) 
+				&& (cubePosition[1] < getyDimension()*L ) && (0 <= cubePosition[2]) && (cubePosition[2] < getzDimension()*L));
+	}
+
 
 	
 	@Basic @Raw
 	public int getNbFactions(){
-		return factions.size();
+		int nb = 0;
+		for (Faction faction: factions)
+			if (faction.isActive())
+				nb += 1;
+		return nb;
 	}
 	
 	@Raw
@@ -445,8 +450,6 @@ public class World {
 		if(! canHaveAsUnit(unit))
 			throw new IllegalArgumentException();	
 		if (getNumberUnits() <100 && !hasAsUnit(unit)){
-		//if( unit.getFaction() != null )
-			// check of unit van faction kan veranderen.
 			this.units.add(unit);
 			this.addUnitToUnitsAtCubeMap(unit);
 			unit.setWorld(this);
@@ -454,7 +457,6 @@ public class World {
 			if (getNbFactions()<5){
 				Faction faction = new Faction();
 				faction.addAsUnit(unit);
-				unit.setFaction(faction);
 			}
 			else{
 				int minNbUnits = 50;
@@ -495,18 +497,20 @@ public class World {
 	public List<List<Unit>> listAllUnitsPerFaction(){
 		List<List<Unit>> list = new ArrayList<List<Unit>>();
 		for (Faction faction:factions){
-			List<Unit> listUnits = new ArrayList<Unit>();
-			for (Unit unit:faction.getUnits()){
-				listUnits.add(unit);
+			if (faction.isActive()){
+				List<Unit> listUnits = new ArrayList<Unit>();
+				for (Unit unit:faction.getUnits()){
+					listUnits.add(unit);
+				}
+				list.add(listUnits);
 			}
-			list.add(listUnits);
 		}
 		return list;
 	}
 	
 	public List<Boulder> listAllBoulders(){
 		List<Boulder> boulderList= new ArrayList<Boulder>();
-		for (Boulder b:boulders){
+		for (Boulder boulder:boulders){
 			boulderList.add(boulder);
 		}
 		return boulderList;
@@ -730,6 +734,10 @@ public class World {
 			}
 		for (Unit unit : this.listAllUnits()){
 			unit.advanceTime(duration);
+			if (unit.getLog() != null)
+				unit.getLog().setPosition(unit.getPosition());
+			if (unit.getBoulder() != null)
+				unit.getBoulder().setPosition(unit.getPosition());
 		}
 		for (Boulder boulder: boulders){
 			boulder.advanceTime(duration);
@@ -743,7 +751,7 @@ public class World {
 	/**
 	 * Symbolic constant registering the side length of cubes, expressed in meters.
 	 */
-	private static final double L = 1.0;
+	private final double L = 1.0;
 	
 	/**
  	 * Terminate this world.
