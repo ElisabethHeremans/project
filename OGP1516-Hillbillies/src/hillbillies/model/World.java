@@ -162,11 +162,16 @@ public class World {
 	 * @return
 	 */
 	public Unit spawnUnit(boolean enableDefaultBehavior){
+		int randomToughness = new Random().nextInt(201)+1;
+		int randomAgility = new Random().nextInt(201)+1;
+		int randomStrength = new Random().nextInt(201)+1;
+		int randomWeight = new Random().nextInt(201-((randomAgility+randomStrength)/2))+1+((randomAgility+randomStrength-2)/2);
+		double randomHitpoints = (double) new Random().nextInt(((int) Math.ceil(200.0*(randomWeight/100.0)*(randomToughness/100.0)))+1);
+		double randomStaminaPoints = (double) new Random().nextInt(((int) Math.ceil(200.0*(randomWeight/100.0)*(randomToughness/100.0)))+1);
 		Unit spawnUnit = new Unit(randomName(), new double[] { (new Random().nextDouble()) * getxDimension()*L, 
 				(new Random().nextDouble()) * this.getyDimension()*L,(new Random().nextDouble()) * getzDimension()*L }, 
-				new Random().nextInt(201)+1,new Random().nextInt(201)+1, new Random().nextInt(201)+1
-				,new Random().nextInt(201)+1,enableDefaultBehavior,(double) new Random().nextInt(),
-				(double)new Random().nextInt(),new Random().nextDouble()*360);
+				randomWeight,randomStrength, randomAgility,randomToughness,enableDefaultBehavior,
+				randomHitpoints,randomStaminaPoints,new Random().nextDouble()*360);
 		 addAsUnit(spawnUnit);
 		 spawnUnit.setWorld(this);
 		 addToFaction(spawnUnit);
@@ -315,17 +320,23 @@ public class World {
 	}
 
 
-	
+	/**
+	 * Return the number of factions in the world.
+	 */
 	@Basic @Raw
 	public int getNbFactions(){
 		return factions.size();
 	}
-	
+	/**
+	 * Return the number of active factions in the world.
+	 */
 	@Raw
 	public int getNbActiveFactions(){
 		return getActiveFactions().size();
 	}
-	
+	/**
+	 * Return a set of all the active factions in the world.
+	 */
 	public Set<Faction> getActiveFactions(){
 		Set<Faction> activeFactions = new HashSet<Faction>();
 		for(Faction faction: this.factions){
@@ -334,18 +345,35 @@ public class World {
 		}
 		return activeFactions;
 	}
-	
+	/**
+	 * Checks whether the given faction is one of the factions 
+	 * 	associated with this world.
+	 * @param faction
+	 * 		The faction to check.
+	 * @return True if and only if this world has the given faction
+	 * 		as one of its factions.
+	 * @throws IllegalArgumentException
+	 */
 	@Basic @Raw
 	public boolean hasAsFaction(Faction faction) throws IllegalArgumentException{
 		return factions.contains(faction);
 	}
-	
+	/**
+	 * Checks whether this world can have the given faction as one of his factions.
+	 * @param faction
+	 * 		The faction to check.
+	 * @return True if and only if the given faction is effective and neither the world or the faction is terminated
+	 * 		and the number of units in the faction is a number between 0 and 50 (0 not included, 50 included).
+	 */
 	@Raw
 	public boolean canHaveAsFaction(Faction faction){
 		return (faction != null && (!this.isTerminated() || faction.isTerminated()) &&faction.getNbUnits() <=50 && faction.getNbUnits() > 0);
 	}
 	
-	
+	/**
+	 * Check whether this world has proper factions associated with it.
+	 * @return True if and only if this world can have each of its factions as a faction.
+	 */
 	@Raw
 	public boolean hasProperFactions(){
 		
@@ -359,7 +387,15 @@ public class World {
 		}
 		return true;
 	}
-	
+	/**
+	 * Add the given faction as a faction for this world.
+	 * @param faction
+	 * 		The faction to become a faction for this world.
+	 * @post If this world contains not more than 5 active factions,
+	 * 		this world has the given faction as one if its factions.
+	 * @throws IllegalArgumentException
+	 * 		This world cannot have the given faction as a faction.
+	 */
 	public void addAsFaction(Faction faction)throws IllegalArgumentException{
 		if (! canHaveAsFaction(faction))
 			throw new IllegalArgumentException();
@@ -370,26 +406,54 @@ public class World {
 		//faction.setWorld(this);
 		
 	}
-	
-	public void removeAsFaction(Faction faction){
+	/**
+	 * Remove the given faction as a faction for this world.
+	 * @param faction
+	 * 		The faction to be removed.
+	 * @post The given faction is not a faction of this world.
+	 * @throws IllegalArgumentException
+	 * 		The given faction is not effective.
+	 */
+	public void removeAsFaction(Faction faction) throws IllegalArgumentException{
 			
 		if( faction == null)
 			throw new IllegalArgumentException();
 		if (hasAsFaction(faction))
 			this.factions.remove(faction);
 	}
-	
+	/**
+	 * Set collecting references to the factions of this world.
+	 * @invar The set of factions is effective.
+	 * @invar Each element in the set of factions references a faction that is an acceptable faction for this world.
+	 */
 	private final Set<Faction> factions = new HashSet<Faction>();
-	
+	/**
+	 * Check whether this world has the given boulder as one of the boulders attached to it.
+	 * @param boulder
+	 * 		The boulder to check.
+	 */
 	@Basic
 	@Raw
 	public boolean hasAsBoulder(Boulder boulder){
 		return this.boulders.contains(boulder);
 	}
+	/**
+	 * Check whether this world can have the given boulder as one of its boulders.
+	 * @param boulder
+	 * 		The boulder to check.
+	 * @return False if the given boulder is not effective. Otherwise true if and only if
+	 * 		this world is not yet terminated or the given boulder is also terminated. 
+	 */
 	@Raw
 	public boolean canHaveAsBoulder(Boulder boulder){
 		return (boulder != null) && (! this.isTerminated() || boulder.isTerminated());
 	}
+	/**
+	 * Check whether this world has proper boulders attached to it.
+	 * @return True if and only if this world can have each of its boulders as
+	 * 		a boulder attached to it, and if each of these boulders references this world
+	 * 		as their world.
+	 */
 	@Raw
 	public boolean hasProperBoulders(){
 		for (Boulder boulder: this.boulders){
@@ -401,15 +465,35 @@ public class World {
 		}
 		return true;
 	}
-	
+	/**
+	 * Add the given boulder to the set of boulders attached to this world.
+	 * @param boulder
+	 * 		The boulder to be added.
+	 * @post This world has the given boulder as one of its boulders.
+	 * @post The given boulder references this world as the world to which it is attached.
+	 * @throws IllegalArgumentException
+	 * 		This world cannot have the given boulder as one of its boulders.
+	 * @throws IllegalArgumentException
+	 * 		The given boulder is already attached to some world.
+	 */
 	public void addAsBoulder(Boulder boulder) throws IllegalArgumentException{
 		if(! canHaveAsBoulder(boulder))
 			throw new IllegalArgumentException();	
-		
+		if( boulder.getWorld()!=null)
+			throw new IllegalArgumentException();
 		this.boulders.add(boulder);
 		this.addBoulderToBouldersAtCubeMap(boulder);
 		boulder.setWorld(this);
 	}
+	/**
+	 * Remove the given boulder from the set of boulders attached to this world.
+	 * @param boulder
+	 * 		The boulder to be removed.
+	 * @post This world does not have the given boulder as one of its boulders.
+	 * @post If this world has the given boulder as one of its boulders,
+	 * 		the given boulder is no longer attached to any world.
+	 * @throws IllegalArgumentException
+	 */
 	public void removeAsBoulder(Boulder boulder) throws IllegalArgumentException{
 		if( boulder == null)
 			throw new IllegalArgumentException();
@@ -419,18 +503,42 @@ public class World {
 			boulder.setWorld(null);
 		}
 	}
-	
+	/**
+	 * Set collecting references to boulders attached to this world.
+	 * @invar The set of boulders is effective.
+	 * @invar Each element in the set of boulders references a boulder that
+	 * 		is an acceptable boulder for this world.
+	 * @invar Each boulder in the set of boulders references this world as the world
+	 * 		to which it is attached.
+	 */
 	private final Set<Boulder> boulders = new HashSet<Boulder>();
-	
+	/**
+	 * Check whether this world has the given log as one of the logs attached to it.
+	 * @param log
+	 * 		The log to check.
+	 */
 	@Basic
 	@Raw
 	public boolean hasAsLog(Log log){
 		return this.logs.contains(log);
 	}
+	/**
+	 * Check whether this world can have the given log as one of its logs.
+	 * @param log
+	 * 		The log to check.
+	 * @return False if the given log is not effective. Otherwise true if and only if
+	 * 		this world is not yet terminated or the given log is also terminated. 
+	 */
 	@Raw
 	public boolean canHaveAsLog(Log log){
 		return (log != null) && (! this.isTerminated() || log.isTerminated());
 	}
+	/**
+	 * Check whether this world has proper logs attached to it.
+	 * @return True if and only if this world can have each of its logs as
+	 * 		a log attached to it, and if each of these logs references this world
+	 * 		as their world.
+	 */
 	@Raw
 	public boolean hasProperLogs(){
 		for (Log log: this.logs){
@@ -442,16 +550,36 @@ public class World {
 		}
 		return true;
 	}
-	
+	/**
+	 * Add the given log to the set of logs attached to this world.
+	 * @param log
+	 * 		The log to be added.
+	 * @post This world has the given log as one of its logs.
+	 * @post The given log references this world as the world to which it is attached.
+	 * @throws IllegalArgumentException
+	 * 		This world cannot have the given log as one of its logs.
+	 * @throws IllegalArgumentException
+	 * 		The given log is already attached to some world.
+	 */
 	public void addAsLog(Log log) throws IllegalArgumentException{
 		if(! canHaveAsLog(log))
-			throw new IllegalArgumentException();	
+			throw new IllegalArgumentException();
+		if(log.getWorld()!= null)
+			throw new IllegalArgumentException();
 		this.logs.add(log);
 		this.addLogToLogsAtCubeMap(log);
 		log.setWorld(this);
 	}
 	
-	
+	/**
+	 * Remove the given log from the set of logs attached to this world.
+	 * @param log
+	 * 		The log to be removed.
+	 * @post This world does not have the given log as one of its logs.
+	 * @post If this world has the given log as one of its logs,
+	 * 		the given log is no longer attached to any world.
+	 * @throws IllegalArgumentException
+	 */
 	public void removeAsLog(Log log) throws IllegalArgumentException{
 		if( log == null)
 			throw new IllegalArgumentException();
@@ -461,7 +589,14 @@ public class World {
 			log.setWorld(null);
 		}
 	}
-	
+	/**
+	 * Set collecting references to logs attached to this world.
+	 * @invar The set of logs is effective.
+	 * @invar Each element in the set of logs references a log that
+	 * 		is an acceptable log for this world.
+	 * @invar Each log in the set of logs references this world as the world
+	 * 		to which it is attached.
+	 */
 	private final Set<Log> logs = new HashSet<Log>();
 	
 	@Basic
