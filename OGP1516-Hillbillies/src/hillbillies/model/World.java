@@ -40,12 +40,17 @@ public class World {
 	 *       number of logs. Otherwise, the number of logs of this new world is equal
 	 *       to 0.
 	 */
-	public World(int[] dimensions,int[][][] terrainTypes, TerrainChangeListener Listener) {
-		this.xDimension = dimensions[0];
-		this.yDimension = dimensions[1];
-		this.zDimension = dimensions[2];
-		this.terrainTypes = terrainTypes;
+	public World(int[][][] terrainTypes, TerrainChangeListener listener) {
+		this.setTerrainTypes(terrainTypes);
+		this.xDimension = terrainTypes.length;
+		this.yDimension = terrainTypes[0].length;
+		this.zDimension = terrainTypes[0][0].length;
+		this.listener = listener;
 	}
+	
+	
+	
+	private final TerrainChangeListener listener;
 
 	/**
 	 * Return the number of units of this world.
@@ -92,7 +97,9 @@ public class World {
 	 * @param position
 	 * 		The position of the cube.
 	 */
-	public TerrainType getTerrain(int[] position) {
+	public TerrainType getTerrain(int[] position) throws IllegalArgumentException {
+		if (!this.isCubeInWorld(position))
+			throw new IllegalArgumentException();
 		return TerrainType.getTerrain(terrainTypes[position[0]][position[1]][position[2]]);
 	}
 	/**
@@ -101,7 +108,7 @@ public class World {
 	 * 		The position of the cube.
 	 * @effect Returns the terraintype of a cube.
 	 */
-	public TerrainType getTerrain (double[] position){
+	public TerrainType getTerrain (double[] position) throws IllegalArgumentException{
 		int[] cube = getCubePosition(position);
 		return getTerrain(cube);
 	}
@@ -113,11 +120,41 @@ public class World {
 	 * @param terrain
 	 * 		The new terraintype for this cube.
 	 */
-	void setTerrain(int[] position, TerrainType terrain){
+	public void setTerrain(int[] position, TerrainType terrain) throws IllegalArgumentException{
+		if (!this.isCubeInWorld(position))
+			throw new IllegalArgumentException();
 		terrainTypes[position[0]][position[1]][position[2]] = terrain.getType();
+		listener.notifyTerrainChanged(position[0], position[1], position[2]);
 	}
 	
-	private static int[][][] terrainTypes;
+	
+	/**
+	 * @return the terrainTypes
+	 */
+	public int[][][] getTerrainTypes() {
+		return terrainTypes;
+	}
+
+	/**
+	 * 
+	 * @param terrainTypes
+	 * @throws IllegalArgumentException
+	 */
+	public final void setTerrainTypes(int[][][] terrainTypes) throws IllegalArgumentException {
+		for (int[][] i : terrainTypes)
+			for (int[] j: terrainTypes[i])
+				for (int k: j)
+					if (terrainTypes[i][j][k] != 0 ||terrainTypes[i][j][k] != 1
+					||terrainTypes[i][j][k] != 2||terrainTypes[i][j][k] != 3)
+						throw new IllegalArgumentException();
+		this.terrainTypes = terrainTypes;
+	}
+
+
+
+	private int[][][] terrainTypes;
+	
+	
 	/**
 	 * Initialize this new unit with a random name, position, weight, strength,
 	 * agility, toughness, state of default behaviour, hitpoints, stamina points
@@ -177,9 +214,10 @@ public class World {
 	 * 		A position in the gameworld.
 	 * @return the coordinates of the cube in which the given position is located.
 	 */
-	public static int[] getCubePosition(double[] position){
-		return new int[] { (int) Math.floor(position[0]), (int) Math.floor(position[1]),
+	int[] getCubePosition(double[] position) {
+		return  new int[] { (int) Math.floor(position[0]), (int) Math.floor(position[1]),
 				(int) Math.floor(position[2]) };
+		
 	}
 	
 	/**
@@ -191,7 +229,7 @@ public class World {
 	 * 		   | result == new double [] { (double) cubePosition[0] + L/2, 
 	 * 		   | (double) cubePosition[1] + L/2,(double) cubePosition[2] + L/2 }
 	 */
-	public double[] getCubeCenter(int[] cubePosition) {
+	double[] getCubeCenter(int[] cubePosition) {
 		return new double[] { (double) cubePosition[0] + L/2, (double) cubePosition[1] + L/2,
 				(double) cubePosition[2] + L/2 };
 	}
@@ -206,7 +244,7 @@ public class World {
 	 * 		   | result == {cubePosition[0]+L/2,cubePosition[1]+L/2,cubePosition[2]+L/2}
 	 */
 
-	public double[] getCubeCenter(double[] cubePosition) {
+	double[] getCubeCenter(double[] cubePosition) {
 		return new double[] { cubePosition[0] + L/2, cubePosition[1] + L/2, cubePosition[2] + L/2 };
 	}
 	/**
@@ -216,7 +254,7 @@ public class World {
 	 * @return True if and only if the terraintype is air or workshop.
 	 */
 	// misschien hier ipv return effect gebruiken?
-	public boolean getPassable(int[] cubePosition){
+	boolean getPassable(int[] cubePosition) {
 		return this.getTerrain(cubePosition).isPassable();
 	}
 	/**
@@ -225,7 +263,7 @@ public class World {
 	 * 		A position in the gameworld.
 	 * @return a list with all the neighboring cubes of the given position.
 	 */
-	public List<int[]> getNeighboringCubes( int[] position){
+	List<int[]> getNeighboringCubes( int[] position){
 		List<int[]> neighboringCubes = new ArrayList<int[]>();
 		for(int i =-1; i < 2; i++){
 			for (int j =-1; i<2; i++){
@@ -247,7 +285,9 @@ public class World {
 	 * @return True if and only if there is at least one neigboring cube which 
 	 * 		terraintype is rock or tree.
 	 */
-	public boolean isNeighboringSolidTerrain( int[] position){
+	boolean isNeighboringSolidTerrain( int[] position)throws IllegalArgumentException{
+		if (!this.isCubeInWorld(position))
+			throw new IllegalArgumentException();
 		List<int[]> neighboringCubes = getNeighboringCubes(position);
 		for(int index=0; index<=neighboringCubes.size(); index++){
 			if(this.getTerrain(neighboringCubes.get(index)) == TerrainType.ROCK 
@@ -259,7 +299,7 @@ public class World {
 	
 
 	
-	public int[] getCubeCoordinate(double[] position){
+	int[] getCubeCoordinate(double[] position){
 		return new int[] { (int) Math.floor(position[0]), (int) Math.floor(position[1]),
 				(int) Math.floor(position[2]) };
 	}
@@ -278,11 +318,7 @@ public class World {
 	
 	@Basic @Raw
 	public int getNbFactions(){
-		int nb = 0;
-		for (Faction faction: factions)
-			if (faction.isActive())
-				nb += 1;
-		return nb;
+		return factions.size();
 	}
 	
 	@Raw
@@ -454,7 +490,7 @@ public class World {
 			this.addUnitToUnitsAtCubeMap(unit);
 			unit.setWorld(this);
 			
-			if (getNbFactions()<5){
+			if (getNbActiveFactions()<5){
 				Faction faction = new Faction();
 				faction.addAsUnit(unit);
 			}
@@ -525,7 +561,9 @@ public class World {
 	}
 	
 	
-	public List<List<?>> inspectCube(int[] position){
+	public List<List<?>> inspectCube(int[] position)throws IllegalArgumentException{
+		if (!this.isCubeInWorld(position))
+			throw new IllegalArgumentException();
 		List<List<?>> list = new ArrayList<>();
 		List<TerrainType> terrainType= new ArrayList<TerrainType>();
 		terrainType.add(this.getTerrain(position));
@@ -562,7 +600,9 @@ public class World {
 		return list;
 	}
 	
-	public Set<Unit> getUnits(int[] position){
+	public Set<Unit> getUnits(int[] position)throws IllegalArgumentException{
+		if (!this.isCubeInWorld(position))
+			throw new IllegalArgumentException();
 		if (unitsAtCubeMap.get(position)==null)
 			return new HashSet<>();
 		else{
@@ -570,7 +610,9 @@ public class World {
 		}
 	}
 	
-	public Set<Log> getLogs(int[] position){
+	public Set<Log> getLogs(int[] position)throws IllegalArgumentException{
+		if (!this.isCubeInWorld(position))
+			throw new IllegalArgumentException();
 		if (logsAtCubeMap.get(position)==null)
 			return new HashSet<>();
 		else{
@@ -578,7 +620,9 @@ public class World {
 		}
 	}
 	
-	public Set<Boulder> getBoulders(int[] position){
+	public Set<Boulder> getBoulders(int[] position)throws IllegalArgumentException{
+		if (!this.isCubeInWorld(position))
+			throw new IllegalArgumentException();
 		if (bouldersAtCubeMap.get(position)==null)
 			return new HashSet<>();
 		else{
@@ -708,7 +752,14 @@ public class World {
 	private ConnectedToBorder connectedToBorder = new ConnectedToBorder(this.getxDimension(),this.getyDimension(),this.getzDimension());
 
 	
-	public void advanceTime(float duration){
+	/**
+	 * @return the connectedToBorder
+	 */
+	public ConnectedToBorder getConnectedToBorder() {
+		return connectedToBorder;
+	}
+
+	public void advanceTime(double duration){
 		for (int x=0; x < getxDimension(); x ++){
 			for (int y=0; y< getyDimension(); y++){
 				for (int z=0; z < getzDimension() ; z ++){
@@ -733,17 +784,17 @@ public class World {
 				}
 			}
 		for (Unit unit : this.listAllUnits()){
-			unit.advanceTime(duration);
+			unit.advanceTime((float)duration);
 			if (unit.getLog() != null)
 				unit.getLog().setPosition(unit.getPosition());
 			if (unit.getBoulder() != null)
 				unit.getBoulder().setPosition(unit.getPosition());
 		}
 		for (Boulder boulder: boulders){
-			boulder.advanceTime(duration);
+			boulder.advanceTime((float) duration);
 		}
 		for (Log log: logs){
-			log.advanceTime(duration);
+			log.advanceTime((float) duration);
 		}
 	}
 

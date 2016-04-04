@@ -1321,6 +1321,7 @@ public class Unit {
 	}
 	
 	public void endWork(int[] targetPosition) {
+		
 		if (this.getBoulder() !=null) {
 			this.getWorld().addAsBoulder(this.getBoulder());
 			this.getBoulder().setPosition(World.getCubeCenter(targetPosition));

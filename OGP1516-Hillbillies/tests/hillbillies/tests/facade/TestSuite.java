@@ -45,10 +45,9 @@ public class TestSuite {
 		DefaultEnabledUnit = new Unit("Cunit",new double[] {3.5,1.5,4.5},75,25,25,75,true,0.0,0.0,Math.PI/2);
 		HitAndStaminaZeroUnit = new Unit("Dunit",new double[] {3.5,1.5,4.5},75,25,25,75,false,0.0,0.0,Math.PI/2);
 		HitMaxStaminaZeroUnit = new Unit("Eunit",new double[] {3.5,1.5,4.5},75,25,25,75,false,0.0,0.0,Math.PI/2);
-		HitMaxStaminaZeroUnit.setHitPoints(HitMaxStaminaZeroUnit.getMaxPoints());
-		HitMaxStaminaMaxUnit = new Unit("Funit",new double[] {3.5,1.5,4.5},75,25,25,75,false,0.0,0.0,Math.PI/2);
-		HitMaxStaminaMaxUnit.setHitPoints(HitMaxStaminaMaxUnit.getMaxPoints());
-		HitMaxStaminaMaxUnit.setStaminaPoints(HitMaxStaminaMaxUnit.getMaxPoints());
+		double maxpoints = HitMaxStaminaZeroUnit.getMaxPoints();
+		HitMaxStaminaZeroUnit = new Unit("Eunit",new double[] {3.5,1.5,4.5},75,25,25,75,false,maxpoints,0.0,Math.PI/2);
+		HitMaxStaminaMaxUnit = new Unit("Funit",new double[] {3.5,1.5,4.5},75,25,25,75,false,maxpoints,maxpoints,Math.PI/2);
 		NeighbourStandardUnit = new Unit("Bunit",new double[] {4.5,0.5,4.5},75,25,25,75,false,25.0,25.0,Math.PI/2);
 
 	}
