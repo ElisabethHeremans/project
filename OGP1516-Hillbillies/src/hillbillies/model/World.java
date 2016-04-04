@@ -43,8 +43,13 @@ public class World {
 	public World(int[][][] terrainTypes, TerrainChangeListener listener) {
 		this.setTerrainTypes(terrainTypes);
 		this.xDimension = terrainTypes.length;
+		System.out.println(xDimension);
 		this.yDimension = terrainTypes[0].length;
+		System.out.println(xDimension);
+
 		this.zDimension = terrainTypes[0][0].length;
+		System.out.println(xDimension);
+
 		this.listener = listener;
 	}
 	
@@ -142,10 +147,9 @@ public class World {
 	 */
 	public final void setTerrainTypes(int[][][] terrainTypes) throws IllegalArgumentException {
 		for (int[][] i : terrainTypes)
-			for (int[] j: terrainTypes[i])
+			for (int[] j: i)
 				for (int k: j)
-					if (terrainTypes[i][j][k] != 0 ||terrainTypes[i][j][k] != 1
-					||terrainTypes[i][j][k] != 2||terrainTypes[i][j][k] != 3)
+					if (k != 0 &&k != 1 &&k != 2&&k!= 3)
 						throw new IllegalArgumentException();
 		this.terrainTypes = terrainTypes;
 	}
@@ -168,14 +172,24 @@ public class World {
 		int randomWeight = new Random().nextInt(201-((randomAgility+randomStrength)/2))+1+((randomAgility+randomStrength-2)/2);
 		double randomHitpoints = (double) new Random().nextInt(((int) Math.ceil(200.0*(randomWeight/100.0)*(randomToughness/100.0)))+1);
 		double randomStaminaPoints = (double) new Random().nextInt(((int) Math.ceil(200.0*(randomWeight/100.0)*(randomToughness/100.0)))+1);
-		Unit spawnUnit = new Unit(randomName(), new double[] { (new Random().nextDouble()) * getxDimension()*L, 
-				(new Random().nextDouble()) * this.getyDimension()*L,(new Random().nextDouble()) * getzDimension()*L }, 
+		boolean validPosFound = false;
+		double[] pos = new double[]{};
+		while (!validPosFound){
+			pos = new double[] { (new Random().nextDouble()) * getxDimension()*L, 
+					(new Random().nextDouble()) * this.getyDimension()*L,(new Random().nextDouble()) * getzDimension()*L };
+			if (this.isCubeInWorld(this.getCubeCoordinate(pos)) && this.getPassable(this.getCubeCoordinate(pos))
+					&& (!this.getPassable(getCubeCoordinate(new double[] {pos[0],pos[1],pos[2]-1.0}))
+							||(int) Math.floor(pos[2]-1.0) == 0))
+				validPosFound = true;
+		}
+		Unit spawnUnit = new Unit(randomName(), pos, 
 				randomWeight,randomStrength, randomAgility,randomToughness,enableDefaultBehavior,
 				randomHitpoints,randomStaminaPoints,new Random().nextDouble()*360);
-		 addAsUnit(spawnUnit);
-		 spawnUnit.setWorld(this);
-		 addToFaction(spawnUnit);
-		 return spawnUnit;
+		if (this.listAllUnits().size()<100)
+			addAsUnit(spawnUnit);
+			spawnUnit.setWorld(this);
+			addToFaction(spawnUnit);
+		return spawnUnit;
 	}
 	// ik denk foutje : 201-> 200 & nieuwe faction starten en zo: hoe?
 	/**
@@ -199,20 +213,25 @@ public class World {
 	 * 		The given unit.
 	 */
 	public void addToFaction(Unit unit){
-		for(Faction faction: this.factions){
-			if(faction.canHaveAsUnit(unit) && unit.getFaction()==null && faction.canAddAsUnit(unit))
-				unit.setFaction(faction);
-			// in addAsUnit moet getFaction al verschillend zijn van nul.
-				faction.addAsUnit(unit);
-		}
-		if(unit.getFaction()== null && getNbActiveFactions()<5)
-			 newFaction = new Faction();
-			 unit.setFaction(newFaction);
+		
+		if(getNbActiveFactions()<5){
+			 Faction newFaction = new Faction();
+			 this.addAsFaction(newFaction);
 			 newFaction.addAsUnit(unit);
+		}
+		else{
+			Faction leastUnitsFaction = null;
+			for(Faction faction: this.getActiveFactions()){
+				if (faction.getUnits().size()<50 && (leastUnitsFaction == null 
+						||faction.getUnits().size()<leastUnitsFaction.getUnits().size())) 
+					leastUnitsFaction = faction;
+			}
+			if (leastUnitsFaction != null)
+				leastUnitsFaction.addAsUnit(unit);
+		
+		}
 	}
-	// we moeten misschien ook eens nadenken hier hoe we die request stilzwijgend gaan beeindigen. Misschien gewoon een nullwaarde teruggeven? 
-	// ik kon ook geen locale variabele maken van newFaction en ik vraag mij af of we die dan altijd ook terug op null moeten zetten 
-	private Faction newFaction;
+
 	/**
 	 * Returns the coordinates of the cube in which the given position is located.
 	 * @param position
@@ -396,7 +415,7 @@ public class World {
 	 * @throws IllegalArgumentException
 	 * 		This world cannot have the given faction as a faction.
 	 */
-	public void addAsFaction(Faction faction)throws IllegalArgumentException{
+	private void addAsFaction(Faction faction)throws IllegalArgumentException{
 		if (! canHaveAsFaction(faction))
 			throw new IllegalArgumentException();
 		if (getNbActiveFactions()!=5)
@@ -414,7 +433,7 @@ public class World {
 	 * @throws IllegalArgumentException
 	 * 		The given faction is not effective.
 	 */
-	public void removeAsFaction(Faction faction) throws IllegalArgumentException{
+	private void removeAsFaction(Faction faction) throws IllegalArgumentException{
 			
 		if( faction == null)
 			throw new IllegalArgumentException();
@@ -426,7 +445,7 @@ public class World {
 	 * @invar The set of factions is effective.
 	 * @invar Each element in the set of factions references a faction that is an acceptable faction for this world.
 	 */
-	private final Set<Faction> factions = new HashSet<Faction>();
+	private Set<Faction> factions = new HashSet<Faction>();
 	/**
 	 * Check whether this world has the given boulder as one of the boulders attached to it.
 	 * @param boulder
@@ -511,7 +530,7 @@ public class World {
 	 * @invar Each boulder in the set of boulders references this world as the world
 	 * 		to which it is attached.
 	 */
-	private final Set<Boulder> boulders = new HashSet<Boulder>();
+	private Set<Boulder> boulders = new HashSet<Boulder>();
 	/**
 	 * Check whether this world has the given log as one of the logs attached to it.
 	 * @param log
@@ -561,7 +580,7 @@ public class World {
 	 * @throws IllegalArgumentException
 	 * 		The given log is already attached to some world.
 	 */
-	public void addAsLog(Log log) throws IllegalArgumentException{
+	void addAsLog(Log log) throws IllegalArgumentException{
 		if(! canHaveAsLog(log))
 			throw new IllegalArgumentException();
 		if(log.getWorld()!= null)
@@ -580,7 +599,7 @@ public class World {
 	 * 		the given log is no longer attached to any world.
 	 * @throws IllegalArgumentException
 	 */
-	public void removeAsLog(Log log) throws IllegalArgumentException{
+	void removeAsLog(Log log) throws IllegalArgumentException{
 		if( log == null)
 			throw new IllegalArgumentException();
 		if (hasAsLog(log)){
@@ -597,7 +616,7 @@ public class World {
 	 * @invar Each log in the set of logs references this world as the world
 	 * 		to which it is attached.
 	 */
-	private final Set<Log> logs = new HashSet<Log>();
+	private Set<Log> logs = new HashSet<Log>();
 	
 	@Basic
 	@Raw
@@ -606,7 +625,8 @@ public class World {
 	}
 	@Raw
 	public boolean canHaveAsUnit(Unit unit){
-		return (unit != null) && (! this.isTerminated() || unit.isTerminated());
+		return (unit != null) 
+				&&(! this.isTerminated() || unit.isTerminated());
 	}
 	@Raw
 	public boolean hasProperUnits(){
@@ -623,7 +643,9 @@ public class World {
 	
 	public void addAsUnit(Unit unit) throws IllegalArgumentException{
 		if(! canHaveAsUnit(unit))
-			throw new IllegalArgumentException();	
+			throw new IllegalArgumentException();
+		if( !(this.isCubeInWorld(unit.getCubeCoordinate())) || !(this.getPassable(unit.getCubeCoordinate())))
+			throw new IllegalArgumentException();
 		if (getNumberUnits() <100 && !hasAsUnit(unit)){
 			this.units.add(unit);
 			this.addUnitToUnitsAtCubeMap(unit);
@@ -649,7 +671,7 @@ public class World {
 			}
 		}
 	}
-	public void removeAsUnit(Unit unit) throws IllegalArgumentException{
+	void removeAsUnit(Unit unit) throws IllegalArgumentException{
 		if( unit == null)
 			throw new IllegalArgumentException();
 		if (hasAsUnit(unit)){
@@ -661,42 +683,20 @@ public class World {
 		}
 	}
 	
-	public List<Unit> listAllUnits(){
-		List<Unit> unitList= new ArrayList<Unit>();
-		for (Unit unit:units){
-			unitList.add(unit);
-		}
-		return unitList;
+	public Set<Unit> listAllUnits(){
+		return units;
 	}
 	
-	public List<List<Unit>> listAllUnitsPerFaction(){
-		List<List<Unit>> list = new ArrayList<List<Unit>>();
-		for (Faction faction:factions){
-			if (faction.isActive()){
-				List<Unit> listUnits = new ArrayList<Unit>();
-				for (Unit unit:faction.getUnits()){
-					listUnits.add(unit);
-				}
-				list.add(listUnits);
-			}
-		}
-		return list;
+	public Set<Unit> listAllUnitsOfFaction(Faction faction){
+		return faction.getUnits();
 	}
 	
-	public List<Boulder> listAllBoulders(){
-		List<Boulder> boulderList= new ArrayList<Boulder>();
-		for (Boulder boulder:boulders){
-			boulderList.add(boulder);
-		}
-		return boulderList;
+	public Set<Boulder> listAllBoulders(){
+		return boulders;
 	}
 	
-	public List<Log> listAllLogs(){
-		List<Log> logList= new ArrayList<Log>();
-		for (Log log:logs){
-			logList.add(log);
-		}
-		return logList;
+	public Set<Log> listAllLogs(){
+		return logs;
 	}
 	
 	

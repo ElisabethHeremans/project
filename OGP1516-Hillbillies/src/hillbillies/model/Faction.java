@@ -70,8 +70,7 @@ public class Faction {
 	public void addAsUnit(Unit unit) throws IllegalArgumentException{
 		if(! canAddAsUnit(unit))
 			throw new IllegalArgumentException();	
-		if( unit.getFaction() != null )
-			// check of unit van faction kan veranderen.
+		if( unit.getFaction() == null )
 			this.units.add(unit);
 			unit.setFaction(this);
 	}

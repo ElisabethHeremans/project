@@ -133,7 +133,7 @@ public class Unit {
 		setOrientation((float) orientation);
 		this.setHitPoints(hitpoints);
 		this.setStaminaPoints(staminaPoints);
-		this.setPosition(position);
+		this.position = position;
 		this.setEnableDefaultBehaviour(enableDefaultBehavior);
 	}
 	/**
@@ -635,6 +635,7 @@ public class Unit {
 	 */
 	@Raw
 	public void setPosition(double[] position) throws IllegalArgumentException {
+		
 		if (!isValidPosition(position))
 			throw new IllegalArgumentException();
 		this.position = position;
@@ -975,7 +976,7 @@ public class Unit {
 			throw new IllegalArgumentException();
 		if (canMove()) {
 			startPosition = new double[] {this.getPosition()[0],this.getPosition()[1],this.getPosition()[2]};
-			nextTargetPosition = World.getCubeCenter(new double[] {this.getCubePosition()[0] + (double) dx , this.getCubePosition()[1] 
+			nextTargetPosition = this.getWorld().getCubeCenter(new double[] {this.getCubePosition()[0] + (double) dx , this.getCubePosition()[1] 
 				+ (double) dy , this.getCubePosition()[2] + (double) dz });
 			setStatus(Status.MOVING);
 			setWalkingSpeed(dz);
@@ -1164,7 +1165,7 @@ public class Unit {
 	 * 		   |	(double) cubePosition[2] + L/2 })  			
 	 */
 	public void moveTo(int[] cubePosition) throws IllegalArgumentException{
-		moveTo(World.getCubeCenter(cubePosition));
+		moveTo(this.getWorld().getCubeCenter(cubePosition));
 	}
 	
 	public void moving(double duration){
@@ -1298,7 +1299,7 @@ public class Unit {
 	 *	 	 | new.progressWork == (float) 0.0
 	 */
 	public void work(int[] position) throws IllegalArgumentException{
-		if(!(this.isNeighbouringCube(World.getCubeCenter(position))||this.getCubeCoordinate()==position))
+		if(!(this.isNeighbouringCube(this.getWorld().getCubeCenter(position))||this.getCubeCoordinate()==position))
 			throw new IllegalArgumentException();
 		else if (canWork()){
 			setStatus(Status.WORKING);
@@ -1324,7 +1325,7 @@ public class Unit {
 		
 		if (this.getBoulder() !=null) {
 			this.getWorld().addAsBoulder(this.getBoulder());
-			this.getBoulder().setPosition(World.getCubeCenter(targetPosition));
+			this.getBoulder().setPosition(this.getWorld().getCubeCenter(targetPosition));
 			this.setWeight(this.getWeight()-this.getBoulder().getWeight());
 			this.setBoulder(null);
 			setExperiencePoints(this.getExperiencePoints()+10);
@@ -1332,7 +1333,7 @@ public class Unit {
 		}
 		else if (this.getLog() !=null) {
 			this.getWorld().addAsLog(this.getLog());
-			this.getLog().setPosition(World.getCubeCenter(targetPosition));
+			this.getLog().setPosition(this.getWorld().getCubeCenter(targetPosition));
 			this.setWeight(this.getWeight()-this.getLog().getWeight());
 			this.setLog(null);
 			setExperiencePoints(this.getExperiencePoints()+10);
@@ -1672,7 +1673,7 @@ public class Unit {
 		if (this.getStatus() == Status.DONE) {
 			setEnableDefaultBehaviour(true);
 			Set<Unit> potentialEnemies = new HashSet<>();
-			List<int[]> potEnemyPos = World.getNeighboringCubes(this.getCubeCoordinate());
+			List<int[]> potEnemyPos = this.getWorld().getNeighboringCubes(this.getCubeCoordinate());
 			potEnemyPos.add(this.getCubeCoordinate());		
 			for (int[] neighbouringCube: potEnemyPos)
 				for(Unit other: this.getWorld().getUnits(neighbouringCube)){
@@ -1701,7 +1702,7 @@ public class Unit {
 				stopSprinting();
 			}
 			if (i == 2){
-				List<int[]> neighbouring = World.getNeighboringCubes(this.getCubeCoordinate());
+				List<int[]> neighbouring = this.getWorld().getNeighboringCubes(this.getCubeCoordinate());
 				neighbouring.add(this.getCubeCoordinate());
 				i = new Random().nextInt(neighbouring.size());
 				work(neighbouring.get(i));
