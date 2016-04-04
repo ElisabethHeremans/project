@@ -161,11 +161,11 @@ public class World {
 	 * and an orientation.
 	 * @return
 	 */
-	public Unit spawnUnit(){
+	public Unit spawnUnit(boolean enableDefaultBehavior){
 		Unit spawnUnit = new Unit(randomName(), new double[] { (new Random().nextDouble()) * getxDimension()*L, 
 				(new Random().nextDouble()) * this.getyDimension()*L,(new Random().nextDouble()) * getzDimension()*L }, 
 				new Random().nextInt(201)+1,new Random().nextInt(201)+1, new Random().nextInt(201)+1
-				,new Random().nextInt(201)+1,new Random().nextBoolean(),(double) new Random().nextInt(),
+				,new Random().nextInt(201)+1,enableDefaultBehavior,(double) new Random().nextInt(),
 				(double)new Random().nextInt(),new Random().nextDouble()*360);
 		 addAsUnit(spawnUnit);
 		 spawnUnit.setWorld(this);
@@ -323,12 +323,16 @@ public class World {
 	
 	@Raw
 	public int getNbActiveFactions(){
-		int nbActiveFactions = 0;
-		for (Faction faction: factions){
+		return getActiveFactions().size();
+	}
+	
+	public Set<Faction> getActiveFactions(){
+		Set<Faction> activeFactions = new HashSet<Faction>();
+		for(Faction faction: this.factions){
 			if (faction.isActive())
-				nbActiveFactions +=1;
+				activeFactions.add(faction);
 		}
-		return nbActiveFactions;
+		return activeFactions;
 	}
 	
 	@Basic @Raw
@@ -791,6 +795,7 @@ public class World {
 				unit.getBoulder().setPosition(unit.getPosition());
 		}
 		for (Boulder boulder: boulders){
+			
 			boulder.advanceTime((float) duration);
 		}
 		for (Log log: logs){

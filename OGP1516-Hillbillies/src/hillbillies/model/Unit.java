@@ -1297,7 +1297,7 @@ public class Unit {
 	 *		 | new.totalWorkingTime == (float) 500.0 / this.getStrength()
 	 *	 	 | new.progressWork == (float) 0.0
 	 */
-	public void work(int[] position) {
+	public void work(int[] position) throws IllegalArgumentException{
 		if(!(this.isNeighbouringCube(World.getCubeCenter(position))||this.getCubeCoordinate()==position))
 			throw new IllegalArgumentException();
 		else if (canWork()){
