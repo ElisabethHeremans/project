@@ -27,18 +27,18 @@ public class Boulder extends RawMaterial {
 			throws IllegalArgumentException {
 		super(position);
 		this.weight = new Random().nextInt(41)+ 10;
-		NbBoulder = NbBoulder + 1;
+		//NbBoulder = NbBoulder + 1;
 	}
 	public Boulder (int[] position){
 		super(position);
 		this.weight = new Random().nextInt(41)+ 10;
 	}
-
-	private int NbBoulder = 0;
-	
-	public int getNbBoulder(){
-		return NbBoulder;
-	}
+//
+//	private int NbBoulder = 0;
+//	
+//	public int getNbBoulder(){
+//		return NbBoulder;
+//	}
 	/**
 	 * Return the position of this boulder.
 	 */
@@ -78,7 +78,9 @@ public class Boulder extends RawMaterial {
 	 * Variable registering the position of this boulder.
 	 */
 	private double[] position;
-
+	/**
+	 * Variable registering the weight of this boulder.
+	 */
 	private final int weight;
 	
 	private double[] nextTargetPosition;
@@ -87,9 +89,7 @@ public class Boulder extends RawMaterial {
 
 
 	/**
-	 * 
-	 * 
-	 * @return the weight
+	 *Return the weight of this boulder.
 	 */
 	@Override
 	public final int getWeight() {
@@ -132,15 +132,29 @@ public class Boulder extends RawMaterial {
 		this.nextTargetPosition = Vector.vectorAdd(this.getPosition(), new double[] {0.0,0.0,-1.0});
 		this.startPosition = this.getPosition();
 	}
-	
+	/**
+	 * Return the status of this boulder.
+	 */
 	public Status getStatus(){
 		return this.status;
 	}
-	
+	/**
+	 * Set the status of this boulder to the given status.
+	 * @param status
+	 * 		The new status for this boulder.
+	 * @post The status of this boulder is equal to the given status.
+	 */
 	public void setStatus(Status status) {
 		this.status = status;
 	}
-	
+	/**
+	 * Set the world attached to this boulder to the given world.
+	 * @param world
+	 * 		The world to be attached to this boulder.
+	 * @pre If the given world is effective, it must already reference
+	 * 		this boulder as one of the boulders to which it is attached.
+	 * @post This boulder references the given world as the world attached to it.
+	 */
 	@Override
 	public void setWorld(@Raw World world){
 		if (world != null)
@@ -148,11 +162,16 @@ public class Boulder extends RawMaterial {
 		// nog condities?
 		this.world = world;
 	}
-	
+	/**
+	 * Check whether this boulder has a proper world attached to it.
+	 * @return True if and only if this boulder does not reference an effective world
+	 * 		or if the world referenced by this boulder in turn references this boulder as 
+	 * 		one of the boulders to which it is attached.
+	 */
 	@Raw
 	@Override
 	public boolean hasProperWorld(){
-		return (getWorld() == null || getWorld().hasAsBoulder(this));
+		return (this.getWorld() == null || this.getWorld().hasAsBoulder(this));
 	}
 	
 //	@Basic @Raw
@@ -164,16 +183,13 @@ public class Boulder extends RawMaterial {
 	
 	/**
 	 * Terminate this boulder.
-	 *
+	 * @effect This boulder is removed from the set of boulders attached to its world.
 	 * @post   This boulder  is terminated.
-	 *       | new.isTerminated()
-	 * @post   ...
-	 *       | ...
 	 */
 	@Override
 	 public void terminate() {
 		this.getWorld().removeAsBoulder(this);
-		this.setWorld(null);
+		//this.setWorld(null);
 		this.isTerminated = true;
 	 }
 	 
