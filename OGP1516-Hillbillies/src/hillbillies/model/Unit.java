@@ -675,50 +675,90 @@ public class Unit {
 	 */
 	private double[] position = {0.5,0.5,0.5};
 	
+	/**
+	 * Return the status of this unit.
+	 */
 	public Status getStatus() {
 		return status;
 	}
-	
+	/**
+	 * Set the status of this unit to the given status.
+	 * @param status
+	 * 		The new status for this unit.
+	 * @post The status of this unit is equal to the given status.
+	 */
 	public void setStatus(Status status) {
 		this.status = status;
 	}
-	
+	/**
+	 * Set the faction attached to this unit to the given faction.
+	 * @param faction
+	 * 		The faction to be attached to this unit.
+	 * @pre If the given faction is effective, it must already reference
+	 * 		this unit as one of the units to which it is attached.
+	 * @post This unit references the given faction as the faction attached to it.
+	 */
 	public void setFaction(@Raw Faction faction){
 		if (faction != null)
 			assert (faction.hasAsUnit(this));
 		// nog condities?
 		this.faction = faction;
 	}
-	
+	/**
+	 * Check whether this unit has a proper faction attached to it.
+	 * @return True if and only if this unit does not reference an effective faction
+	 * 		or if the faction referenced by this unit in turn references this unit as 
+	 * 		one of the units to which it is attached.
+	 */
 	@Raw
 	public boolean hasProperFaction(){
-		return (getFaction().hasAsUnit(this));
+		return (this.getFaction() == null || this.getFaction().hasAsUnit(this));
 	}
-	
+	/**
+	 * Return the faction of this unit.
+	 */
 	@Basic @Raw
 	public Faction getFaction(){
-		return faction;
+		return this.faction;
 	}
-	
+	/**
+	 * Variable referencing the faction of this unit.
+	 */
 	private Faction faction;
-	
+	/**
+	 * Set the world attached to this unit to the given world.
+	 * @param world
+	 * 		The world to be attached to this unit.
+	 * @pre If the given world is effective, it must already reference
+	 * 		this unit as one of the units to which it is attached.
+	 * @post This unit references the given world as the world attached to it.
+	 */
 	public void setWorld(@Raw World world){
 		if (world != null)
 			assert (world.hasAsUnit(this));
 		// nog condities?
 		this.world = world;
 	}
-	
+	/**
+	 * Check whether this unit has a proper world attached to it.
+	 * @return True if and only if this unit does not reference an effective world
+	 * 		or if the world referenced by this unit in turn references this unit as 
+	 * 		one of the units to which it is attached.
+	 */
 	@Raw
 	public boolean hasProperWorld(){
-		return (getWorld().hasAsUnit(this));
+		return (this.getWorld()== null) || (getWorld().hasAsUnit(this));
 	}
-	
+	/**
+	 * Return the world of this unit.
+	 */
 	@Basic @Raw
 	public World getWorld(){
 		return world;
 	}
-	
+	/**
+	 * Variable referencing the world of this unit.
+	 */
 	private World world;
 
 	/**

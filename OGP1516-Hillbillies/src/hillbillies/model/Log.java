@@ -7,10 +7,7 @@ import java.util.Random;
 import be.kuleuven.cs.som.annotate.*;
 
 /**
- * TO BE ADDED TO CLASS HEADING
- * 
- * @invar The position of each log must be a valid position for any log. |
- *        isValidPosition(getPosition())
+ * @invar The position of each log must be a valid position for any log. 
  */
 public class Log extends RawMaterial {
 
@@ -26,7 +23,7 @@ public class Log extends RawMaterial {
 	public Log(double[] position) throws IllegalArgumentException {
 		super(position);
 		this.weight = new Random().nextInt(41) + 10;
-		NbLogs = NbLogs + 1;
+		//NbLogs = NbLogs + 1;
 	}
 	
 	public Log(int[] position){
@@ -34,11 +31,11 @@ public class Log extends RawMaterial {
 		this.weight = new Random().nextInt(41) + 10;
 	}
 
-	private int NbLogs = 0;
-
-	public int getNbLogs() {
-		return NbLogs;
-	}
+//	private int NbLogs = 0;
+//
+//	public int getNbLogs() {
+//		return NbLogs;
+//	}
 
 	/**
 	 * Return the position of this log.
@@ -80,7 +77,9 @@ public class Log extends RawMaterial {
 	 * Variable registering the position of this log.
 	 */
 	private double[] position;
-
+	/**
+	 * Variable registering the weight of this log.
+	 */
 	private final int weight;
 
 	private double[] nextTargetPosition;
@@ -88,9 +87,7 @@ public class Log extends RawMaterial {
 	private double[] startPosition;
 
 	/**
-	 * 
-	 * 
-	 * @return the weight
+	 * Return the weight of this log.
 	 */
 	@Override
 	public final int getWeight() {
@@ -133,12 +130,29 @@ public class Log extends RawMaterial {
 		this.nextTargetPosition = Vector.vectorAdd(this.getPosition(), new double[] {0.0,0.0,-1.0});
 		this.startPosition = this.getPosition();
 	}
+	/**
+	 * Return the status of this log.
+	 */
 	public Status getStatus(){
 		return this.status;
 	}
+	/**
+	 * Set the status of this log to the given status.
+	 * @param status
+	 * 		The new status for this log.
+	 * @post The status of this log is equal to the given status.
+	 */
 	public void setStatus(Status status) {
 		this.status = status;
 	}
+	/**
+	 * Set the world attached to this log to the given world.
+	 * @param world
+	 * 		The world to be attached to this log.
+	 * @pre If the given world is effective, it must already reference
+	 * 		this log as one of the logs to which it is attached.
+	 * @post This log references the given world as the world attached to it.
+	 */
 	@Override
 	public void setWorld(@Raw World world) {
 		if (world != null)
@@ -146,11 +160,16 @@ public class Log extends RawMaterial {
 		// nog condities?
 		this.world = world;
 	}
-
+	/**
+	 * Check whether this log has a proper world attached to it.
+	 * @return True if and only if this log does not reference an effective world
+	 * 		or if the world referenced by this log in turn references this log as 
+	 * 		one of the logs to which it is attached.
+	 */
 	@Raw
 	@Override
 	public boolean hasProperWorld() {
-		return (getWorld().hasAsLog(this));
+		return (this.getWorld()== null || this.getWorld().hasAsLog(this));
 	}
 
 //	@Basic @Raw
@@ -162,9 +181,8 @@ public class Log extends RawMaterial {
 
 	/**
 	 * Terminate this log.
-	 *
-	 * @post This log is terminated. | new.isTerminated()
-	 * @post ... | ...
+	 * @effect This log is removed from the set of logs attached to its world.
+	 * @post This log is terminated. 
 	 */
 	@Override
 	public void terminate() {

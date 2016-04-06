@@ -614,60 +614,104 @@ public class World {
 	 * 		to which it is attached.
 	 */
 	private Set<Log> logs = new HashSet<Log>();
-	
+	/**
+	 * Check whether this world has the given unit as one of the units attached to it.
+	 * @param unit
+	 * 		The unit to check.
+	 */
 	@Basic
 	@Raw
 	public boolean hasAsUnit(Unit unit){
 		return this.units.contains(unit);
 	}
+	/**
+	 * Check whether this world can have the given unit as one of its units.
+	 * @param unit
+	 * 		The unit to check.
+	 * @return False if the given unit is not effective. Otherwise true if and only if
+	 * 		this world is not yet terminated or the given unit is also terminated. 
+	 */
 	@Raw
 	public boolean canHaveAsUnit(Unit unit){
 		return (unit != null) 
 				&&(! this.isTerminated() || unit.isTerminated());
 	}
+	/**
+	 * Check whether this world has proper units attached to it.
+	 * @return False if the total number of units is greater than hundred.
+	 * 		Otherwise, true if and only if this world can have each of its units as
+	 * 		a unit attached to it, and if each of these units references this world
+	 * 		as their world.
+	 */
 	@Raw
 	public boolean hasProperUnits(){
+		// Uit forloop gehaald, anders ga je dit elke keer opnieuw controleren.
+		if (this.getNumberUnits() >100)
+			return false;
 		for (Unit unit: this.units){
 			if (! canHaveAsUnit(unit))
 				return false;
 			if (unit.getWorld() != this)
 				return false;
-			if (this.getNumberUnits() >100)
-				return false;
-		}
+			}
 		return true;
 	}
-	
+	/**
+	 * Add the given unit to the set of units attached to this world.
+	 * @param unit
+	 * 		The unit to be added.
+	 * @post This world has the given unit as one of its units.
+	 * @post The given unit references this world as the world to which it is attached.
+	 * @effect The given unit is added to a faction.
+	 * @throws IllegalArgumentException
+	 * 		This world cannot have the given unit as one of its units or 
+	 * 		the total number of units in this world is not less than 100.
+	 * @throws IllegalArgumentException
+	 * 		The given unit is positioned outside the gameworld or inside a cube that is not passable.
+	 * @throws IllegalArgumentException
+	 * 		The given unit is already attached to some world.
+	 */
 	public void addAsUnit(Unit unit) throws IllegalArgumentException{
-		if(! canHaveAsUnit(unit))
+		if(! canHaveAsUnit(unit)|| !(getNumberUnits() <100))
 			throw new IllegalArgumentException();
 		if( !(this.isCubeInWorld(unit.getCubeCoordinate())) || !(this.getPassable(unit.getCubeCoordinate())))
 			throw new IllegalArgumentException();
-		if (getNumberUnits() <100 && !hasAsUnit(unit)){
-			this.units.add(unit);
-			this.addUnitToUnitsAtCubeMap(unit);
-			unit.setWorld(this);
-			
-			if (getNbActiveFactions()<5){
-				Faction faction = new Faction();
-				faction.addAsUnit(unit);
-			}
-			else{
-				int minNbUnits = 50;
-				Faction minNbUnitsFaction = null;
-				for (Faction faction: factions){
-					if (faction.isActive() && faction.getNbUnits()< minNbUnits){
-						minNbUnits = faction.getNbUnits();
-						minNbUnitsFaction = faction;
-					}
-					
-				}
-				if (minNbUnitsFaction != null){
-					minNbUnitsFaction.addAsUnit(unit);
-				}
-			}
-		}
+		if( unit.getWorld()!=null)
+			throw new IllegalArgumentException();
+		this.units.add(unit);
+		this.addUnitToUnitsAtCubeMap(unit);
+		unit.setWorld(this);
+//		if (getNbActiveFactions()<5){
+//			Faction faction = new Faction();
+//			faction.addAsUnit(unit);
+//		}
+//		else{
+//			int minNbUnits = 50;
+//			Faction minNbUnitsFaction = null;
+//			for (Faction faction: factions){
+//				if (faction.isActive() && faction.getNbUnits()< minNbUnits){
+//					minNbUnits = faction.getNbUnits();
+//					minNbUnitsFaction = faction;
+//				}
+//				
+//			}
+//			if (minNbUnitsFaction != null){
+//				minNbUnitsFaction.addAsUnit(unit);
+//			}
+//		}
+		addToFaction(unit);
 	}
+	/**
+	 * Remove the given unit from the set of units attached to this world.
+	 * @param unit
+	 * 		The unit to be removed.
+	 * @post This world does not have the given unit as one of its units.
+	 * @post If this world has the given unit as one of its units,
+	 * 		the given unit is no longer attached to any world.
+	 * @effect If this world has the given unit as one of its units,
+	 * 		the given unit is removed from the set of units attached to its faction.
+	 * @throws IllegalArgumentException
+	 */
 	void removeAsUnit(Unit unit) throws IllegalArgumentException{
 		if( unit == null)
 			throw new IllegalArgumentException();
@@ -676,22 +720,44 @@ public class World {
 			this.removeUnitFromUnitsAtCubeMap(unit);
 			unit.setWorld(null);
 			unit.getFaction().removeAsUnit(unit);
-			unit.setFaction(null);
+			// overbodig, gebeurd al in removeAsUnit
+			//unit.setFaction(null);
 		}
 	}
-	
+	/**
+	 * Return the set collecting references to units attached to this world.
+	 * 	@return
+	 */
 	public Set<Unit> listAllUnits(){
 		return units;
 	}
+	/**
+	 * Return the set collecting references to units attached 
+	 * to this world and the given faction.
+	 * @param faction
+	 * 		The faction units need to belong to.
+	 * @throws IllegalArgumentException
+	 * 		The given faction is not attached to this world.
+	 * @return
+	 */
+	// Wat als de gegeven faction niet bestaat of zich niet in de gameworld bevindt? 
 	
-	public Set<Unit> listAllUnitsOfFaction(Faction faction){
+	public Set<Unit> listAllUnitsOfFaction(Faction faction) throws IllegalArgumentException{
+		if( !hasAsFaction(faction))
+			throw new IllegalArgumentException();
 		return faction.getUnits();
 	}
-	
+	/**
+	 * Return the set collecting references to boulders attached to this world.
+	 * 	@return
+	 */
 	public Set<Boulder> listAllBoulders(){
 		return boulders;
 	}
-	
+	/**
+	 * Return the set collecting references to logs attached to this world.
+	 * 	@return
+	 */
 	public Set<Log> listAllLogs(){
 		return logs;
 	}
@@ -735,7 +801,14 @@ public class World {
 	
 		return list;
 	}
-	
+	/**
+	 * Return a set of units in this world that are located at the given position in this world.
+	 * @param position
+	 * 		The position of the units.
+	 * @return
+	 * @throws IllegalArgumentException
+	 * 	The given position is not located inside this world.
+	 */
 	public Set<Unit> getUnits(int[] position)throws IllegalArgumentException{
 		if (!this.isCubeInWorld(position))
 			throw new IllegalArgumentException();
@@ -745,7 +818,14 @@ public class World {
 			return unitsAtCubeMap.get(position);
 		}
 	}
-	
+	/**
+	 * Return a set of logs in this world that are located at the given position in this world.
+	 * @param position
+	 * 		The position of the logs.
+	 * @return
+	 * @throws IllegalArgumentException
+	 * 	The given position is not located inside this world.
+	 */
 	public Set<Log> getLogs(int[] position)throws IllegalArgumentException{
 		if (!this.isCubeInWorld(position))
 			throw new IllegalArgumentException();
@@ -755,7 +835,14 @@ public class World {
 			return logsAtCubeMap.get(position);
 		}
 	}
-	
+	/**
+	 * Return a set of boulders in this world that are located at the given position in this world.
+	 * @param position
+	 * 		The position of the boulders.
+	 * @return
+	 * @throws IllegalArgumentException
+	 * 	The given position is not located inside this world.
+	 */
 	public Set<Boulder> getBoulders(int[] position)throws IllegalArgumentException{
 		if (!this.isCubeInWorld(position))
 			throw new IllegalArgumentException();
