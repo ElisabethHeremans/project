@@ -43,14 +43,11 @@ public class World {
 	public World(int[][][] terrainTypes, TerrainChangeListener listener) {
 		this.setTerrainTypes(terrainTypes);
 		this.xDimension = terrainTypes.length;
-		System.out.println(xDimension);
 		this.yDimension = terrainTypes[0].length;
-		System.out.println(xDimension);
-
 		this.zDimension = terrainTypes[0][0].length;
-		System.out.println(xDimension);
-
 		this.listener = listener;
+		this.connectedToBorder = new ConnectedToBorder(this.getxDimension(),this.getyDimension(),this.getzDimension());
+		initializeCubeTerrains();
 	}
 	
 	
@@ -290,8 +287,8 @@ public class World {
 	List<int[]> getNeighboringCubes( int[] position){
 		List<int[]> neighboringCubes = new ArrayList<int[]>();
 		for(int i =-1; i < 2; i++){
-			for (int j =-1; i<2; i++){
-				for (int k =-1; i<2; i++){
+			for (int j =-1; j<2; j++){
+				for (int k =-1; k<2; k++){
 					int[] newPosition = {position[0]+i, position[1]+j, position[2]+k};
 					if(( i!= 0 || j!=0 || k!=0)){
 						if (isCubeInWorld(newPosition))
@@ -888,7 +885,7 @@ public class World {
 
 	private final int zDimension;
 	
-	private ConnectedToBorder connectedToBorder = new ConnectedToBorder(this.getxDimension(),this.getyDimension(),this.getzDimension());
+	protected ConnectedToBorder connectedToBorder;
 
 	
 	/**
@@ -897,13 +894,26 @@ public class World {
 	public ConnectedToBorder getConnectedToBorder() {
 		return connectedToBorder;
 	}
-
-	public void advanceTime(double duration){
+	
+	private void initializeCubeTerrains(){
+		for (int x=0; x < getxDimension(); x ++){
+			for (int y=0; y< getyDimension(); y++){
+				for (int z=0; z < getzDimension() ; z ++){
+					if (this.getPassable(new int[] {x,y,z}))
+						connectedToBorder.changeSolidToPassable(x, y, z);
+					
+					
+					}
+				}
+			}
+	}
+	
+	void updateCubeTerrains(){
 		for (int x=0; x < getxDimension(); x ++){
 			for (int y=0; y< getyDimension(); y++){
 				for (int z=0; z < getzDimension() ; z ++){
 					if (! connectedToBorder.isSolidConnectedToBorder(x, y, z)){
-						List<int[]> positionsToChange = new ArrayList<int[]>(); connectedToBorder.changeSolidToPassable(x,y,z);
+						List<int[]> positionsToChange = connectedToBorder.changeSolidToPassable(x,y,z);
 						for (int[] position: positionsToChange){
 							if (new Random().nextDouble() <= 0.25){
 								if (getTerrain(position) == TerrainType.ROCK){
@@ -916,12 +926,17 @@ public class World {
 								}
 							}
 							setTerrain(position,TerrainType.AIR);
-
+							connectedToBorder.changeSolidToPassable(position[0],position[1],position[2]);
+							updateCubeTerrains();
 							}
 						}
 					}
 				}
 			}
+	}
+
+	public void advanceTime(double duration){
+		updateCubeTerrains();
 		for (Unit unit : this.listAllUnits()){
 			unit.advanceTime((float)duration);
 			if (unit.getLog() != null)
@@ -936,6 +951,7 @@ public class World {
 		for (Log log: logs){
 			log.advanceTime((float) duration);
 		}
+		updateCubeTerrains();
 	}
 
 	

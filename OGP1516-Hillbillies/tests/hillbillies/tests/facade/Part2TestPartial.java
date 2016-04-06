@@ -46,6 +46,7 @@ public class Part2TestPartial {
 		types[1][1][2] = TYPE_WORKSHOP;
 
 		World world = facade.createWorld(types, new DefaultTerrainChangeListener());
+		//System.out.println();
 		Unit unit = facade.createUnit("Test", new int[] { 0, 0, 0 }, 50, 50, 50, 50, false);
 		facade.addUnit(unit, world);
 		assertTrue(facade.isSolidConnectedToBorder(world, 1, 1, 0));

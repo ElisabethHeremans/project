@@ -11,6 +11,7 @@ import java.util.Random;
 import java.util.Set;
 
 import be.kuleuven.cs.som.annotate.*;
+import hillbillies.util.ConnectedToBorder;
 import ogp.framework.util.Util;
 
 /**
@@ -164,7 +165,8 @@ public class Unit {
 	@Raw
 	public Unit(String name, double[] position, int weight, int strength, int agility, int toughness,
 			boolean enableDefaultBehavior) throws IllegalArgumentException{
-		this(name, position, weight, strength, agility, toughness, enableDefaultBehavior, 0.0, 0.0,
+		this(name, position, weight, strength, agility, toughness, enableDefaultBehavior, 
+				Math.ceil(200.0 * (weight / 100.0) * (toughness / 100.0)),Math.ceil(200.0 * (weight / 100.0) * (toughness / 100.0)),
 				(float) Math.PI / 2.0);
 	}
 	
@@ -664,6 +666,10 @@ public class Unit {
 						&& (Util.fuzzyEquals(Math.abs((cubePosition)[1] - this.getCubePosition()[1]),0.0))));
 	}
 	
+	private boolean isNeighbouringCube(int[] cubePosition){
+		return isNeighbouringCube(new double[] {(double)cubePosition[0],(double)cubePosition[1],(double)cubePosition[2]}); 
+	}
+	
 	/**
 	 * A variable registering the position of this unit.
 	 */
@@ -756,6 +762,7 @@ public class Unit {
 	 *             If the duration is less than zero or exceeds or equals 0.2 s.
 	 */
 	public void advanceTime(float duration) throws IllegalArgumentException {
+		//System.out.println(this.getStatus());
 		if (duration < 0 || duration >= 0.2)
 			throw new IllegalArgumentException();
 		restTimer += duration;
@@ -808,17 +815,19 @@ public class Unit {
 	}
 
 	private boolean mustFall() {
-		for (int i = -1; i <2 ; i ++){
-			for (int j = -1; j<2 ; j++){
-				for (int k = -1; k <2; k++){
-					double[] ijk = new double[] {(double) i, (double) j, (double) k};
-					double[] neighbouring = Vector.vectorAdd(this.getPosition(),ijk);
-					if (!this.getWorld().getTerrain(neighbouring).isPassable()){
-						return false;
-					}
-				}
-			}
+		//System.out.println(this.getCubeCoordinate()[2]);
+		if ( (this.getCubeCoordinate()[2]==0)){
+			return false;
 		}
+		
+		for (int[] cube: this.getWorld().getNeighboringCubes(this.getCubeCoordinate())){
+			//System.out.println(cube[0]+" "+ cube[1]+" "+ cube[2]);
+			//System.out.println(this.getWorld().getTerrain(cube).isPassable());
+			if (!this.getWorld().getTerrain(cube).isPassable())
+				return false;
+					
+		}
+		
 		return true;
 	}
 	
@@ -837,14 +846,7 @@ public class Unit {
 		}
 	}
 	
-//	private boolean isFalling(){
-//		return this.isFalling;
-//	}
-	
-//	private void setFalling(boolean falling){
-//		this.isFalling = falling;
-//	}
-	
+
 
 	/**
 	 * Return the base speed of the unit.
@@ -1070,7 +1072,7 @@ public class Unit {
 				boolean toAdd = true;
 				for (int[] queueArray: queue){
 					if (queueArray[0]==currentNeighbour[0]&& queueArray[1] == currentNeighbour[1] 
-							&& queueArray[2] == currentNeighbour[2] && queueArray[3]<n)
+							&& queueArray[2] == currentNeighbour[2] && queueArray[3]>=n)
 						toAdd = false;
 				}
 				if (toAdd){
@@ -1299,7 +1301,8 @@ public class Unit {
 	 *	 	 | new.progressWork == (float) 0.0
 	 */
 	public void work(int[] position) throws IllegalArgumentException{
-		if(!(this.isNeighbouringCube(this.getWorld().getCubeCenter(position))||this.getCubeCoordinate()==position))
+
+		if(!(this.isNeighbouringCube(position)||this.getCubeCoordinate()==position))
 			throw new IllegalArgumentException();
 		else if (canWork()){
 			setStatus(Status.WORKING);
@@ -1322,7 +1325,10 @@ public class Unit {
 	}
 	
 	public void endWork(int[] targetPosition) {
-		
+		System.out.println(targetPosition[0]);
+		System.out.println(targetPosition[1]);
+		System.out.println(targetPosition[2]);
+
 		if (this.getBoulder() !=null) {
 			this.getWorld().addAsBoulder(this.getBoulder());
 			this.getBoulder().setPosition(this.getWorld().getCubeCenter(targetPosition));
@@ -1345,9 +1351,7 @@ public class Unit {
 			Log log = (Log) this.getWorld().inspectCube(targetPosition).get(2).get(0);
 			Boulder boulder = (Boulder) this.getWorld().inspectCube(targetPosition).get(3).get(0);
 			this.getWorld().removeAsBoulder(boulder);
-			boulder.terminate();
 			this.getWorld().removeAsLog(log);
-			log.terminate();
 			this.setWeight(this.getWeight()+1);
 			this.setToughness(this.getToughness()+1);
 			setExperiencePoints(this.getExperiencePoints()+10);
@@ -1377,6 +1381,8 @@ public class Unit {
 		}
 		else if (this.getWorld().getTerrain(targetPosition)== TerrainType.TREE){
 			this.getWorld().setTerrain(targetPosition, TerrainType.AIR);
+			this.getWorld().connectedToBorder.changeSolidToPassable(targetPosition[0],targetPosition[1],targetPosition[2]);
+			this.getWorld().updateCubeTerrains();
 			if( new Random().nextDouble()<=0.25){
 				// nieuwe log creeeren en verbinden met de wereld. Weet niet of dit helemaal correct is.
 				// targetPosition in het centrum van een cube? 
@@ -1388,6 +1394,8 @@ public class Unit {
 		}
 		else if (this.getWorld().getTerrain(targetPosition)== TerrainType.ROCK){
 			this.getWorld().setTerrain(targetPosition, TerrainType.AIR);
+			this.getWorld().connectedToBorder.changeSolidToPassable(targetPosition[0],targetPosition[1],targetPosition[2]);
+			this.getWorld().updateCubeTerrains();
 			if( new Random().nextDouble()<=0.25){
 				// nieuwe boulder creeeren en verbinden met de wereld. Weet niet of dit helemaal correct is.
 				// targetPosition in het centrum van een cube? 
