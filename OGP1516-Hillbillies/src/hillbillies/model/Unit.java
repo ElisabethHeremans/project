@@ -729,8 +729,9 @@ public class Unit {
 	 * @post This unit references the given world as the world attached to it.
 	 */
 	public void setWorld(@Raw World world){
-		if (world != null)
+		if (world != null){
 			assert (world.hasAsUnit(this));
+		}
 		// nog condities?
 		this.world = world;
 	}
@@ -856,7 +857,7 @@ public class Unit {
 	}
 	/**
 	 * Check whether this unit needs to fall.
-	 * @return False if the z-coördinate of this unit is equal to zero or 
+	 * @return False if the z-coï¿½rdinate of this unit is equal to zero or 
 	 * 		there is a neighboring cube that is not passable. Otherwise, return true.
 	 */
 	private boolean mustFall() {
@@ -1370,10 +1371,6 @@ public class Unit {
 	}
 	
 	public void endWork(int[] targetPosition) {
-		System.out.println(targetPosition[0]);
-		System.out.println(targetPosition[1]);
-		System.out.println(targetPosition[2]);
-
 		if (this.getBoulder() !=null) {
 			this.getWorld().addAsBoulder(this.getBoulder());
 			this.getBoulder().setPosition(this.getWorld().getCubeCenter(targetPosition));
@@ -1425,30 +1422,35 @@ public class Unit {
 			
 		}
 		else if (this.getWorld().getTerrain(targetPosition)== TerrainType.TREE){
-			this.getWorld().setTerrain(targetPosition, TerrainType.AIR);
-			this.getWorld().connectedToBorder.changeSolidToPassable(targetPosition[0],targetPosition[1],targetPosition[2]);
-			this.getWorld().updateCubeTerrains();
-			if( new Random().nextDouble()<=0.25){
-				// nieuwe log creeeren en verbinden met de wereld. Weet niet of dit helemaal correct is.
-				// targetPosition in het centrum van een cube? 
-				Log log = new Log(targetPosition);
-				this.getWorld().addAsLog(log);
-				setExperiencePoints(this.getExperiencePoints()+10);
+			//this.getWorld().setTerrain(targetPosition, TerrainType.AIR);
+			this.getWorld().solidToPassableUpdate(targetPosition);
+			//this.getWorld().connectedToBorder.changeSolidToPassable(targetPosition[0],targetPosition[1],targetPosition[2]);
+			//this.getWorld().updateCubeTerrains();
+//			if( new Random().nextDouble()<=0.25){
+//				// nieuwe log creeeren en verbinden met de wereld. Weet niet of dit helemaal correct is.
+//				// targetPosition in het centrum van een cube? ->nee dat is een int[] als cubepositie
+//				Log log = new Log(targetPosition);
+//				this.getWorld().addAsLog(log);
+//
+//			}
+			setExperiencePoints(this.getExperiencePoints()+10);
 
-			}
 		}
 		else if (this.getWorld().getTerrain(targetPosition)== TerrainType.ROCK){
-			this.getWorld().setTerrain(targetPosition, TerrainType.AIR);
-			this.getWorld().connectedToBorder.changeSolidToPassable(targetPosition[0],targetPosition[1],targetPosition[2]);
-			this.getWorld().updateCubeTerrains();
-			if( new Random().nextDouble()<=0.25){
-				// nieuwe boulder creeeren en verbinden met de wereld. Weet niet of dit helemaal correct is.
-				// targetPosition in het centrum van een cube? 
-				Boulder boulder = new Boulder(targetPosition);
-				this.getWorld().addAsBoulder(boulder);
-				setExperiencePoints(this.getExperiencePoints()+10);
+			this.getWorld().solidToPassableUpdate(targetPosition);
 
-			}
+//			this.getWorld().setTerrain(targetPosition, TerrainType.AIR);
+//			this.getWorld().connectedToBorder.changeSolidToPassable(targetPosition[0],targetPosition[1],targetPosition[2]);
+//			this.getWorld().updateCubeTerrains();
+//			if( new Random().nextDouble()<=0.25){
+//				// nieuwe boulder creeeren en verbinden met de wereld. Weet niet of dit helemaal correct is.
+//				// targetPosition in het centrum van een cube? 
+//				Boulder boulder = new Boulder(targetPosition);
+//				this.getWorld().addAsBoulder(boulder);
+//				setExperiencePoints(this.getExperiencePoints()+10);
+
+			setExperiencePoints(this.getExperiencePoints()+10);
+
 		}
 		setStatus(Status.DONE);
 	}

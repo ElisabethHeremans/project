@@ -11,7 +11,7 @@ import hillbillies.model.Status;
 import hillbillies.model.Unit;
 
 
-public class TestSuite {
+public class TestSuitePart1 {
 	
 	
 	private static Unit Aunit;

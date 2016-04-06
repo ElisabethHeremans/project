@@ -184,8 +184,6 @@ public class World {
 				randomHitpoints,randomStaminaPoints,new Random().nextDouble()*360);
 		if (this.listAllUnits().size()<100)
 			addAsUnit(spawnUnit);
-			spawnUnit.setWorld(this);
-			addToFaction(spawnUnit);
 		return spawnUnit;
 	}
 	// ik denk foutje : 201-> 200 & nieuwe faction starten en zo: hoe?
@@ -210,7 +208,6 @@ public class World {
 	 * 		The given unit.
 	 */
 	public void addToFaction(Unit unit){
-		
 		if(getNbActiveFactions()<5){
 			 Faction newFaction = new Faction();
 			 this.addAsFaction(newFaction);
@@ -383,7 +380,7 @@ public class World {
 	 */
 	@Raw
 	public boolean canHaveAsFaction(Faction faction){
-		return (faction != null && (!this.isTerminated() || faction.isTerminated()) &&faction.getNbUnits() <=50 && faction.getNbUnits() > 0);
+		return (faction != null && (!this.isTerminated() || faction.isTerminated()) &&faction.getNbUnits() <=50);
 	}
 	
 	/**
@@ -672,34 +669,21 @@ public class World {
 	 * 		The given unit is already attached to some world.
 	 */
 	public void addAsUnit(Unit unit) throws IllegalArgumentException{
-		if(! canHaveAsUnit(unit)|| !(getNumberUnits() <100))
+
+		if(! canHaveAsUnit(unit)|| !(getNumberUnits() <100)){
 			throw new IllegalArgumentException();
-		if( !(this.isCubeInWorld(unit.getCubeCoordinate())) || !(this.getPassable(unit.getCubeCoordinate())))
+		}
+		if( !(this.isCubeInWorld(unit.getCubeCoordinate())) || !(this.getPassable(unit.getCubeCoordinate()))){
 			throw new IllegalArgumentException();
-		if( unit.getWorld()!=null)
+		}
+		if( unit.getWorld()!=null){
 			throw new IllegalArgumentException();
+		}
 		this.units.add(unit);
 		this.addUnitToUnitsAtCubeMap(unit);
 		unit.setWorld(this);
-//		if (getNbActiveFactions()<5){
-//			Faction faction = new Faction();
-//			faction.addAsUnit(unit);
-//		}
-//		else{
-//			int minNbUnits = 50;
-//			Faction minNbUnitsFaction = null;
-//			for (Faction faction: factions){
-//				if (faction.isActive() && faction.getNbUnits()< minNbUnits){
-//					minNbUnits = faction.getNbUnits();
-//					minNbUnitsFaction = faction;
-//				}
-//				
-//			}
-//			if (minNbUnitsFaction != null){
-//				minNbUnitsFaction.addAsUnit(unit);
-//			}
-//		}
 		addToFaction(unit);
+
 	}
 	/**
 	 * Remove the given unit from the set of units attached to this world.
@@ -1000,26 +984,30 @@ public class World {
 			for (int y=0; y< getyDimension(); y++){
 				for (int z=0; z < getzDimension() ; z ++){
 					if (! connectedToBorder.isSolidConnectedToBorder(x, y, z)){
-						List<int[]> positionsToChange = connectedToBorder.changeSolidToPassable(x,y,z);
-						for (int[] position: positionsToChange){
-							if (new Random().nextDouble() <= 0.25){
-								if (getTerrain(position) == TerrainType.ROCK){
-									Boulder boulder = new Boulder(position);
-									addAsBoulder(boulder);
-								}
-								if (getTerrain(position) == TerrainType.TREE){
-									Log log = new Log(position);
-									addAsLog(log);
-								}
-							}
-							setTerrain(position,TerrainType.AIR);
-							connectedToBorder.changeSolidToPassable(position[0],position[1],position[2]);
-							updateCubeTerrains();
-							}
+						solidToPassableUpdate(new int[] {x,y,z});
 						}
 					}
 				}
 			}
+	}
+	void solidToPassableUpdate(int[] position){
+		List<int[]> toChange = connectedToBorder.changeSolidToPassable(position[0],position[1],position[2]);
+		setTerrain(position,TerrainType.AIR);
+		if (new Random().nextDouble() <= 0.25){
+			if (getTerrain(position) == TerrainType.ROCK){
+				Boulder boulder = new Boulder(position);
+				addAsBoulder(boulder);
+			}
+			if (getTerrain(position) == TerrainType.TREE){
+				Log log = new Log(position);
+				addAsLog(log);
+			}
+		}
+		for (int[] positionToChange: toChange){
+			solidToPassableUpdate(positionToChange);
+			
+		}
+		
 	}
 
 	public void advanceTime(double duration){
