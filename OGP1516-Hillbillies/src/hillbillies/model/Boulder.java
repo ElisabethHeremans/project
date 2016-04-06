@@ -82,9 +82,13 @@ public class Boulder extends RawMaterial {
 	 * Variable registering the weight of this boulder.
 	 */
 	private final int weight;
-	
+	/**
+	 * Variable registering the next target position of a falling boulder.
+	 */
 	private double[] nextTargetPosition;
-
+	/**
+	 * Variable registering the start position of a falling boulder.
+	 */
 	private double[] startPosition;
 
 
@@ -95,7 +99,18 @@ public class Boulder extends RawMaterial {
 	public final int getWeight() {
 		return this.weight;
 	}
-		
+	/**
+	 * Update the position and activity status of this boulder.
+	 * @param duration
+	 *        The game time after which advanceTime is called.
+	 * @effect If this boulder needs to fall and his status isn't already falling, 
+	 * 		this boulder will fall. 
+	 * @post if this boulder is falling, his position will be updated. When this boulder 
+	 * 		arrived at his target position. His next position will be updated one z-level
+	 * 		lower.
+	 * @effect If this boulder next position is not passable, his status is set to done.
+	 * @effect Otherwise, this boulder will keep falling.
+	 */	
 	@Override
 	public void advanceTime(float duration) {
 		 if (mustFall() && this.getStatus()!= Status.FALLING)
@@ -115,7 +130,11 @@ public class Boulder extends RawMaterial {
 			}	
 
 	}
-
+	/**
+	 * Check whether this boulder needs to fall.
+	 * @return False if the cube one z-level lower than the position of this boulder
+	 * 		is not passable terrain.
+	 */
 	public boolean mustFall() {
 
 		double[] ijk = new double[] { 0.0, 0.0, -1.0 };
@@ -126,7 +145,12 @@ public class Boulder extends RawMaterial {
 
 		return true;
 	}
-	
+	/**
+	 * Makes the boulder fall.
+	 * @post This boulders new status will be equal to falling.
+	 * @post The startposition of this boulder is the position of this boulder and 
+	 * 		the next target position is one z-level lower than the position of this boulder.
+	 */
 	public void fall() {
 		setStatus(Status.FALLING);
 		this.nextTargetPosition = Vector.vectorAdd(this.getPosition(), new double[] {0.0,0.0,-1.0});
@@ -142,7 +166,7 @@ public class Boulder extends RawMaterial {
 	 * Set the status of this boulder to the given status.
 	 * @param status
 	 * 		The new status for this boulder.
-	 * @post The status of this boulder is equal to the given status.
+	 * @post The new status of this boulder is equal to the given status.
 	 */
 	public void setStatus(Status status) {
 		this.status = status;

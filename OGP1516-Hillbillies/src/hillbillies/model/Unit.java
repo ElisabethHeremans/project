@@ -574,11 +574,6 @@ public class Unit {
 		return this.position;
 	}
 	
-	
-
-	
-	
-	
 	/**
 	 * Check whether the given position is a position inside the game world, a
 	 * valid position.
@@ -847,13 +842,23 @@ public class Unit {
 				setStatus(Status.DONE);
 		}
 	}
-	
+	/**
+	 * Make the unit fall.
+	 * 
+	 * @post This units new status will be equal to falling.
+	 * @post The startposition of this unit is the position of this unit and 
+	 * 		the next target position is one z-level lower than the position of this unit.
+	 */ 
 	private void fall() {
 		setStatus(Status.FALLING);
 		this.nextTargetPosition = Vector.vectorAdd(this.getPosition(), new double[] {0.0,0.0,-1.0});
 		this.startPosition = this.getPosition();
 	}
-
+	/**
+	 * Check whether this unit needs to fall.
+	 * @return False if the z-coördinate of this unit is equal to zero or 
+	 * 		there is a neighboring cube that is not passable. Otherwise, return true.
+	 */
 	private boolean mustFall() {
 		//System.out.println(this.getCubeCoordinate()[2]);
 		if ( (this.getCubeCoordinate()[2]==0)){
@@ -1461,7 +1466,9 @@ public class Unit {
 	 * A variable registering the duration that the unit must work to complete a task.
 	 */
 	private float totalWorkingTime;
-	
+	/**
+	 * A variable registering the position of the place to work.
+	 */
 	private int[] workTargetPosition;
 
 	/**
@@ -1579,7 +1586,10 @@ public class Unit {
 			}
 		}
 	}
-	
+	/**
+	 * Check whether it's possible for a unit to defend.
+	 * @return True if and only if the unit is not currently falling and the unit is not terminated.
+	 */		
 	public boolean canDefend(){
 		return (this.getStatus() != Status.FALLING && !this.isTerminated());
 	}
@@ -1791,8 +1801,11 @@ public class Unit {
  	 *
  	 * @post   This unit  is terminated.
  	 *       | new.isTerminated()
- 	 * @post   ...
- 	 *       | ...
+ 	 * @post   No boulder is attached any longer to this unit.
+ 	 * @post   No log is attached any longer to this unit.
+ 	 * @effect This unit is removed from the world to which it is attached.
+ 	 * @effect This unit is removed from the faction to which it is attached.
+ 	 * @effect The status of this unit is set to done.
  	 */
  	 public void terminate() {
  		 
@@ -1805,9 +1818,9 @@ public class Unit {
  			 getWorld().addAsLog(this.getLog());
  		 this.setLog(null);
  		 this.getWorld().removeAsUnit(this);
-		 this.setWorld(null);
+		 //this.setWorld(null);
  		 this.getFaction().removeAsUnit(this);
- 		 this.setFaction(null);
+ 		 //this.setFaction(null);
  		 this.setStatus(Status.DONE);
  		 this.isTerminated = true;
  	 }
@@ -1825,49 +1838,92 @@ public class Unit {
  	  * Variable registering whether this unit is terminated.
  	  */
  	 private boolean isTerminated = false;
-  	
+  	/**
+  	 * Return the boulder attached to this unit.
+  	 */
  	@Basic @Raw
  	public Boulder getBoulder() {
  		return this.boulder;
  	}
+ 	/**
+ 	 * Check whether the given boulder is a valid boulder for any unit.
+ 	 * @param boulder
+ 	 * 		The boulder to check.
+ 	 * @return True if and only if the given boulder is not effective
+ 	 * 		or the position of the given boulder equals the position of this unit.
+ 	 */
  	// Hier de voorwaarde dat de boulder in dezelfde cube als de unit moet zijn. Maakt de methode wel niet 
  	// meer static. 
  	public boolean isValidBoulder(Boulder boulder){
  		return (boulder == null) || (boulder.getPosition() == this.getPosition());
  	}
- 	
+ 	/**
+	 * Set the boulder for this unit to the given boulder.
+	 * @param boulder
+	 * 		The new boulder for this unit.
+	 * @post The new boulder for this unit is the same as the given boulder.
+	 * @throws IllegalArgumentException()
+	 * 		The given boulder is not a valid boulder for any unit.
+	 */
  	@Raw
  	public void setBoulder(Boulder boulder) throws IllegalArgumentException{
  		if(! isValidBoulder(boulder))
  			throw new IllegalArgumentException();
  		this.boulder = boulder;
  	}
- 	
+ 	/**
+ 	 * Variable referencing the boulder of this unit.
+ 	 */
  	private Boulder boulder;
- 	
+ 	/**
+  	 * Return the log attached to this unit.
+  	 */
  	@Basic @Raw
  	public Log getLog() {
  		return this.log;
  	}
+ 	/**
+ 	 * Check whether the given log is a valid log for any unit.
+ 	 * @param log
+ 	 * 		The log to check.
+ 	 * @return True if and only if the given log is not effective
+ 	 * 		or the position of the given log equals the position of this unit.
+ 	 */
  	// Hier de voorwaarde dat de log in dezelfde cube als de unit moet zijn. Maakt de methode wel niet 
  	// meer static. 
  	public boolean isValidLog(Log log){
  		return (log == null) || (log.getPosition() == this.getPosition());
  	}
- 
+ 	/**
+	 * Set the log for this unit to the given log.
+	 * @param log
+	 * 		The new log for this unit.
+	 * @post The new log for this unit is the same as the given log.
+	 * @throws IllegalArgumentException()
+	 * 		The given log is not a valid log for any unit.
+	 */
 	@Raw
 	public void setLog(Log log) throws IllegalArgumentException{
  		if(! isValidLog(log))
  			throw new IllegalArgumentException();
  		this.log = log;
  	}
- 	
+	/**
+ 	 * Variable referencing the log of this unit.
+ 	 */
  	private Log log;
-	
+	/**
+	 * Return the experience points of this unit. 
+	 */
 	public int getExperiencePoints(){
 		return this.experiencePoints;
 	}
-	
+	/**
+	 * Set the experience points of this unit to the given experience points.
+	 * @param points
+	 * 		The new experience points for this unit.
+	 * @post The new experience points for this unit are equal to the given experience points.
+	 */
 	private void setExperiencePoints(int points){
 		experiencePoints = points;
 	}

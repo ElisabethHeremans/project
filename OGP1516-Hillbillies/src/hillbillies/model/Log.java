@@ -81,9 +81,13 @@ public class Log extends RawMaterial {
 	 * Variable registering the weight of this log.
 	 */
 	private final int weight;
-
+	/**
+	 * Variable registering the next target position of a falling log.
+	 */
 	private double[] nextTargetPosition;
-
+	/**
+	 * Variable registering the start position of a falling log.
+	 */
 	private double[] startPosition;
 
 	/**
@@ -93,7 +97,18 @@ public class Log extends RawMaterial {
 	public final int getWeight() {
 		return this.weight;
 	}
-
+	/**
+	 * Update the position and activity status of a log.
+	 * @param duration
+	 *        The game time after which advanceTime is called.
+	 * @effect If this log needs to fall and his status isn't already falling, 
+	 * 		this log will fall. 
+	 * @post if this log is falling, his position will be updated. When this log 
+	 * 		arrived at his target position. His next position will be updated one z-level
+	 * 		lower.
+	 * @effect If this logs next position is not passable, his status is set to done.
+	 * @effect Otherwise, this log will keep falling.
+	 */
 	@Override
 	public void advanceTime(float duration) {
 		 if (mustFall() && this.getStatus()!= Status.FALLING)
@@ -113,7 +128,11 @@ public class Log extends RawMaterial {
 			}	
 
 	}
-
+	/**
+	 * Check whether this log needs to fall.
+	 * @return False if the cube one z-level lower than the position of this log
+	 * 		is not passable terrain.
+	 */
 	public boolean mustFall() {
 
 		double[] ijk = new double[] { 0.0, 0.0, -1.0 };
@@ -124,7 +143,12 @@ public class Log extends RawMaterial {
 
 		return true;
 	}
-	
+	/**
+	 * Makes the log fall.
+	 * @post This logs new status will be equal to falling.
+	 * @post The startposition of this log is the position of this log and 
+	 * 		the next target position is one z-level lower than the position of this log.
+	 */
 	public void fall() {
 		setStatus(Status.FALLING);
 		this.nextTargetPosition = Vector.vectorAdd(this.getPosition(), new double[] {0.0,0.0,-1.0});
