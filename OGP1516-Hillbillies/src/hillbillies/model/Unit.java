@@ -803,8 +803,8 @@ public class Unit {
 	 */
 	public void advanceTime(float duration) throws IllegalArgumentException {
 		//System.out.println(this.getStatus());
-		if (duration < 0 || duration >= 0.2)
-			throw new IllegalArgumentException();
+//		if (duration < 0 || duration > 0.2)
+//			throw new IllegalArgumentException();
 		restTimer += duration;
 		if (experiencePoints >=10){
 			if (isValidStrength(this.getStrength()+1))
@@ -1794,18 +1794,21 @@ public class Unit {
  	 */
  	 public void terminate() {
  		 
- 		 if (this.getBoulder() != null)
+ 		 if (this.getBoulder() != null){
  			 this.getBoulder().setPosition(this.getPosition());
  			 getWorld().addAsBoulder(this.getBoulder());
+ 		 }
  		 this.setBoulder(null);
- 		 if (this.getLog()!= null)
+ 		 if (this.getLog()!= null){
  			 this.getLog().setPosition(this.getPosition());
  			 getWorld().addAsLog(this.getLog());
+ 		 }
  		 this.setLog(null);
- 		 this.getWorld().removeAsUnit(this);
-		 //this.setWorld(null);
- 		 this.getFaction().removeAsUnit(this);
- 		 //this.setFaction(null);
+ 		 if (this.getWorld()!=null){
+ 			 this.getWorld().removeAsUnit(this);
+ 		 }
+ 		 if (this.getFaction()!= null)
+ 			 this.getFaction().removeAsUnit(this);
  		 this.setStatus(Status.DONE);
  		 this.isTerminated = true;
  	 }

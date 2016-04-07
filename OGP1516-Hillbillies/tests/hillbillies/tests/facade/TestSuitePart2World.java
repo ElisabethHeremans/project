@@ -27,6 +27,8 @@ public class TestSuitePart2World {
 	private static final int[][][] types = new int[10][20][30];
 	
 	private static World world1;
+	private Unit StandardUnit;
+
 	
 	private World world2;
 	
@@ -48,6 +50,7 @@ public class TestSuitePart2World {
 		types[1][1][0] = TYPE_ROCK;
 		types[1][1][1] = TYPE_TREE;
 		types[1][1][2] = TYPE_WORKSHOP;
+		StandardUnit = new Unit("Bunit",new double[] {3.5,1.5,4.5},75,25,25,75,false,25.0,25.0,Math.PI/2);
 		world2 = new World(types, new DefaultTerrainChangeListener());
 		
 	}
@@ -96,7 +99,7 @@ public class TestSuitePart2World {
 	
 	@Test
 	public final void getTerrainTypes(){
-		Assert.assertEquals(types,world1.getTerrainTypes());
+		Assert.assertTrue(types==world1.getTerrainTypes());
 	}
 	
 	@Test
@@ -136,66 +139,59 @@ public class TestSuitePart2World {
 		Assert.assertFalse(unit.mustFall());
 		Assert.assertTrue(unit.getWorld()==world2);
 		Assert.assertTrue(world2.hasAsUnit(unit));
-		//Assert.assertTrue(world2.getUnits(unit.getCubeCoordinate()).contains(unit));
-
+		Assert.assertTrue(world2.getUnits(unit.getCubeCoordinate()).contains(unit));
+		Assert.assertFalse(unit.isEnableDefaultBehaviour());
 		
 	}
-	
-	public class Position {
-		private int[] coords;
-		
-		public Position(int[] coords){
-			this.coords = coords;
-		}
-
-		/* (non-Javadoc)
-		 * @see java.lang.Object#hashCode()
-		 */
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + getOuterType().hashCode();
-			result = prime * result + Arrays.hashCode(coords);
-			return result;
-		}
-
-		/* (non-Javadoc)
-		 * @see java.lang.Object#equals(java.lang.Object)
-		 */
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			Position other = (Position) obj;
-			if (!getOuterType().equals(other.getOuterType()))
-				return false;
-			if (!Arrays.equals(coords, other.coords))
-				return false;
-			return true;
-		}
-
-		private TestSuitePart2World getOuterType() {
-			return TestSuitePart2World.this;
-		}
-		
-	} 
 	
 	@Test
-	public final void spawnUnit2(){
-		Map<Position,Set<Unit>> unitsAtCubeMap = new HashMap<Position, Set<Unit>>();
-		int[] coord = new int[]{1,1,1};
-		Set<Unit> units = new HashSet<>();
-		Position p = new Position(coord);
-		unitsAtCubeMap.put(p, units);
-		if(unitsAtCubeMap.containsKey(p)) {
-			System.out.println(coord);
-		}
+	public final void getNumberUnits(){
+		Unit unit = world2.spawnUnit(false);
+		Assert.assertTrue(world2.getNumberUnits()==1);
 	}
+	
+	@Test
+	public final void hasAsUnit_LegalCase(){
+		Unit unit = world2.spawnUnit(false);
+		Assert.assertFalse(world1.hasAsUnit(unit));
+		Assert.assertTrue(world2.hasAsUnit(unit));
+	}
+		
+	@Test(expected = IllegalArgumentException.class)
+	public final void hasAsUnit_IllegalCase(){
+		world2.hasAsUnit(null);
+	}
+	
+	@Test
+	public final void canHaveAsUnit_TrueCases(){
+		Assert.assertTrue(world2.canHaveAsUnit(StandardUnit));
+		world2.terminate();
+		StandardUnit.terminate();
+		Assert.assertTrue(world2.canHaveAsUnit(StandardUnit));
+
+	}
+	
+	@Test
+	public final void canHaveAsUnit_FalseCases(){
+		Assert.assertFalse(world1.canHaveAsUnit(null));
+		world2.terminate();
+		Assert.assertFalse(world2.canHaveAsUnit(StandardUnit));
+
+	}
+	
+	
+//	@Test
+//	public final void spawnUnit2(){
+//		Map<Position,Set<Unit>> unitsAtCubeMap = new HashMap<Position, Set<Unit>>();
+//		int[] coord = new int[]{1,1,1};
+//		Set<Unit> units = new HashSet<>();
+//		Position p = new Position(coord);
+//		unitsAtCubeMap.put(p, units);
+//		if(unitsAtCubeMap.containsKey(p)) {
+//			System.out.println(coord);
+//		}
+//	}
+	
 	
 	
 

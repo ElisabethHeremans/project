@@ -285,7 +285,7 @@ public class World {
 			addAsUnit(spawnUnit);
 		return spawnUnit;
 	}
-	// ik denk foutje : 201-> 200 & nieuwe faction starten en zo: hoe?
+
 	/**
 	 * Creates a random name.
 	 * @return A random name that is at least two characters long,
@@ -309,21 +309,6 @@ public class World {
 	private StringBuilder name= new StringBuilder();
 
 
-	/**
-	 * Check whether the given number of units is a valid number of units for
-	 * any world.
-	 * 
-	 * @param Units
-	 *            The number of units to check.
-	 * @return True if and only if the number of units is less than or equal to
-	 *         100 and greater than or equal to zero.
-	 */
-	public static boolean isValidNumberUnits(int Units) {
-		return (Units >= 0 && Units <= 100);
-	}
-
-
-
 
 	/**
 	 * Return the number of units of this world.
@@ -344,7 +329,9 @@ public class World {
 	 */
 	@Basic
 	@Raw
-	public boolean hasAsUnit(Unit unit){
+	public boolean hasAsUnit(Unit unit) throws IllegalArgumentException{
+		if (unit==null)
+			throw new IllegalArgumentException();
 		return this.listAllUnits().contains(unit);
 	}
 
@@ -409,15 +396,12 @@ public class World {
 	public void addAsUnit(Unit unit) throws IllegalArgumentException{
 	
 		if(! canHaveAsUnit(unit)|| !(getNumberUnits() <100)){
-			System.out.println("c");
 			throw new IllegalArgumentException();
 		}
 		if( !(this.isCubeInWorld(unit.getCubeCoordinate())) || !(this.getPassable(unit.getCubeCoordinate()))){
-			System.out.println("d");
 			throw new IllegalArgumentException();
 		}
 		if( unit.getWorld()!=null){
-			System.out.println("e");
 			throw new IllegalArgumentException();
 		}
 		this.units.add(unit);
@@ -545,12 +529,12 @@ public class World {
 	 * @throws IllegalArgumentException
 	 */
 	@Basic @Raw
-	public boolean hasAsFaction(Faction faction) {
-		if (faction!= null){
-			return factions.contains(faction);
+	public boolean hasAsFaction(Faction faction) throws IllegalArgumentException {
+		if (faction== null){
+			throw new IllegalArgumentException();
 		}
 		else
-			return false;
+			return factions.contains(faction);
 	}
 	
 	/**
@@ -840,17 +824,17 @@ public class World {
 		list.add(terrainType);
 		
 		List<Unit> unitList= new ArrayList<Unit>();
-		if(unitsAtCubeMap.get(position) !=null){
-			for (Unit unit:unitsAtCubeMap.get(position)){
+		if(unitsAtCubeMap.get(new Position(position)) !=null){
+			for (Unit unit:unitsAtCubeMap.get(new Position(position))){
 				unitList.add(unit);
 			}
 		}
 		list.add(unitList);
 		
 		List<Log> logList= new ArrayList<Log>();
-		if(logsAtCubeMap.get(position) !=null){
+		if(logsAtCubeMap.get(new Position(position)) !=null){
 
-		for (Log log:logsAtCubeMap.get(position)){
+		for (Log log:logsAtCubeMap.get(new Position(position))){
 			logList.add(log);
 		}
 		}
@@ -859,9 +843,9 @@ public class World {
 
 		
 		List<Boulder> boulderList= new ArrayList<Boulder>();
-		if(bouldersAtCubeMap.get(position) !=null){
+		if(bouldersAtCubeMap.get(new Position(position)) !=null){
 
-		for (Boulder boulder:bouldersAtCubeMap.get(position)){
+		for (Boulder boulder:bouldersAtCubeMap.get(new Position(position))){
 			boulderList.add(boulder);
 		}
 		}
@@ -880,13 +864,11 @@ public class World {
 	public Set<Unit> getUnits(int[] position)throws IllegalArgumentException{
 		if (!this.isCubeInWorld(position))
 			throw new IllegalArgumentException();
-		if (unitsAtCubeMap.get(position)==null){
-			System.out.println("a");
+		if (unitsAtCubeMap.get(new Position(position))==null){
 			return new HashSet<>();
 		}
 		else{
-			System.out.println("b");
-			return unitsAtCubeMap.get(position);
+			return unitsAtCubeMap.get(new Position(position));
 		}
 	}
 	/**
@@ -900,10 +882,10 @@ public class World {
 	public Set<Log> getLogs(int[] position)throws IllegalArgumentException{
 		if (!this.isCubeInWorld(position))
 			throw new IllegalArgumentException();
-		if (logsAtCubeMap.get(position)==null)
+		if (logsAtCubeMap.get(new Position(position))==null)
 			return new HashSet<>();
 		else{
-			return logsAtCubeMap.get(position);
+			return logsAtCubeMap.get(new Position(position));
 		}
 	}
 	/**
@@ -917,57 +899,57 @@ public class World {
 	public Set<Boulder> getBoulders(int[] position)throws IllegalArgumentException{
 		if (!this.isCubeInWorld(position))
 			throw new IllegalArgumentException();
-		if (bouldersAtCubeMap.get(position)==null)
+		if (bouldersAtCubeMap.get(new Position(position))==null)
 			return new HashSet<>();
 		else{
-			return bouldersAtCubeMap.get(position);
+			return bouldersAtCubeMap.get(new Position(position));
 		}
 	}
 	
 	
 	private void addUnitToUnitsAtCubeMap(Unit unit){
-		Set<Unit> unitsAtCube = this.unitsAtCubeMap.get(unit.getCubeCoordinate());
+		Set<Unit> unitsAtCube = this.unitsAtCubeMap.get(new Position(unit.getCubeCoordinate()));
 		System.out.println("f");
 		if ( unitsAtCube != null){
 			unitsAtCube.add(unit);
-			this.unitsAtCubeMap.put(unit.getCubeCoordinate(),unitsAtCube);
+			this.unitsAtCubeMap.put(new Position(unit.getCubeCoordinate()),unitsAtCube);
 		}
 		else{
 			unitsAtCube = new HashSet<Unit>();
 			unitsAtCube.add(unit);
-			this.unitsAtCubeMap.put(unit.getCubeCoordinate(),unitsAtCube);
+			this.unitsAtCubeMap.put(new Position(unit.getCubeCoordinate()),unitsAtCube);
 			System.out.println("g");
-			//System.out.println(unitsAtCubeMap.get(unit.getCubeCoordinate()).contains(unit));
+			System.out.println(unitsAtCubeMap.get(new Position(unit.getCubeCoordinate())).contains(unit));
 
 		}
 	}
 	
 	private void removeUnitFromUnitsAtCubeMap(Unit unit){
-		Set<Unit> unitsAtCube = this.unitsAtCubeMap.get(unit.getCubeCoordinate());
+		Set<Unit> unitsAtCube = this.unitsAtCubeMap.get(new Position(unit.getCubeCoordinate()));
 		if (unitsAtCube.contains(unit)){
 			unitsAtCube.remove(unit);
 			if (unitsAtCube.isEmpty())
-				unitsAtCubeMap.remove(unit.getCubeCoordinate());
+				unitsAtCubeMap.remove(new Position(unit.getCubeCoordinate()));
 			else{
-				unitsAtCubeMap.replace(unit.getCubeCoordinate(), unitsAtCube);
+				unitsAtCubeMap.replace(new Position(unit.getCubeCoordinate()), unitsAtCube);
 			}
 		}
 	}
 	
-	private Map<int[],Set<Unit>> unitsAtCubeMap = new HashMap<int[], Set<Unit>>();
+	private Map<Position,Set<Unit>> unitsAtCubeMap = new HashMap<Position, Set<Unit>>();
 
 	
 	
 	private void addBoulderToBouldersAtCubeMap(Boulder boulder){
-		Set<Boulder> bouldersAtCube = this.bouldersAtCubeMap.get(boulder.getCubeCoordinate());
+		Set<Boulder> bouldersAtCube = this.bouldersAtCubeMap.get(new Position(boulder.getCubeCoordinate()));
 		if ( bouldersAtCube != null){
 			bouldersAtCube.add(boulder);
-			this.bouldersAtCubeMap.put(boulder.getCubeCoordinate(),bouldersAtCube);
+			this.bouldersAtCubeMap.put(new Position(boulder.getCubeCoordinate()),bouldersAtCube);
 		}
 		else{
 			bouldersAtCube = new HashSet<Boulder>();
 			bouldersAtCube.add(boulder);
-			this.bouldersAtCubeMap.put(boulder.getCubeCoordinate(),bouldersAtCube);
+			this.bouldersAtCubeMap.put(new Position(boulder.getCubeCoordinate()),bouldersAtCube);
 		}
 	}
 	private void removeBoulderFromBouldersAtCubeMap(Boulder boulder){
@@ -975,42 +957,42 @@ public class World {
 		if (bouldersAtCube.contains(boulder)){
 			bouldersAtCube.remove(boulder);
 			if (bouldersAtCube.isEmpty())
-				bouldersAtCubeMap.remove(boulder.getCubeCoordinate());
+				bouldersAtCubeMap.remove(new Position(boulder.getCubeCoordinate()));
 			else{
-				bouldersAtCubeMap.replace(boulder.getCubeCoordinate(), bouldersAtCube);
+				bouldersAtCubeMap.replace(new Position(boulder.getCubeCoordinate()), bouldersAtCube);
 			}
 		}
 	}
 	
-	private Map<int[],Set<Boulder>> bouldersAtCubeMap = new HashMap<int[],Set<Boulder>>();
+	private Map<Position,Set<Boulder>> bouldersAtCubeMap = new HashMap<Position,Set<Boulder>>();
 
 	
 	private void addLogToLogsAtCubeMap(Log log){
-		Set<Log> logsAtCube = this.logsAtCubeMap.get(log.getCubeCoordinate());
+		Set<Log> logsAtCube = this.logsAtCubeMap.get(new Position(log.getCubeCoordinate()));
 		if ( logsAtCube != null){
 			logsAtCube.add(log);
-			this.logsAtCubeMap.put(log.getCubeCoordinate(),logsAtCube);
+			this.logsAtCubeMap.put(new Position(log.getCubeCoordinate()),logsAtCube);
 		}
 		else{
 			logsAtCube = new HashSet<Log>();
 			logsAtCube.add(log);
-			this.logsAtCubeMap.put(log.getCubeCoordinate(),logsAtCube);
+			this.logsAtCubeMap.put(new Position(log.getCubeCoordinate()),logsAtCube);
 		}
 	}
 	
 	private void removeLogFromLogsAtCubeMap(Log log){
-		Set<Log> logsAtCube = this.logsAtCubeMap.get(log.getCubeCoordinate());
+		Set<Log> logsAtCube = this.logsAtCubeMap.get(new Position(log.getCubeCoordinate()));
 		if (logsAtCube.contains(log)){
 			logsAtCube.remove(log);
 			if (logsAtCube.isEmpty())
-				logsAtCubeMap.remove(log.getCubeCoordinate());
+				logsAtCubeMap.remove(new Position(log.getCubeCoordinate()));
 			else{
-				logsAtCubeMap.replace(log.getCubeCoordinate(), logsAtCube);
+				logsAtCubeMap.replace(new Position(log.getCubeCoordinate()), logsAtCube);
 			}
 		}
 	}
 	
-	private Map<int[],Set<Log>> logsAtCubeMap = new HashMap<int[],Set<Log>>();
+	private Map<Position,Set<Log>> logsAtCubeMap = new HashMap<Position,Set<Log>>();
 
 	private final Set<Unit> units = new HashSet<Unit>();
 	
