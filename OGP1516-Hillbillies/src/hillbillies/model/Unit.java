@@ -586,9 +586,13 @@ public class Unit {
 	 *         | && (position[0] <= X) | && (0<= position[1]) && (position[1] <=Y)
 	 *         | && (0<= position[2]) && (position[2] <= Z)
 	 */
-	public boolean isValidPosition(double[] position) {
+	public boolean canHaveAsPosition(double[] position) {
+		if (this.getWorld()!= null){
 		return (getWorld().isCubeInWorld(this.getWorld().getCubeCoordinate(position)) 
 				&& getWorld().getPassable(this.getWorld().getCubeCoordinate(position)));
+		}
+		else
+			return true;
 		
 		
 	}
@@ -633,7 +637,7 @@ public class Unit {
 	@Raw
 	public void setPosition(double[] position) throws IllegalArgumentException {
 		
-		if (!isValidPosition(position))
+		if (!canHaveAsPosition(position))
 			throw new IllegalArgumentException();
 		this.position = position;
 	}
@@ -1019,7 +1023,7 @@ public class Unit {
 	public void moveToAdjacent(int dx, int dy, int dz) throws IllegalArgumentException {
 		if (!((dx >= -1 && dx <= 1) && (dy >= -1 && dy <= 1) && (dz >= -1 && dz <= 1)))
 			throw new IllegalArgumentException();
-		if (!isValidPosition(new double[] { getPosition()[0] + (double) dx, getPosition()[1] + (double) dy,
+		if (!canHaveAsPosition(new double[] { getPosition()[0] + (double) dx, getPosition()[1] + (double) dy,
 				getPosition()[2] + (double) dz }))
 			throw new IllegalArgumentException();
 		if (canMove()) {
@@ -1070,7 +1074,7 @@ public class Unit {
 	 *             | ! isValidPosition(targetPosition)
 	 */
 	public void moveTo(double[] targetPosition) throws IllegalArgumentException {
-		if (!isValidPosition(targetPosition))
+		if (!canHaveAsPosition(targetPosition))
 			throw new IllegalArgumentException();
 		
 		if (canMove()) {
@@ -1131,7 +1135,7 @@ public class Unit {
 	}
 	
 	public void moveTo1(double[] targetPosition){
-		if (!isValidPosition(targetPosition))
+		if (!canHaveAsPosition(targetPosition))
 			throw new IllegalArgumentException();
 		if (canMove()) {
 			int index = 0;

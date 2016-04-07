@@ -8,6 +8,7 @@ import org.junit.*;
 import hillbillies.model.*;
 import ogp.framework.util.*;
 
-public class TestSuitePart2 {
+public class TestSuitePart2Unit {
+	
 
 }

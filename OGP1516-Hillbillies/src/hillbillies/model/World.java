@@ -52,48 +52,17 @@ public class World {
 	
 	
 	
+
+	/**
+	 * @return the listener
+	 */
+	private final TerrainChangeListener getListener() {
+		return listener;
+	}
+	
 	private final TerrainChangeListener listener;
 
-	/**
-	 * Return the number of units of this world.
-	 */
-	@Basic
-	@Raw
-	public int getNumberUnits() {
-		return this.units.size();
-	}
 
-	/**
-	 * Check whether the given number of units is a valid number of units for
-	 * any world.
-	 * 
-	 * @param Units
-	 *            The number of units to check.
-	 * @return True if and only if the number of units is less than or equal to
-	 *         100 and greater than or equal to zero.
-	 */
-	public static boolean isValidNumberUnits(int Units) {
-		return (Units >= 0 && Units <= 100);
-	}
-
-
-	/**
-	 * Return the number of boulders of this world.
-	 */
-	@Basic @Raw
-	public int getNumberBoulders() {
-		return this.boulders.size();
-	}
-	
-
-	/**
-	 * Return the number of logs of this world.
-	 */
-	@Basic @Raw
-	public int getNumberLogs() {
-		return this.logs.size();
-	}
-	
 	/**
 	 * Return the terraintype of a cube.
 	 * @param position
@@ -102,7 +71,7 @@ public class World {
 	public TerrainType getTerrain(int[] position) throws IllegalArgumentException {
 		if (!this.isCubeInWorld(position))
 			throw new IllegalArgumentException();
-		return TerrainType.getTerrain(terrainTypes[position[0]][position[1]][position[2]]);
+		return TerrainType.getTerrain(getTerrainTypes()[position[0]][position[1]][position[2]]);
 	}
 	/**
 	 * Return the terraintype of a cube.
@@ -126,7 +95,7 @@ public class World {
 		if (!this.isCubeInWorld(position))
 			throw new IllegalArgumentException();
 		terrainTypes[position[0]][position[1]][position[2]] = terrain.getType();
-		listener.notifyTerrainChanged(position[0], position[1], position[2]);
+		getListener().notifyTerrainChanged(position[0], position[1], position[2]);
 	}
 	
 	
@@ -150,8 +119,6 @@ public class World {
 						throw new IllegalArgumentException();
 		this.terrainTypes = terrainTypes;
 	}
-
-
 
 	private int[][][] terrainTypes;
 	
@@ -441,6 +408,17 @@ public class World {
 	 */
 	private Set<Faction> factions = new HashSet<Faction>();
 	/**
+	 * Return the number of boulders of this world.
+	 */
+	@Basic @Raw
+	public int getNumberBoulders() {
+		return this.boulders.size();
+	}
+
+
+
+
+	/**
 	 * Check whether this world has the given boulder as one of the boulders attached to it.
 	 * @param boulder
 	 * 		The boulder to check.
@@ -525,6 +503,17 @@ public class World {
 	 * 		to which it is attached.
 	 */
 	private Set<Boulder> boulders = new HashSet<Boulder>();
+	/**
+	 * Return the number of logs of this world.
+	 */
+	@Basic @Raw
+	public int getNumberLogs() {
+		return this.logs.size();
+	}
+
+
+
+
 	/**
 	 * Check whether this world has the given log as one of the logs attached to it.
 	 * @param log
@@ -611,6 +600,34 @@ public class World {
 	 * 		to which it is attached.
 	 */
 	private Set<Log> logs = new HashSet<Log>();
+	/**
+	 * Check whether the given number of units is a valid number of units for
+	 * any world.
+	 * 
+	 * @param Units
+	 *            The number of units to check.
+	 * @return True if and only if the number of units is less than or equal to
+	 *         100 and greater than or equal to zero.
+	 */
+	public static boolean isValidNumberUnits(int Units) {
+		return (Units >= 0 && Units <= 100);
+	}
+
+
+
+
+	/**
+	 * Return the number of units of this world.
+	 */
+	@Basic
+	@Raw
+	public int getNumberUnits() {
+		return this.units.size();
+	}
+
+
+
+
 	/**
 	 * Check whether this world has the given unit as one of the units attached to it.
 	 * @param unit
@@ -972,8 +989,6 @@ public class World {
 				for (int z=0; z < getzDimension() ; z ++){
 					if (this.getPassable(new int[] {x,y,z}))
 						connectedToBorder.changeSolidToPassable(x, y, z);
-					
-					
 					}
 				}
 			}

@@ -40,8 +40,12 @@ public abstract class RawMaterial {
 	 *         solid cube.
 	 */
 	public boolean canHaveAsPosition(double[] position){
+		if (getWorld()!= null){
 		return (getWorld().isCubeInWorld(this.getWorld().getCubeCoordinate(position)) &&
 				this.getWorld().getTerrain(position).isPassable());
+		}
+		else
+			return true;
 	}
 	/**
 	 * Return the weight of this raw material.
