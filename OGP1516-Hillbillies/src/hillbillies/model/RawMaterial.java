@@ -11,7 +11,7 @@ public abstract class RawMaterial {
 	}
 	
 	public RawMaterial(int[] position){
-		this(new double[] { position[0], position[1],position[2]});
+		this(new double[] {(double) position[0]+0.5, (double)position[1]+0.5,(double) position[2]+0.5});
 	}
 	/**
 	 * Return the position of this raw material.
@@ -29,6 +29,7 @@ public abstract class RawMaterial {
 	 * @post The position of this raw material is equal to the given position.
 	 */
 	public abstract void setPosition(double[] position);
+	
 	
 	/**
 	 * Check whether the given position is a valid position for any raw material.

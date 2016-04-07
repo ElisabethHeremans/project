@@ -433,8 +433,6 @@ public class World {
 			this.removeUnitFromUnitsAtCubeMap(unit);
 			unit.setWorld(null);
 			unit.getFaction().removeAsUnit(unit);
-			// overbodig, gebeurd al in removeAsUnit
-			//unit.setFaction(null);
 		}
 	}
 
@@ -668,7 +666,9 @@ public class World {
 	 */
 	public void addAsBoulder(Boulder boulder) throws IllegalArgumentException{
 		if(! canHaveAsBoulder(boulder))
-			throw new IllegalArgumentException();	
+			throw new IllegalArgumentException();
+		if( !(this.isCubeInWorld(boulder.getCubeCoordinate())) || !(this.getPassable(boulder.getCubeCoordinate()))){
+			throw new IllegalArgumentException();
 		if( boulder.getWorld()!=null)
 			throw new IllegalArgumentException();
 		this.boulders.add(boulder);
@@ -909,7 +909,7 @@ public class World {
 	
 	private void addUnitToUnitsAtCubeMap(Unit unit){
 		Set<Unit> unitsAtCube = this.unitsAtCubeMap.get(new Position(unit.getCubeCoordinate()));
-		System.out.println("f");
+		//System.out.println("f");
 		if ( unitsAtCube != null){
 			unitsAtCube.add(unit);
 			this.unitsAtCubeMap.put(new Position(unit.getCubeCoordinate()),unitsAtCube);
@@ -918,8 +918,8 @@ public class World {
 			unitsAtCube = new HashSet<Unit>();
 			unitsAtCube.add(unit);
 			this.unitsAtCubeMap.put(new Position(unit.getCubeCoordinate()),unitsAtCube);
-			System.out.println("g");
-			System.out.println(unitsAtCubeMap.get(new Position(unit.getCubeCoordinate())).contains(unit));
+			//System.out.println("g");
+			//System.out.println(unitsAtCubeMap.get(new Position(unit.getCubeCoordinate())).contains(unit));
 
 		}
 	}

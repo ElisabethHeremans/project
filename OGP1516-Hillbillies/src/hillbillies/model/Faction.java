@@ -142,8 +142,6 @@ public class Faction {
 		if (hasAsUnit(unit))
 			this.units.remove(unit);
 			unit.setFaction(null);
-//			if (units.isEmpty())
-//				this.terminate();
 	}
 	/**
 	 * Return the set collecting references to units attached to this faction.

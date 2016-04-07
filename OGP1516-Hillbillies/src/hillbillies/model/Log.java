@@ -119,7 +119,7 @@ public class Log extends RawMaterial {
 				if (Vector.getDistance(nextTargetPosition, startPosition)-Vector.getDistance(startPosition, this.getPosition())<=0.0){
 					setPosition(nextTargetPosition);
 					double[] nextPosition = Vector.vectorAdd(this.getPosition(), new double[] {0.0,0.0,-1.0});
-					if (!this.getWorld().getTerrain(nextPosition).isPassable() ||nextPosition[2]<1.0){
+					if (!mustFall()){
 						status = Status.DONE;
 					}
 					else
@@ -134,7 +134,9 @@ public class Log extends RawMaterial {
 	 * 		is not passable terrain.
 	 */
 	public boolean mustFall() {
-
+		if ( (this.getCubeCoordinate()[2]==0)){
+			return false;
+		}
 		double[] ijk = new double[] { 0.0, 0.0, -1.0 };
 		double[] neighbouring = Vector.vectorAdd(this.getPosition(), ijk);
 		if (!world.getTerrain(neighbouring).isPassable()) {

@@ -134,7 +134,7 @@ public class Unit {
 		setOrientation((float) orientation);
 		this.setHitPoints(hitpoints);
 		this.setStaminaPoints(staminaPoints);
-		this.position = position;
+		this.setPosition(position);
 		this.setEnableDefaultBehaviour(enableDefaultBehavior);
 	}
 	/**
@@ -700,7 +700,6 @@ public class Unit {
 	public void setFaction(@Raw Faction faction){
 		if (faction != null)
 			assert (faction.hasAsUnit(this));
-		// nog condities?
 		this.faction = faction;
 	}
 	/**
@@ -736,7 +735,6 @@ public class Unit {
 		if (world != null){
 			assert (world.hasAsUnit(this));
 		}
-		// nog condities?
 		this.world = world;
 	}
 	/**
@@ -802,9 +800,8 @@ public class Unit {
 	 *             If the duration is less than zero or exceeds or equals 0.2 s.
 	 */
 	public void advanceTime(float duration) throws IllegalArgumentException {
-		//System.out.println(this.getStatus());
-//		if (duration < 0 || duration > 0.2)
-//			throw new IllegalArgumentException();
+		if (duration < 0 || duration > 0.2)
+			throw new IllegalArgumentException();
 		restTimer += duration;
 		if (experiencePoints >=10){
 			setExperiencePoints(this.getExperiencePoints()-10);
@@ -889,7 +886,7 @@ public class Unit {
 			setPosition(nextTargetPosition);
 			setHitPoints(this.getHitpoints() - 10);
 			double[] nextPosition = Vector.vectorAdd(this.getPosition(), new double[] {0.0,0.0,-1.0});
-			if (this.getPosition()[2]<1.0 || !this.getWorld().getTerrain(nextPosition).isPassable()){
+			if (this.getCubeCoordinate()[2]==1.0 || !this.getWorld().getTerrain(nextPosition).isPassable()){
 				setStatus(Status.DONE);
 			}
 			else
@@ -1352,7 +1349,6 @@ public class Unit {
 	 *	 	 | new.progressWork == (float) 0.0
 	 */
 	public void work(int[] position) throws IllegalArgumentException{
-
 		if(!(this.isNeighbouringCube(position)||this.getCubeCoordinate()==position))
 			throw new IllegalArgumentException();
 		else if (canWork()){
@@ -1377,16 +1373,16 @@ public class Unit {
 	
 	public void endWork(int[] targetPosition) {
 		if (this.getBoulder() !=null) {
-			this.getWorld().addAsBoulder(this.getBoulder());
 			this.getBoulder().setPosition(this.getWorld().getCubeCenter(targetPosition));
+			this.getWorld().addAsBoulder(this.getBoulder());
 			this.setWeight(this.getWeight()-this.getBoulder().getWeight());
 			this.setBoulder(null);
 			setExperiencePoints(this.getExperiencePoints()+10);
 
 		}
 		else if (this.getLog() !=null) {
-			this.getWorld().addAsLog(this.getLog());
 			this.getLog().setPosition(this.getWorld().getCubeCenter(targetPosition));
+			this.getWorld().addAsLog(this.getLog());
 			this.setWeight(this.getWeight()-this.getLog().getWeight());
 			this.setLog(null);
 			setExperiencePoints(this.getExperiencePoints()+10);
@@ -1409,8 +1405,6 @@ public class Unit {
 			Boulder boulder = (Boulder) this.getWorld().inspectCube(targetPosition).get(3).get(0);
 			this.setBoulder(boulder);
 			this.getWorld().removeAsBoulder(boulder);
-			boulder.setWorld(null);
-			this.setWeight(this.getWeight()+boulder.getWeight());
 			setExperiencePoints(this.getExperiencePoints()+10);
 
 
@@ -1419,9 +1413,7 @@ public class Unit {
 		else if (!this.getWorld().getLogs(targetPosition).isEmpty()){
 			Log log = (Log) this.getWorld().inspectCube(targetPosition).get(2).get(0);
 			this.getWorld().removeAsLog(log);
-			log.setWorld(null);
 			this.setLog(log);
-			this.setWeight(this.getWeight()+log.getWeight());
 			setExperiencePoints(this.getExperiencePoints()+10);
 
 			
@@ -1808,8 +1800,6 @@ public class Unit {
  		 if (this.getWorld()!=null){
  			 this.getWorld().removeAsUnit(this);
  		 }
- 		 if (this.getFaction()!= null)
- 			 this.getFaction().removeAsUnit(this);
  		 this.setStatus(Status.DONE);
  		 this.isTerminated = true;
  	 }
@@ -1859,6 +1849,7 @@ public class Unit {
  		if(! isValidBoulder(boulder))
  			throw new IllegalArgumentException();
  		this.boulder = boulder;
+		this.setWeight(this.getWeight()+boulder.getWeight());
  	}
  	/**
  	 * Variable referencing the boulder of this unit.
@@ -1896,6 +1887,8 @@ public class Unit {
  		if(! isValidLog(log))
  			throw new IllegalArgumentException();
  		this.log = log;
+		this.setWeight(this.getWeight()+log.getWeight());
+
  	}
 	/**
  	 * Variable referencing the log of this unit.
