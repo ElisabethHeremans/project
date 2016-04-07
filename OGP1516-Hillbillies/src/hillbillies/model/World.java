@@ -247,8 +247,8 @@ public class World {
 	 * @return True if and only if the given x-, y-, z-coordinate is between 0 and the x-, y-,z-dimension of the gameworld. 
 	 */
 	public boolean isCubeInWorld(int[] cubePosition){
-		return ((0 <= cubePosition[0]) && (cubePosition[0] < getxDimension()*L) && (0 <= cubePosition[1]) 
-				&& (cubePosition[1] < getyDimension()*L ) && (0 <= cubePosition[2]) && (cubePosition[2] < getzDimension()*L));
+		return ((0 <= cubePosition[0]) && (cubePosition[0] < getxDimension()) && (0 <= cubePosition[1]) 
+				&& (cubePosition[1] < getyDimension()) && (0 <= cubePosition[2]) && (cubePosition[2] < getzDimension()));
 	}
 
 
@@ -545,9 +545,14 @@ public class World {
 	 * @throws IllegalArgumentException
 	 */
 	@Basic @Raw
-	public boolean hasAsFaction(Faction faction) throws IllegalArgumentException{
-		return factions.contains(faction);
+	public boolean hasAsFaction(Faction faction) {
+		if (faction!= null){
+			return factions.contains(faction);
+		}
+		else
+			return false;
 	}
+	
 	/**
 	 * Checks whether this world can have the given faction as one of his factions.
 	 * @param faction
@@ -932,7 +937,7 @@ public class World {
 			unitsAtCube.add(unit);
 			this.unitsAtCubeMap.put(unit.getCubeCoordinate(),unitsAtCube);
 			System.out.println("g");
-			System.out.println(unitsAtCubeMap.get(unit.getCubeCoordinate()).contains(unit));
+			//System.out.println(unitsAtCubeMap.get(unit.getCubeCoordinate()).contains(unit));
 
 		}
 	}
@@ -1074,7 +1079,7 @@ public class World {
 	}
 	void solidToPassableUpdate(int[] position){
 		List<int[]> toChange = connectedToBorder.changeSolidToPassable(position[0],position[1],position[2]);
-		setTerrain(position,TerrainType.AIR);
+		
 		if (new Random().nextDouble() <= 0.25){
 			if (getTerrain(position) == TerrainType.ROCK){
 				Boulder boulder = new Boulder(position);
@@ -1085,6 +1090,7 @@ public class World {
 				addAsLog(log);
 			}
 		}
+		setTerrain(position,TerrainType.AIR);
 		for (int[] positionToChange: toChange){
 			solidToPassableUpdate(positionToChange);
 			
@@ -1102,7 +1108,6 @@ public class World {
 				unit.getBoulder().setPosition(unit.getPosition());
 		}
 		for (Boulder boulder: boulders){
-			
 			boulder.advanceTime((float) duration);
 		}
 		for (Log log: logs){

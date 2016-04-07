@@ -4,6 +4,12 @@ import static hillbillies.tests.util.PositionAsserts.assertDoublePositionEquals;
 import static hillbillies.tests.util.PositionAsserts.assertIntegerPositionEquals;
 import static org.junit.Assert.*;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.junit.*;
 
 import hillbillies.model.*;
@@ -130,9 +136,65 @@ public class TestSuitePart2World {
 		Assert.assertFalse(unit.mustFall());
 		Assert.assertTrue(unit.getWorld()==world2);
 		Assert.assertTrue(world2.hasAsUnit(unit));
-		Assert.assertTrue(world2.getUnits(unit.getCubeCoordinate()).contains(unit));
+		//Assert.assertTrue(world2.getUnits(unit.getCubeCoordinate()).contains(unit));
 
 		
+	}
+	
+	public class Position {
+		private int[] coords;
+		
+		public Position(int[] coords){
+			this.coords = coords;
+		}
+
+		/* (non-Javadoc)
+		 * @see java.lang.Object#hashCode()
+		 */
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + getOuterType().hashCode();
+			result = prime * result + Arrays.hashCode(coords);
+			return result;
+		}
+
+		/* (non-Javadoc)
+		 * @see java.lang.Object#equals(java.lang.Object)
+		 */
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			Position other = (Position) obj;
+			if (!getOuterType().equals(other.getOuterType()))
+				return false;
+			if (!Arrays.equals(coords, other.coords))
+				return false;
+			return true;
+		}
+
+		private TestSuitePart2World getOuterType() {
+			return TestSuitePart2World.this;
+		}
+		
+	} 
+	
+	@Test
+	public final void spawnUnit2(){
+		Map<Position,Set<Unit>> unitsAtCubeMap = new HashMap<Position, Set<Unit>>();
+		int[] coord = new int[]{1,1,1};
+		Set<Unit> units = new HashSet<>();
+		Position p = new Position(coord);
+		unitsAtCubeMap.put(p, units);
+		if(unitsAtCubeMap.containsKey(p)) {
+			System.out.println(coord);
+		}
 	}
 	
 	
