@@ -807,6 +807,7 @@ public class Unit {
 //			throw new IllegalArgumentException();
 		restTimer += duration;
 		if (experiencePoints >=10){
+			setExperiencePoints(this.getExperiencePoints()-10);
 			if (isValidStrength(this.getStrength()+1))
 				this.setStrength(this.getStrength()+1);
 			else if (isValidAgility(this.getAgility()+1))
@@ -888,7 +889,7 @@ public class Unit {
 			setPosition(nextTargetPosition);
 			setHitPoints(this.getHitpoints() - 10);
 			double[] nextPosition = Vector.vectorAdd(this.getPosition(), new double[] {0.0,0.0,-1.0});
-			if (!this.getWorld().getTerrain(nextPosition).isPassable() ||nextPosition[2]<1.0){
+			if (this.getPosition()[2]<1.0 || !this.getWorld().getTerrain(nextPosition).isPassable()){
 				setStatus(Status.DONE);
 			}
 			else
