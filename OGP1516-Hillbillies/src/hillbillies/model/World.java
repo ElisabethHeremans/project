@@ -124,26 +124,158 @@ public class World {
 	
 	
 	/**
+	 * Returns the coordinates of the cube in which the given position is located.
+	 * @param position
+	 * 		A position in the gameworld.
+	 * @return the coordinates of the cube in which the given position is located.
+	 */
+	int[] getCubePosition(double[] position) {
+		return  new int[] { (int) Math.floor(position[0]), (int) Math.floor(position[1]),
+				(int) Math.floor(position[2]) };
+	}
+
+
+
+
+	/**
+	 * Return the position of the center of the cube with given integer coordinates.
+	 * 
+	 * @param cubePosition
+	 * 			The position of the cube.
+	 * @return the position of the center of the given cube, is each coordinate increased with the length of one cube /2.
+	 * 		   | result == new double [] { (double) cubePosition[0] + L/2, 
+	 * 		   | (double) cubePosition[1] + L/2,(double) cubePosition[2] + L/2 }
+	 */
+	double[] getCubeCenter(int[] cubePosition) {
+		return new double[] { (double) cubePosition[0] + L/2, (double) cubePosition[1] + L/2,
+				(double) cubePosition[2] + L/2 };
+	}
+
+
+
+
+	/**
+	 * Return the center of a cube.
+	 * 
+	 * @param cubePosition
+	 *            The position of the cube.
+	 * @return The center of the given cube, a double array with 
+	 * 		   the x,y and z-coordinate of the cube position increased by half of the length of a cube. 
+	 * 		   | result == {cubePosition[0]+L/2,cubePosition[1]+L/2,cubePosition[2]+L/2}
+	 */
+	
+	double[] getCubeCenter(double[] cubePosition) {
+		return new double[] { cubePosition[0] + L/2, cubePosition[1] + L/2, cubePosition[2] + L/2 };
+	}
+
+
+
+
+	/**
+	 * Checks whether a given cube is passable for a unit.
+	 * @param cubePosition
+	 * 		the position of the cube.
+	 * @return True if and only if the terraintype is air or workshop.
+	 */
+	// misschien hier ipv return effect gebruiken?
+	boolean getPassable(int[] cubePosition) {
+		return this.getTerrain(cubePosition).isPassable();
+	}
+
+
+
+
+	/**
+	 * Find all neighboring cubes of a given position.
+	 * @param position
+	 * 		A position in the gameworld.
+	 * @return a list with all the neighboring cubes of the given position.
+	 */
+	List<int[]> getNeighboringCubes( int[] position){
+		List<int[]> neighboringCubes = new ArrayList<int[]>();
+		for(int i =-1; i < 2; i++){
+			for (int j =-1; j<2; j++){
+				for (int k =-1; k<2; k++){
+					int[] newPosition = {position[0]+i, position[1]+j, position[2]+k};
+					if(( i!= 0 || j!=0 || k!=0)){
+						if (isCubeInWorld(newPosition))
+							neighboringCubes.add(newPosition);
+					}
+				}
+			}
+		}
+		return neighboringCubes;
+	}
+
+
+
+
+	/**
+	 * Checks if all the neighboring cubes of a position are solid.
+	 * @param position
+	 * 		A position in the gameworld.
+	 * @return True if and only if there is at least one neigboring cube which 
+	 * 		terraintype is rock or tree.
+	 */
+	boolean isNeighboringSolidTerrain( int[] position)throws IllegalArgumentException{
+		if (!this.isCubeInWorld(position))
+			throw new IllegalArgumentException();
+		List<int[]> neighboringCubes = getNeighboringCubes(position);
+		for(int index=0; index<=neighboringCubes.size(); index++){
+			if(this.getTerrain(neighboringCubes.get(index)) == TerrainType.ROCK 
+					|| this.getTerrain(neighboringCubes.get(index)) == TerrainType.TREE)
+				return true;
+		}
+		return false;
+	}
+
+
+
+
+	int[] getCubeCoordinate(double[] position){
+		return new int[] { (int) Math.floor(position[0]), (int) Math.floor(position[1]),
+				(int) Math.floor(position[2]) };
+	}
+
+
+
+
+	/**
+	 * Checks whether the cube is located inside the gameworld.
+	 * @param cubePosition
+	 * 		The position of the cube.
+	 * @return True if and only if the given x-, y-, z-coordinate is between 0 and the x-, y-,z-dimension of the gameworld. 
+	 */
+	public boolean isCubeInWorld(int[] cubePosition){
+		return ((0 <= cubePosition[0]) && (cubePosition[0] < getxDimension()*L) && (0 <= cubePosition[1]) 
+				&& (cubePosition[1] < getyDimension()*L ) && (0 <= cubePosition[2]) && (cubePosition[2] < getzDimension()*L));
+	}
+
+
+
+
+	/**
 	 * Initialize this new unit with a random name, position, weight, strength,
 	 * agility, toughness, state of default behaviour, hitpoints, stamina points
 	 * and an orientation.
 	 * @return
 	 */
 	public Unit spawnUnit(boolean enableDefaultBehavior){
-		int randomToughness = new Random().nextInt(201)+1;
-		int randomAgility = new Random().nextInt(201)+1;
-		int randomStrength = new Random().nextInt(201)+1;
-		int randomWeight = new Random().nextInt(201-((randomAgility+randomStrength)/2))+1+((randomAgility+randomStrength-2)/2);
-		double randomHitpoints = (double) new Random().nextInt(((int) Math.ceil(200.0*(randomWeight/100.0)*(randomToughness/100.0)))+1);
-		double randomStaminaPoints = (double) new Random().nextInt(((int) Math.ceil(200.0*(randomWeight/100.0)*(randomToughness/100.0)))+1);
+		int randomToughness = new Random().nextInt(76)+25;
+		int randomAgility = new Random().nextInt(76)+25;
+		int randomStrength = new Random().nextInt(76)+25;
+		int randomWeight = new Random().nextInt(101-((randomAgility+randomStrength)/2))+((randomAgility+randomStrength)/2);
+		double randomHitpoints = (double) new Random().nextInt(((int) Math.ceil(200.0*(randomWeight/100.0)*(randomToughness/100.0)))+1)+1.0;
+		double randomStaminaPoints = (double) new Random().nextInt(((int) Math.ceil(200.0*(randomWeight/100.0)*(randomToughness/100.0)))+1)+1.0;
 		boolean validPosFound = false;
 		double[] pos = new double[]{};
 		while (!validPosFound){
 			pos = new double[] { (new Random().nextDouble()) * getxDimension()*L, 
 					(new Random().nextDouble()) * this.getyDimension()*L,(new Random().nextDouble()) * getzDimension()*L };
+			//System.out.println(pos[0]+ " "+pos[1]+" "+pos[2]);
 			if (this.isCubeInWorld(this.getCubeCoordinate(pos)) && this.getPassable(this.getCubeCoordinate(pos))
-					&& (!this.getPassable(getCubeCoordinate(new double[] {pos[0],pos[1],pos[2]-1.0}))
-							||(int) Math.floor(pos[2]-1.0) == 0))
+					&& ((int) Math.floor(pos[2]) == 0 ||
+					!this.getPassable(getCubeCoordinate(new double[] {pos[0],pos[1],pos[2]-1.0}))))
 				validPosFound = true;
 		}
 		Unit spawnUnit = new Unit(randomName(), pos, 
@@ -161,13 +293,198 @@ public class World {
 	 * 		quotes (single and double) and spaces.
 	 */
 	private String randomName(){
-		Char = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz \'\"";
+		characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz \'\"";
 		int Length = new Random().nextInt(9)+2;
-		Name.append(Char.charAt(new Random().nextInt(26)));
-		for( int i = 1; i < Length; i++ ) 
-		      Name.append( Char.charAt(new Random().nextInt(Char.length()) ) );
-		   return Name.toString();
+		//System.out.println(characters.charAt(new Random().nextInt(27)));
+		//System.out.println(name.toString());
+		char character = characters.charAt(new Random().nextInt(27));
+		name.append(character);
+		for( int i = 0; i < Length; i++ ){ 
+		      name.append( characters.charAt(new Random().nextInt(characters.length()) ) );
+		}
+		return name.toString();
 	}
+	private String characters;
+
+	private StringBuilder name= new StringBuilder();
+
+
+	/**
+	 * Check whether the given number of units is a valid number of units for
+	 * any world.
+	 * 
+	 * @param Units
+	 *            The number of units to check.
+	 * @return True if and only if the number of units is less than or equal to
+	 *         100 and greater than or equal to zero.
+	 */
+	public static boolean isValidNumberUnits(int Units) {
+		return (Units >= 0 && Units <= 100);
+	}
+
+
+
+
+	/**
+	 * Return the number of units of this world.
+	 */
+	@Basic
+	@Raw
+	public int getNumberUnits() {
+		return this.units.size();
+	}
+
+
+
+
+	/**
+	 * Check whether this world has the given unit as one of the units attached to it.
+	 * @param unit
+	 * 		The unit to check.
+	 */
+	@Basic
+	@Raw
+	public boolean hasAsUnit(Unit unit){
+		return this.listAllUnits().contains(unit);
+	}
+
+
+
+
+	/**
+	 * Check whether this world can have the given unit as one of its units.
+	 * @param unit
+	 * 		The unit to check.
+	 * @return False if the given unit is not effective. Otherwise true if and only if
+	 * 		this world is not yet terminated or the given unit is also terminated. 
+	 */
+	@Raw
+	public boolean canHaveAsUnit(Unit unit){
+		return (unit != null) 
+				&&(! this.isTerminated() || unit.isTerminated());
+	}
+
+
+
+
+	/**
+	 * Check whether this world has proper units attached to it.
+	 * @return False if the total number of units is greater than hundred.
+	 * 		Otherwise, true if and only if this world can have each of its units as
+	 * 		a unit attached to it, and if each of these units references this world
+	 * 		as their world.
+	 */
+	@Raw
+	public boolean hasProperUnits(){
+		// Uit forloop gehaald, anders ga je dit elke keer opnieuw controleren.
+		if (this.getNumberUnits() >100)
+			return false;
+		for (Unit unit: this.units){
+			if (! canHaveAsUnit(unit))
+				return false;
+			if (unit.getWorld() != this)
+				return false;
+			}
+		return true;
+	}
+
+
+
+
+	/**
+	 * Add the given unit to the set of units attached to this world.
+	 * @param unit
+	 * 		The unit to be added.
+	 * @post This world has the given unit as one of its units.
+	 * @post The given unit references this world as the world to which it is attached.
+	 * @effect The given unit is added to a faction.
+	 * @throws IllegalArgumentException
+	 * 		This world cannot have the given unit as one of its units or 
+	 * 		the total number of units in this world is not less than 100.
+	 * @throws IllegalArgumentException
+	 * 		The given unit is positioned outside the gameworld or inside a cube that is not passable.
+	 * @throws IllegalArgumentException
+	 * 		The given unit is already attached to some world.
+	 */
+	public void addAsUnit(Unit unit) throws IllegalArgumentException{
+	
+		if(! canHaveAsUnit(unit)|| !(getNumberUnits() <100)){
+			System.out.println("c");
+			throw new IllegalArgumentException();
+		}
+		if( !(this.isCubeInWorld(unit.getCubeCoordinate())) || !(this.getPassable(unit.getCubeCoordinate()))){
+			System.out.println("d");
+			throw new IllegalArgumentException();
+		}
+		if( unit.getWorld()!=null){
+			System.out.println("e");
+			throw new IllegalArgumentException();
+		}
+		this.units.add(unit);
+		this.addUnitToUnitsAtCubeMap(unit);
+		unit.setWorld(this);
+		addToFaction(unit);
+	
+	}
+
+
+
+
+	/**
+	 * Remove the given unit from the set of units attached to this world.
+	 * @param unit
+	 * 		The unit to be removed.
+	 * @post This world does not have the given unit as one of its units.
+	 * @post If this world has the given unit as one of its units,
+	 * 		the given unit is no longer attached to any world.
+	 * @effect If this world has the given unit as one of its units,
+	 * 		the given unit is removed from the set of units attached to its faction.
+	 * @throws IllegalArgumentException
+	 */
+	void removeAsUnit(Unit unit) throws IllegalArgumentException{
+		if( unit == null)
+			throw new IllegalArgumentException();
+		if (hasAsUnit(unit)){
+			this.units.remove(unit);
+			this.removeUnitFromUnitsAtCubeMap(unit);
+			unit.setWorld(null);
+			unit.getFaction().removeAsUnit(unit);
+			// overbodig, gebeurd al in removeAsUnit
+			//unit.setFaction(null);
+		}
+	}
+
+
+
+
+	/**
+	 * Return the set collecting references to units attached to this world.
+	 * 	@return
+	 */
+	public Set<Unit> listAllUnits(){
+		return units;
+	}
+
+
+
+
+	/**
+	 * Return the set collecting references to units attached 
+	 * to this world and the given faction.
+	 * @param faction
+	 * 		The faction units need to belong to.
+	 * @throws IllegalArgumentException
+	 * 		The given faction is not attached to this world.
+	 * @return
+	 */
+	// Wat als de gegeven faction niet bestaat of zich niet in de gameworld bevindt? 
+	
+	public Set<Unit> listAllUnitsOfFaction(Faction faction) throws IllegalArgumentException{
+		if( !hasAsFaction(faction))
+			throw new IllegalArgumentException();
+		return faction.getUnits();
+	}
+
 	/**
 	 * Adds a given unit to a faction and creates a new faction in which the unit is added
 	 * if no legal faction is available.
@@ -192,113 +509,6 @@ public class World {
 		
 		}
 	}
-
-	/**
-	 * Returns the coordinates of the cube in which the given position is located.
-	 * @param position
-	 * 		A position in the gameworld.
-	 * @return the coordinates of the cube in which the given position is located.
-	 */
-	int[] getCubePosition(double[] position) {
-		return  new int[] { (int) Math.floor(position[0]), (int) Math.floor(position[1]),
-				(int) Math.floor(position[2]) };
-		
-	}
-	
-	/**
-	 * Return the position of the center of the cube with given integer coordinates.
-	 * 
-	 * @param cubePosition
-	 * 			The position of the cube.
-	 * @return the position of the center of the given cube, is each coordinate increased with the length of one cube /2.
-	 * 		   | result == new double [] { (double) cubePosition[0] + L/2, 
-	 * 		   | (double) cubePosition[1] + L/2,(double) cubePosition[2] + L/2 }
-	 */
-	double[] getCubeCenter(int[] cubePosition) {
-		return new double[] { (double) cubePosition[0] + L/2, (double) cubePosition[1] + L/2,
-				(double) cubePosition[2] + L/2 };
-	}
-	
-	/**
-	 * Return the center of a cube.
-	 * 
-	 * @param cubePosition
-	 *            The position of the cube.
-	 * @return The center of the given cube, a double array with 
-	 * 		   the x,y and z-coordinate of the cube position increased by half of the length of a cube. 
-	 * 		   | result == {cubePosition[0]+L/2,cubePosition[1]+L/2,cubePosition[2]+L/2}
-	 */
-
-	double[] getCubeCenter(double[] cubePosition) {
-		return new double[] { cubePosition[0] + L/2, cubePosition[1] + L/2, cubePosition[2] + L/2 };
-	}
-	/**
-	 * Checks whether a given cube is passable for a unit.
-	 * @param cubePosition
-	 * 		the position of the cube.
-	 * @return True if and only if the terraintype is air or workshop.
-	 */
-	// misschien hier ipv return effect gebruiken?
-	boolean getPassable(int[] cubePosition) {
-		return this.getTerrain(cubePosition).isPassable();
-	}
-	/**
-	 * Find all neighboring cubes of a given position.
-	 * @param position
-	 * 		A position in the gameworld.
-	 * @return a list with all the neighboring cubes of the given position.
-	 */
-	List<int[]> getNeighboringCubes( int[] position){
-		List<int[]> neighboringCubes = new ArrayList<int[]>();
-		for(int i =-1; i < 2; i++){
-			for (int j =-1; j<2; j++){
-				for (int k =-1; k<2; k++){
-					int[] newPosition = {position[0]+i, position[1]+j, position[2]+k};
-					if(( i!= 0 || j!=0 || k!=0)){
-						if (isCubeInWorld(newPosition))
-							neighboringCubes.add(newPosition);
-					}
-				}
-			}
-		}
-		return neighboringCubes;
-	}
-	/**
-	 * Checks if all the neighboring cubes of a position are solid.
-	 * @param position
-	 * 		A position in the gameworld.
-	 * @return True if and only if there is at least one neigboring cube which 
-	 * 		terraintype is rock or tree.
-	 */
-	boolean isNeighboringSolidTerrain( int[] position)throws IllegalArgumentException{
-		if (!this.isCubeInWorld(position))
-			throw new IllegalArgumentException();
-		List<int[]> neighboringCubes = getNeighboringCubes(position);
-		for(int index=0; index<=neighboringCubes.size(); index++){
-			if(this.getTerrain(neighboringCubes.get(index)) == TerrainType.ROCK 
-					|| this.getTerrain(neighboringCubes.get(index)) == TerrainType.TREE)
-				return true;
-		}
-		return false;
-	}
-	
-
-	
-	int[] getCubeCoordinate(double[] position){
-		return new int[] { (int) Math.floor(position[0]), (int) Math.floor(position[1]),
-				(int) Math.floor(position[2]) };
-	}
-	/**
-	 * Checks whether the cube is located inside the gameworld.
-	 * @param cubePosition
-	 * 		The position of the cube.
-	 * @return True if and only if the given x-, y-, z-coordinate is between 0 and the x-, y-,z-dimension of the gameworld. 
-	 */
-	public boolean isCubeInWorld(int[] cubePosition){
-		return ((0 <= cubePosition[0]) && (cubePosition[0] < getxDimension()*L) && (0 <= cubePosition[1]) 
-				&& (cubePosition[1] < getyDimension()*L ) && (0 <= cubePosition[2]) && (cubePosition[2] < getzDimension()*L));
-	}
-
 
 	/**
 	 * Return the number of factions in the world.
@@ -601,154 +811,6 @@ public class World {
 	 */
 	private Set<Log> logs = new HashSet<Log>();
 	/**
-	 * Check whether the given number of units is a valid number of units for
-	 * any world.
-	 * 
-	 * @param Units
-	 *            The number of units to check.
-	 * @return True if and only if the number of units is less than or equal to
-	 *         100 and greater than or equal to zero.
-	 */
-	public static boolean isValidNumberUnits(int Units) {
-		return (Units >= 0 && Units <= 100);
-	}
-
-
-
-
-	/**
-	 * Return the number of units of this world.
-	 */
-	@Basic
-	@Raw
-	public int getNumberUnits() {
-		return this.units.size();
-	}
-
-
-
-
-	/**
-	 * Check whether this world has the given unit as one of the units attached to it.
-	 * @param unit
-	 * 		The unit to check.
-	 */
-	@Basic
-	@Raw
-	public boolean hasAsUnit(Unit unit){
-		return this.units.contains(unit);
-	}
-	/**
-	 * Check whether this world can have the given unit as one of its units.
-	 * @param unit
-	 * 		The unit to check.
-	 * @return False if the given unit is not effective. Otherwise true if and only if
-	 * 		this world is not yet terminated or the given unit is also terminated. 
-	 */
-	@Raw
-	public boolean canHaveAsUnit(Unit unit){
-		return (unit != null) 
-				&&(! this.isTerminated() || unit.isTerminated());
-	}
-	/**
-	 * Check whether this world has proper units attached to it.
-	 * @return False if the total number of units is greater than hundred.
-	 * 		Otherwise, true if and only if this world can have each of its units as
-	 * 		a unit attached to it, and if each of these units references this world
-	 * 		as their world.
-	 */
-	@Raw
-	public boolean hasProperUnits(){
-		// Uit forloop gehaald, anders ga je dit elke keer opnieuw controleren.
-		if (this.getNumberUnits() >100)
-			return false;
-		for (Unit unit: this.units){
-			if (! canHaveAsUnit(unit))
-				return false;
-			if (unit.getWorld() != this)
-				return false;
-			}
-		return true;
-	}
-	/**
-	 * Add the given unit to the set of units attached to this world.
-	 * @param unit
-	 * 		The unit to be added.
-	 * @post This world has the given unit as one of its units.
-	 * @post The given unit references this world as the world to which it is attached.
-	 * @effect The given unit is added to a faction.
-	 * @throws IllegalArgumentException
-	 * 		This world cannot have the given unit as one of its units or 
-	 * 		the total number of units in this world is not less than 100.
-	 * @throws IllegalArgumentException
-	 * 		The given unit is positioned outside the gameworld or inside a cube that is not passable.
-	 * @throws IllegalArgumentException
-	 * 		The given unit is already attached to some world.
-	 */
-	public void addAsUnit(Unit unit) throws IllegalArgumentException{
-
-		if(! canHaveAsUnit(unit)|| !(getNumberUnits() <100)){
-			throw new IllegalArgumentException();
-		}
-		if( !(this.isCubeInWorld(unit.getCubeCoordinate())) || !(this.getPassable(unit.getCubeCoordinate()))){
-			throw new IllegalArgumentException();
-		}
-		if( unit.getWorld()!=null){
-			throw new IllegalArgumentException();
-		}
-		this.units.add(unit);
-		this.addUnitToUnitsAtCubeMap(unit);
-		unit.setWorld(this);
-		addToFaction(unit);
-
-	}
-	/**
-	 * Remove the given unit from the set of units attached to this world.
-	 * @param unit
-	 * 		The unit to be removed.
-	 * @post This world does not have the given unit as one of its units.
-	 * @post If this world has the given unit as one of its units,
-	 * 		the given unit is no longer attached to any world.
-	 * @effect If this world has the given unit as one of its units,
-	 * 		the given unit is removed from the set of units attached to its faction.
-	 * @throws IllegalArgumentException
-	 */
-	void removeAsUnit(Unit unit) throws IllegalArgumentException{
-		if( unit == null)
-			throw new IllegalArgumentException();
-		if (hasAsUnit(unit)){
-			this.units.remove(unit);
-			this.removeUnitFromUnitsAtCubeMap(unit);
-			unit.setWorld(null);
-			unit.getFaction().removeAsUnit(unit);
-			// overbodig, gebeurd al in removeAsUnit
-			//unit.setFaction(null);
-		}
-	}
-	/**
-	 * Return the set collecting references to units attached to this world.
-	 * 	@return
-	 */
-	public Set<Unit> listAllUnits(){
-		return units;
-	}
-	/**
-	 * Return the set collecting references to units attached 
-	 * to this world and the given faction.
-	 * @param faction
-	 * 		The faction units need to belong to.
-	 * @throws IllegalArgumentException
-	 * 		The given faction is not attached to this world.
-	 * @return
-	 */
-	// Wat als de gegeven faction niet bestaat of zich niet in de gameworld bevindt? 
-	
-	public Set<Unit> listAllUnitsOfFaction(Faction faction) throws IllegalArgumentException{
-		if( !hasAsFaction(faction))
-			throw new IllegalArgumentException();
-		return faction.getUnits();
-	}
-	/**
 	 * Return the set collecting references to boulders attached to this world.
 	 * 	@return
 	 */
@@ -813,9 +875,12 @@ public class World {
 	public Set<Unit> getUnits(int[] position)throws IllegalArgumentException{
 		if (!this.isCubeInWorld(position))
 			throw new IllegalArgumentException();
-		if (unitsAtCubeMap.get(position)==null)
+		if (unitsAtCubeMap.get(position)==null){
+			System.out.println("a");
 			return new HashSet<>();
+		}
 		else{
+			System.out.println("b");
 			return unitsAtCubeMap.get(position);
 		}
 	}
@@ -857,6 +922,7 @@ public class World {
 	
 	private void addUnitToUnitsAtCubeMap(Unit unit){
 		Set<Unit> unitsAtCube = this.unitsAtCubeMap.get(unit.getCubeCoordinate());
+		System.out.println("f");
 		if ( unitsAtCube != null){
 			unitsAtCube.add(unit);
 			this.unitsAtCubeMap.put(unit.getCubeCoordinate(),unitsAtCube);
@@ -865,6 +931,9 @@ public class World {
 			unitsAtCube = new HashSet<Unit>();
 			unitsAtCube.add(unit);
 			this.unitsAtCubeMap.put(unit.getCubeCoordinate(),unitsAtCube);
+			System.out.println("g");
+			System.out.println(unitsAtCubeMap.get(unit.getCubeCoordinate()).contains(unit));
+
 		}
 	}
 	
@@ -940,8 +1009,6 @@ public class World {
 
 	private final Set<Unit> units = new HashSet<Unit>();
 	
-	private String Char;
-	private StringBuilder Name;
 	private int maxUnits = 100;
 	private int maxFactions = 5;
 	
@@ -1060,6 +1127,7 @@ public class World {
  	 */
  	 public void terminate() {
  		 this.isTerminated = true;
+ 		 
  	 }
  	 
  	 /**

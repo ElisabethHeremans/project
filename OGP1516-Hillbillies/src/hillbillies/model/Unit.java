@@ -864,7 +864,7 @@ public class Unit {
 	 * @return False if the z-co�rdinate of this unit is equal to zero or 
 	 * 		there is a neighboring cube that is not passable. Otherwise, return true.
 	 */
-	private boolean mustFall() {
+	public boolean mustFall() {
 		//System.out.println(this.getCubeCoordinate()[2]);
 		if ( (this.getCubeCoordinate()[2]==0)){
 			return false;

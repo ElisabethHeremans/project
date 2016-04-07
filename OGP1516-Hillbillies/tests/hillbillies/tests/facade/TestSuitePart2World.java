@@ -103,6 +103,38 @@ public class TestSuitePart2World {
 
 	}
 	
+	@Test
+	public final void isCubeInWorld_TrueCase(){
+		Assert.assertTrue(world1.isCubeInWorld(new int[] {9,0,24}));
+	}
+	
+	@Test
+	public final void isCubeInWorld_FalseCase(){
+		Assert.assertFalse(world1.isCubeInWorld(new int[] {-1,12,24}));
+		Assert.assertFalse(world1.isCubeInWorld(new int[] {10,19,24}));
+
+	}
+	
+	@Test
+	public final void spawnUnit(){
+		Unit unit = world2.spawnUnit(false);
+		Assert.assertTrue(Unit.isValidAgility(unit.getAgility()));
+		Assert.assertTrue(Unit.isValidToughness(unit.getToughness()));
+		Assert.assertTrue(Unit.isValidStrength(unit.getStrength()));
+		Assert.assertTrue(unit.canHaveAsPosition(unit.getPosition()));
+		Assert.assertTrue(unit.canHaveAsHitpoints(unit.getHitpoints()));
+		Assert.assertTrue(unit.canHaveAsStaminaPoints(unit.getStaminaPoints()));
+		Assert.assertTrue(unit.canHaveAsWeight(unit.getWeight()));
+		Assert.assertTrue(Unit.isValidName(unit.getName()));
+		Assert.assertTrue(unit.getAgility()<=100);
+		Assert.assertFalse(unit.mustFall());
+		Assert.assertTrue(unit.getWorld()==world2);
+		Assert.assertTrue(world2.hasAsUnit(unit));
+		Assert.assertTrue(world2.getUnits(unit.getCubeCoordinate()).contains(unit));
+
+		
+	}
+	
 	
 
 }
