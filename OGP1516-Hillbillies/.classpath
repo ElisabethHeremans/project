@@ -9,7 +9,6 @@
 		</accessrules>
 	</classpathentry>
 	<classpathentry exported="true" kind="lib" path="lib/AnnotationsDoclets.jar"/>
-	<classpathentry kind="lib" path="/Users/adminheremans/Downloads/AnnotationsDoclets.jar"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
