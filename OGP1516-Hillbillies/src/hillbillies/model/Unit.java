@@ -407,9 +407,9 @@ public class Unit {
 	 */
 	@Raw
 	public void setName(String name) throws IllegalArgumentException {
-		System.out.println(name);
+		//System.out.println(name);
 		if (!isValidName(name)){
-			System.out.println("invalid " + name);
+			//System.out.println("invalid " + name);
 			throw new IllegalArgumentException();
 		}
 		this.name = name;
@@ -803,10 +803,11 @@ public class Unit {
 	 *             If the duration is less than zero or exceeds or equals 0.2 s.
 	 */
 	public void advanceTime(float duration) throws IllegalArgumentException {
-		if (Util.fuzzyLessThanOrEqualTo(duration, 0.0 )|| Util.fuzzyGreaterThanOrEqualTo((double)duration, 0.2)){
+		if (!(Util.fuzzyGreaterThanOrEqualTo(duration, 0.0-Util.DEFAULT_EPSILON )&& Util.fuzzyLessThanOrEqualTo((double)duration, 0.2+Util.DEFAULT_EPSILON))){
 			System.out.println(duration);
 			throw new IllegalArgumentException();
 		}
+
 		restTimer += duration;
 		if (experiencePoints >=10){
 			setExperiencePoints(this.getExperiencePoints()-10);
@@ -1171,6 +1172,10 @@ public class Unit {
 		}	
 	}
 	
+	public void moveTo1(int[] cubePos){
+		moveTo1(new double[] {(double)cubePos[0]+0.5,(double) cubePos[1]+0.5,(double)cubePos[2]+0.5);
+	}
+	
 	public void moving1(double duration){
 		double d = Vector.getDistance(nextTargetPosition,startPosition);
 		double[] v = new double[] {getCurrentSpeed()*(nextTargetPosition[0]-startPosition[0])/d,
@@ -1379,64 +1384,162 @@ public class Unit {
 	}
 	
 	private void endWork(int[] targetPosition) {
-		if (this.getBoulder() !=null) {
-			this.getBoulder().setPosition(this.getWorld().getCubeCenter(targetPosition));
-			this.getWorld().addAsBoulder(this.getBoulder());
-			this.setWeight(this.getWeight()-this.getBoulder().getWeight());
-			this.setBoulder(null);
+		switch(this.getWorld().getTerrain(targetPosition)){
+		case TREE:
+			this.getWorld().solidToPassableUpdate(targetPosition);
 			setExperiencePoints(this.getExperiencePoints()+10);
-
-		}
-		else if (this.getLog() !=null) {
-			this.getLog().setPosition(this.getWorld().getCubeCenter(targetPosition));
-			this.getWorld().addAsLog(this.getLog());
-			this.setWeight(this.getWeight()-this.getLog().getWeight());
-			this.setLog(null);
+			break;
+		case ROCK:
+			this.getWorld().solidToPassableUpdate(targetPosition);
 			setExperiencePoints(this.getExperiencePoints()+10);
-
-		}
-		else if (this.getWorld().getTerrain(targetPosition) == TerrainType.WORKSHOP 
-				&& !this.getWorld().getBoulders(targetPosition).isEmpty() 
-				&& !this.getWorld().getLogs(targetPosition).isEmpty()) {
-			Log log = (Log) this.getWorld().inspectCube(targetPosition).get(2).get(0);
-			Boulder boulder = (Boulder) this.getWorld().inspectCube(targetPosition).get(3).get(0);
-			this.getWorld().removeAsBoulder(boulder);
-			this.getWorld().removeAsLog(log);
-			this.setWeight(this.getWeight()+1);
-			this.setToughness(this.getToughness()+1);
-			setExperiencePoints(this.getExperiencePoints()+10);
-
+			break;
+		default:
+			switch(this.getNbBoulders()){
+			case 1:
+				this.getBoulder().setPosition(this.getWorld().getCubeCenter(targetPosition));
+				this.getWorld().addAsBoulder(this.getBoulder());
+				this.setWeight(this.getWeight()-this.getBoulder().getWeight());
+				this.setBoulder(null);
+				setExperiencePoints(this.getExperiencePoints()+10);
+				break;
+			case 0:
+				switch(this.getNbLogs()){
+				case 1:
+					this.getLog().setPosition(this.getWorld().getCubeCenter(targetPosition));
+					this.getWorld().addAsLog(this.getLog());
+					this.setWeight(this.getWeight()-this.getLog().getWeight());
+					this.setLog(null);
+					setExperiencePoints(this.getExperiencePoints()+10);
+					break;
+				case 0:
+					switch(this.getWorld().getTerrain(targetPosition)){
+					case WORKSHOP:
+						switch(this.getWorld().getBoulders(targetPosition).size()){
+						case 0:
+							switch(this.getWorld().getLogs(targetPosition).size()){
+							case 0:
+								break;
+							default:
+								Log log = (Log) this.getWorld().inspectCube(targetPosition).get(2).get(0);
+								this.getWorld().removeAsLog(log);
+								this.setLog(log);
+								setExperiencePoints(this.getExperiencePoints()+10);
+								this.setWeight(this.getWeight()+log.getWeight());
+								break;
+							}
+							break;
+						default:
+							switch(this.getWorld().getLogs(targetPosition).size()){
+							case 0:
+								Boulder boulder = (Boulder) this.getWorld().inspectCube(targetPosition).get(3).get(0);
+								this.setBoulder(boulder);
+								this.getWorld().removeAsBoulder(boulder);
+								setExperiencePoints(this.getExperiencePoints()+10);
+								this.setWeight(this.getWeight()+boulder.getWeight());
+								break;
+							default:
+								Log log = (Log) this.getWorld().inspectCube(targetPosition).get(2).get(0);
+								Boulder boulder2 = (Boulder) this.getWorld().inspectCube(targetPosition).get(3).get(0);
+								this.getWorld().removeAsBoulder(boulder2);
+								this.getWorld().removeAsLog(log);
+								this.setWeight(this.getWeight()+1);
+								this.setToughness(this.getToughness()+1);
+								setExperiencePoints(this.getExperiencePoints()+10);
+								break;
+							}
+							break;
+						}
+						break;
+					default:
+						switch(this.getWorld().getBoulders(targetPosition).size()){
+						case 0:
+							switch(this.getWorld().getLogs(targetPosition).size()){
+							case 0:
+								break;
+							default:
+								Log log = (Log) this.getWorld().inspectCube(targetPosition).get(2).get(0);
+								this.getWorld().removeAsLog(log);
+								this.setLog(log);
+								setExperiencePoints(this.getExperiencePoints()+10);
+								this.setWeight(this.getWeight()+log.getWeight());
+								break;
+							}
+							break;
+						default:
+							Boulder boulder = (Boulder) this.getWorld().inspectCube(targetPosition).get(3).get(0);
+							this.setBoulder(boulder);
+							this.getWorld().removeAsBoulder(boulder);
+							setExperiencePoints(this.getExperiencePoints()+10);
+							this.setWeight(this.getWeight()+boulder.getWeight());
+							break;
+						}
+						break;
+					}
+					break;
+			}
+			break;
+			}
+			break;
 		}
 		
-		else if (!this.getWorld().getBoulders(targetPosition).isEmpty()){
-			Boulder boulder = (Boulder) this.getWorld().inspectCube(targetPosition).get(3).get(0);
-			this.setBoulder(boulder);
-			this.getWorld().removeAsBoulder(boulder);
-			setExperiencePoints(this.getExperiencePoints()+10);
-			this.setWeight(this.getWeight()+boulder.getWeight());
-
-
-		}
-
-		else if (!this.getWorld().getLogs(targetPosition).isEmpty()){
-			Log log = (Log) this.getWorld().inspectCube(targetPosition).get(2).get(0);
-			this.getWorld().removeAsLog(log);
-			this.setLog(log);
-			setExperiencePoints(this.getExperiencePoints()+10);
-			this.setWeight(this.getWeight()+log.getWeight());
-
-			
-		}
-		else if (this.getWorld().getTerrain(targetPosition)== TerrainType.TREE){
-			this.getWorld().solidToPassableUpdate(targetPosition);
-			setExperiencePoints(this.getExperiencePoints()+10);
-
-		}
-		else if (this.getWorld().getTerrain(targetPosition)== TerrainType.ROCK){
-			this.getWorld().solidToPassableUpdate(targetPosition);
-			setExperiencePoints(this.getExperiencePoints()+10);
-
-		}
+//		if (this.getBoulder() !=null) {
+//			this.getBoulder().setPosition(this.getWorld().getCubeCenter(targetPosition));
+//			this.getWorld().addAsBoulder(this.getBoulder());
+//			this.setWeight(this.getWeight()-this.getBoulder().getWeight());
+//			this.setBoulder(null);
+//			setExperiencePoints(this.getExperiencePoints()+10);
+//
+//		}
+//		else if (this.getLog() !=null) {
+//			this.getLog().setPosition(this.getWorld().getCubeCenter(targetPosition));
+//			this.getWorld().addAsLog(this.getLog());
+//			this.setWeight(this.getWeight()-this.getLog().getWeight());
+//			this.setLog(null);
+//			setExperiencePoints(this.getExperiencePoints()+10);
+//
+//		}
+//		else if (this.getWorld().getTerrain(targetPosition) == TerrainType.WORKSHOP 
+//				&& !this.getWorld().getBoulders(targetPosition).isEmpty() 
+//				&& !this.getWorld().getLogs(targetPosition).isEmpty()) {
+//			Log log = (Log) this.getWorld().inspectCube(targetPosition).get(2).get(0);
+//			Boulder boulder = (Boulder) this.getWorld().inspectCube(targetPosition).get(3).get(0);
+//			this.getWorld().removeAsBoulder(boulder);
+//			this.getWorld().removeAsLog(log);
+//			this.setWeight(this.getWeight()+1);
+//			this.setToughness(this.getToughness()+1);
+//			setExperiencePoints(this.getExperiencePoints()+10);
+//
+//		}
+//		
+//		else if (!this.getWorld().getBoulders(targetPosition).isEmpty()){
+//			Boulder boulder = (Boulder) this.getWorld().inspectCube(targetPosition).get(3).get(0);
+//			this.setBoulder(boulder);
+//			this.getWorld().removeAsBoulder(boulder);
+//			setExperiencePoints(this.getExperiencePoints()+10);
+//			this.setWeight(this.getWeight()+boulder.getWeight());
+//
+//
+//		}
+//
+//		else if (!this.getWorld().getLogs(targetPosition).isEmpty()){
+//			Log log = (Log) this.getWorld().inspectCube(targetPosition).get(2).get(0);
+//			this.getWorld().removeAsLog(log);
+//			this.setLog(log);
+//			setExperiencePoints(this.getExperiencePoints()+10);
+//			this.setWeight(this.getWeight()+log.getWeight());
+//
+//			
+//		}
+//		else if (this.getWorld().getTerrain(targetPosition)== TerrainType.TREE){
+//			this.getWorld().solidToPassableUpdate(targetPosition);
+//			setExperiencePoints(this.getExperiencePoints()+10);
+//
+//		}
+//		else if (this.getWorld().getTerrain(targetPosition)== TerrainType.ROCK){
+//			this.getWorld().solidToPassableUpdate(targetPosition);
+//			setExperiencePoints(this.getExperiencePoints()+10);
+//
+//		}
 		setStatus(Status.DONE);
 	}
 	/**
@@ -1847,7 +1950,7 @@ public class Unit {
  	// Hier de voorwaarde dat de boulder in dezelfde cube als de unit moet zijn. Maakt de methode wel niet 
  	// meer static. 
  	public boolean isValidBoulder(Boulder boulder){
- 		return (boulder == null) || (boulder.getPosition() == this.getPosition());
+ 		return (boulder == null) || (boulder.getPosition() == this.getPosition())||(this.isNeighbouringCube(boulder.getPosition()));
  	}
  	/**
 	 * Set the boulder for this unit to the given boulder.
@@ -1861,8 +1964,17 @@ public class Unit {
  	public void setBoulder(Boulder boulder) throws IllegalArgumentException{
  		if(! isValidBoulder(boulder))
  			throw new IllegalArgumentException();
+ 		
  		this.boulder = boulder;
  	}
+ 	
+ 	public int getNbBoulders(){
+ 		if (this.getBoulder()!=null)
+ 			return 1;
+ 		else
+ 			return 0;
+ 	}
+ 	
  	/**
  	 * Variable referencing the boulder of this unit.
  	 */
@@ -1884,7 +1996,7 @@ public class Unit {
  	// Hier de voorwaarde dat de log in dezelfde cube als de unit moet zijn. Maakt de methode wel niet 
  	// meer static. 
  	public boolean isValidLog(Log log){
- 		return (log == null) || (log.getPosition() == this.getPosition());
+ 		return (log == null) || (log.getPosition() == this.getPosition())|| this.isNeighbouringCube(log.getPosition());
  	}
  	/**
 	 * Set the log for this unit to the given log.
@@ -1901,6 +2013,14 @@ public class Unit {
  		this.log = log;
 
  	}
+	
+	public int getNbLogs(){
+		if (this.getLog()==null)
+			return 0;
+		else
+			return 1;
+	}
+	
 	/**
  	 * Variable referencing the log of this unit.
  	 */
