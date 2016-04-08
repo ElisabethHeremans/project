@@ -47,7 +47,7 @@ public class Log extends RawMaterial {
 		return this.position;
 	}
 	
-	public int[] getCubeCoordinate() {
+	protected int[] getCubeCoordinate() {
 		return new int[] { (int) Math.floor(this.getPosition()[0]), (int) Math.floor(this.getPosition()[1]),
 				(int) Math.floor(this.getPosition()[2]) };
 	}
@@ -67,7 +67,7 @@ public class Log extends RawMaterial {
 	 */
 	@Raw
 	@Override
-	public void setPosition(double[] position) throws IllegalArgumentException {
+	protected void setPosition(double[] position) throws IllegalArgumentException {
 		if (!canHaveAsPosition(position))
 			throw new IllegalArgumentException();
 		this.position = position;

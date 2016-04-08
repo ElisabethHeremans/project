@@ -6,6 +6,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import hillbillies.model.Boulder;
+import hillbillies.model.Unit;
 import hillbillies.tests.util.PositionAsserts;
 import ogp.framework.util.Util;
 
@@ -16,6 +17,8 @@ public class TestSuitePart2Boulder {
 	private static Boulder IntegerBoulder;
 	
 	private Boulder ABoulder;
+	
+	private Boulder BBoulder;
 	
 	/**
 	 * Set up an immutable test fixture
@@ -31,6 +34,7 @@ public class TestSuitePart2Boulder {
 	@Before
 	public void setUpBefore(){
 		ABoulder = new Boulder(new double[] {3.5,1.5,4.5});
+		BBoulder = new Boulder(new double[] {6.5,3.5,0.5});
 	}
 	
 	@Test
@@ -40,6 +44,46 @@ public class TestSuitePart2Boulder {
 	
 	@Test 
 	public final void getPosition_int(){
-		Assert.assertArrayEquals(new int[] {1,2,3},IntegerBoulder.getPosition(),Util.DEFAULT_EPSILON)
+		Assert.assertArrayEquals(new double[] {1.5,2.5,3.5},IntegerBoulder.getPosition(),Util.DEFAULT_EPSILON);
 	}
+	
+	@Test
+	public final void getWeight(){
+		Assert.assertTrue(DoubleBoulder.getWeight()<=51);
+		Assert.assertTrue(DoubleBoulder.getWeight()>=10);
+	}
+	
+	@Test
+	public final void getWeight_int(){
+		Assert.assertTrue(IntegerBoulder.getWeight()<=51);
+		Assert.assertTrue(IntegerBoulder.getWeight()>=10);
+	}
+	
+	/**
+	 * Helper method to advance time by some time for the given unit. (we based this on the helper method in Part1TestPartial)
+	 * 
+	 * @param time
+	 *            The time, in seconds, to advance.
+	 * @param step
+	 *            The step size, in seconds, by which to advance.
+	 */
+	private static void advanceTimeFor(Unit unit, double time, double step) {
+		int n = (int) (time / step);
+		for (int i = 0; i < n; i++)
+			unit.advanceTime((float)step);
+		unit.advanceTime((float) (time - n * step));
+	}
+	
+	@Test
+	public final void mustFall(){
+		Assert.assertFalse(BBoulder.mustFall());
+	}
+	
+//	@Test
+//	public final void advanceTime_Falling(){
+//		ABoulder.fall();
+//		float duration = (float) 0.1;
+//		ABoulder.advanceTime(duration);
+//		PositionAsserts.assertDoublePositionEquals(3.5,1.5,4.5-3.0*duration,ABoulder.getPosition());
+//	}
 }
