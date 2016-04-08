@@ -101,7 +101,7 @@ public class Unit {
 	 *       	| if (25<= weight <=100) && (this.getStrength+this.getAgility)/2 <= weight)
 	 *       	|	then new.getWeight() == weight 
 	 *       	| if !(25<= weight <=100) || !(this.getStrength+this.getAgility)/2 <= weight)
-	 *       	|	new.getWeight() == 25
+	 *       	|	new.getWeight() == (int) Math.ceil((this.getStrength()+this.getAgility())/2.0);
 	 * @effect The position of this new unit is set to the given position. 
 	 * 			|this.setPosition(position)
 	 * @effect The hitpoints of this new unit is set to the given number of hitpoints. 
@@ -128,8 +128,9 @@ public class Unit {
 		if(! (25<=toughness && toughness<=100))
 			toughness = 25;
 		setToughness(toughness);
-		if (!(25<=weight && weight<=100 && (this.getStrength()+this.getAgility())/2.0 <= weight))
-			weight = 25;
+		if (!(25<=weight && weight<=100 && (this.getStrength()+this.getAgility())/2 <= weight))
+			weight = (int) Math.ceil((this.getStrength()+this.getAgility())/2.0);
+		
 		setWeight(weight);
 		setOrientation((float) orientation);
 		this.setHitPoints(hitpoints);
@@ -812,7 +813,6 @@ public class Unit {
 			System.out.println(duration);
 			throw new IllegalArgumentException();
 		}
-
 		restTimer += duration;
 		if (experiencePoints >=10){
 			setExperiencePoints(this.getExperiencePoints()-10);
@@ -855,7 +855,13 @@ public class Unit {
 			if (attackTimer >= 1.0)
 				setStatus(Status.DONE);
 		}
+		if (this.getLog() != null)
+			this.getLog().setPosition(this.getPosition());
+		if (this.getBoulder() != null)
+			this.getBoulder().setPosition(this.getPosition());
+
 	}
+	
 	/**
 	 * Make the unit fall.
 	 * 
@@ -1952,8 +1958,6 @@ public class Unit {
  	 * @return True if and only if the given boulder is not effective
  	 * 		or the position of the given boulder equals the position of this unit.
  	 */
- 	// Hier de voorwaarde dat de boulder in dezelfde cube als de unit moet zijn. Maakt de methode wel niet 
- 	// meer static. 
  	public boolean isValidBoulder(Boulder boulder){
  		return (boulder == null) || (boulder.getPosition() == this.getPosition())||(this.isNeighbouringCube(boulder.getPosition()));
  	}

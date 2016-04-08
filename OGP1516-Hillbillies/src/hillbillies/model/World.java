@@ -15,32 +15,18 @@ import hillbillies.part2.listener.TerrainChangeListener;
 import hillbillies.util.ConnectedToBorder;
 import ogp.framework.util.Util;
 
+/**
+ * A class of Worlds with a matrix of terrain types and a terrain change listener.
+ * 
+ * @invar The terrain types of each world are valid terrain types.
+ * @invar The units of each world are proper units for that world.
+ * @invar The boulders of each world are proper boulders for that world.
+ * @invar The logs of each world are proper logs for that world.
+ * @invar The factions of each worlds are proper factions for that world.
+ * 
+ *
+ */
 public class World {
-
-
-	
-	/**
-	 * 
-	 * @param Units
-	 *            The number of units for this new world.
-	 * @param  Boulders
-	 *         The number of boulders for this new world.
-	 * @param  Logs
-	 *         The number of logs for this new world.
-	 * @post If the given number of units is a valid number of units for any
-	 *       world, the number of units of this new world is equal to the given
-	 *       number of units. Otherwise, the number of units of this new world
-	 *       is equal to 0.
-	 * @post If the given number of boulders is a valid number of boulders for any world,
-	 *       the number of boulders of this new world is equal to the given
-	 *       number of boulders. Otherwise, the number of boulders of this new world is equal
-	 *       to 0.
-	 * @post If the given number of logs is a valid number of logs for any world,
-	 *       the number of logs of this new world is equal to the given
-	 *       number of logs. Otherwise, the number of logs of this new world is equal
-	 *       to 0.
-	 */
-	
 	/**
 	 * Initialize this new world with given terrain types and terrain change listener.
 	 * 
@@ -428,6 +414,9 @@ public class World {
 				return false;
 			if (unit.getWorld() != this)
 				return false;
+			if( !(this.isCubeInWorld(unit.getCubeCoordinate())) || !(this.getPassable(unit.getCubeCoordinate())))
+				return false;
+
 			}
 		return true;
 	}
@@ -791,6 +780,8 @@ public class World {
 				return false;
 			if (boulder.getWorld() != this)
 				return false;
+			if( !(this.isCubeInWorld(boulder.getCubeCoordinate())) || !(this.getPassable(boulder.getCubeCoordinate())))
+				return false;
 			
 		}
 		return true;
@@ -875,7 +866,7 @@ public class World {
 	 * @throws IllegalArgumentException
 	 * 			If the given boulder is not attached to this world.
 	 */
-	protected void addBoulderToBouldersAtCubeMap(Boulder boulder)throws IllegalArgumentException{
+	void addBoulderToBouldersAtCubeMap(Boulder boulder)throws IllegalArgumentException{
 		if(!this.hasAsBoulder(boulder))
 			throw new IllegalArgumentException();
 
@@ -903,7 +894,7 @@ public class World {
 	 * @throws IllegalArgumentException
 	 * 			If the given boulder is not attached to this world.
 	 */
-	protected void removeBoulderFromBouldersAtCubeMap(Boulder boulder){
+	void removeBoulderFromBouldersAtCubeMap(Boulder boulder){
 		Set<Boulder> bouldersAtCube = this.bouldersAtCubeMap.get(new Position(boulder.getCubeCoordinate()));
 		if (bouldersAtCube.contains(boulder)){
 			bouldersAtCube.remove(boulder);
@@ -972,7 +963,8 @@ public class World {
 				return false;
 			if (log.getWorld() != this)
 				return false;
-			
+			if( !(this.isCubeInWorld(log.getCubeCoordinate())) || !(this.getPassable(log.getCubeCoordinate())))
+				return false;
 		}
 		return true;
 	}
@@ -1059,7 +1051,7 @@ public class World {
 	 * @throws IllegalArgumentException
 	 * 			If the given log is not attached to this world.
 	 */
-	protected void addLogToLogsAtCubeMap(Log log) throws IllegalArgumentException{
+	void addLogToLogsAtCubeMap(Log log) throws IllegalArgumentException{
 		if(!this.hasAsLog(log))
 			throw new IllegalArgumentException();
 		Set<Log> logsAtCube = this.logsAtCubeMap.get(new Position(log.getCubeCoordinate()));
@@ -1086,7 +1078,7 @@ public class World {
 	 * @throws IllegalArgumentException
 	 * 			If the given log is not attached to this world.
 	 */
-	protected void removeLogFromLogsAtCubeMap(Log log){
+	void removeLogFromLogsAtCubeMap(Log log){
 		Set<Log> logsAtCube = this.logsAtCubeMap.get(new Position(log.getCubeCoordinate()));
 		if (logsAtCube.contains(log)){
 			logsAtCube.remove(log);
@@ -1113,8 +1105,19 @@ public class World {
 	 */
 	private Set<Log> logs = new HashSet<Log>();
 	
-	
-	List<List<?>> inspectCube(int[] position)throws IllegalArgumentException{
+	/**
+	 * Inspect the given cube. Return a list with a list containing the terrain type of the cube, 
+	 * a list of all units occupying the cube, 
+	 * a list of all the logs occupying the cube and a list of all the boulders in the cube.
+	 * @param position
+	 * 		the cube position to inspect
+	 * @return A list containing a list with the terrain type, a list with all units in the cube, 
+	 * 			a list with all logs in the cube and a list with all boulders in the cube.
+	 * @throws IllegalArgumentException
+	 * 			If the given position is not a cube of the world.
+	 * 
+	 */
+	List<List<?>> inspectCube(int[] position) throws IllegalArgumentException{
 		if (!this.isCubeInWorld(position))
 			throw new IllegalArgumentException();
 		List<List<?>> list = new ArrayList<>();
@@ -1152,57 +1155,73 @@ public class World {
 	
 		return list;
 	}
+	/**
+	 * A variable registering all the units of this world.
+	 * @invar The set of units is effective.
+	 * @invar Each element in the set of units references a unit that
+	 * 		is an acceptable unit for this world.
+	 * @invar Each unit in the set of units references this world as the world
+	 * 		to which it is attached.
+	 */
 	private final Set<Unit> units = new HashSet<Unit>();
 	
+	/**
+	 * A constant: the maximum number of units in this world
+	 */
 	private final static int MAX_UNITS = 100;
+	
+	/**
+	 * A constant representing the maximum number of factions in this world.
+	 */
 	private final static int MAX_FACTIONS = 5;
+	
+	/**
+	 * A constant registering the maximum number of units per faction
+	 */
 	private final static int MAX_UNITS_PER_FACTION = 50;
 	
 	/**
-	 * @return the xDimension
+	 * Return the x dimension of this world.
 	 */
 	public final int getxDimension() {
 		return xDimension;
 	}
 
 	/**
-	 * @return the yDimension
+	 * Return the y dimension of this world
 	 */
 	public final int getyDimension() {
 		return yDimension;
 	}
 
 	/**
-	 * @return the zDimension
+	 * return the z dimension of this world
 	 */
 	public final int getzDimension() {
 		return zDimension;
 	}
 
-	
+	/**
+	 * A variable registering the x dimension of this world
+	 */
 	private final int xDimension;
-
+	
+	/**
+	 * A variable registering the y dimension of this world.
+	 */
 	private final int yDimension;
-
+	
+	/**
+	 * A variable registering the z dimension of this world.
+	 */
 	private final int zDimension;
 	
-	protected ConnectedToBorder connectedToBorder;
-
-	
-//	/**
-//	 * @return the connectedToBorder
-//	 */
-//	public ConnectedToBorder getConnectedToBorder() {
-//		return connectedToBorder;
-//	}
-	
-	public boolean isSolidConnectedToBorder(int[] pos) throws IllegalArgumentException{
-		if (!isCubeInWorld(pos))
-			throw new IllegalArgumentException();
-		else
-			return this.connectedToBorder.isSolidConnectedToBorder(pos[0], pos[1], pos[2]);
-	}
-	
+	/**
+	 * Initialize the cube terrains of connectedToBorder, 
+	 * by changing all cubes that are passable to passable terrain in connectedToBorder.
+	 * @effect Change all the cubes that are passable in this world, from solid to passable, 
+	 * 			in the connectedToBorder variable.
+	 */
 	private void initializeCubeTerrains(){
 		for (int x=0; x < getxDimension(); x ++){
 			for (int y=0; y< getyDimension(); y++){
@@ -1214,6 +1233,32 @@ public class World {
 			}
 	}
 	
+	/**
+	 * Return if the given cube is a solid cube connected to the border of this world.
+	 * 
+	 * @param pos
+	 * 			The cube position to check
+	 * @return True if and only if the given cube position is a solid cube connected to the border of this world.
+	 * @throws IllegalArgumentException
+	 * 			If the given cube is not inside this world
+	 */
+	public boolean isSolidConnectedToBorder(int[] pos) throws IllegalArgumentException{
+		if (!isCubeInWorld(pos))
+			throw new IllegalArgumentException();
+		else
+			return this.connectedToBorder.isSolidConnectedToBorder(pos[0], pos[1], pos[2]);
+	}
+	
+	/**
+	 * A variable registering the connected to border aspects of this world.
+	 */
+	protected ConnectedToBorder connectedToBorder;
+
+	/**
+	 * Update all the cube terrains of connectedToBorder.
+	 * @effect Update all the cubes that are not solid and connected to border in connectedToBorder,
+	 * 			from solid to passable.
+	 */
 	void updateCubeTerrains(){
 		for (int x=0; x < getxDimension(); x ++){
 			for (int y=0; y< getyDimension(); y++){
@@ -1225,9 +1270,21 @@ public class World {
 				}
 			}
 	}
+	
+	/**
+	 * Update the given position from solid to passable.
+	 * @param position
+	 * 			The position to update.
+	 * @effect Change this position from solid to passable in connected to border.
+	 * @post If the terrain of the given position is rock, the terrain type is changed to air 
+	 * 			and a boulder can appear in the given position.
+	 * @post If the terrain of the given position is tree, the terrain type is changed to air
+	 * 			and a log can appear in the given position.
+	 * @effect For all positions neighboring the given position, if these positions are 
+	 * 			not connected to the borders of this world anymore, they are updated to passable cubes (with this method).
+	 */
 	void solidToPassableUpdate(int[] position){
 		List<int[]> toChange = connectedToBorder.changeSolidToPassable(position[0],position[1],position[2]);
-		
 		if (new Random().nextDouble() <= 0.25){
 			if (getTerrain(position) == TerrainType.ROCK){
 				Boulder boulder = new Boulder(position);
@@ -1242,11 +1299,20 @@ public class World {
 		}
 		for (int[] positionToChange: toChange){
 			solidToPassableUpdate(positionToChange);
-			
 		}
-		
 	}
-
+	
+	/**
+	 * Advance time for this world. Update the position and activity status of all the logs, boulders and units in this world.
+	 * @param duration
+	 *         The game time after which advanceTime is called.
+	 * @effect Update the cube terrains of this world.
+	 * @effect Advance time for all the units in this world.
+	 * @effect Advance time for all the boulders in this world.
+	 * @effect Advance time for all the logs in this world.
+	 * @throws IllegalArgumentException
+	 * 			If the duration is not valid, not between 0 and 0.2.
+	 */
 	public void advanceTime(double duration) throws IllegalArgumentException{
 		if (!(Util.fuzzyGreaterThanOrEqualTo(duration, 0.0-Util.DEFAULT_EPSILON )&& Util.fuzzyLessThanOrEqualTo((double)duration, 0.2+Util.DEFAULT_EPSILON))){
 			System.out.println(duration);
@@ -1255,10 +1321,6 @@ public class World {
 		updateCubeTerrains();
 		for (Unit unit : this.listAllUnits()){
 			unit.advanceTime((float)duration);
-			if (unit.getLog() != null)
-				unit.getLog().setPosition(unit.getPosition());
-			if (unit.getBoulder() != null)
-				unit.getBoulder().setPosition(unit.getPosition());
 		}
 		for (Boulder boulder: boulders){
 			boulder.advanceTime((float) duration);
@@ -1280,8 +1342,6 @@ public class World {
  	 *
  	 * @post   This world  is terminated.
  	 *       | new.isTerminated()
- 	 * @post   ...
- 	 *       | ...
  	 */
  	 public void terminate() {
  		 this.isTerminated = true;

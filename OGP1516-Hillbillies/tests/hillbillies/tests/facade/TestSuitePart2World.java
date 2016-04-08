@@ -13,9 +13,9 @@ import java.util.Set;
 import org.junit.*;
 
 import hillbillies.model.*;
-import hillbillies.part2.facade.IFacade;
+//import hillbillies.part2.facade.IFacade;
 import hillbillies.part2.listener.DefaultTerrainChangeListener;
-import hillbillies.part2.listener.TerrainChangeListener;
+//import hillbillies.part2.listener.TerrainChangeListener;
 import ogp.framework.util.*;
 
 
