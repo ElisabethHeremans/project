@@ -13,6 +13,7 @@ import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Raw;
 import hillbillies.part2.listener.TerrainChangeListener;
 import hillbillies.util.ConnectedToBorder;
+import ogp.framework.util.Util;
 
 public class World {
 
@@ -265,8 +266,8 @@ public class World {
 		int randomAgility = new Random().nextInt(76)+25;
 		int randomStrength = new Random().nextInt(76)+25;
 		int randomWeight = new Random().nextInt(101-((randomAgility+randomStrength)/2))+((randomAgility+randomStrength)/2);
-		double randomHitpoints = (double) new Random().nextInt(((int) Math.ceil(200.0*(randomWeight/100.0)*(randomToughness/100.0)))+1)+1.0;
-		double randomStaminaPoints = (double) new Random().nextInt(((int) Math.ceil(200.0*(randomWeight/100.0)*(randomToughness/100.0)))+1)+1.0;
+		double randomHitpoints = (double) new Random().nextInt(((int) Math.ceil(200.0*(randomWeight/100.0)*(randomToughness/100.0))))+1;
+		double randomStaminaPoints = (double) new Random().nextInt(((int) Math.ceil(200.0*(randomWeight/100.0)*(randomToughness/100.0))))+1;
 		boolean validPosFound = false;
 		double[] pos = new double[]{};
 		while (!validPosFound){
@@ -281,7 +282,7 @@ public class World {
 		Unit spawnUnit = new Unit(randomName(), pos, 
 				randomWeight,randomStrength, randomAgility,randomToughness,enableDefaultBehavior,
 				randomHitpoints,randomStaminaPoints,new Random().nextDouble()*360);
-		if (this.listAllUnits().size()<100)
+		if (this.getNumberUnits()<MAX_UNITS)
 			addAsUnit(spawnUnit);
 		return spawnUnit;
 	}
@@ -364,7 +365,7 @@ public class World {
 	@Raw
 	public boolean hasProperUnits(){
 	
-		if (this.getNumberUnits() >100){
+		if (this.getNumberUnits() >MAX_UNITS){
 			
 			return false;
 		}
@@ -397,7 +398,7 @@ public class World {
 	 */
 	public void addAsUnit(Unit unit) throws IllegalArgumentException{
 	
-		if(! canHaveAsUnit(unit)|| !(getNumberUnits() <100)){
+		if(! canHaveAsUnit(unit)|| !(getNumberUnits() <MAX_UNITS)){
 			throw new IllegalArgumentException();
 		}
 		if( !(this.isCubeInWorld(unit.getCubeCoordinate())) || !(this.getPassable(unit.getCubeCoordinate()))){
@@ -470,13 +471,70 @@ public class World {
 	}
 
 	/**
+	 * Return a set of units in this world that are located at the given position in this world.
+	 * @param position
+	 * 		The position of the units.
+	 * @return
+	 * @throws IllegalArgumentException
+	 * 	The given position is not located inside this world.
+	 */
+	public Set<Unit> getUnits(int[] position)throws IllegalArgumentException{
+		if (!this.isCubeInWorld(position))
+			throw new IllegalArgumentException();
+		if (unitsAtCubeMap.get(new Position(position))==null){
+			return new HashSet<>();
+		}
+		else{
+			return unitsAtCubeMap.get(new Position(position));
+		}
+	}
+
+
+
+
+	private void addUnitToUnitsAtCubeMap(Unit unit){
+		Set<Unit> unitsAtCube = this.unitsAtCubeMap.get(new Position(unit.getCubeCoordinate()));
+		//System.out.println("f");
+		if ( unitsAtCube != null){
+			unitsAtCube.add(unit);
+			this.unitsAtCubeMap.put(new Position(unit.getCubeCoordinate()),unitsAtCube);
+		}
+		else{
+			unitsAtCube = new HashSet<Unit>();
+			unitsAtCube.add(unit);
+			this.unitsAtCubeMap.put(new Position(unit.getCubeCoordinate()),unitsAtCube);
+			//System.out.println("g");
+			//System.out.println(unitsAtCubeMap.get(new Position(unit.getCubeCoordinate())).contains(unit));
+	
+		}
+	}
+
+
+
+
+	private void removeUnitFromUnitsAtCubeMap(Unit unit){
+		Set<Unit> unitsAtCube = this.unitsAtCubeMap.get(new Position(unit.getCubeCoordinate()));
+		if (unitsAtCube.contains(unit)){
+			unitsAtCube.remove(unit);
+			if (unitsAtCube.isEmpty())
+				unitsAtCubeMap.remove(new Position(unit.getCubeCoordinate()));
+			else{
+				unitsAtCubeMap.replace(new Position(unit.getCubeCoordinate()), unitsAtCube);
+			}
+		}
+	}
+
+	private Map<Position,Set<Unit>> unitsAtCubeMap = new HashMap<Position, Set<Unit>>();
+
+
+	/**
 	 * Adds a given unit to a faction and creates a new faction in which the unit is added
 	 * if no legal faction is available.
 	 * @param unit
 	 * 		The given unit.
 	 */
 	private void addToFaction(Unit unit){
-		if(getNbActiveFactions()<5){
+		if(getNbActiveFactions()<MAX_FACTIONS){
 			 Faction newFaction = new Faction();
 			 this.addAsFaction(newFaction);
 			 newFaction.addAsUnit(unit);
@@ -484,7 +542,7 @@ public class World {
 		else{
 			Faction leastUnitsFaction = null;
 			for(Faction faction: this.getActiveFactions()){
-				if (faction.getUnits().size()<50 && (leastUnitsFaction == null 
+				if (faction.getUnits().size()<MAX_UNITS_PER_FACTION && (leastUnitsFaction == null 
 						||faction.getUnits().size()<leastUnitsFaction.getUnits().size())) 
 					leastUnitsFaction = faction;
 			}
@@ -548,7 +606,7 @@ public class World {
 	 */
 	@Raw
 	public boolean canHaveAsFaction(Faction faction){
-		return (faction != null && (!this.isTerminated() || faction.isTerminated()) &&faction.getNbUnits() <=50);
+		return (faction != null && (!this.isTerminated() || faction.isTerminated()) &&faction.getNbUnits() <=MAX_UNITS_PER_FACTION);
 	}
 	
 	/**
@@ -560,7 +618,7 @@ public class World {
 		for (Faction faction: this.factions){
 			if (! canHaveAsFaction(faction))
 				return false;
-			if (getNbActiveFactions()>5)
+			if (getNbActiveFactions()>MAX_FACTIONS)
 				return false;
 		}
 		return true;
@@ -577,7 +635,7 @@ public class World {
 	private void addAsFaction(Faction faction)throws IllegalArgumentException{
 		if (! canHaveAsFaction(faction))
 			throw new IllegalArgumentException();
-		if (getNbActiveFactions()!=5)
+		if (getNbActiveFactions()!=MAX_FACTIONS)
 			factions.add( faction);
 //		if (faction.getWorld() != null)
 //			throw new IllegalArgumentException();
@@ -674,7 +732,7 @@ public class World {
 	 * @throws IllegalArgumentException
 	 * 		The given boulder is already attached to some world.
 	 */
-	void addAsBoulder(Boulder boulder) throws IllegalArgumentException{
+	public void addAsBoulder(Boulder boulder) throws IllegalArgumentException{
 		if(! canHaveAsBoulder(boulder))
 			throw new IllegalArgumentException();
 		if( !(this.isCubeInWorld(boulder.getCubeCoordinate())) || !(this.getPassable(boulder.getCubeCoordinate())))
@@ -703,6 +761,54 @@ public class World {
 			boulder.setWorld(null);
 		}
 	}
+	/**
+	 * Return a set of boulders in this world that are located at the given position in this world.
+	 * @param position
+	 * 		The position of the boulders.
+	 * @return
+	 * @throws IllegalArgumentException
+	 * 	The given position is not located inside this world.
+	 */
+	public Set<Boulder> getBoulders(int[] position)throws IllegalArgumentException{
+		if (!this.isCubeInWorld(position))
+			throw new IllegalArgumentException();
+		if (bouldersAtCubeMap.get(new Position(position))==null)
+			return new HashSet<>();
+		else{
+			return bouldersAtCubeMap.get(new Position(position));
+		}
+	}
+
+	private void addBoulderToBouldersAtCubeMap(Boulder boulder){
+		Set<Boulder> bouldersAtCube = this.bouldersAtCubeMap.get(new Position(boulder.getCubeCoordinate()));
+		if ( bouldersAtCube != null){
+			bouldersAtCube.add(boulder);
+			this.bouldersAtCubeMap.put(new Position(boulder.getCubeCoordinate()),bouldersAtCube);
+		}
+		else{
+			bouldersAtCube = new HashSet<Boulder>();
+			bouldersAtCube.add(boulder);
+			this.bouldersAtCubeMap.put(new Position(boulder.getCubeCoordinate()),bouldersAtCube);
+		}
+	}
+
+
+
+
+	private void removeBoulderFromBouldersAtCubeMap(Boulder boulder){
+		Set<Boulder> bouldersAtCube = this.bouldersAtCubeMap.get(new Position(boulder.getCubeCoordinate()));
+		if (bouldersAtCube.contains(boulder)){
+			bouldersAtCube.remove(boulder);
+			if (bouldersAtCube.isEmpty())
+				bouldersAtCubeMap.remove(new Position(boulder.getCubeCoordinate()));
+			else{
+				bouldersAtCubeMap.replace(new Position(boulder.getCubeCoordinate()), bouldersAtCube);
+			}
+		}
+	}
+
+	private Map<Position,Set<Boulder>> bouldersAtCubeMap = new HashMap<Position,Set<Boulder>>();
+
 	/**
 	 * Set collecting references to boulders attached to this world.
 	 * @invar The set of boulders is effective.
@@ -781,8 +887,10 @@ public class World {
 	 * @throws IllegalArgumentException
 	 * 		The given log is already attached to some world.
 	 */
-	void addAsLog(Log log) throws IllegalArgumentException{
+	public void addAsLog(Log log) throws IllegalArgumentException{
 		if(! canHaveAsLog(log))
+			throw new IllegalArgumentException();
+		if( !(this.isCubeInWorld(log.getCubeCoordinate())) || !(this.getPassable(log.getCubeCoordinate())))
 			throw new IllegalArgumentException();
 		if(log.getWorld()!= null)
 			throw new IllegalArgumentException();
@@ -810,6 +918,56 @@ public class World {
 		}
 	}
 	/**
+	 * Return a set of logs in this world that are located at the given position in this world.
+	 * @param position
+	 * 		The position of the logs.
+	 * @return
+	 * @throws IllegalArgumentException
+	 * 	The given position is not located inside this world.
+	 */
+	public Set<Log> getLogs(int[] position)throws IllegalArgumentException{
+		if (!this.isCubeInWorld(position)){
+			//System.out.println(position[0]+" "+position[1]+" "+position[2]);
+			throw new IllegalArgumentException();
+		}
+		if (logsAtCubeMap.get(new Position(position))==null)
+			return new HashSet<>();
+		else{
+			return logsAtCubeMap.get(new Position(position));
+		}
+	}
+
+	private void addLogToLogsAtCubeMap(Log log){
+		Set<Log> logsAtCube = this.logsAtCubeMap.get(new Position(log.getCubeCoordinate()));
+		if ( logsAtCube != null){
+			logsAtCube.add(log);
+			this.logsAtCubeMap.put(new Position(log.getCubeCoordinate()),logsAtCube);
+		}
+		else{
+			logsAtCube = new HashSet<Log>();
+			logsAtCube.add(log);
+			this.logsAtCubeMap.put(new Position(log.getCubeCoordinate()),logsAtCube);
+		}
+	}
+
+
+
+
+	private void removeLogFromLogsAtCubeMap(Log log){
+		Set<Log> logsAtCube = this.logsAtCubeMap.get(new Position(log.getCubeCoordinate()));
+		if (logsAtCube.contains(log)){
+			logsAtCube.remove(log);
+			if (logsAtCube.isEmpty())
+				logsAtCubeMap.remove(new Position(log.getCubeCoordinate()));
+			else{
+				logsAtCubeMap.replace(new Position(log.getCubeCoordinate()), logsAtCube);
+			}
+		}
+	}
+
+	private Map<Position,Set<Log>> logsAtCubeMap = new HashMap<Position,Set<Log>>();
+
+	/**
 	 * Set collecting references to logs attached to this world.
 	 * @invar The set of logs is effective.
 	 * @invar Each element in the set of logs references a log that
@@ -818,7 +976,7 @@ public class World {
 	 * 		to which it is attached.
 	 */
 	private Set<Log> logs = new HashSet<Log>();
-	public List<List<?>> inspectCube(int[] position)throws IllegalArgumentException{
+	List<List<?>> inspectCube(int[] position)throws IllegalArgumentException{
 		if (!this.isCubeInWorld(position))
 			throw new IllegalArgumentException();
 		List<List<?>> list = new ArrayList<>();
@@ -856,151 +1014,11 @@ public class World {
 	
 		return list;
 	}
-	/**
-	 * Return a set of units in this world that are located at the given position in this world.
-	 * @param position
-	 * 		The position of the units.
-	 * @return
-	 * @throws IllegalArgumentException
-	 * 	The given position is not located inside this world.
-	 */
-	public Set<Unit> getUnits(int[] position)throws IllegalArgumentException{
-		if (!this.isCubeInWorld(position))
-			throw new IllegalArgumentException();
-		if (unitsAtCubeMap.get(new Position(position))==null){
-			return new HashSet<>();
-		}
-		else{
-			return unitsAtCubeMap.get(new Position(position));
-		}
-	}
-	/**
-	 * Return a set of logs in this world that are located at the given position in this world.
-	 * @param position
-	 * 		The position of the logs.
-	 * @return
-	 * @throws IllegalArgumentException
-	 * 	The given position is not located inside this world.
-	 */
-	public Set<Log> getLogs(int[] position)throws IllegalArgumentException{
-		if (!this.isCubeInWorld(position))
-			throw new IllegalArgumentException();
-		if (logsAtCubeMap.get(new Position(position))==null)
-			return new HashSet<>();
-		else{
-			return logsAtCubeMap.get(new Position(position));
-		}
-	}
-	/**
-	 * Return a set of boulders in this world that are located at the given position in this world.
-	 * @param position
-	 * 		The position of the boulders.
-	 * @return
-	 * @throws IllegalArgumentException
-	 * 	The given position is not located inside this world.
-	 */
-	public Set<Boulder> getBoulders(int[] position)throws IllegalArgumentException{
-		if (!this.isCubeInWorld(position))
-			throw new IllegalArgumentException();
-		if (bouldersAtCubeMap.get(new Position(position))==null)
-			return new HashSet<>();
-		else{
-			return bouldersAtCubeMap.get(new Position(position));
-		}
-	}
-	
-	
-	private void addUnitToUnitsAtCubeMap(Unit unit){
-		Set<Unit> unitsAtCube = this.unitsAtCubeMap.get(new Position(unit.getCubeCoordinate()));
-		//System.out.println("f");
-		if ( unitsAtCube != null){
-			unitsAtCube.add(unit);
-			this.unitsAtCubeMap.put(new Position(unit.getCubeCoordinate()),unitsAtCube);
-		}
-		else{
-			unitsAtCube = new HashSet<Unit>();
-			unitsAtCube.add(unit);
-			this.unitsAtCubeMap.put(new Position(unit.getCubeCoordinate()),unitsAtCube);
-			//System.out.println("g");
-			//System.out.println(unitsAtCubeMap.get(new Position(unit.getCubeCoordinate())).contains(unit));
-
-		}
-	}
-	
-	private void removeUnitFromUnitsAtCubeMap(Unit unit){
-		Set<Unit> unitsAtCube = this.unitsAtCubeMap.get(new Position(unit.getCubeCoordinate()));
-		if (unitsAtCube.contains(unit)){
-			unitsAtCube.remove(unit);
-			if (unitsAtCube.isEmpty())
-				unitsAtCubeMap.remove(new Position(unit.getCubeCoordinate()));
-			else{
-				unitsAtCubeMap.replace(new Position(unit.getCubeCoordinate()), unitsAtCube);
-			}
-		}
-	}
-	
-	private Map<Position,Set<Unit>> unitsAtCubeMap = new HashMap<Position, Set<Unit>>();
-
-	
-	
-	private void addBoulderToBouldersAtCubeMap(Boulder boulder){
-		Set<Boulder> bouldersAtCube = this.bouldersAtCubeMap.get(new Position(boulder.getCubeCoordinate()));
-		if ( bouldersAtCube != null){
-			bouldersAtCube.add(boulder);
-			this.bouldersAtCubeMap.put(new Position(boulder.getCubeCoordinate()),bouldersAtCube);
-		}
-		else{
-			bouldersAtCube = new HashSet<Boulder>();
-			bouldersAtCube.add(boulder);
-			this.bouldersAtCubeMap.put(new Position(boulder.getCubeCoordinate()),bouldersAtCube);
-		}
-	}
-	private void removeBoulderFromBouldersAtCubeMap(Boulder boulder){
-		Set<Boulder> bouldersAtCube = this.bouldersAtCubeMap.get(boulder.getCubeCoordinate());
-		if (bouldersAtCube.contains(boulder)){
-			bouldersAtCube.remove(boulder);
-			if (bouldersAtCube.isEmpty())
-				bouldersAtCubeMap.remove(new Position(boulder.getCubeCoordinate()));
-			else{
-				bouldersAtCubeMap.replace(new Position(boulder.getCubeCoordinate()), bouldersAtCube);
-			}
-		}
-	}
-	
-	private Map<Position,Set<Boulder>> bouldersAtCubeMap = new HashMap<Position,Set<Boulder>>();
-
-	
-	private void addLogToLogsAtCubeMap(Log log){
-		Set<Log> logsAtCube = this.logsAtCubeMap.get(new Position(log.getCubeCoordinate()));
-		if ( logsAtCube != null){
-			logsAtCube.add(log);
-			this.logsAtCubeMap.put(new Position(log.getCubeCoordinate()),logsAtCube);
-		}
-		else{
-			logsAtCube = new HashSet<Log>();
-			logsAtCube.add(log);
-			this.logsAtCubeMap.put(new Position(log.getCubeCoordinate()),logsAtCube);
-		}
-	}
-	
-	private void removeLogFromLogsAtCubeMap(Log log){
-		Set<Log> logsAtCube = this.logsAtCubeMap.get(new Position(log.getCubeCoordinate()));
-		if (logsAtCube.contains(log)){
-			logsAtCube.remove(log);
-			if (logsAtCube.isEmpty())
-				logsAtCubeMap.remove(new Position(log.getCubeCoordinate()));
-			else{
-				logsAtCubeMap.replace(new Position(log.getCubeCoordinate()), logsAtCube);
-			}
-		}
-	}
-	
-	private Map<Position,Set<Log>> logsAtCubeMap = new HashMap<Position,Set<Log>>();
-
 	private final Set<Unit> units = new HashSet<Unit>();
 	
-	private int maxUnits = 100;
-	private int maxFactions = 5;
+	private final static int MAX_UNITS = 100;
+	private final static int MAX_FACTIONS = 5;
+	private final static int MAX_UNITS_PER_FACTION = 50;
 	
 	/**
 	 * @return the xDimension
@@ -1033,11 +1051,18 @@ public class World {
 	protected ConnectedToBorder connectedToBorder;
 
 	
-	/**
-	 * @return the connectedToBorder
-	 */
-	public ConnectedToBorder getConnectedToBorder() {
-		return connectedToBorder;
+//	/**
+//	 * @return the connectedToBorder
+//	 */
+//	public ConnectedToBorder getConnectedToBorder() {
+//		return connectedToBorder;
+//	}
+	
+	public boolean isSolidConnectedToBorder(int[] pos) throws IllegalArgumentException{
+		if (!isCubeInWorld(pos))
+			throw new IllegalArgumentException();
+		else
+			return this.connectedToBorder.isSolidConnectedToBorder(pos[0], pos[1], pos[2]);
 	}
 	
 	private void initializeCubeTerrains(){
@@ -1084,7 +1109,11 @@ public class World {
 		
 	}
 
-	public void advanceTime(double duration){
+	public void advanceTime(double duration) throws IllegalArgumentException{
+		if (!(Util.fuzzyGreaterThanOrEqualTo(duration, 0.0-Util.DEFAULT_EPSILON )&& Util.fuzzyLessThanOrEqualTo((double)duration, 0.2+Util.DEFAULT_EPSILON))){
+			System.out.println(duration);
+			throw new IllegalArgumentException();
+		}
 		updateCubeTerrains();
 		for (Unit unit : this.listAllUnits()){
 			unit.advanceTime((float)duration);

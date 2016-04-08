@@ -34,6 +34,12 @@ public class TestSuitePart2World {
 	private Unit StandardUnit2;
 	private Faction faction = new Faction();
 	private Boulder boulder = new Boulder(new int[] {0,0,0});
+	private Boulder invalidPosBoulder;
+	private Boulder OutsideBoulder;
+	private Log log;
+	private Log invalidPosLog;
+	private Log OutsideLog;
+	private Unit StandardUnit3;
 
 	
 	private World world2;
@@ -59,8 +65,14 @@ public class TestSuitePart2World {
 		InvalidPosUnit = new Unit("Bunit",new double[] {1.5,1.5,0.5},75,25,25,75,false,25.0,25.0,Math.PI/2);
 		OutsideUnit = new Unit("Bunit",new double[] {3.5,1.5,0.5},75,25,25,75,false,25.0,25.0,Math.PI/2);
 		StandardUnit2 = new Unit("Bunit",new double[] {1.5,2.5,0.5},75,25,25,75,false,25.0,25.0,Math.PI/2);
+		StandardUnit3 = new Unit("Bunit",new double[] {1.5,0.5,0.5},75,25,25,75,false,25.0,25.0,Math.PI/2);
 		world2 = new World(types, new DefaultTerrainChangeListener());
-		
+		OutsideBoulder = new Boulder(new int[] {-1,0,0});
+		invalidPosBoulder = new Boulder(new int[] {1,1,1});
+		log = new Log(new int[] {0,0,0});
+		OutsideLog = new Log(new int[] {-1,0,0});
+		invalidPosLog = new Log(new int[] {1,1,1});
+
 	}
 	
 	@Test
@@ -381,10 +393,195 @@ public class TestSuitePart2World {
 		advanceTimeFor(world2, 100.0, 0.02);
 		Assert.assertTrue(world2.listAllBoulders().size()==1);
 	}
-
 	
+	@Test
+	public final void addAsBoulder_ValidCase(){
+		world2.addAsBoulder(boulder);
+		Assert.assertTrue(world2.hasAsBoulder(boulder));
+		Assert.assertTrue(world2.getBoulders(boulder.getCubeCoordinate()).contains(boulder));
+		Assert.assertEquals(world2,boulder.getWorld());
+
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public final void addAsBoulder_InvalidCube(){
+		world2.addAsBoulder(invalidPosBoulder);
+	}
+		
+	@Test(expected=IllegalArgumentException.class)
+	public final void addAsBoulder_OutsideWorld(){
+		world2.addAsBoulder(OutsideBoulder);
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public final void addAsBoulder_HasWorld(){
+		world2.addAsBoulder(boulder);
+		world1.addAsBoulder(boulder);
+	}
+
+
+	@Test
+	public final void getNbLogs(){
+		world2.addAsLog(log);
+		Assert.assertTrue(world2.getNumberLogs()==1);
+	}
+	
+	@Test
+	public final void canHaveAsLog_TrueCase(){
+		Assert.assertTrue(world2.canHaveAsLog(log));
+		log.terminate();
+		world2.terminate();
+		Assert.assertTrue(world2.canHaveAsLog(log));
+	}
+	
+	@Test
+	public final void canHaveAsLog_FalseCase(){
+		Assert.assertFalse(world2.canHaveAsLog(null));
+		world2.terminate();
+		Assert.assertFalse(world2.canHaveAsLog(log));
+	}
+	
+	@Test
+	public final void hasProperLogs_True(){
+		world2.addAsLog(log);
+		Assert.assertTrue(world2.hasProperLogs());
+	}
+	
+	@Test
+	public final void hasProperLogs_False(){
+		world2.addAsLog(log);
+		world2.terminate();
+		Assert.assertFalse(world2.hasProperLogs());
+	}
 	
 
+	@Test
+	public final void listAllLogs(){
+		world2.addAsLog(log);
+		Assert.assertTrue(world2.listAllLogs().contains(log));
+		Assert.assertTrue(world2.listAllLogs().size()==1);
+
+	}
+	
+	@Test
+	public final void addAsLog_ValidCase(){
+		world2.addAsLog(log);
+		Assert.assertTrue(world2.hasAsLog(log));
+		Assert.assertTrue(world2.getLogs(log.getCubeCoordinate()).contains(log));
+		Assert.assertEquals(world2,log.getWorld());
+
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public final void addAsLog_InvalidCube(){
+		world2.addAsLog(invalidPosLog);
+	}
+		
+	@Test(expected=IllegalArgumentException.class)
+	public final void addAsLog_OutsideWorld(){
+		world2.addAsLog(OutsideLog);
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public final void addAsLog_HasWorld(){
+		world2.addAsLog(log);
+		world1.addAsLog(log);
+	}
+
+	@Test
+	public final void getUnits_LegalCase(){
+		world2.addAsUnit(StandardUnit);
+		Assert.assertTrue(world2.getUnits(new int[] {1,1,1}).size()==0);
+		Assert.assertTrue(world2.getUnits(new int[] {2,1,0}).size()==1);
+		Assert.assertTrue(world2.getUnits(new int[] {2,1,0}).contains(StandardUnit));
+
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public final void getUnits_IllegalCase(){
+		world2.getUnits(new int[] {-1,0,0});
+	}
+	
+	@Test
+	public final void getLogs_LegalCase(){
+		world2.addAsLog(log);
+		Assert.assertTrue(world2.getLogs(new int[] {0,0,1}).size()==0);
+		Assert.assertTrue(world2.getLogs(new int[] {0,0,0}).size()==1);
+		Assert.assertTrue(world2.getLogs(new int[] {0,0,0}).contains(log));
+
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public final void getLogs_IllegalCase(){
+		world2.getLogs(new int[] {-1,0,0});
+	}
+	
+	@Test
+	public final void getBoulders_LegalCase(){
+		world2.addAsBoulder(boulder);
+		Assert.assertTrue(world2.getBoulders(new int[] {1,1,1}).size()==0);
+		Assert.assertTrue(world2.getBoulders(new int[] {0,0,0}).size()==1);
+		Assert.assertTrue(world2.getBoulders(new int[] {0,0,0}).contains(boulder));
+
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public final void getBoulders_IllegalCase(){
+		world2.getBoulders(new int[] {-1,0,0});
+	}
+
+	@Test
+	public final void getXDimension(){
+		Assert.assertEquals(10,world1.getxDimension());
+	}
+	
+	@Test
+	public final void getYDimension(){
+		Assert.assertEquals(20,world1.getyDimension());
+	}
+	
+	@Test
+	public final void getZDimension(){
+		Assert.assertEquals(30,world1.getzDimension());
+	}
+
+
+	@Test
+	public final void isSolidConnectedToBorder(){
+		world2.addAsUnit(StandardUnit);
+		assertTrue(world2.isSolidConnectedToBorder(new int[] {1, 1, 0}));
+		assertTrue(world2.isSolidConnectedToBorder(new int[] { 1, 1, 1}));
+		StandardUnit.work(new int[] { 1, 1, 0});
+		advanceTimeFor(world2,200,0.1);
+		assertFalse(world2.isSolidConnectedToBorder(new int[] {1, 1, 0}));
+		assertFalse(world2.isSolidConnectedToBorder(new int[] { 1, 1, 1}));
+	}
+	
+	@Test
+	public final void advanceTime_Legal(){
+		world2.addAsBoulder(boulder);
+		world2.addAsLog(log);
+		world2.addAsUnit(StandardUnit);
+		world2.addAsUnit(StandardUnit3);
+		assertTrue(world2.isSolidConnectedToBorder(new int[] {1, 1, 0}));
+		assertTrue(world2.isSolidConnectedToBorder(new int[] { 1, 1, 1}));
+		assertTrue(world2.hasAsBoulder(boulder));
+		StandardUnit.work(new int[] { 1, 1, 0});
+		StandardUnit3.work(new int[] {0,0, 0});
+		advanceTimeFor(world2,200,0.1);
+		assertFalse(world2.isSolidConnectedToBorder(new int[] {1, 1, 0}));
+		assertFalse(world2.isSolidConnectedToBorder(new int[] { 1, 1, 1}));
+		assertTrue(StandardUnit3.getNbBoulders()==1);
+		assertFalse(world2.hasAsBoulder(boulder));
+
+	}
+	
+	@Test
+	public final void terminate(){
+		world2.terminate();
+		assertTrue(world2.isTerminated());
+
+	}
 	
 //	@Test
 //	public final void spawnUnit2(){
@@ -412,6 +609,8 @@ public class TestSuitePart2World {
 			world.advanceTime(step);
 		//advanceTimeFor(world, time - n * step,step);
 	}
+	
+	
 	
 	
 

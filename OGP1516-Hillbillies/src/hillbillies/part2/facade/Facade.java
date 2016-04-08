@@ -475,10 +475,8 @@ public class Facade implements IFacade{
 	@Override
 	public boolean isSolidConnectedToBorder(World world, int x, int y, int z) throws ModelException {
 		try{
-			if (!world.isCubeInWorld((new int[] {x,y,z})))
-					throw new IllegalArgumentException();
-			return world.getConnectedToBorder().isSolidConnectedToBorder(x, y, z);
-			}
+			return world.isSolidConnectedToBorder(new int[] {x,y,z});
+		}
 		catch(NullPointerException exc){
 			throw new ModelException();
 		}
