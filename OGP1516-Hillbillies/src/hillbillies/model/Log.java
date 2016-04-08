@@ -1,6 +1,7 @@
 package hillbillies.model;
 
 import hillbillies.model.World.*;
+import ogp.framework.util.Util;
 
 import java.util.Random;
 
@@ -110,7 +111,11 @@ public class Log extends RawMaterial {
 	 * @effect Otherwise, this log will keep falling.
 	 */
 	@Override
-	public void advanceTime(float duration) {
+	public void advanceTime(float duration) throws IllegalArgumentException {
+		 if (!(Util.fuzzyGreaterThanOrEqualTo(duration, 0.0-Util.DEFAULT_EPSILON )&& Util.fuzzyLessThanOrEqualTo((double)duration, 0.2+Util.DEFAULT_EPSILON))){
+			System.out.println(duration);
+			throw new IllegalArgumentException();
+		 }
 		 if (mustFall() && this.getStatus()!= Status.FALLING)
 			 fall();
 		 if (getStatus() == Status.FALLING){
