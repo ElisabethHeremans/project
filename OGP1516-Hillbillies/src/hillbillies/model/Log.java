@@ -71,7 +71,11 @@ public class Log extends RawMaterial {
 	protected void setPosition(double[] position) throws IllegalArgumentException {
 		if (!canHaveAsPosition(position))
 			throw new IllegalArgumentException();
+		if (this.getWorld()!=null)
+			this.getWorld().removeLogFromLogsAtCubeMap(this);
 		this.position = position;
+		if (this.getWorld()!=null)
+			this.getWorld().addLogToLogsAtCubeMap(this);
 	}
 
 	/**

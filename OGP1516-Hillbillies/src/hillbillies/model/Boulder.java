@@ -72,7 +72,11 @@ public class Boulder extends RawMaterial {
 			throws IllegalArgumentException {
 		if (! canHaveAsPosition(position))
 			throw new IllegalArgumentException();
+		if (this.getWorld()!=null)
+			this.getWorld().removeBoulderFromBouldersAtCubeMap(this);
 		this.position = position;
+		if (this.getWorld()!=null)
+			this.getWorld().addBoulderToBouldersAtCubeMap(this);
 	}
 	
 	/**
@@ -118,10 +122,10 @@ public class Boulder extends RawMaterial {
 			System.out.println(duration);
 			throw new IllegalArgumentException();
 		 }
-	
-		 if (mustFall() && this.getStatus()!= Status.FALLING)
+		 if (mustFall() && this.getStatus()!= Status.FALLING){
 			 fall();
-		 if (getStatus() == Status.FALLING){
+			 }
+		 if (this.getStatus() == Status.FALLING){
 				double[] v = new double[] {0.0,0.0,-3.0};
 				setPosition(Vector.vectorAdd(this.getPosition(), Vector.scalarMultiplication(v, duration)));
 				if (Vector.getDistance(nextTargetPosition, startPosition)-Vector.getDistance(startPosition, this.getPosition())<=0.0){

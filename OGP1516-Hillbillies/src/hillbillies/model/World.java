@@ -875,7 +875,7 @@ public class World {
 	 * @throws IllegalArgumentException
 	 * 			If the given boulder is not attached to this world.
 	 */
-	private void addBoulderToBouldersAtCubeMap(Boulder boulder)throws IllegalArgumentException{
+	protected void addBoulderToBouldersAtCubeMap(Boulder boulder)throws IllegalArgumentException{
 		if(!this.hasAsBoulder(boulder))
 			throw new IllegalArgumentException();
 
@@ -903,7 +903,7 @@ public class World {
 	 * @throws IllegalArgumentException
 	 * 			If the given boulder is not attached to this world.
 	 */
-	private void removeBoulderFromBouldersAtCubeMap(Boulder boulder){
+	protected void removeBoulderFromBouldersAtCubeMap(Boulder boulder){
 		Set<Boulder> bouldersAtCube = this.bouldersAtCubeMap.get(new Position(boulder.getCubeCoordinate()));
 		if (bouldersAtCube.contains(boulder)){
 			bouldersAtCube.remove(boulder);
@@ -1059,7 +1059,7 @@ public class World {
 	 * @throws IllegalArgumentException
 	 * 			If the given log is not attached to this world.
 	 */
-	private void addLogToLogsAtCubeMap(Log log) throws IllegalArgumentException{
+	protected void addLogToLogsAtCubeMap(Log log) throws IllegalArgumentException{
 		if(!this.hasAsLog(log))
 			throw new IllegalArgumentException();
 		Set<Log> logsAtCube = this.logsAtCubeMap.get(new Position(log.getCubeCoordinate()));
@@ -1086,7 +1086,7 @@ public class World {
 	 * @throws IllegalArgumentException
 	 * 			If the given log is not attached to this world.
 	 */
-	private void removeLogFromLogsAtCubeMap(Log log){
+	protected void removeLogFromLogsAtCubeMap(Log log){
 		Set<Log> logsAtCube = this.logsAtCubeMap.get(new Position(log.getCubeCoordinate()));
 		if (logsAtCube.contains(log)){
 			logsAtCube.remove(log);
