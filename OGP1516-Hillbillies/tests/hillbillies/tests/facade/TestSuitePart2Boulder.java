@@ -6,6 +6,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import hillbillies.model.Boulder;
+import hillbillies.model.Status;
 import hillbillies.model.Unit;
 import hillbillies.tests.util.PositionAsserts;
 import ogp.framework.util.Util;
@@ -79,6 +80,12 @@ public class TestSuitePart2Boulder {
 		Assert.assertFalse(BBoulder.mustFall());
 	}
 	
+	@Test
+	public final void fall(){
+		ABoulder.fall();
+		Assert.assertEquals(ABoulder.getStatus(),Status.FALLING);
+	}
+	
 //	@Test
 //	public final void advanceTime_Falling(){
 //		ABoulder.fall();
@@ -86,4 +93,22 @@ public class TestSuitePart2Boulder {
 //		ABoulder.advanceTime(duration);
 //		PositionAsserts.assertDoublePositionEquals(3.5,1.5,4.5-3.0*duration,ABoulder.getPosition());
 //	}
+	
+	@Test
+	public final void advanceTime_Normal(){
+		BBoulder.advanceTime((float) 0.1);
+		Assert.assertEquals(BBoulder.getStatus(),Status.DONE);
+		PositionAsserts.assertDoublePositionEquals(6.5,3.5,0.5,BBoulder.getPosition());
+	}
+	
+	@Test 
+	public final void getStatus_Normal(){
+		Assert.assertEquals(ABoulder.getStatus(),Status.DONE);
+	}
+	
+	@Test 
+	public final void getStatus_Falling(){
+		ABoulder.fall();
+		Assert.assertEquals(ABoulder.getStatus(),Status.FALLING);
+	}
 }

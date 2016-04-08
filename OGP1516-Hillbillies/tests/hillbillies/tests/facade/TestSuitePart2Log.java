@@ -1,0 +1,116 @@
+	package hillbillies.tests.facade;
+
+	import org.junit.Assert;
+	import org.junit.Before;
+	import org.junit.BeforeClass;
+	import org.junit.Test;
+
+	import hillbillies.model.Log;
+	import hillbillies.model.Status;
+	import hillbillies.model.Unit;
+	import hillbillies.tests.util.PositionAsserts;
+	import ogp.framework.util.Util;
+
+public class TestSuitePart2Log {
+		
+		private static Log DoubleLog;
+		
+		private static Log IntegerLog;
+		
+		private Log ALog;
+		
+		private Log BLog;
+		
+		/**
+		 * Set up an immutable test fixture
+		 */
+		@BeforeClass
+		public static void setUpBeforeClass(){
+			DoubleLog = new Log(new double[] {1.5,4.5,3.5});
+			IntegerLog = new Log(new int[] {1,2,3});
+		}
+		/**
+		 * Set up an mutable test fixture
+		 */
+		@Before
+		public void setUpBefore(){
+			ALog = new Log(new double[] {3.5,1.5,4.5});
+			BLog = new Log(new double[] {6.5,3.5,0.5});
+		}
+		
+		@Test
+		public final void getPosition(){
+			PositionAsserts.assertDoublePositionEquals(1.5,4.5,3.5,DoubleLog.getPosition());
+		}
+		
+		@Test 
+		public final void getPosition_int(){
+			Assert.assertArrayEquals(new double[] {1.5,2.5,3.5},IntegerLog.getPosition(),Util.DEFAULT_EPSILON);
+		}
+		
+		@Test
+		public final void getWeight(){
+			Assert.assertTrue(DoubleLog.getWeight()<=51);
+			Assert.assertTrue(DoubleLog.getWeight()>=10);
+		}
+		
+		@Test
+		public final void getWeight_int(){
+			Assert.assertTrue(IntegerLog.getWeight()<=51);
+			Assert.assertTrue(IntegerLog.getWeight()>=10);
+		}
+		
+		/**
+		 * Helper method to advance time by some time for the given unit. (we based this on the helper method in Part1TestPartial)
+		 * 
+		 * @param time
+		 *            The time, in seconds, to advance.
+		 * @param step
+		 *            The step size, in seconds, by which to advance.
+		 */
+		private static void advanceTimeFor(Unit unit, double time, double step) {
+			int n = (int) (time / step);
+			for (int i = 0; i < n; i++)
+				unit.advanceTime((float)step);
+			unit.advanceTime((float) (time - n * step));
+		}
+		
+		@Test
+		public final void mustFall(){
+			Assert.assertFalse(BLog.mustFall());
+		}
+		
+		@Test
+		public final void fall(){
+			ALog.fall();
+			Assert.assertEquals(ALog.getStatus(),Status.FALLING);
+		}
+		
+//		@Test
+//		public final void advanceTime_Falling(){
+//			ABoulder.fall();
+//			float duration = (float) 0.1;
+//			ABoulder.advanceTime(duration);
+//			PositionAsserts.assertDoublePositionEquals(3.5,1.5,4.5-3.0*duration,ABoulder.getPosition());
+//		}
+		
+		@Test
+		public final void advanceTime_Normal(){
+			BLog.advanceTime((float) 0.1);
+			Assert.assertEquals(BLog.getStatus(),Status.DONE);
+			PositionAsserts.assertDoublePositionEquals(6.5,3.5,0.5,BLog.getPosition());
+		}
+		
+		@Test 
+		public final void getStatus_Normal(){
+			Assert.assertEquals(ALog.getStatus(),Status.DONE);
+		}
+		
+		@Test 
+		public final void getStatus_Falling(){
+			ALog.fall();
+			Assert.assertEquals(ALog.getStatus(),Status.FALLING);
+		}
+	}
+
+}
