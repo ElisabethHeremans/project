@@ -47,7 +47,7 @@ public class Boulder extends RawMaterial {
 		return this.position;
 	}
 	
-	public int[] getCubeCoordinate() {
+	protected int[] getCubeCoordinate() {
 		return new int[] { (int) Math.floor(this.getPosition()[0]), (int) Math.floor(this.getPosition()[1]),
 				(int) Math.floor(this.getPosition()[2]) };
 	}
@@ -67,7 +67,7 @@ public class Boulder extends RawMaterial {
 	 *       | ! isValidPosition(getPosition())
 	 */
 	@Raw @Override
-	public void setPosition(double[] position) 
+	protected void setPosition(double[] position) 
 			throws IllegalArgumentException {
 		if (! canHaveAsPosition(position))
 			throw new IllegalArgumentException();
@@ -170,7 +170,7 @@ public class Boulder extends RawMaterial {
 	 * 		The new status for this boulder.
 	 * @post The new status of this boulder is equal to the given status.
 	 */
-	public void setStatus(Status status) {
+	protected void setStatus(Status status) {
 		this.status = status;
 	}
 	/**
@@ -182,7 +182,7 @@ public class Boulder extends RawMaterial {
 	 * @post This boulder references the given world as the world attached to it.
 	 */
 	@Override
-	public void setWorld(@Raw World world){
+	protected void setWorld(@Raw World world){
 		if (world != null)
 			assert (world.hasAsBoulder(this));
 		// nog condities?
@@ -196,7 +196,7 @@ public class Boulder extends RawMaterial {
 	 */
 	@Raw
 	@Override
-	public boolean hasProperWorld(){
+	protected boolean hasProperWorld(){
 		return (this.getWorld() == null || this.getWorld().hasAsBoulder(this));
 	}
 	
@@ -213,7 +213,7 @@ public class Boulder extends RawMaterial {
 	 * @post   This boulder  is terminated.
 	 */
 	@Override
-	 public void terminate() {
+	 protected void terminate() {
 		if (this.getWorld()!=null)
 			this.getWorld().removeAsBoulder(this);
 		//this.setWorld(null);

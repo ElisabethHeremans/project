@@ -20,7 +20,7 @@ public abstract class RawMaterial {
 	/**
 	 * Return the coordinates of the cube where this raw material is located.
 	 */
-	public abstract int[] getCubeCoordinate();
+	protected abstract int[] getCubeCoordinate();
 
 	/**
 	 * Set the position of this raw material to the given position.
@@ -28,7 +28,7 @@ public abstract class RawMaterial {
 	 * 		The new position for this raw material
 	 * @post The position of this raw material is equal to the given position.
 	 */
-	public abstract void setPosition(double[] position);
+	protected abstract void setPosition(double[] position);
 	
 	
 	/**
@@ -71,13 +71,13 @@ public abstract class RawMaterial {
 	 * 		The world to be attached to this raw material..
 	 * @post This raw material references the given world as the world attached to it.
 	 */
-	public abstract void setWorld(@Raw World world);
+	protected abstract void setWorld(@Raw World world);
 	/**
 	 * Check whether this raw material has a proper world attached to it.
 	 * @return ...
 	 */
 	@Raw
-	public abstract boolean hasProperWorld();
+	protected abstract boolean hasProperWorld();
 	/**
 	 * Variable referencing the world of this raw material.
 	 */
@@ -86,7 +86,7 @@ public abstract class RawMaterial {
 	 * Terminate this raw material.
 	 * @post   This raw material  is terminated.
 	 */
-	public abstract void terminate();
+	protected abstract void terminate();
 	/**
 	  * Variable registering whether this raw material is terminated.
 	  */
