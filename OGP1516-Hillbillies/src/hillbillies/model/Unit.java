@@ -407,8 +407,11 @@ public class Unit {
 	 */
 	@Raw
 	public void setName(String name) throws IllegalArgumentException {
-		if (!isValidName(name))
+		System.out.println(name);
+		if (!isValidName(name)){
+			System.out.println("invalid " + name);
 			throw new IllegalArgumentException();
+		}
 		this.name = name;
 	}
 
@@ -800,8 +803,10 @@ public class Unit {
 	 *             If the duration is less than zero or exceeds or equals 0.2 s.
 	 */
 	public void advanceTime(float duration) throws IllegalArgumentException {
-		if (duration < 0 || duration > 0.2)
+		if (Util.fuzzyLessThanOrEqualTo(duration, 0.0 )|| Util.fuzzyGreaterThanOrEqualTo((double)duration, 0.2)){
+			System.out.println(duration);
 			throw new IllegalArgumentException();
+		}
 		restTimer += duration;
 		if (experiencePoints >=10){
 			setExperiencePoints(this.getExperiencePoints()-10);
@@ -824,11 +829,11 @@ public class Unit {
 		if (mustRest())
 			rest();
 		else if (this.getStatus() == Status.DONE && targetPosition != null && !this.isEnableDefaultBehaviour())
-			moveTo(targetPosition);
+			moveTo1(targetPosition);
 		else if (this.isEnableDefaultBehaviour() && this.getStatus() == Status.DONE)
 			startDefaultBehaviour();
 		else if (this.getStatus() == Status.MOVING) {
-			moving(duration);
+			moving1(duration);
 		}
 		else if (this.getStatus() == Status.WORKING) {
 			working(duration);
@@ -1033,77 +1038,77 @@ public class Unit {
 		}
 	}
 
-	/**
-	 * Start moving the given unit to the given cube.
-	 * 
-	 * @param targetPosition
-	 *         the position to move to
-	 * @post If this unit can move, this new unit's target position is targetPosition and this units new status is in-center
-	 * 		   | if (canMove())
-	 * 		   |	then new.targetPosition == targetPosition && new.status == Status.IN_CENTER
-	 * @effect If this unit can move, the variables x, y and z  register
-	 * 			if this unit needs to go further (=1) in the x-, y-, z-direction or
-	 * 			if this unit needs to go back (=-1) in the x-, y-, z-direction or 
-	 * 			if this unit needs to stay (=0) at the same x-, y-, z-coordinate. 
-	 * 			The unit will move to the appropriate neighboring cube.
-	 * 		   | if (canMove()) 
-	 * 		   |		 if (Util.fuzzyEquals(targetPosition[0] - this.getPosition()[0], 0))
-	 * 		   |			then x = 0
-	 * 		   |		 if (Math.signum(targetPosition[0] - this.getPosition()[0]) == -1)
-	 * 		   |		 	then x = -1
-	 * 		   |		 if (Math.signum(targetPosition[0] - this.getPosition()[0]) == 1)
-	 * 		   |			then x = 1
-	 * 		   |		 if (Util.fuzzyEquals(targetPosition[1] - this.getPosition()[1], 0))
-	 * 		   |			then y = 0
-	 * 		   |		 if (Math.signum(targetPosition[1] - this.getPosition()[1]) == -1)		
-	 * 		   |			then y = -1
-	 * 		   |		 if (Math.signum(targetPosition[1] - this.getPosition()[1]) == 1)		
-	 * 		   |			then y = 1
-	 * 		   |		 if (Util.fuzzyEquals(targetPosition[2] - this.getPosition()[2], 0))
-	 * 		   |			then z = 0
-	 * 		   |		 if (Math.signum(targetPosition[2] - this.getPosition()[2]) == -1)
-	 * 		   |			then z = -1
- 	 * 		   |		 if (Math.signum(targetPosition[2] - this.getPosition()[2]) == 1)
-	 * 		   |		 	then z = 1
-	 * 		   |		moveToAdjacent(x,y,z)
-	 * @throws IllegalArgumentException
-	 *             The given targetPosition is not a valid targetPosition for a
-	 *             unit. 
-	 *             | ! isValidPosition(targetPosition)
-	 */
-	public void moveTo(double[] targetPosition) throws IllegalArgumentException {
-		if (!canHaveAsPosition(targetPosition))
-			throw new IllegalArgumentException();
-		
-		if (canMove()) {
-			this.targetPosition = targetPosition;
-			setStatus(Status.IN_CENTER);
-			int x = 0;
-			int y = 0;
-			int z = 0;
-
-			if (Util.fuzzyEquals(targetPosition[0] - this.getPosition()[0], 0))
-				x = 0;
-			else if (Math.signum(targetPosition[0] - this.getPosition()[0]) == -1)
-				x = -1;
-			else
-				x = 1;
-			if (Util.fuzzyEquals(targetPosition[1] - this.getPosition()[1], 0))
-				y = 0;
-			else if (Math.signum(targetPosition[1] - this.getPosition()[1]) == -1)
-				y = -1;
-			else
-				y = 1;
-			if (Util.fuzzyEquals(targetPosition[2] - this.getPosition()[2], 0))
-				z = 0;
-			else if (Math.signum(targetPosition[2] - this.getPosition()[2]) == -1)
-				z = -1;
-			else
-				z = 1;
-			moveToAdjacent(x, y, z);
-
-		}
-	}
+//	/**
+//	 * Start moving the given unit to the given cube.
+//	 * 
+//	 * @param targetPosition
+//	 *         the position to move to
+//	 * @post If this unit can move, this new unit's target position is targetPosition and this units new status is in-center
+//	 * 		   | if (canMove())
+//	 * 		   |	then new.targetPosition == targetPosition && new.status == Status.IN_CENTER
+//	 * @effect If this unit can move, the variables x, y and z  register
+//	 * 			if this unit needs to go further (=1) in the x-, y-, z-direction or
+//	 * 			if this unit needs to go back (=-1) in the x-, y-, z-direction or 
+//	 * 			if this unit needs to stay (=0) at the same x-, y-, z-coordinate. 
+//	 * 			The unit will move to the appropriate neighboring cube.
+//	 * 		   | if (canMove()) 
+//	 * 		   |		 if (Util.fuzzyEquals(targetPosition[0] - this.getPosition()[0], 0))
+//	 * 		   |			then x = 0
+//	 * 		   |		 if (Math.signum(targetPosition[0] - this.getPosition()[0]) == -1)
+//	 * 		   |		 	then x = -1
+//	 * 		   |		 if (Math.signum(targetPosition[0] - this.getPosition()[0]) == 1)
+//	 * 		   |			then x = 1
+//	 * 		   |		 if (Util.fuzzyEquals(targetPosition[1] - this.getPosition()[1], 0))
+//	 * 		   |			then y = 0
+//	 * 		   |		 if (Math.signum(targetPosition[1] - this.getPosition()[1]) == -1)		
+//	 * 		   |			then y = -1
+//	 * 		   |		 if (Math.signum(targetPosition[1] - this.getPosition()[1]) == 1)		
+//	 * 		   |			then y = 1
+//	 * 		   |		 if (Util.fuzzyEquals(targetPosition[2] - this.getPosition()[2], 0))
+//	 * 		   |			then z = 0
+//	 * 		   |		 if (Math.signum(targetPosition[2] - this.getPosition()[2]) == -1)
+//	 * 		   |			then z = -1
+// 	 * 		   |		 if (Math.signum(targetPosition[2] - this.getPosition()[2]) == 1)
+//	 * 		   |		 	then z = 1
+//	 * 		   |		moveToAdjacent(x,y,z)
+//	 * @throws IllegalArgumentException
+//	 *             The given targetPosition is not a valid targetPosition for a
+//	 *             unit. 
+//	 *             | ! isValidPosition(targetPosition)
+//	 */
+//	public void moveTo(double[] targetPosition) throws IllegalArgumentException {
+//		if (!canHaveAsPosition(targetPosition))
+//			throw new IllegalArgumentException();
+//		
+//		if (canMove()) {
+//			this.targetPosition = targetPosition;
+//			setStatus(Status.IN_CENTER);
+//			int x = 0;
+//			int y = 0;
+//			int z = 0;
+//
+//			if (Util.fuzzyEquals(targetPosition[0] - this.getPosition()[0], 0))
+//				x = 0;
+//			else if (Math.signum(targetPosition[0] - this.getPosition()[0]) == -1)
+//				x = -1;
+//			else
+//				x = 1;
+//			if (Util.fuzzyEquals(targetPosition[1] - this.getPosition()[1], 0))
+//				y = 0;
+//			else if (Math.signum(targetPosition[1] - this.getPosition()[1]) == -1)
+//				y = -1;
+//			else
+//				y = 1;
+//			if (Util.fuzzyEquals(targetPosition[2] - this.getPosition()[2], 0))
+//				z = 0;
+//			else if (Math.signum(targetPosition[2] - this.getPosition()[2]) == -1)
+//				z = -1;
+//			else
+//				z = 1;
+//			moveToAdjacent(x, y, z);
+//
+//		}
+//	}
 
 	
 	private Queue<int[]> queue =  new LinkedList<int[]>();
@@ -1136,6 +1141,8 @@ public class Unit {
 		if (!canHaveAsPosition(targetPosition))
 			throw new IllegalArgumentException();
 		if (canMove()) {
+			this.targetPosition = targetPosition;
+			setStatus(Status.IN_CENTER);
 			int index = 0;
 			int[] nextPosition;
 			while (this.getPosition() != targetPosition){
@@ -1199,64 +1206,64 @@ public class Unit {
 			if (targetPosition != null){
 				//System.out.println("moveto" + targetPosition +"huidige loc" + this.getPosition());
 				setStatus(Status.IN_CENTER);
-				moveTo(targetPosition);
+				moveTo1(targetPosition);
 			}
 			else
 				setStatus(Status.DONE);
 		}
 	}
 
-	/**
-	 * Start moving the given unit to the given cube, given as an array of integers.
-	 * @param cubePosition
-	 * 			The coordinate of the cube to move to.
-	 * @effect The new position of the unit is the center of the given cube.
-	 * 		   | moveTo(new double[] { (double) cubePosition[0] + L/2, (double) cubePosition[1] + L/2,
-	 * 		   |	(double) cubePosition[2] + L/2 })  			
-	 */
-	public void moveTo(int[] cubePosition) throws IllegalArgumentException{
-		moveTo(this.getWorld().getCubeCenter(cubePosition));
-	}
-	
-	public void moving(double duration){
-		double d = Vector.getDistance(nextTargetPosition,startPosition);
-		double[] v = new double[] {getCurrentSpeed()*(nextTargetPosition[0]-startPosition[0])/d,
-				getCurrentSpeed()*(nextTargetPosition[1]-startPosition[1])/d,
-				getCurrentSpeed()*(nextTargetPosition[2]-startPosition[2])/d};
-		//double[] v1 = new double[] Vector.scalarMultiplication(Vector.vectorReduction(nextTargetPosition, startPosition), getCurrentSpeed()/d);
-		
-		setPosition(Vector.vectorAdd(this.getPosition(), Vector.scalarMultiplication(v, duration)));
-		setOrientation((float) Math.atan2(v[1],v[0]));
-		if (isSprinting()){
-
-			if (Util.fuzzyLessThanOrEqualTo(this.getStaminaPoints()-10.0*duration,0.0)){
-		
-				setStaminaPoints(0.0);
-				stopSprinting();
-			} else {
-				setStaminaPoints(this.getStaminaPoints() - 10.0 * duration);
-				startSprinting();
-			}
-		}
-		if (targetPosition != null && startPosition != null
-				&& Vector.getDistance(targetPosition, startPosition)-Vector.getDistance(startPosition, this.getPosition())<=0.0){
-			setPosition(targetPosition);
-			setStatus(Status.DONE);
-			targetPosition = null;
-			setExperiencePoints(this.getExperiencePoints()+1);
-		}
-		else if (nextTargetPosition != null && Vector.getDistance(nextTargetPosition, startPosition)-Vector.getDistance(startPosition, this.getPosition())<=0.0){
-			setExperiencePoints(this.getExperiencePoints()+1);
-			setPosition(nextTargetPosition);
-			if (targetPosition != null){
-				//System.out.println("moveto" + targetPosition +"huidige loc" + this.getPosition());
-				setStatus(Status.IN_CENTER);
-				moveTo(targetPosition);
-			}
-			else
-				setStatus(Status.DONE);
-		}
-	}
+//	/**
+//	 * Start moving the given unit to the given cube, given as an array of integers.
+//	 * @param cubePosition
+//	 * 			The coordinate of the cube to move to.
+//	 * @effect The new position of the unit is the center of the given cube.
+//	 * 		   | moveTo(new double[] { (double) cubePosition[0] + L/2, (double) cubePosition[1] + L/2,
+//	 * 		   |	(double) cubePosition[2] + L/2 })  			
+//	 */
+//	public void moveTo(int[] cubePosition) throws IllegalArgumentException{
+//		moveTo(this.getWorld().getCubeCenter(cubePosition));
+//	}
+//	
+//	public void moving(double duration){
+//		double d = Vector.getDistance(nextTargetPosition,startPosition);
+//		double[] v = new double[] {getCurrentSpeed()*(nextTargetPosition[0]-startPosition[0])/d,
+//				getCurrentSpeed()*(nextTargetPosition[1]-startPosition[1])/d,
+//				getCurrentSpeed()*(nextTargetPosition[2]-startPosition[2])/d};
+//		//double[] v1 = new double[] Vector.scalarMultiplication(Vector.vectorReduction(nextTargetPosition, startPosition), getCurrentSpeed()/d);
+//		
+//		setPosition(Vector.vectorAdd(this.getPosition(), Vector.scalarMultiplication(v, duration)));
+//		setOrientation((float) Math.atan2(v[1],v[0]));
+//		if (isSprinting()){
+//
+//			if (Util.fuzzyLessThanOrEqualTo(this.getStaminaPoints()-10.0*duration,0.0)){
+//		
+//				setStaminaPoints(0.0);
+//				stopSprinting();
+//			} else {
+//				setStaminaPoints(this.getStaminaPoints() - 10.0 * duration);
+//				startSprinting();
+//			}
+//		}
+//		if (targetPosition != null && startPosition != null
+//				&& Vector.getDistance(targetPosition, startPosition)-Vector.getDistance(startPosition, this.getPosition())<=0.0){
+//			setPosition(targetPosition);
+//			setStatus(Status.DONE);
+//			targetPosition = null;
+//			setExperiencePoints(this.getExperiencePoints()+1);
+//		}
+//		else if (nextTargetPosition != null && Vector.getDistance(nextTargetPosition, startPosition)-Vector.getDistance(startPosition, this.getPosition())<=0.0){
+//			setExperiencePoints(this.getExperiencePoints()+1);
+//			setPosition(nextTargetPosition);
+//			if (targetPosition != null){
+//				//System.out.println("moveto" + targetPosition +"huidige loc" + this.getPosition());
+//				setStatus(Status.IN_CENTER);
+//				moveTo(targetPosition);
+//			}
+//			else
+//				setStatus(Status.DONE);
+//		}
+//	}
 	
 	/**
 	 * Return the walking speed of this unit.
@@ -1361,7 +1368,7 @@ public class Unit {
 
 	}
 	
-	public void working(double duration) {
+	private void working(double duration) {
 		if (workingTime < totalWorkingTime) {
 			workingTime += duration;
 			progressWork = workingTime / totalWorkingTime;
@@ -1371,7 +1378,7 @@ public class Unit {
 		}
 	}
 	
-	public void endWork(int[] targetPosition) {
+	private void endWork(int[] targetPosition) {
 		if (this.getBoulder() !=null) {
 			this.getBoulder().setPosition(this.getWorld().getCubeCenter(targetPosition));
 			this.getWorld().addAsBoulder(this.getBoulder());
@@ -1406,6 +1413,7 @@ public class Unit {
 			this.setBoulder(boulder);
 			this.getWorld().removeAsBoulder(boulder);
 			setExperiencePoints(this.getExperiencePoints()+10);
+			this.setWeight(this.getWeight()+boulder.getWeight());
 
 
 		}
@@ -1415,6 +1423,7 @@ public class Unit {
 			this.getWorld().removeAsLog(log);
 			this.setLog(log);
 			setExperiencePoints(this.getExperiencePoints()+10);
+			this.setWeight(this.getWeight()+log.getWeight());
 
 			
 		}
@@ -1725,14 +1734,14 @@ public class Unit {
 			} 
 			if (i == 0) {
 				setStatus(Status.IN_CENTER);
-				moveTo(new double[] { (new Random().nextDouble()) * this.getWorld().getxDimension(), 
+				moveTo1(new double[] { (new Random().nextDouble()) * this.getWorld().getxDimension(), 
 						(new Random().nextDouble()) * this.getWorld().getyDimension(),
 						(new Random().nextDouble()) * this.getWorld().getzDimension() });
 				startSprinting();
 			}
 			if (i == 1) {
 				setStatus(Status.IN_CENTER);
-				moveTo(new double[] { (new Random().nextDouble()) * this.getWorld().getxDimension(), 
+				moveTo1(new double[] { (new Random().nextDouble()) * this.getWorld().getxDimension(), 
 						(new Random().nextDouble()) * this.getWorld().getyDimension(),
 						(new Random().nextDouble()) * this.getWorld().getzDimension() });
 				stopSprinting();
@@ -1790,11 +1799,15 @@ public class Unit {
  		 if (this.getBoulder() != null){
  			 this.getBoulder().setPosition(this.getPosition());
  			 getWorld().addAsBoulder(this.getBoulder());
+ 			 this.setWeight(this.getWeight()-this.getBoulder().getWeight());
+
  		 }
  		 this.setBoulder(null);
  		 if (this.getLog()!= null){
  			 this.getLog().setPosition(this.getPosition());
  			 getWorld().addAsLog(this.getLog());
+ 			 this.setWeight(this.getWeight()-this.getLog().getWeight());
+
  		 }
  		 this.setLog(null);
  		 if (this.getWorld()!=null){
@@ -1849,7 +1862,6 @@ public class Unit {
  		if(! isValidBoulder(boulder))
  			throw new IllegalArgumentException();
  		this.boulder = boulder;
-		this.setWeight(this.getWeight()+boulder.getWeight());
  	}
  	/**
  	 * Variable referencing the boulder of this unit.
@@ -1887,7 +1899,6 @@ public class Unit {
  		if(! isValidLog(log))
  			throw new IllegalArgumentException();
  		this.log = log;
-		this.setWeight(this.getWeight()+log.getWeight());
 
  	}
 	/**

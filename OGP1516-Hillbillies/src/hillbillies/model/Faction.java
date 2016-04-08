@@ -15,8 +15,6 @@ public class Faction {
 	 * Initialize this new faction.
 	 */
 	public Faction() {
-		//this.Name = name;
-		//this.Active = Active;
 	}
 
 

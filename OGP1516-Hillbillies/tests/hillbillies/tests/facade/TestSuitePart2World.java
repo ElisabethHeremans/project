@@ -13,6 +13,7 @@ import java.util.Set;
 import org.junit.*;
 
 import hillbillies.model.*;
+import hillbillies.part2.facade.IFacade;
 import hillbillies.part2.listener.DefaultTerrainChangeListener;
 import hillbillies.part2.listener.TerrainChangeListener;
 import ogp.framework.util.*;
@@ -28,6 +29,11 @@ public class TestSuitePart2World {
 	
 	private static World world1;
 	private Unit StandardUnit;
+	private Unit InvalidPosUnit;
+	private Unit OutsideUnit;
+	private Unit StandardUnit2;
+	private Faction faction = new Faction();
+	private Boulder boulder = new Boulder(new int[] {0,0,0});
 
 	
 	private World world2;
@@ -37,7 +43,6 @@ public class TestSuitePart2World {
 	 */
 	@BeforeClass
 	public static void setUpBeforeClass(){
-		
 		world1 = new World(types, new DefaultTerrainChangeListener());
 	}
 	
@@ -50,7 +55,10 @@ public class TestSuitePart2World {
 		types[1][1][0] = TYPE_ROCK;
 		types[1][1][1] = TYPE_TREE;
 		types[1][1][2] = TYPE_WORKSHOP;
-		StandardUnit = new Unit("Bunit",new double[] {3.5,1.5,4.5},75,25,25,75,false,25.0,25.0,Math.PI/2);
+		StandardUnit = new Unit("Bunit",new double[] {2.5,1.5,0.5},75,25,25,75,false,25.0,25.0,Math.PI/2);
+		InvalidPosUnit = new Unit("Bunit",new double[] {1.5,1.5,0.5},75,25,25,75,false,25.0,25.0,Math.PI/2);
+		OutsideUnit = new Unit("Bunit",new double[] {3.5,1.5,0.5},75,25,25,75,false,25.0,25.0,Math.PI/2);
+		StandardUnit2 = new Unit("Bunit",new double[] {1.5,2.5,0.5},75,25,25,75,false,25.0,25.0,Math.PI/2);
 		world2 = new World(types, new DefaultTerrainChangeListener());
 		
 	}
@@ -148,6 +156,7 @@ public class TestSuitePart2World {
 	public final void getNumberUnits(){
 		Unit unit = world2.spawnUnit(false);
 		Assert.assertTrue(world2.getNumberUnits()==1);
+		Assert.assertTrue(world1.getNumberUnits()==0);
 	}
 	
 	@Test
@@ -176,9 +185,206 @@ public class TestSuitePart2World {
 		Assert.assertFalse(world1.canHaveAsUnit(null));
 		world2.terminate();
 		Assert.assertFalse(world2.canHaveAsUnit(StandardUnit));
+	}
+	
+	@Test
+	public final void hasProperUnits_TrueCase(){
+		world2.addAsUnit(StandardUnit);
+		Assert.assertTrue(world2.hasProperUnits());
 
 	}
 	
+	@Test
+	public final void hasProperUnits_FalseCase(){
+		world2.addAsUnit(StandardUnit);
+		StandardUnit.setWorld(null);
+		Assert.assertFalse(world2.hasProperUnits());
+	}
+	
+	@Test
+	public final void hasProperUnits_FalseCase2(){
+		world2.addAsUnit(StandardUnit);
+		world2.terminate();
+		Assert.assertFalse(world2.hasProperUnits());
+	}
+
+	
+	@Test
+	public final void addAsUnit_ValidCase(){
+		world2.addAsUnit(StandardUnit);
+		Assert.assertTrue(world2.hasAsUnit(StandardUnit));
+		Assert.assertTrue(world2.getUnits(StandardUnit.getCubeCoordinate()).contains(StandardUnit));
+		Assert.assertEquals(world2,StandardUnit.getWorld());
+		Assert.assertTrue(StandardUnit.getFaction()!=null);
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public final void addAsUnit_InvalidCube(){
+		world2.addAsUnit(InvalidPosUnit);
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public final void addAsUnit_OutsideWorld(){
+		world2.addAsUnit(OutsideUnit);
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public final void addAsUnit_HasWorld(){
+		world2.addAsUnit(StandardUnit);
+		world1.addAsUnit(StandardUnit);
+	}
+	
+	@Test
+	public final void listAllUnits(){
+		Assert.assertTrue(world2.listAllUnits().size()==0);
+		world2.addAsUnit(StandardUnit);
+		Assert.assertTrue(world2.listAllUnits().size()==1);
+		Assert.assertTrue(world2.listAllUnits().contains(StandardUnit));
+
+	}
+	
+	@Test
+	public final void listAllUnitsOfFaction_ValidCase(){
+		world2.addAsUnit(StandardUnit);
+		Faction faction = StandardUnit.getFaction();
+		Assert.assertTrue(world2.listAllUnitsOfFaction(faction).size()==1);
+		Assert.assertTrue(world2.listAllUnitsOfFaction(faction).contains(StandardUnit));
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public final void listAllUnitsOfFaction_InvalidCase(){
+		Faction faction = new Faction();
+		world2.listAllUnitsOfFaction(faction);
+	}
+	
+	@Test
+	public final void getNbFactions(){
+		Assert.assertEquals(0, world2.getNbFactions());
+		world2.addAsUnit(StandardUnit);
+		Assert.assertEquals(1, world2.getNbFactions());
+		world2.addAsUnit(StandardUnit2);
+		StandardUnit2.terminate();
+		Assert.assertEquals(2, world2.getNbFactions());
+
+	}
+	
+	@Test
+	public final void getNbActiveFactions(){
+		world2.addAsUnit(StandardUnit);
+		world2.addAsUnit(StandardUnit2);
+		StandardUnit2.terminate();
+		Assert.assertEquals(1, world2.getNbActiveFactions());	
+		}
+	
+	@Test
+	public final void getActiveFactions(){
+		world2.addAsUnit(StandardUnit);
+		world2.addAsUnit(StandardUnit2);
+		Faction faction = StandardUnit2.getFaction();
+		StandardUnit2.terminate();
+		Assert.assertTrue(world2.getActiveFactions().contains(StandardUnit.getFaction()));
+		Assert.assertFalse(world2.getActiveFactions().contains(faction));
+	}
+	
+	@Test
+	public final void hasAsFaction_TrueCase(){
+		world2.addAsUnit(StandardUnit);
+		Assert.assertTrue(world2.hasAsFaction(StandardUnit.getFaction()));
+	}
+	
+	@Test
+	public final void hasAsFaction_FalseCase(){
+		world2.addAsUnit(StandardUnit);
+		Assert.assertFalse(world1.hasAsFaction(StandardUnit.getFaction()));
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public final void hasAsFaction_InvalidCase(){
+		world1.hasAsFaction(null);
+	}
+	
+	@Test
+	public final void canHaveAsFaction_TrueCases(){
+		Assert.assertTrue(world1.canHaveAsFaction(faction));
+		faction.terminate();
+		world2.terminate();
+		Assert.assertTrue(world2.canHaveAsFaction(faction));
+
+	}
+	
+	@Test
+	public final void canHaveAsFaction_FalseCases(){
+		Assert.assertFalse(world2.canHaveAsFaction(null));
+		world2.terminate();
+		Assert.assertFalse(world2.canHaveAsFaction(faction));
+	}
+
+	@Test
+	public final void hasProperFactions_TrueCase(){
+		world2.addAsUnit(StandardUnit);
+		Assert.assertTrue(world2.hasProperFactions());
+	}
+	
+	@Test
+	public final void hasProperFactions_FalseCase(){
+		world2.addAsUnit(StandardUnit);
+		world2.terminate();
+		Assert.assertFalse(world2.hasProperFactions());
+
+	}
+	
+	@Test
+	public final void getNbBoulders(){
+		world2.addAsUnit(StandardUnit2);
+		StandardUnit2.work(new int[] {1,1,0});
+		advanceTimeFor(world2, 100.0, 0.02);
+		Assert.assertTrue(world2.getNumberBoulders()==1);
+	}
+	
+	@Test
+	public final void canHaveAsBoulder_TrueCase(){
+		Assert.assertTrue(world2.canHaveAsBoulder(boulder));
+		boulder.terminate();
+		world2.terminate();
+		Assert.assertTrue(world2.canHaveAsBoulder(boulder));
+	}
+	
+	@Test
+	public final void canHaveAsBoulder_FalseCase(){
+		Assert.assertFalse(world2.canHaveAsBoulder(null));
+		world2.terminate();
+		Assert.assertFalse(world2.canHaveAsBoulder(boulder));
+	}
+	
+	@Test
+	public final void hasProperBoulders_True(){
+		world2.addAsUnit(StandardUnit2);
+		StandardUnit2.work(new int[] {1,1,0});
+		advanceTimeFor(world2, 100.0, 0.02);
+		Assert.assertTrue(world2.hasProperBoulders());
+	}
+	
+	@Test
+	public final void hasProperBoulders_False(){
+		world2.addAsUnit(StandardUnit2);
+		StandardUnit2.work(new int[] {1,1,0});
+		advanceTimeFor(world2, 100.0, 0.02);
+		world2.terminate();
+		Assert.assertFalse(world2.hasProperBoulders());
+	}
+	
+
+	@Test
+	public final void listAllBoulders(){
+		world2.addAsUnit(StandardUnit2);
+		StandardUnit2.work(new int[] {1,1,0});
+		advanceTimeFor(world2, 100.0, 0.02);
+		Assert.assertTrue(world2.listAllBoulders().size()==1);
+	}
+
+	
+	
+
 	
 //	@Test
 //	public final void spawnUnit2(){
@@ -192,6 +398,20 @@ public class TestSuitePart2World {
 //		}
 //	}
 	
+	/**
+	 * Helper method to advance time for the given world by some time.
+	 * 
+	 * @param time
+	 *            The time, in seconds, to advance.
+	 * @param step
+	 *            The step size, in seconds, by which to advance.
+	 */
+	private static void advanceTimeFor(World world, double time, double step) {
+		int n = (int) (time / step);
+		for (int i = 0; i < n; i++)
+			world.advanceTime(step);
+		//advanceTimeFor(world, time - n * step,step);
+	}
 	
 	
 

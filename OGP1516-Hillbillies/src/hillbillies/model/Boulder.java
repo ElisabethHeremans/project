@@ -214,8 +214,10 @@ public class Boulder extends RawMaterial {
 	 */
 	@Override
 	 public void terminate() {
-		this.getWorld().removeAsBoulder(this);
+		if (this.getWorld()!=null)
+			this.getWorld().removeAsBoulder(this);
 		//this.setWorld(null);
+		this.setWorld(null);
 		this.isTerminated = true;
 	 }
 	 

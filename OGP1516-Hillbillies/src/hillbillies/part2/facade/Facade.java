@@ -295,7 +295,7 @@ public class Facade implements IFacade{
 	@Override
 	public void moveTo(Unit unit, int[] cube) throws ModelException {
 		try{
-			unit.moveTo(cube);
+			unit.moveTo1(cube);
 		}
 		catch (NullPointerException exc){
 			throw new ModelException();

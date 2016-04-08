@@ -297,7 +297,7 @@ public class World {
 		int Length = new Random().nextInt(9)+2;
 		//System.out.println(characters.charAt(new Random().nextInt(27)));
 		//System.out.println(name.toString());
-		char character = characters.charAt(new Random().nextInt(27));
+		char character = characters.charAt(new Random().nextInt(26));
 		name.append(character);
 		for( int i = 0; i < Length; i++ ){ 
 		      name.append( characters.charAt(new Random().nextInt(characters.length()) ) );
@@ -363,9 +363,11 @@ public class World {
 	 */
 	@Raw
 	public boolean hasProperUnits(){
-		// Uit forloop gehaald, anders ga je dit elke keer opnieuw controleren.
-		if (this.getNumberUnits() >100)
+	
+		if (this.getNumberUnits() >100){
+			
 			return false;
+		}
 		for (Unit unit: this.units){
 			if (! canHaveAsUnit(unit))
 				return false;
@@ -473,7 +475,7 @@ public class World {
 	 * @param unit
 	 * 		The given unit.
 	 */
-	public void addToFaction(Unit unit){
+	private void addToFaction(Unit unit){
 		if(getNbActiveFactions()<5){
 			 Faction newFaction = new Faction();
 			 this.addAsFaction(newFaction);
@@ -499,6 +501,8 @@ public class World {
 	public int getNbFactions(){
 		return factions.size();
 	}
+	
+	
 	/**
 	 * Return the number of active factions in the world.
 	 */
@@ -553,12 +557,9 @@ public class World {
 	 */
 	@Raw
 	public boolean hasProperFactions(){
-		
 		for (Faction faction: this.factions){
 			if (! canHaveAsFaction(faction))
 				return false;
-//			if (faction.getWorld() != this)
-//				return false;
 			if (getNbActiveFactions()>5)
 				return false;
 		}
@@ -613,8 +614,6 @@ public class World {
 	}
 
 
-
-
 	/**
 	 * Check whether this world has the given boulder as one of the boulders attached to it.
 	 * @param boulder
@@ -654,6 +653,17 @@ public class World {
 		return true;
 	}
 	/**
+	 * Return the set collecting references to boulders attached to this world.
+	 * 	@return
+	 */
+	public Set<Boulder> listAllBoulders(){
+		return boulders;
+	}
+
+
+
+
+	/**
 	 * Add the given boulder to the set of boulders attached to this world.
 	 * @param boulder
 	 * 		The boulder to be added.
@@ -664,10 +674,10 @@ public class World {
 	 * @throws IllegalArgumentException
 	 * 		The given boulder is already attached to some world.
 	 */
-	public void addAsBoulder(Boulder boulder) throws IllegalArgumentException{
+	void addAsBoulder(Boulder boulder) throws IllegalArgumentException{
 		if(! canHaveAsBoulder(boulder))
 			throw new IllegalArgumentException();
-		if( !(this.isCubeInWorld(boulder.getCubeCoordinate())) || !(this.getPassable(boulder.getCubeCoordinate()))){
+		if( !(this.isCubeInWorld(boulder.getCubeCoordinate())) || !(this.getPassable(boulder.getCubeCoordinate())))
 			throw new IllegalArgumentException();
 		if( boulder.getWorld()!=null)
 			throw new IllegalArgumentException();
@@ -684,7 +694,7 @@ public class World {
 	 * 		the given boulder is no longer attached to any world.
 	 * @throws IllegalArgumentException
 	 */
-	public void removeAsBoulder(Boulder boulder) throws IllegalArgumentException{
+	void removeAsBoulder(Boulder boulder) throws IllegalArgumentException{
 		if( boulder == null)
 			throw new IllegalArgumentException();
 		if (hasAsBoulder(boulder)){
@@ -709,8 +719,6 @@ public class World {
 	public int getNumberLogs() {
 		return this.logs.size();
 	}
-
-
 
 
 	/**
@@ -751,6 +759,17 @@ public class World {
 		}
 		return true;
 	}
+	/**
+	 * Return the set collecting references to logs attached to this world.
+	 * 	@return
+	 */
+	public Set<Log> listAllLogs(){
+		return logs;
+	}
+
+
+
+
 	/**
 	 * Add the given log to the set of logs attached to this world.
 	 * @param log
@@ -799,22 +818,6 @@ public class World {
 	 * 		to which it is attached.
 	 */
 	private Set<Log> logs = new HashSet<Log>();
-	/**
-	 * Return the set collecting references to boulders attached to this world.
-	 * 	@return
-	 */
-	public Set<Boulder> listAllBoulders(){
-		return boulders;
-	}
-	/**
-	 * Return the set collecting references to logs attached to this world.
-	 * 	@return
-	 */
-	public Set<Log> listAllLogs(){
-		return logs;
-	}
-	
-	
 	public List<List<?>> inspectCube(int[] position)throws IllegalArgumentException{
 		if (!this.isCubeInWorld(position))
 			throw new IllegalArgumentException();
@@ -1065,14 +1068,15 @@ public class World {
 		if (new Random().nextDouble() <= 0.25){
 			if (getTerrain(position) == TerrainType.ROCK){
 				Boulder boulder = new Boulder(position);
+				setTerrain(position,TerrainType.AIR);
 				addAsBoulder(boulder);
 			}
 			if (getTerrain(position) == TerrainType.TREE){
 				Log log = new Log(position);
+				setTerrain(position,TerrainType.AIR);
 				addAsLog(log);
 			}
 		}
-		setTerrain(position,TerrainType.AIR);
 		for (int[] positionToChange: toChange){
 			solidToPassableUpdate(positionToChange);
 			

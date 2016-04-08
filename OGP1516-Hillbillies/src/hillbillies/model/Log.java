@@ -212,7 +212,8 @@ public class Log extends RawMaterial {
 	 */
 	@Override
 	public void terminate() {
-		this.getWorld().removeAsLog(this);
+		if (this.getWorld()!=null)
+			this.getWorld().removeAsLog(this);
 		this.setWorld(null);
 		this.isTerminated = true;
 	}
