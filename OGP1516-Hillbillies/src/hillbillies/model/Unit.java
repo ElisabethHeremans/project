@@ -642,7 +642,12 @@ public class Unit {
 		
 		if (!canHaveAsPosition(position))
 			throw new IllegalArgumentException();
+		if (this.getWorld()!=null)
+			this.getWorld().removeUnitFromUnitsAtCubeMap(this);
 		this.position = position;
+		if (this.getWorld()!=null)
+			this.getWorld().addUnitToUnitsAtCubeMap(this);
+
 	}
 
 	/**
@@ -1173,7 +1178,7 @@ public class Unit {
 	}
 	
 	public void moveTo1(int[] cubePos){
-		moveTo1(new double[] {(double)cubePos[0]+0.5,(double) cubePos[1]+0.5,(double)cubePos[2]+0.5);
+		moveTo1(new double[] {(double)cubePos[0]+0.5,(double) cubePos[1]+0.5,(double)cubePos[2]+0.5});
 	}
 	
 	public void moving1(double duration){
