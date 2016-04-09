@@ -30,24 +30,15 @@ public abstract class RawMaterial {
 	 */
 	protected abstract void setPosition(double[] position);
 	
-	
 	/**
-	 * Check whether the given position is a valid position for any raw material.
+	 * Check whether the given position is a valid position for this raw material.
 	 * 
 	 * @param position
 	 *            The position to check.
-	 * @return True if and only if the terrain type of this cube is passable and
-	 *         the z-position is 0 or the position is located directly above a
-	 *         solid cube.
 	 */
-	public boolean canHaveAsPosition(double[] position){
-		if (getWorld()!= null){
-		return (getWorld().isCubeInWorld(this.getWorld().getCubeCoordinate(position)) &&
-				this.getWorld().getTerrain(position).isPassable());
-		}
-		else
-			return true;
-	}
+	protected abstract boolean canHaveAsPosition(double[] position);
+	
+	
 	/**
 	 * Return the weight of this raw material.
 	 */
