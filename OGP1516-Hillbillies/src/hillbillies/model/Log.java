@@ -77,24 +77,31 @@ public class Log extends RawMaterial {
 		if (this.getWorld()!=null)
 			this.getWorld().addLogToLogsAtCubeMap(this);
 	}
+	
+	/**
+	 * Check whether the given position is a valid position for this log.
+	 * 
+	 * @param position
+	 *            The position to check.
+	 * @return If this log has a world, true if and only if the cube in which this log is located is in the world, 
+	 * 			and the terrain type of this cube is passable.
+	 * @return else true
+	 */
+	@Override
+	public boolean canHaveAsPosition(double[] position){
+		if (getWorld()!= null){
+		return (getWorld().isCubeInWorld(this.getWorld().getCubeCoordinate(position)) &&
+				this.getWorld().getTerrain(position).isPassable());
+		}
+		else
+			return true;
+	}
+
 
 	/**
 	 * Variable registering the position of this log.
 	 */
 	private double[] position;
-	/**
-	 * Variable registering the weight of this log.
-	 */
-	private final int weight;
-	/**
-	 * Variable registering the next target position of a falling log.
-	 */
-	private double[] nextTargetPosition;
-	/**
-	 * Variable registering the start position of a falling log.
-	 */
-	private double[] startPosition;
-
 	/**
 	 * Return the weight of this log.
 	 */
@@ -102,6 +109,11 @@ public class Log extends RawMaterial {
 	public final int getWeight() {
 		return this.weight;
 	}
+
+	/**
+	 * Variable registering the weight of this log.
+	 */
+	private final int weight;
 	/**
 	 * Update the position and activity status of a log.
 	 * @param duration
@@ -111,8 +123,8 @@ public class Log extends RawMaterial {
 	 * @post if this log is falling, his position will be updated. When this log 
 	 * 		arrived at his target position. His next position will be updated one z-level
 	 * 		lower.
-	 * @effect If this logs next position is not passable, his status is set to done.
-	 * @effect Otherwise, this log will keep falling.
+	 * 		then,  If this log must still fall, his status is set to done.
+	 *				if this log must fall, this log falls.
 	 */
 	@Override
 	public void advanceTime(float duration) throws IllegalArgumentException {
@@ -166,6 +178,15 @@ public class Log extends RawMaterial {
 		this.startPosition = this.getPosition();
 	}
 	/**
+	 * Variable registering the next target position of a falling log.
+	 */
+	private double[] nextTargetPosition;
+	/**
+	 * Variable registering the start position of a falling log.
+	 */
+	private double[] startPosition;
+
+	/**
 	 * Return the status of this log.
 	 */
 	public Status getStatus(){
@@ -180,6 +201,10 @@ public class Log extends RawMaterial {
 	protected void setStatus(Status status) {
 		this.status = status;
 	}
+	/**
+	 * Variable registering the status of this log.
+	 */
+	private Status status= Status.DONE;
 	/**
 	 * Set the world attached to this log to the given world.
 	 * @param world
@@ -207,12 +232,6 @@ public class Log extends RawMaterial {
 		return (this.getWorld()== null || this.getWorld().hasAsLog(this));
 	}
 
-//	@Basic @Raw
-//	public World getWorld(){
-//		return world;
-//	}
-	
-//	private World world;
 
 	/**
 	 * Terminate this log.
@@ -241,6 +260,5 @@ public class Log extends RawMaterial {
 	 * Variable registering whether this log is terminated.
 	 */
 	private boolean isTerminated = false;
-	private Status status= Status.DONE;
 
 }

@@ -8,8 +8,7 @@ import be.kuleuven.cs.som.annotate.*;
 /**
  * A class of factions.
  * 
- * @author Moran Gybels
- * @version 1.0
+ * @invar Each faction has proper units for that faction
  */
 public class Faction {
 	/**

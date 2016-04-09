@@ -7,6 +7,8 @@ import java.util.Random;
 import be.kuleuven.cs.som.annotate.*;
 
 /** 
+ * A class of boulders, with a position.
+ * 
  * @invar  The position of each boulder must be a valid position for any
  *         boulder.
  *       | isValidPosition(getPosition())
@@ -27,19 +29,22 @@ public class Boulder extends RawMaterial {
 	public Boulder(double[] position)
 			throws IllegalArgumentException {
 		super(position);
-		this.weight = new Random().nextInt(41)+ 10;
-		//NbBoulder = NbBoulder + 1;
+		this.weight = new Random().nextInt(31)+ 10;
 	}
+	
+	/**
+	 * Initialize this new boulder with a given cube position.
+	 * @param position
+	 * 			The integer position to give to the boulder
+	 * @effect Initialize this new boulder with the given position.
+	 * @post The weight of this new boulder is an integer in the range of 10 to 40.
+	 */
 	public Boulder (int[] position){
 		super(position);
 		this.weight = new Random().nextInt(41)+ 10;
 	}
-//
-//	private int NbBoulder = 0;
-//	
-//	public int getNbBoulder(){
-//		return NbBoulder;
-//	}
+
+	
 	/**
 	 * Return the position of this boulder.
 	 */
@@ -48,6 +53,11 @@ public class Boulder extends RawMaterial {
 		return this.position;
 	}
 	
+	/**
+	 * Return the cube coordinate of this boulder.
+	 * 
+	 * @return The cube coordinate of this boulder, which means that each coordinate is rounded down to an integer.
+	 */
 	protected int[] getCubeCoordinate() {
 		return new int[] { (int) Math.floor(this.getPosition()[0]), (int) Math.floor(this.getPosition()[1]),
 				(int) Math.floor(this.getPosition()[2]) };
@@ -80,23 +90,29 @@ public class Boulder extends RawMaterial {
 	}
 	
 	/**
+	 * Check whether the given position is a valid position for this boulder.
+	 * 
+	 * @param position
+	 *            The position to check.
+	 * @return if this log has a world, true if and only if the cube in which this boulder is located is in the world, 
+	 * 			and the terrain type of this cube is passable.
+	 */
+	@Override
+	public boolean canHaveAsPosition(double[] position){
+		if (getWorld()!= null){
+		return (getWorld().isCubeInWorld(this.getWorld().getCubeCoordinate(position)) &&
+				this.getWorld().getTerrain(position).isPassable());
+		}
+		else
+			return true;
+	}
+
+	
+	/**
 	 * Variable registering the position of this boulder.
 	 */
 	private double[] position;
-	/**
-	 * Variable registering the weight of this boulder.
-	 */
-	private final int weight;
-	/**
-	 * Variable registering the next target position of a falling boulder.
-	 */
-	private double[] nextTargetPosition;
-	/**
-	 * Variable registering the start position of a falling boulder.
-	 */
-	private double[] startPosition;
-
-
+	
 	/**
 	 *Return the weight of this boulder.
 	 */
@@ -105,16 +121,22 @@ public class Boulder extends RawMaterial {
 		return this.weight;
 	}
 	/**
+	 * Variable registering the weight of this boulder.
+	 */
+	private final int weight;
+
+
+	/**
 	 * Update the position and activity status of this boulder.
 	 * @param duration
 	 *        The game time after which advanceTime is called.
 	 * @effect If this boulder needs to fall and his status isn't already falling, 
 	 * 		this boulder will fall. 
 	 * @post if this boulder is falling, his position will be updated. When this boulder 
-	 * 		arrived at his target position. His next position will be updated one z-level
+	 * 		arrived at his next target position, the next position will be updated one z-level
 	 * 		lower.
-	 * @effect If this boulder next position is not passable, his status is set to done.
-	 * @effect Otherwise, this boulder will keep falling.
+	 * 			then, 	If this boulder must not fall, his status is set to done.
+	 * 					If this boulder must fall, this boulder will fall.
 	 */	
 	@Override
 	public void advanceTime(float duration) throws IllegalArgumentException{
@@ -138,8 +160,8 @@ public class Boulder extends RawMaterial {
 						fall();
 				}
 			}	
-
 	}
+	
 	/**
 	 * Check whether this boulder needs to fall.
 	 * @return False if the cube one z-level lower than the position of this boulder
@@ -169,6 +191,16 @@ public class Boulder extends RawMaterial {
 		this.startPosition = this.getPosition();
 	}
 	/**
+	 * Variable registering the next target position of this boulder when falling.
+	 */
+	private double[] nextTargetPosition;
+	/**
+	 * Variable registering the start position of this boulder when falling.
+	 */
+	private double[] startPosition;
+
+
+	/**
 	 * Return the status of this boulder.
 	 */
 	public Status getStatus(){
@@ -184,6 +216,11 @@ public class Boulder extends RawMaterial {
 		this.status = status;
 	}
 	/**
+	  * Variable registering the status of this boulder.
+	  */
+	 private Status status= Status.DONE;
+
+	/**
 	 * Set the world attached to this boulder to the given world.
 	 * @param world
 	 * 		The world to be attached to this boulder.
@@ -195,7 +232,6 @@ public class Boulder extends RawMaterial {
 	protected void setWorld(@Raw World world){
 		if (world != null)
 			assert (world.hasAsBoulder(this));
-		// nog condities?
 		this.world = world;
 	}
 	/**
@@ -210,12 +246,6 @@ public class Boulder extends RawMaterial {
 		return (this.getWorld() == null || this.getWorld().hasAsBoulder(this));
 	}
 	
-//	@Basic @Raw
-// 	public World getWorld(){
-// 		return world;
-// 	}
-	
-//	private World world;
 	
 	/**
 	 * Terminate this boulder.
@@ -244,6 +274,5 @@ public class Boulder extends RawMaterial {
 	  * Variable registering whether this boulder is terminated.
 	  */
 	 private boolean isTerminated = false;
-	 private Status status= Status.DONE;
 	 
 }

@@ -4,14 +4,27 @@ import java.util.Arrays;
 
 import be.kuleuven.cs.som.annotate.Value;
 
+/**
+ * A value class of positions, as three-dimensional arrays of coordinates.
+ * 
+ * @author adminheremans
+ *
+ */
 @Value
 public class Position {
 	
-		
+		/**
+		 * Initialize this new position with a given integer array of coordinates.
+		 * @param coords
+		 * 			The coordinates that define the position.
+		 */
 		public Position(int[] coords){
 			this.coords = coords;
 		}
 		
+		/**
+		 * A variable registering the coordinates of this position.
+		 */
 		private int[] coords;
 		
 		public int[] getCoords(){
@@ -20,6 +33,11 @@ public class Position {
 
 		/* (non-Javadoc)
 		 * @see java.lang.Object#hashCode()
+		 */
+		/**
+		 * Return the hashcode of this position.
+		 * 
+		 * @return the hash code of this position
 		 */
 		@Override
 		public int hashCode() {
@@ -33,6 +51,11 @@ public class Position {
 
 		/* (non-Javadoc)
 		 * @see java.lang.Object#equals(java.lang.Object)
+		 */
+		/**
+		 * Return whether this position equals an other position.
+		 * 
+		 * @return True if and only if this position's coordinates are the same as the compared position's coordinates.
 		 */
 		@Override
 		public boolean equals(Object obj) {

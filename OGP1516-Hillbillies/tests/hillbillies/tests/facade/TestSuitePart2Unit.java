@@ -705,6 +705,7 @@ public class TestSuitePart2Unit {
 	@Test
 	public final void rest_IneffectiveCase(){
 		HitMaxStaminaMaxUnit.rest();
+		System.out.println(HitMaxStaminaMaxUnit.getStatus().toString());
 		assertEquals(Status.DONE,HitMaxStaminaMaxUnit.getStatus());
 		StandardUnit.rest();
 		assertEquals(Status.DONE,StandardUnit.getStatus());
