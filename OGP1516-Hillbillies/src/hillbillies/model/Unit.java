@@ -899,7 +899,17 @@ public class Unit {
 		
 		return true;
 	}
-	
+	/**
+	 * The unit is falling.
+	 * @param duration
+	 * 		The game time after which falling is called.
+	 * @effect The position is updated.
+	 * @effect If the unit arrived or passed the targetposition,  his hitpoints are decreased and 
+	 * 		his position is set at the targetposition. 
+	 * @effect If the position a z-level lower than the units position is the lowest z-level or
+	 * 		the terrain is not passable, the status is set to done. Otherwise, the unit keeps falling.
+	 * 
+	 */
 	private void falling(double duration){
 		double[] v = new double[] {0.0,0.0,-3.0};
 		setPosition(Vector.vectorAdd(this.getPosition(), Vector.scalarMultiplication(v, duration)));
@@ -1126,10 +1136,22 @@ public class Unit {
 //		}
 //	}
 
-	
+	/**
+	 * A list collecting valid neighboring positions.
+	 */
 	private Queue<int[]> queue =  new LinkedList<int[]>();
+	/**
+	 * A list collecting valid neighboring positions.
+	 */
 	private Queue<int[]> queuePos = new LinkedList<int[]>();
 	
+	/**
+	 * Search the neighboring cubes of the array that are passable and
+	 * are neighboring solid terrain.
+	 * @param array
+	 * 		The array to search around.
+	 * @return 
+	 */
 	public Queue<int[]> search(int[] array){
 		int[] position = {array[0], array[1], array[2]};
 		int n = array[3];
@@ -1401,7 +1423,18 @@ public class Unit {
 			endWork(workTargetPosition);
 		}
 	}
-	
+	/**
+	 * End this units work.
+	 * @param targetPosition
+	 * 		The position on which the unit is working.
+	 * @effect If the terraintype of the target cube is tree, 
+	 * 		the terrain is changed to passable and the experience points
+	 * 		are increased with 10.
+	 * @effect If the terraintype of the target cube is rock,
+	 * 		the terrain is changed to passable and the experience points
+	 * 		are increased with 10.
+	 * @effect
+	 */
 	private void endWork(int[] targetPosition) {
 		switch(this.getWorld().getTerrain(targetPosition)){
 		case TREE:
@@ -1758,7 +1791,20 @@ public class Unit {
 				setStatus(Status.RESTING);
 		}
 	}
-	
+	/**
+	 * This unit is initial resting.
+	 * @param duration
+	 * 		The game time after which initial resting is called.
+	 * @effect If this unit is initial resting, his new hitpoints are increased by (getToughness() / 200.0) * 5 * duration,
+	 * 			as well as the recovered hitpoints. If his hitpoints are equal to or greater then the maximum value, 
+	 * 			this unit's status will be updated to resting and his hitpoints will be set to the maximum value.
+	 * 			If his recoveredHitpoints are equal to or greater than 1, this unit's status is updated to resting.
+	 * 			| this.setHitPoints((getToughness() / 200.0) * 5 * duration + getHitpoints()) && recoveredHitpoints += (getToughness() / 200.0) * 5 * duration
+	 * 			| if (this.getHitpoints() >= getMaxPoints())
+	 * 			|	then his.setHitPoints(getMaxPoints()) && setStatus(Status.RESTING)
+	 * 			| else if (recoveredHitpoints >= 1.0) 
+	 * 			|	then setStatus(Status.RESTING)
+	 */
 	private void initialResting(double duration) {
 		this.setHitPoints((getToughness() / 200.0) * 5 * duration + getHitpoints());
 		recoveredHitpoints += (getToughness() / 200.0) * 5 * duration;
@@ -1770,7 +1816,21 @@ public class Unit {
 			setStatus(Status.RESTING);
 		}
 	}
-	
+	/**
+	 * This unit is resting.
+	 * @param duration
+	 * 		The game time after which resting is called.
+	 * @effect If the status of this unit is resting and if his hitpoints are less then the maximum value, 
+	 * 			this unit will increase its hitpoints by (getToughness() / 200.0) * 5 * duration. 
+	 * 			If his hitpoints are at the maximum value but the stamina points aren't, 
+	 * 			the unit will increase stamina points by (getToughness() / 100.0) * 5 * duration. 
+	 * 			If both hitpoints and stamina points are at the maximum value, the unit's status will be updated to done.
+	 * 			| if this.getHitpoints() < getMaxPoints()
+	 * 			|	then this.setHitPoints((getToughness() / 200.0) * 5 * duration + getHitpoints())
+	 * 			| else if this.getStaminaPoints() < getMaxPoints()
+	 * 			|	then this.setHitPoints(getMaxPoints()) && this.setStaminaPoints((getToughness() / 100.0) * 5 * duration + getStaminaPoints())
+	 * 			| else then this.setStaminaPoints(getMaxPoints()) &&  setStatus(Status.DONE)
+	 */
 	private void resting(double duration){
 		if (this.getHitpoints() < getMaxPoints())
 			this.setHitPoints((getToughness() / 200.0) * 5 * duration + getHitpoints());
@@ -1824,17 +1884,21 @@ public class Unit {
 	 * @effect If this unit's status is not done, its enableDefaultBehaviour is set to false.
 	 * 		 | if !(status == Status.DONE)
 	 * 		 |	then this.setEnableDefaultBehaviour(false)
-	 * @effect If this unit's status is done, it will do randomly walks to a random position
-	 * 			 - this new unit's status is moving and this sprints to a random position
+	 * @effect If this unit's status is done, it will conduct at random an activity:
+	 * 			 - this new unit's status is moving and this unit sprints to a random position
+	 * 			 - this new unit's status is moving and this unit walks to a random position
 	 * 			 - this unit starts working
 	 * 			 - this unit starts resting
+	 * 			 - If this new unit is surrounded by enemies, this unit can also attack.
 	 * 		   | (new.status == Status.MOVING && startSprinting() && moveTo(new double[] { (new Random().nextDouble()) * 50, (new Random().nextDouble()) * 50,
 	 *		   |		 (new Random().nextDouble()) * 50 }))
 	 *		   |OR (new.status = Status.MOVING && stopSprinting() &&
 	 *		   |		moveTo(new double[] { (new Random().nextDouble()) * 50, (new Random().nextDouble()) * 50,
 	 *		   |		 (new Random().nextDouble()) * 50 }))
 	 *		   |OR work()
-	 *		   |OR rest()	   
+	 *		   |OR rest()
+	 *		   |OR if ! (potentialEnemies.size()==0)
+	 *		   |	then attack()	   
 	 */
 	public void startDefaultBehaviour() {
 		if (this.getStatus() == Status.DONE) {
@@ -1848,7 +1912,7 @@ public class Unit {
 						potentialEnemies.add(other);
 				}
 			int i = 0;
-			if (potentialEnemies.size()==0){
+			if (! (potentialEnemies.size()==0)){
 				i = new Random().nextInt(5);
 			}
 			else{
@@ -1911,10 +1975,13 @@ public class Unit {
  	 * @post   This unit  is terminated.
  	 *       | new.isTerminated()
  	 * @post   No boulder is attached any longer to this unit.
+ 	 * 		| this.setBoulder(null)
  	 * @post   No log is attached any longer to this unit.
- 	 * @effect This unit is removed from the world to which it is attached.
- 	 * @effect This unit is removed from the faction to which it is attached.
+ 	 * 		| this.setLog(null);
+ 	 * @effect This unit is removed from the world and from the faction to which it is attached.
+ 	 * 		| this.getWorld().removeAsUnit(this);
  	 * @effect The status of this unit is set to done.
+ 	 * 		| this.setStatus(Status.DONE);
  	 */
  	 public void terminate() {
  		 
@@ -1965,6 +2032,7 @@ public class Unit {
  	 * 		The boulder to check.
  	 * @return True if and only if the given boulder is not effective
  	 * 		or the position of the given boulder equals the position of this unit.
+ 	 * 		| result == (boulder == null) || (boulder.getPosition() == this.getPosition())||(this.isNeighbouringCube(boulder.getPosition()))
  	 */
  	private boolean isValidBoulder(Boulder boulder){
  		return (boulder == null) || (boulder.getPosition() == this.getPosition())||(this.isNeighbouringCube(boulder.getPosition()));
@@ -1974,8 +2042,10 @@ public class Unit {
 	 * @param boulder
 	 * 		The new boulder for this unit.
 	 * @post The new boulder for this unit is the same as the given boulder.
+	 * 		| new.getBoulder() == boulder
 	 * @throws IllegalArgumentException()
 	 * 		The given boulder is not a valid boulder for any unit.
+	 * 		| ! isValidBoulder(boulder)
 	 */
  	@Raw
  	private void setBoulder(Boulder boulder) throws IllegalArgumentException{
@@ -1984,7 +2054,10 @@ public class Unit {
  		
  		this.boulder = boulder;
  	}
- 	
+ 	/**
+ 	 * Return the number of boulders this unit is carrying.
+ 	 * @return 1 if a boulder is attached to this unit or 0 if there's no boulder attached.
+ 	 */
  	public int getNbBoulders(){
  		if (this.getBoulder()!=null)
  			return 1;
@@ -2009,6 +2082,7 @@ public class Unit {
  	 * 		The log to check.
  	 * @return True if and only if the given log is not effective
  	 * 		or the position of the given log equals the position of this unit.
+ 	 * 		| result == (log == null) || (log.getPosition() == this.getPosition())|| this.isNeighbouringCube(log.getPosition())
  	 */
  	// Hier de voorwaarde dat de log in dezelfde cube als de unit moet zijn. Maakt de methode wel niet 
  	// meer static. 
@@ -2020,8 +2094,10 @@ public class Unit {
 	 * @param log
 	 * 		The new log for this unit.
 	 * @post The new log for this unit is the same as the given log.
+	 * 		| new.getLog() == log;
 	 * @throws IllegalArgumentException()
 	 * 		The given log is not a valid log for any unit.
+	 * 		| ! isValidLog(log)
 	 */
 	@Raw
 	private void setLog(Log log) throws IllegalArgumentException{
@@ -2030,7 +2106,10 @@ public class Unit {
  		this.log = log;
 
  	}
-	
+	/**
+ 	 * Return the number of logs this unit is carrying.
+ 	 * @return 1 if a log is attached to this unit or 0 if there's no log attached.
+ 	 */
 	protected int getNbLogs(){
 		if (this.getLog()==null)
 			return 0;
@@ -2053,6 +2132,7 @@ public class Unit {
 	 * @param points
 	 * 		The new experience points for this unit.
 	 * @post The new experience points for this unit are equal to the given experience points.
+	 * 		| new.getExperiencePoints() == points;
 	 */
 	private void setExperiencePoints(int points){
 		experiencePoints = points;
