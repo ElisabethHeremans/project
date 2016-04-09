@@ -1,5 +1,6 @@
 package hillbillies.model;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -23,14 +24,14 @@ public class Faction {
 	 */
 	@Basic
 	@Raw
-	public int getNbUnits() {
+	protected int getNbUnits() {
 		return this.getUnits().size();
 	}
 	/**
 	 * Check whether this faction is active.
 	 * @return True if and only if the number of units in this faction is greater than zero.
 	 */
-	public boolean isActive(){
+	protected boolean isActive(){
 		return getNbUnits() > 0;
 	}
 
@@ -43,7 +44,7 @@ public class Faction {
 	 * @return True if and only if the number of units is greater or equal to zero, 
 	 * 		but less than or equal to fifty.
 	 */
-	public static boolean isValidNumberUnits(int Units) {
+	protected static boolean isValidNumberUnits(int Units) {
 		return (0<= Units && Units<= 50);
 	}
 	/**
@@ -54,7 +55,7 @@ public class Faction {
 	 * @invar Each unit in the set of units references this faction as the faction
 	 * 		to which it is attached.
 	 */
-	private Set<Unit> units = new HashSet<Unit>();
+	protected Set<Unit> units =  Collections.synchronizedSet(new HashSet<Unit>());
 	/**
 	 * Check whether this faction has the given unit as one of the units attached to it.
 	 * @param unit
@@ -62,7 +63,7 @@ public class Faction {
 	 */
 	@Basic
 	@Raw
-	public boolean hasAsUnit(Unit unit){
+	protected boolean hasAsUnit(Unit unit){
 		return this.units.contains(unit);
 	}
 	/**
@@ -73,7 +74,7 @@ public class Faction {
 	 * 		this faction is not yet terminated or the given unit is also terminated. 
 	 */
 	@Raw
-	public boolean canHaveAsUnit(Unit unit){
+	protected boolean canHaveAsUnit(Unit unit){
 		return (unit != null) && (! this.isTerminated() || unit.isTerminated());
 	}
 	/**
@@ -84,7 +85,7 @@ public class Faction {
 	 * 		as their faction.
 	 */
 	@Raw
-	public boolean hasProperUnits(){
+	protected boolean hasProperUnits(){
 		if (this.getNbUnits() >50)
 			return false;
 		for (Unit unit: this.units){
@@ -103,7 +104,7 @@ public class Faction {
 	 * 		this faction is not yet terminated or the given unit is also terminated and 
 	 * 		the total number of units in this faction is less than fifty.
 	 */
-	public boolean canAddAsUnit(Unit unit){
+	protected boolean canAddAsUnit(Unit unit){
 		return canHaveAsUnit(unit) && getNbUnits()<50;
 	}
 	/**
@@ -134,7 +135,7 @@ public class Faction {
 	 * 		the given unit is no longer attached to any faction.
 	 * @throws IllegalArgumentException
 	 */
-	public void removeAsUnit(Unit unit) throws IllegalArgumentException{
+	protected void removeAsUnit(Unit unit) throws IllegalArgumentException{
 		if( unit == null)
 			throw new IllegalArgumentException();
 		if (hasAsUnit(unit))
@@ -156,10 +157,10 @@ public class Faction {
 	 * @post   This faction  is terminated.
 	 */
 	 public void terminate() {
-		 for (Unit unit:this.getUnits()){
-			 this.units.remove(unit);
+		 for (Unit unit:this.units){
 			 unit.setFaction(null);
 		 }
+		 units  =  Collections.synchronizedSet(new HashSet<Unit>());
 		 this.isTerminated = true;
 	 }
 	 

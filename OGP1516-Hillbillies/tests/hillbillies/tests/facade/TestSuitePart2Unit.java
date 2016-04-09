@@ -34,6 +34,8 @@ public class TestSuitePart2Unit {
 	
 	private World world2;
 	
+	private Faction Faction1;
+	
 	private static final int TYPE_AIR = 0;
 	private static final int TYPE_ROCK = 1;
 	private static final int TYPE_TREE = 2;
@@ -61,7 +63,7 @@ public class TestSuitePart2Unit {
 		world2 = new World(types, new DefaultTerrainChangeListener());
 		Unit1InWorld = new Unit("Bunit",new double[] {1.5,2.5,2.5},75,25,25,75,false,25.0,25.0,Math.PI/2);
 		UnitInWorldInvalidPos = new Unit("Bunit",new double[] {1.5,1.5,2.5},75,25,25,75,false,25.0,25.0,Math.PI/2);
-		
+		Faction1 = new Faction();
 		StandardUnit = new Unit("Bunit",new double[] {3.5,1.5,4.5},75,25,25,75,false,25.0,25.0,Math.PI/2);
 		DefaultEnabledUnit = new Unit("Cunit",new double[] {3.5,1.5,4.5},75,25,25,75,true,25.0,25.0,Math.PI/2);
 		HitAndStaminaZeroUnit = new Unit("Dunit",new double[] {3.5,1.5,4.5},75,25,25,75,false,25.0,25.0,Math.PI/2);
@@ -70,6 +72,7 @@ public class TestSuitePart2Unit {
 		HitMaxStaminaZeroUnit = new Unit("Eunit",new double[] {3.5,1.5,4.5},75,25,25,75,false,maxpoints,25.0,Math.PI/2);
 		HitMaxStaminaMaxUnit = new Unit("Funit",new double[] {3.5,1.5,4.5},75,25,25,75,false,maxpoints,maxpoints,Math.PI/2);
 		NeighbourStandardUnit = new Unit("Bunit",new double[] {4.5,0.5,4.5},75,25,25,75,false,25.0,25.0,Math.PI/2);
+		
 	}
 	
 	@Test
@@ -95,7 +98,7 @@ public class TestSuitePart2Unit {
 	
 	@Test
 	public final void extendedConstructor_InvalidWeight(){
-		Unit NewUnit = new Unit("Bunit",new double[] {3.5,1.5,4.5},75,50,50,75,false,25.0,25.0,Math.PI/2);
+		Unit NewUnit = new Unit("Bunit",new double[] {3.5,1.5,4.5},45,50,50,75,false,25.0,25.0,Math.PI/2);
 		Assert.assertEquals(50, NewUnit.getWeight());
 
 	}
@@ -232,14 +235,14 @@ public class TestSuitePart2Unit {
 	public final void getPosition() {
 		assertDoublePositionEquals(3.5,1.5,4.5,StandardUnit.getPosition());
 	}
-	@Test 
-	public final void getCubePosition() {
-		Assert.assertArrayEquals(new double[] {Math.floor(3.5),Math.floor(1.5),Math.floor(4.5)}, StandardUnit.getCubePosition(), Util.DEFAULT_EPSILON);
-	}
+//	@Test 
+//	public final void getCubePosition() {
+//		Assert.assertArrayEquals(new double[] {Math.floor(3.5),Math.floor(1.5),Math.floor(4.5)}, StandardUnit.getCubePosition(), Util.DEFAULT_EPSILON);
+//	}
 	@Test
 	public final void getCubeCoordinate() {
 		Assert.assertArrayEquals(new int[] {(int) Math.floor(3.5),(int) Math.floor(1.5),(int) Math.floor(4.5)}, 
-				new int[] {(int) StandardUnit.getCubePosition()[0],(int) StandardUnit.getCubePosition()[1],(int) StandardUnit.getCubePosition()[2]});
+				new int[] {(int) StandardUnit.getCubeCoordinate()[0],(int) StandardUnit.getCubeCoordinate()[1],(int) StandardUnit.getCubeCoordinate()[2]});
 	}
 	@Test (expected = IllegalArgumentException.class)
 	public final void setPosition_InvalidOutsideWorld() throws IllegalArgumentException {
@@ -261,6 +264,77 @@ public class TestSuitePart2Unit {
 	public final void getBaseSpeed(){
 		Assert.assertEquals(1.5*(50+50)/(200.0*50/100.0), Aunit.getBaseSpeed(), Util.DEFAULT_EPSILON);
 	}
+	
+	@Test 
+	public final void getStatus(){
+		Assert.assertEquals(StandardUnit.getStatus(), Status.DONE);
+		StandardUnit.setStatus(Status.IN_CENTER);
+		Assert.assertEquals(StandardUnit.getStatus(), Status.IN_CENTER);
+	}
+	
+	@Test
+	public final void setStatus(){
+		StandardUnit.setStatus(Status.IN_CENTER);
+		Assert.assertEquals(StandardUnit.getStatus(), Status.IN_CENTER);
+		StandardUnit.setStatus(Status.ATTACKING);
+		Assert.assertEquals(StandardUnit.getStatus(), Status.ATTACKING);
+	}
+	
+	@Test
+	public final void getFaction(){
+		StandardUnit.setFaction(Faction1);
+		Assert.assertEquals(StandardUnit.getFaction(), Faction1);
+	}
+	
+	@Test
+	public final void setFaction_Null(){
+		StandardUnit.setFaction(null);
+		Assert.assertEquals(StandardUnit.getFaction(), null);
+	}
+	
+	@Test
+	public final void setFaction_Effective(){
+		Faction1.addAsUnit(StandardUnit);
+		StandardUnit.setFaction(Faction1);
+		Assert.assertEquals(StandardUnit.getFaction(), Faction1);
+	}
+	
+	@Test
+	public final void setFaction_NonEffective(){
+		StandardUnit.setFaction(Faction1);
+		Assert.assertEquals(StandardUnit.getFaction(), null);
+	}
+	
+	@Test
+	public final void setWorld_null(){
+		StandardUnit.setWorld(null);
+		Assert.assertEquals(StandardUnit.getWorld(), null);
+	}
+	
+	@Test
+	public final void setWorld_Effective(){
+		world2.addAsUnit(StandardUnit);
+		StandardUnit.setWorld(world2);
+		Assert.assertEquals(StandardUnit.getWorld(), world2);
+	}
+	
+	@Test
+	public final void setWorld_NonEffective(){
+		StandardUnit.setWorld(world2);
+		Assert.assertEquals(StandardUnit.getWorld(), null);
+	}
+	
+	@Test 
+	public final void getWorld(){
+		StandardUnit.setWorld(null);
+		Assert.assertEquals(StandardUnit.getWorld(), null);
+		world2.addAsUnit(Unit1InWorld);
+		Unit1InWorld.setWorld(world2);
+		Assert.assertEquals(Unit1InWorld.getWorld(), world2);
+		Unit1InWorld.setWorld(world2);
+		Assert.assertEquals(Unit1InWorld.getWorld(), null);
+	}
+	
 	@Test
 	public final void startSprinting_Effective(){
 		StandardUnit.setStatus(Status.MOVING);
@@ -309,6 +383,13 @@ public class TestSuitePart2Unit {
 		StandardUnit.moveToAdjacent(1, 1, 0);
 		StandardUnit.startSprinting();
 		assert(Util.fuzzyEquals(2.0*StandardUnit.getBaseSpeed(),StandardUnit.getCurrentSpeed()));
+		
+	}
+	
+	@Test
+	public final void getCurrentSpeed_Falling(){
+		StandardUnit.setStatus(Status.FALLING);
+		assert(Util.fuzzyEquals(3,StandardUnit.getCurrentSpeed()));
 		
 	}
 	
@@ -365,10 +446,10 @@ public class TestSuitePart2Unit {
 	
 	@Test
 	public final void advanceTime_InterruptedMovement(){
-		StandardUnit.moveTo1(new int[] {1,2,3});
+		Unit1InWorld.moveTo1(new int[] {0,1,2});
 		StandardUnit.setStatus(Status.DONE);
-		advanceTimeFor(StandardUnit,20.0,0.1);
-		assertIntegerPositionEquals(1,2,3,StandardUnit.getCubeCoordinate());
+		advanceTimeFor(Unit1InWorld,20.0,0.1);
+		assertIntegerPositionEquals(1,2,2,Unit1InWorld.getCubeCoordinate());
 	}
 	
 	@Test
@@ -380,16 +461,24 @@ public class TestSuitePart2Unit {
 	}
 	
 	@Test
+	public final void search(){
+		world2.addAsUnit(Unit1InWorld);
+		int[] array = new int[] {(int) Unit1InWorld.getPosition()[0], (int) Unit1InWorld.getPosition()[1],
+				(int) Unit1InWorld.getPosition()[2], (int) 0};
+		Assert.assertEquals(4, Unit1InWorld.search(array).size());
+	}
+	
+	@Test
 	public final void advanceTime_MovingToNextCube(){
-		StandardUnit.moveTo1(new int[]{4,1,4});
-		double speed = StandardUnit.getCurrentSpeed();
+		Unit1InWorld.moveTo1(new int[]{0,2,2});
+		double speed = Unit1InWorld.getCurrentSpeed();
 		double time = 1.0 / speed;
-		StandardUnit.advanceTime((float) 0.1);
-		assertDoublePositionEquals(3.5+speed*0.1,1.5,4.5,StandardUnit.getPosition());
-		assertEquals(0.0, StandardUnit.getOrientation(),Util.DEFAULT_EPSILON);
-		advanceTimeFor(StandardUnit,time-0.1,0.1);
-		Assert.assertArrayEquals(new double[] {4.5,1.5,4.5}, StandardUnit.getPosition(), Util.DEFAULT_EPSILON);
-		Assert.assertEquals(Status.DONE, StandardUnit.getStatus());
+		Unit1InWorld.advanceTime((float) 0.1);
+		assertDoublePositionEquals(1.5-speed*0.1,2.5,2.5,Unit1InWorld.getPosition());
+		assertEquals(0.0, Unit1InWorld.getOrientation(),Util.DEFAULT_EPSILON);
+		advanceTimeFor(Unit1InWorld,time-0.1,0.1);
+		Assert.assertArrayEquals(new double[] {0.5,2.5,2.5}, Unit1InWorld.getPosition(), Util.DEFAULT_EPSILON);
+		Assert.assertEquals(Status.DONE, Unit1InWorld.getStatus());
 		
 	}
 	
@@ -515,17 +604,17 @@ public class TestSuitePart2Unit {
 		assertDoublePositionEquals(10.5,1.5,4.5, StandardUnit.getPosition());
 	}
 	
-	@Test
-	public final void canMove_TrueCase(){
-		StandardUnit.setStatus(Status.RESTING);
-		assertTrue(StandardUnit.canMove());
-	}
-	
-	@Test
-	public final void canMove_FalseCase(){
-		StandardUnit.setStatus(Status.MOVING);
-		assertFalse(StandardUnit.canMove());
-	}
+//	@Test
+//	public final void canMove_TrueCase(){
+//		StandardUnit.setStatus(Status.RESTING);
+//		assertTrue(StandardUnit.canMove());
+//	}
+//	
+//	@Test
+//	public final void canMove_FalseCase(){
+//		StandardUnit.setStatus(Status.MOVING);
+//		assertFalse(StandardUnit.canMove());
+//	}
 	
 	@Test
 	public final void work_EffectiveCase(){
@@ -543,14 +632,14 @@ public class TestSuitePart2Unit {
 		assertEquals(Status.MOVING,StandardUnit.getStatus());
 	}
 	
-	@Test
-	public final void getProgressWork(){
-		StandardUnit.setStatus(Status.DONE);
-		StandardUnit.work(new int[] {2,1,4});
-		assertEquals(Status.WORKING,StandardUnit.getStatus());
-		advanceTimeFor(StandardUnit,250.0/25,0.1);
-		assertEquals(0.5,StandardUnit.getProgressWork(),Util.DEFAULT_EPSILON);
-	}
+//	@Test
+//	public final void getProgressWork(){
+//		StandardUnit.setStatus(Status.DONE);
+//		StandardUnit.work(new int[] {2,1,4});
+//		assertEquals(Status.WORKING,StandardUnit.getStatus());
+//		advanceTimeFor(StandardUnit,250.0/25,0.1);
+//		assertEquals(0.5,StandardUnit.getProgressWork(),Util.DEFAULT_EPSILON);
+//	}
 	
 	@Test
 	public final void canWork_False(){
@@ -692,11 +781,11 @@ public class TestSuitePart2Unit {
 		assertFalse(StandardUnit.isEnableDefaultBehaviour());
 	}
 	
-	@Test
-	public final void setEnableDefaultBehaviour(){
-		StandardUnit.setEnableDefaultBehaviour(true);
-		assertTrue(StandardUnit.isEnableDefaultBehaviour());
-	}
+//	@Test
+//	public final void setEnableDefaultBehaviour(){
+//		StandardUnit.setEnableDefaultBehaviour(true);
+//		assertTrue(StandardUnit.isEnableDefaultBehaviour());
+//	}
 
 	
 

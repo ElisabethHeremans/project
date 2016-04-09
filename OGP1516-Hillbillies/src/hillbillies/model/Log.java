@@ -177,7 +177,7 @@ public class Log extends RawMaterial {
 	 * 		The new status for this log.
 	 * @post The status of this log is equal to the given status.
 	 */
-	public void setStatus(Status status) {
+	protected void setStatus(Status status) {
 		this.status = status;
 	}
 	/**
@@ -189,7 +189,7 @@ public class Log extends RawMaterial {
 	 * @post This log references the given world as the world attached to it.
 	 */
 	@Override
-	public void setWorld(@Raw World world) {
+	protected void setWorld(@Raw World world) {
 		if (world != null)
 			assert (world.hasAsLog(this));
 		// nog condities?
@@ -203,7 +203,7 @@ public class Log extends RawMaterial {
 	 */
 	@Raw
 	@Override
-	public boolean hasProperWorld() {
+	protected boolean hasProperWorld() {
 		return (this.getWorld()== null || this.getWorld().hasAsLog(this));
 	}
 

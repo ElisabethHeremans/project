@@ -4,9 +4,11 @@ import static hillbillies.tests.util.PositionAsserts.assertDoublePositionEquals;
 import static hillbillies.tests.util.PositionAsserts.assertIntegerPositionEquals;
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -398,7 +400,7 @@ public class TestSuitePart2World {
 	public final void addAsBoulder_ValidCase(){
 		world2.addAsBoulder(boulder);
 		Assert.assertTrue(world2.hasAsBoulder(boulder));
-		Assert.assertTrue(world2.getBoulders(boulder.getCubeCoordinate()).contains(boulder));
+		Assert.assertTrue(world2.getBoulders(boulder.getWorld().getCubeCoordinate(boulder.getPosition())).contains(boulder));
 		Assert.assertEquals(world2,boulder.getWorld());
 
 	}
@@ -467,7 +469,7 @@ public class TestSuitePart2World {
 	public final void addAsLog_ValidCase(){
 		world2.addAsLog(log);
 		Assert.assertTrue(world2.hasAsLog(log));
-		Assert.assertTrue(world2.getLogs(log.getCubeCoordinate()).contains(log));
+		Assert.assertTrue(world2.getLogs(log.getWorld().getCubeCoordinate(log.getPosition())).contains(log));
 		Assert.assertEquals(world2,log.getWorld());
 
 	}
@@ -581,6 +583,46 @@ public class TestSuitePart2World {
 		world2.terminate();
 		assertTrue(world2.isTerminated());
 
+	}
+	
+	@Test
+	public final void getNeighboringCubes_all(){
+		int[] position = new int[] {1,1,1};
+//		world2.getNeighboringCubes(position);
+//		List<int[]> neighboringCubes = new ArrayList<int[]>();
+//		neighboringCubes.add(new int[] {0,0,0});
+//		neighboringCubes.add(new int[] {0,1,0});
+//		neighboringCubes.add(new int[] {0,2,0});
+//		neighboringCubes.add(new int[] {1,0,0});
+//		neighboringCubes.add(new int[] {1,1,0});
+//		neighboringCubes.add(new int[] {1,2,0});
+//		neighboringCubes.add(new int[] {2,0,0});
+//		neighboringCubes.add(new int[] {2,1,0});
+//		neighboringCubes.add(new int[] {2,2,0});
+//		neighboringCubes.add(new int[] {2,0,1});
+//		neighboringCubes.add(new int[] {2,1,1});
+//		neighboringCubes.add(new int[] {2,2,1});
+//		neighboringCubes.add(new int[] {1,0,1});
+//		neighboringCubes.add(new int[] {1,2,1});
+//		neighboringCubes.add(new int[] {0,0,1});
+//		neighboringCubes.add(new int[] {0,1,1});
+//		neighboringCubes.add(new int[] {0,2,1});
+//		neighboringCubes.add(new int[] {0,0,2});
+//		neighboringCubes.add(new int[] {0,1,2});
+//		neighboringCubes.add(new int[] {0,2,2});
+//		neighboringCubes.add(new int[] {1,0,2});
+//		neighboringCubes.add(new int[] {1,1,2});
+//		neighboringCubes.add(new int[] {1,2,2});
+//		neighboringCubes.add(new int[] {2,0,2});
+//		neighboringCubes.add(new int[] {2,1,2});
+//		neighboringCubes.add(new int[] {2,2,2});
+		Assert.assertEquals(world2.getNeighboringCubes(position).size(), 26);
+	}
+	
+	@Test 
+	public final void getNeighboringCubes_Bourder(){
+		int[] position = new int[] {2,2,0};
+		Assert.assertEquals(world2.getNeighboringCubes(position).size(), 7);
 	}
 	
 //	@Test

@@ -1,5 +1,6 @@
 package hillbillies.model;
 
+import java.lang.reflect.Array;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -222,6 +223,9 @@ public class Unit {
 	public void setWeight(int weight) {
 		if (canHaveAsWeight(weight))
 			this.weight = weight;
+		else{
+			this.weight = (int) Math.ceil((this.getStrength()+this.getAgility())/2);
+		}
 	}
 
 	/**
@@ -610,7 +614,7 @@ public class Unit {
 	 *         | result == new double[] {Math.floor(this.getPosition()[0]),
 	 *         | Math.floor(this.getPosition()[1]),Math.floor(this.getPosition()[2])}
 	 */
-	public double[] getCubePosition() {
+	protected double[] getCubePosition() {
 		return new double[] { Math.floor(this.getPosition()[0]), Math.floor(this.getPosition()[1]),
 				Math.floor(this.getPosition()[2]) };
 	}
@@ -718,7 +722,7 @@ public class Unit {
 	 * 		one of the units to which it is attached.
 	 */
 	@Raw
-	public boolean hasProperFaction(){
+	protected boolean hasProperFaction(){
 		return (this.getFaction() == null || this.getFaction().hasAsUnit(this));
 	}
 	/**
@@ -753,7 +757,7 @@ public class Unit {
 	 * 		one of the units to which it is attached.
 	 */
 	@Raw
-	public boolean hasProperWorld(){
+	protected boolean hasProperWorld(){
 		return (this.getWorld()== null) || (getWorld().hasAsUnit(this));
 	}
 	/**
@@ -1126,10 +1130,13 @@ public class Unit {
 	private Queue<int[]> queue =  new LinkedList<int[]>();
 	private Queue<int[]> queuePos = new LinkedList<int[]>();
 	
-	public void search(int[] array){
+	public Queue<int[]> search(int[] array){
 		int[] position = {array[0], array[1], array[2]};
 		int n = array[3];
+		System.out.print("ok");
 		List<int[]> neighboringCubes = this.getWorld().getNeighboringCubes(position);
+		System.out.print("not");
+		System.out.print(neighboringCubes);
 		for (int index= 0; index< neighboringCubes.size(); index++){
 			int[] currentNeighbour = neighboringCubes.get(index);
 			if( this.getWorld().getPassable(currentNeighbour) && 
@@ -1147,9 +1154,10 @@ public class Unit {
 				
 			}
 		}
+		return queue;
 	}
 	
-	public void moveTo1(double[] targetPosition){
+	public void moveTo1(double[] targetPosition)throws IllegalArgumentException{
 		if (!canHaveAsPosition(targetPosition))
 			throw new IllegalArgumentException();
 		if (canMove()) {
@@ -1356,7 +1364,7 @@ public class Unit {
 	 * @return the value of progressWork
 	 * 			| result == this.progressWork
 	 */
-	public double getProgressWork(){
+	protected double getProgressWork(){
 		return progressWork;
 	}
 	/**
@@ -1691,7 +1699,7 @@ public class Unit {
 	 * Check whether it's possible for a unit to defend.
 	 * @return True if and only if the unit is not currently falling and the unit is not terminated.
 	 */		
-	public boolean canDefend(){
+	private boolean canDefend(){
 		return (this.getStatus() != Status.FALLING && !this.isTerminated());
 	}
 
@@ -1751,7 +1759,7 @@ public class Unit {
 		}
 	}
 	
-	public void initialResting(double duration) {
+	private void initialResting(double duration) {
 		this.setHitPoints((getToughness() / 200.0) * 5 * duration + getHitpoints());
 		recoveredHitpoints += (getToughness() / 200.0) * 5 * duration;
 		if (this.getHitpoints() >= getMaxPoints()) {
@@ -1763,7 +1771,7 @@ public class Unit {
 		}
 	}
 	
-	public void resting(double duration){
+	private void resting(double duration){
 		if (this.getHitpoints() < getMaxPoints())
 			this.setHitPoints((getToughness() / 200.0) * 5 * duration + getHitpoints());
 		else if (this.getStaminaPoints() < getMaxPoints()) {
@@ -1803,7 +1811,7 @@ public class Unit {
 	 * @post The enableDefaultBehaviour of this new unit is equal to the given enableDefaultBehaviour.
 	 * 		 | new.isEnableDefaultBehaviour() == enableDefaultBehaviour
 	 */
-	public void setEnableDefaultBehaviour(boolean enableDefaultBehaviour) {
+	private void setEnableDefaultBehaviour(boolean enableDefaultBehaviour) {
 		this.enableDefaultBehaviour = enableDefaultBehaviour;
 	}
 
@@ -1958,7 +1966,7 @@ public class Unit {
  	 * @return True if and only if the given boulder is not effective
  	 * 		or the position of the given boulder equals the position of this unit.
  	 */
- 	public boolean isValidBoulder(Boulder boulder){
+ 	private boolean isValidBoulder(Boulder boulder){
  		return (boulder == null) || (boulder.getPosition() == this.getPosition())||(this.isNeighbouringCube(boulder.getPosition()));
  	}
  	/**
@@ -1970,7 +1978,7 @@ public class Unit {
 	 * 		The given boulder is not a valid boulder for any unit.
 	 */
  	@Raw
- 	public void setBoulder(Boulder boulder) throws IllegalArgumentException{
+ 	private void setBoulder(Boulder boulder) throws IllegalArgumentException{
  		if(! isValidBoulder(boulder))
  			throw new IllegalArgumentException();
  		
@@ -2004,7 +2012,7 @@ public class Unit {
  	 */
  	// Hier de voorwaarde dat de log in dezelfde cube als de unit moet zijn. Maakt de methode wel niet 
  	// meer static. 
- 	public boolean isValidLog(Log log){
+ 	private boolean isValidLog(Log log){
  		return (log == null) || (log.getPosition() == this.getPosition())|| this.isNeighbouringCube(log.getPosition());
  	}
  	/**
@@ -2016,14 +2024,14 @@ public class Unit {
 	 * 		The given log is not a valid log for any unit.
 	 */
 	@Raw
-	public void setLog(Log log) throws IllegalArgumentException{
+	private void setLog(Log log) throws IllegalArgumentException{
  		if(! isValidLog(log))
  			throw new IllegalArgumentException();
  		this.log = log;
 
  	}
 	
-	public int getNbLogs(){
+	protected int getNbLogs(){
 		if (this.getLog()==null)
 			return 0;
 		else

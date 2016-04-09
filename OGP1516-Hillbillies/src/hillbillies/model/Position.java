@@ -13,6 +13,10 @@ public class Position {
 		}
 		
 		private int[] coords;
+		
+		public int[] getCoords(){
+			return this.coords;
+		}
 
 		/* (non-Javadoc)
 		 * @see java.lang.Object#hashCode()

@@ -2,6 +2,7 @@ package hillbillies.model;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -199,7 +200,7 @@ public class World {
 	 * @return the coordinates of the cube in which the given position is located.
 	 * 
 	 */
-	int[] getCubeCoordinate(double[] position){
+	public int[] getCubeCoordinate(double[] position){
 		return new int[] { (int) Math.floor(position[0]/L), (int) Math.floor(position[1]/L),
 				(int) Math.floor(position[2]/L) };
 	}
@@ -233,9 +234,9 @@ public class World {
 	 * 			If the given position is not inside this world.
 	 * 
 	 */
-	List<int[]> getNeighboringCubes( int[] position) throws IllegalArgumentException{
-		if (!this.isCubeInWorld(position))
-			throw new IllegalArgumentException();
+	public List<int[]> getNeighboringCubes( int[] position) throws IllegalArgumentException{
+		if (!this.isCubeInWorld(position)){
+			throw new IllegalArgumentException();}
 		List<int[]> neighboringCubes = new ArrayList<int[]>();
 		for(int i =-1; i < 2; i++){
 			for (int j =-1; j<2; j++){
