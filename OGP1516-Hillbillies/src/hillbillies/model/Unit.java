@@ -187,8 +187,16 @@ public class Unit {
 	 * @param Weight
 	 *            The weight to check.
 	 * @return  True if and only if the weight is equal to or greater than half of
-	 * 			the unit's strength increased with his agility, and a number from 1 to 200.
+	 * 			the unit's strength increased with his agility, and a number from 1 to 200 if the
+	 * 			this unit is not carrying a log or boulder, otherwise his weight may exceed 200 with
+	 * 			the weight of the log or boulder.
 	 * 			| result == (weight >= (this.getStrength() + this.getAgility())/2 && weight >=1 && weight <=200)
+	 * 			| OR if (this.getLog() != null)
+	 * 			|	then result == (weight >= (( this.getStrength() + this.getAgility()) / 2) 
+	 *			|		&& (weight >=1 && weight <=200+this.getLog().getWeight())
+	 *			| OR if (this.getBoulder() != null)
+	 *			|	then result == (weight >= (this.getStrength() + this.getAgility()) / 2) 
+	 *			|		&& (weight >=1 && weight <=200+this.getBoulder().getWeight())
 	 */
 	@Raw
 	public boolean canHaveAsWeight(int weight) {
@@ -677,7 +685,14 @@ public class Unit {
 						&& (Util.fuzzyEquals(Math.abs((cubePosition)[1] - this.getCubePosition()[1]),0.0))
 						&& (Util.fuzzyEquals(Math.abs((cubePosition)[1] - this.getCubePosition()[1]),0.0))));
 	}
-	
+	/**
+	 * Checks whether the given cube is neighboring this unit.
+	 * @param cubePosition
+	 * 		The cube to check.
+	 * @return True if and only if the difference between the respective x, y and z -coordinates of the cubeCenters are equal to 0, 1 or -1,
+	 * 			and the difference between the respective x,y and z coordinates are not all 0.
+	 * 			| result == isNeighbouringCube(new double[] {(double)cubePosition[0],(double)cubePosition[1],(double)cubePosition[2]})
+	 */
 	private boolean isNeighbouringCube(int[] cubePosition){
 		return isNeighbouringCube(new double[] {(double)cubePosition[0],(double)cubePosition[1],(double)cubePosition[2]}); 
 	}
@@ -698,6 +713,7 @@ public class Unit {
 	 * @param status
 	 * 		The new status for this unit.
 	 * @post The status of this unit is equal to the given status.
+	 * 		| new.getStatus() == status
 	 */
 	public void setStatus(Status status) {
 		this.status = status;
@@ -708,7 +724,9 @@ public class Unit {
 	 * 		The faction to be attached to this unit.
 	 * @pre If the given faction is effective, it must already reference
 	 * 		this unit as one of the units to which it is attached.
+	 * 		| assert (faction.hasAsUnit(this))
 	 * @post This unit references the given faction as the faction attached to it.
+	 * 		| new.getFaction() == faction
 	 */
 	public void setFaction(@Raw Faction faction){
 		if (faction != null)
@@ -720,6 +738,7 @@ public class Unit {
 	 * @return True if and only if this unit does not reference an effective faction
 	 * 		or if the faction referenced by this unit in turn references this unit as 
 	 * 		one of the units to which it is attached.
+	 * 		| result == (this.getFaction() == null || this.getFaction().hasAsUnit(this))
 	 */
 	@Raw
 	protected boolean hasProperFaction(){
@@ -742,7 +761,9 @@ public class Unit {
 	 * 		The world to be attached to this unit.
 	 * @pre If the given world is effective, it must already reference
 	 * 		this unit as one of the units to which it is attached.
+	 * 		| assert (world.hasAsUnit(this))
 	 * @post This unit references the given world as the world attached to it.
+	 * 		| new.getWorld() == world
 	 */
 	public void setWorld(@Raw World world){
 		if (world != null){
@@ -755,6 +776,7 @@ public class Unit {
 	 * @return True if and only if this unit does not reference an effective world
 	 * 		or if the world referenced by this unit in turn references this unit as 
 	 * 		one of the units to which it is attached.
+	 * 		| result == (this.getWorld()== null) || (getWorld().hasAsUnit(this))
 	 */
 	@Raw
 	protected boolean hasProperWorld(){
@@ -777,6 +799,13 @@ public class Unit {
 	 * 
 	 * @param duration
 	 *         The game time after which advanceTime is called.
+	 * @effect If the experience points of this unit are greater than or equal to ten,
+	 * 			his strength or his agility or his toughness is increased by 1
+	 * 			and his experience points are decreased by 10.
+	 * @effect If the hitpoints of this unit are less than or equal to zero,
+	 * 			this unit is terminated.
+	 * @effect If this unit must fall and is not already falling, this unit shall fall.
+	 * @effect If the status of this unit is falling, the unit will continue falling.
 	 * @effect If this unit must rest, this unit shall rest.
 	 * @effect If this unit is doing nothing, while default behaviour is not enabled, and the unit still has a
 	 *         targetPosition, this unit shall resume moving to the targetPosition.
@@ -794,7 +823,7 @@ public class Unit {
 	 *         has arrived to the next target position (the center of the next
 	 *         cube), its new position is the next target position and it moves
 	 *         to the target position.
-	 * @post If this unit is working, and if his task is not completed, the new unit's
+	 * @effect If this unit is working, and if his task is not completed, the new unit's
 	 *       working time is increased with duration, and the progress of its work is
 	 *       updated. If this unit is working and its task is completed, the
 	 *       new status is DONE.
@@ -807,8 +836,12 @@ public class Unit {
 	 * 			If his hitpoints are at the maximum value but the stamina points aren't, 
 	 * 			the unit will increase stamina points by (getToughness() / 100.0) * 5 * duration. 
 	 * 			If both hitpoints and stamina points are at the maximum value, the unit's status will be updated to done.
-	 * @post If this unit's status is attacking, this new unit's attackTimer will be increased with duration and if the attackTimer becomes 
+	 * @effect If this unit's status is attacking, this new unit's attackTimer will be increased with duration and if the attackTimer becomes 
 	 * 			equal or greater then one, this new unit's status will be updated to done.
+	 * @effect If this unit is carrying a boulder, the position of the boulder equals
+	 *			the position of this unit.
+	 * @effect If this unit is carrying a log, the position of the log equals
+	 *			the position of this unit. 
 	 * @throws IllegalArgumentException
 	 *             If the duration is less than zero or exceeds or equals 0.2 s.
 	 */
@@ -820,9 +853,9 @@ public class Unit {
 		restTimer += duration;
 		if (experiencePoints >=10){
 			setExperiencePoints(this.getExperiencePoints()-10);
-			if (isValidStrength(this.getStrength()+1))
+			if (isValidStrength(this.getStrength()+1) && this.getWeight()>=((this.getStrength()+1)+this.getAgility())/2 )
 				this.setStrength(this.getStrength()+1);
-			else if (isValidAgility(this.getAgility()+1))
+			else if (isValidAgility(this.getAgility()+1) && this.getWeight()>=(this.getStrength()+(this.getAgility()+1))/2)
 				this.setAgility(this.getAgility()+1);
 			else if (isValidToughness(this.getToughness()+1))
 				this.setToughness(this.getToughness()+1);
@@ -870,8 +903,11 @@ public class Unit {
 	 * Make the unit fall.
 	 * 
 	 * @post This units new status will be equal to falling.
+	 * 		| setStatus(Status.FALLING)
 	 * @post The startposition of this unit is the position of this unit and 
 	 * 		the next target position is one z-level lower than the position of this unit.
+	 * 		| this.nextTargetPosition = Vector.vectorAdd(this.getPosition(), new double[] {0.0,0.0,-1.0})
+	 * 		| && this.startPosition = this.getPosition()
 	 */ 
 	private void fall() {
 		setStatus(Status.FALLING);
@@ -880,8 +916,10 @@ public class Unit {
 	}
 	/**
 	 * Check whether this unit needs to fall.
-	 * @return False if the z-co�rdinate of this unit is equal to zero or 
+	 * @return False if the z-coordinate of this unit is equal to zero or 
 	 * 		there is a neighboring cube that is not passable. Otherwise, return true.
+	 * 		result == (this.getCubeCoordinate()[2]!=0) 
+	 * 				&& this.getWorld().getTerrain(neighborinCubes).isPassable()
 	 */
 	public boolean mustFall() {
 		//System.out.println(this.getCubeCoordinate()[2]);
@@ -903,11 +941,17 @@ public class Unit {
 	 * The unit is falling.
 	 * @param duration
 	 * 		The game time after which falling is called.
-	 * @effect The position is updated.
+	 * @effect The position of this unit is updated.
+	 * 		| setPosition(Vector.vectorAdd(this.getPosition(), Vector.scalarMultiplication(v, duration)))
 	 * @effect If the unit arrived or passed the targetposition,  his hitpoints are decreased and 
 	 * 		his position is set at the targetposition. 
-	 * @effect If the position a z-level lower than the units position is the lowest z-level or
+	 * 		| if (Vector.getDistance(nextTargetPosition, startPosition)-Vector.getDistance(startPosition, this.getPosition())<=0.0)
+	 * 		|	then setPosition(nextTargetPosition) && setHitPoints(this.getHitpoints() - 10)
+	 * @effect And if the position a z-level lower than the units position is the lowest z-level or
 	 * 		the terrain is not passable, the status is set to done. Otherwise, the unit keeps falling.
+	 * 			| if (this.getCubeCoordinate()[2]==1.0 || !this.getWorld().getTerrain(nextPosition).isPassable())
+	 * 			| 	then setStatus(Status.DONE)
+	 * 			| else then fall()
 	 * 
 	 */
 	private void falling(double duration){
@@ -948,6 +992,9 @@ public class Unit {
 	 * @return The speed at which the unit is moving is the walking speed if the unit is walking.
 	 * 			| if (status == Status.MOVING && !isSprinting()) 
 	 * 			| 	then result == getWalkingSpeed();
+	 * @return The speed at which the unit is moving is 3.0 if the unit is falling.
+	 * 			| if (this.getStatus() == Status.FALLING)
+	 * 			|	then result == 3.0
 	 */
 	public double getCurrentSpeed() {
 		if (this.getStatus() == Status.MOVING) {
@@ -967,7 +1014,8 @@ public class Unit {
 	 * 
 	 * @return True only if the unit is currently resting or doing nothing or 
 	 * 			is moving and currently in the center of a cube.
-	 * 		   | result == (status == Status.RESTING || status == Status.DONE || status == Status.IN_CENTER)
+	 * 		   | result == (status == Status.RESTING || status == Status.DONE 
+	 * 		   |	|| status == Status.IN_CENTER || status == Status.FALLING)
 	 */
 	public boolean canMove() {
 		if (this.getStatus() == Status.RESTING || this.getStatus() == Status.DONE || this.getStatus() == Status.IN_CENTER || this.getStatus() == Status.FALLING)
@@ -1064,78 +1112,6 @@ public class Unit {
 		}
 	}
 
-//	/**
-//	 * Start moving the given unit to the given cube.
-//	 * 
-//	 * @param targetPosition
-//	 *         the position to move to
-//	 * @post If this unit can move, this new unit's target position is targetPosition and this units new status is in-center
-//	 * 		   | if (canMove())
-//	 * 		   |	then new.targetPosition == targetPosition && new.status == Status.IN_CENTER
-//	 * @effect If this unit can move, the variables x, y and z  register
-//	 * 			if this unit needs to go further (=1) in the x-, y-, z-direction or
-//	 * 			if this unit needs to go back (=-1) in the x-, y-, z-direction or 
-//	 * 			if this unit needs to stay (=0) at the same x-, y-, z-coordinate. 
-//	 * 			The unit will move to the appropriate neighboring cube.
-//	 * 		   | if (canMove()) 
-//	 * 		   |		 if (Util.fuzzyEquals(targetPosition[0] - this.getPosition()[0], 0))
-//	 * 		   |			then x = 0
-//	 * 		   |		 if (Math.signum(targetPosition[0] - this.getPosition()[0]) == -1)
-//	 * 		   |		 	then x = -1
-//	 * 		   |		 if (Math.signum(targetPosition[0] - this.getPosition()[0]) == 1)
-//	 * 		   |			then x = 1
-//	 * 		   |		 if (Util.fuzzyEquals(targetPosition[1] - this.getPosition()[1], 0))
-//	 * 		   |			then y = 0
-//	 * 		   |		 if (Math.signum(targetPosition[1] - this.getPosition()[1]) == -1)		
-//	 * 		   |			then y = -1
-//	 * 		   |		 if (Math.signum(targetPosition[1] - this.getPosition()[1]) == 1)		
-//	 * 		   |			then y = 1
-//	 * 		   |		 if (Util.fuzzyEquals(targetPosition[2] - this.getPosition()[2], 0))
-//	 * 		   |			then z = 0
-//	 * 		   |		 if (Math.signum(targetPosition[2] - this.getPosition()[2]) == -1)
-//	 * 		   |			then z = -1
-// 	 * 		   |		 if (Math.signum(targetPosition[2] - this.getPosition()[2]) == 1)
-//	 * 		   |		 	then z = 1
-//	 * 		   |		moveToAdjacent(x,y,z)
-//	 * @throws IllegalArgumentException
-//	 *             The given targetPosition is not a valid targetPosition for a
-//	 *             unit. 
-//	 *             | ! isValidPosition(targetPosition)
-//	 */
-//	public void moveTo(double[] targetPosition) throws IllegalArgumentException {
-//		if (!canHaveAsPosition(targetPosition))
-//			throw new IllegalArgumentException();
-//		
-//		if (canMove()) {
-//			this.targetPosition = targetPosition;
-//			setStatus(Status.IN_CENTER);
-//			int x = 0;
-//			int y = 0;
-//			int z = 0;
-//
-//			if (Util.fuzzyEquals(targetPosition[0] - this.getPosition()[0], 0))
-//				x = 0;
-//			else if (Math.signum(targetPosition[0] - this.getPosition()[0]) == -1)
-//				x = -1;
-//			else
-//				x = 1;
-//			if (Util.fuzzyEquals(targetPosition[1] - this.getPosition()[1], 0))
-//				y = 0;
-//			else if (Math.signum(targetPosition[1] - this.getPosition()[1]) == -1)
-//				y = -1;
-//			else
-//				y = 1;
-//			if (Util.fuzzyEquals(targetPosition[2] - this.getPosition()[2], 0))
-//				z = 0;
-//			else if (Math.signum(targetPosition[2] - this.getPosition()[2]) == -1)
-//				z = -1;
-//			else
-//				z = 1;
-//			moveToAdjacent(x, y, z);
-//
-//		}
-//	}
-
 	/**
 	 * A list collecting valid neighboring positions.
 	 */
@@ -1144,13 +1120,16 @@ public class Unit {
 	 * A list collecting valid neighboring positions.
 	 */
 	private Queue<int[]> queuePos = new LinkedList<int[]>();
-	
+	 
+	// Documentatie bij een for loop? 
 	/**
 	 * Search the neighboring cubes of the array that are passable and
 	 * are neighboring solid terrain.
 	 * @param array
 	 * 		The array to search around.
-	 * @return 
+	 * @return A collection of all the neighboring cubes with an extra index
+	 * 		 (one greater then that of the array)
+	 * 		 of the array that are passable and are neighboring solid terrain. 
 	 */
 	public Queue<int[]> search(int[] array){
 		int[] position = {array[0], array[1], array[2]};
@@ -1178,7 +1157,23 @@ public class Unit {
 		}
 		return queue;
 	}
-	
+	// ik weet niet goed hoe je de documentatie voor while loops moet doen.
+	/**
+	 * Makes this unit move to a given target position.
+	 * @param targetPosition
+	 * 		The target position to move to.
+	 * @effect If a unit can move, his status is IN_CENTER.
+	 * 		| if canMove()
+	 * 		|	then setStatus(Status.IN_CENTER)
+	 * @effect A list with possible positions for different path is created and 
+	 * 			the unit will move to an adjacent cube that's in the list.
+	 * 		| search(nextPosition)
+	 * 		| moveToAdjacent(candidateNextArray[0]-this.getCubeCoordinate()[0],
+	 *		| candidateNextArray[1]-this.getCubeCoordinate()[1],candidateNextArray[2]-this.getCubeCoordinate()[2])
+	 * @throws IllegalArgumentException
+	 * 		The given target position is not a valid position for a unit.
+	 * 		| !canHaveAsPosition(targetPosition)
+	 */
 	public void moveTo1(double[] targetPosition)throws IllegalArgumentException{
 		if (!canHaveAsPosition(targetPosition))
 			throw new IllegalArgumentException();
@@ -1212,11 +1207,54 @@ public class Unit {
 			}
 		}	
 	}
-	
+	/**
+	 * Move to the given cube.
+	 * @param cubePos
+	 * 		The cube to move to.
+	 * @effect	This unit moves to the given cube.
+	 * 		| moveTo1(new double[] {(double)cubePos[0]+0.5,(double) cubePos[1]+0.5,(double)cubePos[2]+0.5})
+	 */
 	public void moveTo1(int[] cubePos){
 		moveTo1(new double[] {(double)cubePos[0]+0.5,(double) cubePos[1]+0.5,(double)cubePos[2]+0.5});
 	}
-	
+	/**
+	 * The unit is moving.
+	 * @param duration
+	 * 		The game time after which moving is called.
+	 *  @effect The position of this  unit is set to the
+	 *         updated position (the old position + this unit's speed *
+	 *         duration) and the orientation of this new unit is set to the
+	 *         direction in which he is going. If this unit is sprinting,
+	 *         the stamina points are decreased with one per 0.1 s. If its stamina
+	 *         points are equal to or less than zero, this unit stops sprinting
+	 *         and its stamina points are set to 0. If this unit has arrived to
+	 *         the target position, its new position is the target position, its
+	 *         status is DONE and its target position is null. If this unit
+	 *         has arrived to the next target position (the center of the next
+	 *         cube), its new position is the next target position and it moves
+	 *         to the target position.
+	 *		| setPosition(Vector.vectorAdd(this.getPosition(), Vector.scalarMultiplication(v, duration)))
+	 *		| setOrientation((float) Math.atan2(v[1],v[0]));
+	 *		| if(isSprinting() && StaminaPoints != 0 )
+	 *		|	then  setStaminaPoints(this.getStaminaPoints() - 10.0 * duration)
+	 *		|		&&  startSprinting()
+	 *		| if(isSprinting() && StaminaPoints == 0 )	
+	 *		|	then  setStaminaPoints(0.0) && stopSprinting()
+	 *		| if (targetPosition != null && startPosition != null
+	 *		|	&& Vector.getDistance(targetPosition, startPosition)
+	 *		|	- Vector.getDistance(startPosition, this.getPosition())<=0.0)
+	 *		|		then setPosition(targetPosition) && setStatus(Status.DONE)
+	 *		|			&& setExperiencePoints(this.getExperiencePoints()+1)
+	 *		| else if (nextTargetPosition != null && Vector.getDistance(nextTargetPosition, startPosition)
+	 *		|	-Vector.getDistance(startPosition, this.getPosition())<=0.0 && targetPosition != null)
+	 *		|		then setExperiencePoints(this.getExperiencePoints()+1)
+	 *		|		&& setPosition(nextTargetPosition) && setStatus(Status.IN_CENTER)
+	 *		|		&& moveTo1(targetPosition);
+	 *		| else if (nextTargetPosition != null && Vector.getDistance(nextTargetPosition, startPosition)
+	 *		|	-Vector.getDistance(startPosition, this.getPosition())<=0.0 && targetPosition == null)
+	 *		|		then setExperiencePoints(this.getExperiencePoints()+1)
+	 *		|		&& setPosition(nextTargetPosition) && setStatus(Status.DONE)	   
+	 */
 	public void moving1(double duration){
 		double d = Vector.getDistance(nextTargetPosition,startPosition);
 		double[] v = new double[] {getCurrentSpeed()*(nextTargetPosition[0]-startPosition[0])/d,
@@ -1259,58 +1297,6 @@ public class Unit {
 		}
 	}
 
-//	/**
-//	 * Start moving the given unit to the given cube, given as an array of integers.
-//	 * @param cubePosition
-//	 * 			The coordinate of the cube to move to.
-//	 * @effect The new position of the unit is the center of the given cube.
-//	 * 		   | moveTo(new double[] { (double) cubePosition[0] + L/2, (double) cubePosition[1] + L/2,
-//	 * 		   |	(double) cubePosition[2] + L/2 })  			
-//	 */
-//	public void moveTo(int[] cubePosition) throws IllegalArgumentException{
-//		moveTo(this.getWorld().getCubeCenter(cubePosition));
-//	}
-//	
-//	public void moving(double duration){
-//		double d = Vector.getDistance(nextTargetPosition,startPosition);
-//		double[] v = new double[] {getCurrentSpeed()*(nextTargetPosition[0]-startPosition[0])/d,
-//				getCurrentSpeed()*(nextTargetPosition[1]-startPosition[1])/d,
-//				getCurrentSpeed()*(nextTargetPosition[2]-startPosition[2])/d};
-//		//double[] v1 = new double[] Vector.scalarMultiplication(Vector.vectorReduction(nextTargetPosition, startPosition), getCurrentSpeed()/d);
-//		
-//		setPosition(Vector.vectorAdd(this.getPosition(), Vector.scalarMultiplication(v, duration)));
-//		setOrientation((float) Math.atan2(v[1],v[0]));
-//		if (isSprinting()){
-//
-//			if (Util.fuzzyLessThanOrEqualTo(this.getStaminaPoints()-10.0*duration,0.0)){
-//		
-//				setStaminaPoints(0.0);
-//				stopSprinting();
-//			} else {
-//				setStaminaPoints(this.getStaminaPoints() - 10.0 * duration);
-//				startSprinting();
-//			}
-//		}
-//		if (targetPosition != null && startPosition != null
-//				&& Vector.getDistance(targetPosition, startPosition)-Vector.getDistance(startPosition, this.getPosition())<=0.0){
-//			setPosition(targetPosition);
-//			setStatus(Status.DONE);
-//			targetPosition = null;
-//			setExperiencePoints(this.getExperiencePoints()+1);
-//		}
-//		else if (nextTargetPosition != null && Vector.getDistance(nextTargetPosition, startPosition)-Vector.getDistance(startPosition, this.getPosition())<=0.0){
-//			setExperiencePoints(this.getExperiencePoints()+1);
-//			setPosition(nextTargetPosition);
-//			if (targetPosition != null){
-//				//System.out.println("moveto" + targetPosition +"huidige loc" + this.getPosition());
-//				setStatus(Status.IN_CENTER);
-//				moveTo(targetPosition);
-//			}
-//			else
-//				setStatus(Status.DONE);
-//		}
-//	}
-	
 	/**
 	 * Return the walking speed of this unit.
 	 */
@@ -1370,7 +1356,8 @@ public class Unit {
 	 * 
 	 * @return True if and only if the unit wasn't currently moving or 
 	 * 			wasn't initial resting or wasn't attacking an other unit.
-	 * 		   | result == (status != Status.MOVING && status != Status.INITIAL_RESTING && status != Status.ATTACKING)
+	 * 		   | result == (status != Status.MOVING && status != Status.INITIAL_RESTING 
+	 * 		   |	&& status != Status.ATTACKING && status != Status.FALLING)
 	 */
 	public boolean canWork() {
 		if (!this.isTerminated() && this.getStatus() != Status.MOVING 
@@ -1413,7 +1400,19 @@ public class Unit {
 		}
 
 	}
-	
+	/**
+	 * This unit is working
+	 * @param duration
+	 * 		The game time after which working is called.
+	 * @post If this unit is working, and if his task is not completed, the new unit's
+	 *       working time is increased with duration, and the progress of its work is
+	 *       updated. If this unit is working and its task is completed, the
+	 *       new status is DONE.
+	 *       | if (workingTime < totalWorkingTime)
+	 *       |	then workingTime += duration && progressWork = workingTime / totalWorkingTime
+	 * @effect Otherwise the unit will end his work and the progress is completed.
+	 * 		 | else then progressWork = (float) 1.0 && endWork(workTargetPosition)
+	 */
 	private void working(double duration) {
 		if (workingTime < totalWorkingTime) {
 			workingTime += duration;
@@ -1427,13 +1426,59 @@ public class Unit {
 	 * End this units work.
 	 * @param targetPosition
 	 * 		The position on which the unit is working.
-	 * @effect If the terraintype of the target cube is tree, 
-	 * 		the terrain is changed to passable and the experience points
-	 * 		are increased with 10.
-	 * @effect If the terraintype of the target cube is rock,
-	 * 		the terrain is changed to passable and the experience points
-	 * 		are increased with 10.
-	 * @effect
+	 * @post The status of this unit is done.
+	 * 		| this.setStatus(Status.DONE)
+	 * @effect If this unit carries a boulder, the boulder is dropped 
+	 * 			at the centre of the cube targeted.
+	 * 		| If (this.getBoulder()!= null)
+	 * 		|	then this.getBoulder().setPosition(this.getWorld().getCubeCenter(targetPosition))
+	 * 		|	&& this.getWorld().addAsBoulder(this.getBoulder())
+	 * 		|	&& this.setWeight(this.getWeight()-this.getBoulder().getWeight())
+	 * 		|	&& this.setBoulder(null) && setExperiencePoints(this.getExperiencePoints()+10)
+	 * @effect Otherwise if this unit carries a log, the log is dropped
+	 * 			at the centre of the cube targeted.
+	 * 		| If (this.getBoulder() == null && this.getLog() != null)
+	 * 		|	then this.getLog().setPosition(this.getWorld().getCubeCenter(targetPosition))
+	 * 		|	&& this.getWorld().addAsLog(this.getLog())
+	 *		|	&& this.setWeight(this.getWeight()-this.getLog().getWeight())
+	 *		|	&& this.setLog(null) && setExperiencePoints(this.getExperiencePoints()+10)
+	 * @effect Otherwise if the targeted cube has the terraintype workshop and one boulder and
+	 * 			one log is available an the targeted cube, this unit consumes the 
+	 * 			boulder and the log and increases his weight and toughness by one.
+	 * 		| If(this.getBoulder() == null && this.getLog() == null 
+	 * 		|	&& this.getWorld().getTerrain(targetPosition) == WORKSHOP 
+	 * 		|	&& this.getWorld().getBoulders(targetPosition).size() > 0
+	 * 		|	&& this.getWorld().getLogs(targetPosition).size() > 0)
+	 * 		|		then this.getWorld().removeAsBoulder(boulder)
+	 *		|		&& this.getWorld().removeAsLog(log)
+	 *		|		&& this.setWeight(this.getWeight()+1)
+	 *		|		&& this.setToughness(this.getToughness()+1)
+	 *		|		&& setExperiencePoints(this.getExperiencePoints()+10)
+	 * @effect Otherwise if a boulder is present on the targeted cube, 
+	 * 			this unit carries the boulder.
+	 * 		| else if (this.getWorld().getBoulders(targetPosition).size()>0)
+	 * 		|	then this.setBoulder(boulder) && this.getWorld().removeAsBoulder(boulder)
+	 *		|	&& setExperiencePoints(this.getExperiencePoints()+10)
+	 *		|	&& this.setWeight(this.getWeight()+boulder.getWeight())
+	 * @effect Otherwise if a log is present on the targeted cube,
+	 * 			this unit carries the log.
+	 * 		| else if (this.getWorld().getBoulders(targetPosition).size() ==0 
+	 * 		|	&& this.getWorld().getLogs(targetPosition).size() >0)
+	 * 		|		then this.getWorld().removeAsLog(log) && this.setLog(log)
+	 *		|			setExperiencePoints(this.getExperiencePoints()+10)
+	 *		|			&& this.setWeight(this.getWeight()+log.getWeight())
+	 * @effect Otherwise if the terraintype of the target cube is tree, 
+	 * 		the terrain is changed to passable leaving with 25 percent chance a log
+	 * 		 and the experience points are increased with 10.
+	 * 		| case TREE
+	 * 		|	then his.getWorld().solidToPassableUpdate(targetPosition) && 
+	 * 		|	setExperiencePoints(this.getExperiencePoints()+10)
+	 * @effect Otherwise if the terraintype of the target cube is rock,
+	 * 		the terrain is changed to passable leaving with 25 percent chance a boulder 
+	 * 		and the experience points are increased with 10.
+	 * 		| case ROCK
+	 * 		|	then this.getWorld().solidToPassableUpdate(targetPosition) &&
+	 * 		|	setExperiencePoints(this.getExperiencePoints()+10)
 	 */
 	private void endWork(int[] targetPosition) {
 		switch(this.getWorld().getTerrain(targetPosition)){
@@ -1616,8 +1661,8 @@ public class Unit {
 	/**
 	 * Check whether it's possible for a unit to attack.
 	 * 
-	 * @return True if the unit is not currently moving.
-	 * 		   | result == (status != Status.MOVING)
+	 * @return True if the unit is not currently moving or falling and this unit is not terminated.
+	 * 		   | result == (status != Status.MOVING)&& this.getStatus() != Status.FALLING && !this.isTerminated()
 	 */
 	public boolean canAttack() {
 		if (this.getStatus() != Status.MOVING && this.getStatus() != Status.FALLING && !this.isTerminated())
@@ -1670,18 +1715,24 @@ public class Unit {
 	 * @effect Change the orientation of this unit so that this new unit faces the attacking unit.
 	 * 		   | this.setOrientation((float) Math.atan2(unit.getPosition()[1] - this.getPosition()[1],
 	 *		   |	unit.getPosition()[0] - this.getPosition()[0]))
-	 * @effect If this unit is able to dodge, his position is set to a random neighbhouring cube.
+	 * @effect If this unit is able to dodge, his position is set to a random valid neighbhouring cube 
+	 * 			and his experience points are increased by 20.
 	 * 		   | if (new Random().nextDouble() <= 0.20 * (this.getAgility() / unit.getAgility()))
-	 * 		   |	this.setPosition(new double[] {this.getPosition()[0]+ (double)(-1 + (new Random().nextInt(3))),
+	 * 		   |	then this.setPosition(new double[] {this.getPosition()[0]+ (double)(-1 + (new Random().nextInt(3))),
 	 *		   |			this.getPosition()[1]+ (double)(-1 + (new Random().nextInt(3))),
 	 *		   |			this.getPosition()[2]+ (double)(-1 + (new Random().nextInt(3)))});
+	 *		   |		&& this.setExperiencePoints(this.getExperiencePoints()+20)
+	 * @effect If this unit is able to block, his experience points are increased by 20.
+	 * 		   | if (new Random().nextDouble() <= 0.25* ((this.getStrength() + this.getAgility()) / (unit.getStrength() + unit.getAgility())))
+	 * 		   |	then this.setExperiencePoints(this.getExperiencePoints()+20)
 	 * @effect If this unit isn't able to dodge or to block the attack, this unit will lose hitpoints equal to 
 	 * 			to the attacking unit's strength divided by 10. If the hitpoints would go under zero,
-	 * 			they will be set to zero.
+	 * 			they will be set to zero. The experience points of the attacking unit are increased by 20.
 	 * 		   | if (!(new Random().nextDouble() <= 0.20 * (this.getAgility() / unit.getAgility()))
 	 * 		   |	this.setPosition(new double[] {this.getPosition()[0]+ (double)(-1 + (new Random().nextInt(3))) &&
 	 * 		   | 	!(new Random().nextDouble() <= 0.25*
 	 *	 	   |	((this.getStrength() + this.getAgility()) / (unit.getStrength() + unit.getAgility())))){
+	 *		   |		then unit.setExperiencePoints(unit.getExperiencePoints() +20)
 	 * 		   | 	if (this.getHitpoints() - unit.getStrength() / 10.0 > 0)
 	 * 		   |		then this.setHitPoints(this.getHitpoints() - unit.getStrength() / 10.0)
 	 * 		   | 	if (this.getHitpoints() - unit.getStrength() / 10.0 <=0)
@@ -1731,6 +1782,7 @@ public class Unit {
 	/**
 	 * Check whether it's possible for a unit to defend.
 	 * @return True if and only if the unit is not currently falling and the unit is not terminated.
+	 * 		| result == this.getStatus() != Status.FALLING && !this.isTerminated()
 	 */		
 	private boolean canDefend(){
 		return (this.getStatus() != Status.FALLING && !this.isTerminated());
@@ -1749,7 +1801,7 @@ public class Unit {
 	}
 	/**
 	 * Check whether it's possible for a unit to rest.
-	 * @return True if and only if this unit's stamina points or hitpoints are equal to zero, 
+	 * @return True if and only if this unit is not terminared and this unit's stamina points or hitpoints are less then the maximum
 	 * 			and if this unit is currently doing nothing or is resting or 
 	 * 			working or is moving and currently in the center of a cube.
 	 * 		   | result == (this.getStaminaPoints() <= 0 || this.getHitpoints() <= 0)&&
