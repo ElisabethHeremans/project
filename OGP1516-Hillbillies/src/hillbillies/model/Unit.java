@@ -1117,7 +1117,11 @@ public class Unit {
 	 * A list collecting valid neighboring positions.
 	 */
 	private Queue<int[]> queuePos = new LinkedList<int[]>();
-	 
+	/**
+	 * A variable registering the length of the queue.
+	 */
+	private int length = 0; 
+	
 	// Documentatie bij een for loop? 
 	/**
 	 * Search the neighboring cubes of the array that are passable and
@@ -1133,21 +1137,24 @@ public class Unit {
 		int n = array[3];
 		List<int[]> neighboringCubes = this.getWorld().getNeighboringCubes(position);
 		for (int index= 0; index< neighboringCubes.size(); index++){
-			System.out.print(index);
 			int[] currentNeighbour = neighboringCubes.get(index);
 			if( this.getWorld().getPassable(currentNeighbour) && 
 					this.getWorld().isNeighboringSolidTerrain(currentNeighbour)){
+				System.out.println("Add");
+				System.out.println(Arrays.toString(currentNeighbour));
 				boolean toAdd = true;
 				for (int[] queueArray: queue){
 					if (queueArray[0]==currentNeighbour[0]&& queueArray[1] == currentNeighbour[1] 
 							&& queueArray[2] == currentNeighbour[2] && queueArray[3]>=n)
+						System.out.println("NotAdd");
 						toAdd = false;
 				}
+				System.out.println("UitFor");
 				if (toAdd){
 					queuePos.add(currentNeighbour);
 					queue.add(new int[] {currentNeighbour[0],currentNeighbour[1],currentNeighbour[2],n+1});
+					length = length +1;
 				}
-				
 			}
 		}
 		System.out.print("ok");
@@ -1174,7 +1181,7 @@ public class Unit {
 		if (!canHaveAsPosition(targetPosition))
 			throw new IllegalArgumentException();
 		if (canMove()) {
-			this.targetPosition = targetPosition;
+			this.targetPosition = this.getWorld().getCubeCenter(targetPosition);
 			setStatus(Status.IN_CENTER);
 			int index = 0;
 			int[] nextPosition;
@@ -1183,14 +1190,17 @@ public class Unit {
 				int[] position = {(int) targetPosition[0], (int) targetPosition[1], (int) targetPosition[2]};
 				int[] positionn = {(int) targetPosition[0], (int) targetPosition[1], (int) targetPosition[2], 0};
 				queue.add(positionn);
+				length = length +1;
 				queuePos.add(position);
-				while(!queueContainsPos(queue, this.getCubeCoordinate()) && queue.size()>index){
+				while(!queueContainsPos((LinkedList<int[]>) queue, this.getCubeCoordinate()) || length>index){
+					System.out.println(queueContainsPos((LinkedList<int[]>) queue, this.getCubeCoordinate()));
 					System.out.println("search");
+					System.out.println(index);
  					nextPosition = ((LinkedList<int[]>) queue).get(index);
 					search(nextPosition);
 					index = index+1;
 				}
-			if( queueContainsPos(queue, this.getCubeCoordinate())){
+			if( queueContainsPos((LinkedList<int[]>) queue, this.getCubeCoordinate())){
 				int[] candidateNextArray = null;
 				for (int[] array: queue){
 					double[] nextPos = {(double)array[0], (double)array[1], (double)array[2]};
@@ -1206,11 +1216,11 @@ public class Unit {
 		}	
 	}
 	
-	public boolean queueContainsPos(Queue queue, int[] position){
-		for(int index= 0; index< queue.size(); index++){
-			if(position[0]==((List<int[]>) queue).get(index)[0]
-					&& position[1]==((List<int[]>) queue).get(index)[1]
-							&& position[2]==((List<int[]>) queue).get(index)[2])
+	public boolean queueContainsPos(LinkedList<int[]> queue, int[] position){
+		for(int[] queueArray: queue){
+			if(position[0]==queueArray[0]
+					&& position[1]==queueArray[1]
+							&& position[2]==queueArray[2])
 				return true;
 		}
 		return false;

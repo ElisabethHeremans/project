@@ -4,6 +4,7 @@ import static hillbillies.tests.util.PositionAsserts.assertIntegerPositionEquals
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
+import java.util.LinkedList;
 
 import org.junit.*;
 
@@ -730,28 +731,43 @@ public class TestSuitePart2Unit {
 		Unit1InWorld.moveTo1(new double[] {1.5,0.5,1.5});
 	}
 	
-//	@Test
-//	public final void moveTo_CannotMove(){
-//		world1.addAsUnit(Unit1InWorld);
-//		Unit1InWorld.setStatus(Status.ATTACKING);
-//		Unit1InWorld.moveTo1(new double[] {0.5,2.5,2.5});
-//		Unit1InWorld.advanceTime((float) 0.1);
-//		assertEquals(Status.ATTACKING,Unit1InWorld.getStatus());
-//
-//	}
+	@Test
+	public final void moveTo_CannotMove(){
+		world1.addAsUnit(Unit1InWorld);
+		Unit1InWorld.setStatus(Status.ATTACKING);
+		Unit1InWorld.moveTo1(new double[] {0.5,2.5,2.5});
+		Unit1InWorld.advanceTime((float) 0.1);
+		assertEquals(Status.ATTACKING,Unit1InWorld.getStatus());
+
+	}
 	
-//	@Test
-//	public final void moveTo_OnePath(){
-//		world3.addAsUnit(BUnit);
-//		BUnit.moveTo1(new int[] {0,0,1});
-////		double speed = Bunit.getCurrentSpeed();
-////		System.out.println(speed);
-//		advanceTimeFor(BUnit,30.0,0.1);
-//		System.out.print(BUnit.getStatus());
-//		System.out.println(Arrays.toString(BUnit.getPosition()));
-//		assertDoublePositionEquals(0.5,0.5,1.5, BUnit.getPosition());
-//	}
-//	
+	@Test
+	public final void queueContainsPos(){
+		LinkedList<int[]> queue = new LinkedList<int[]>();
+		queue.add(StandardUnit.getCubeCoordinate());
+		Assert.assertTrue(StandardUnit.queueContainsPos(queue, StandardUnit.getCubeCoordinate()));
+	}
+	
+	@Test
+	public final void queueContainsPos_Long(){
+		LinkedList<int[]> queue = new LinkedList<int[]>();
+		queue.add(StandardUnit.getCubeCoordinate());
+		queue.add(new int[] {1,5,6});
+		Assert.assertTrue(StandardUnit.queueContainsPos(queue, StandardUnit.getCubeCoordinate()));
+	}
+	
+	@Test
+	public final void moveTo_OnePath(){
+		world3.addAsUnit(BUnit);
+		BUnit.moveTo1(new int[] {0,1,1});
+//		double speed = Bunit.getCurrentSpeed();
+//		System.out.println(speed);
+		advanceTimeFor(BUnit,30.0,0.1);
+		System.out.print(BUnit.getStatus());
+		System.out.println(Arrays.toString(BUnit.getPosition()));
+		assertDoublePositionEquals(0.5,0.5,1.5, BUnit.getPosition());
+	}
+	
 //	@Test
 //	public final void moveTo_IntegerPosition(){
 //		StandardUnit.moveTo1(new int[] {10,1,4});
