@@ -528,7 +528,7 @@ public class Unit {
 	 *       | new.getStaminaPoints() == staminaPoints
 	 */
 	@Raw
-	private void setStaminaPoints(double staminaPoints) {
+	public void setStaminaPoints(double staminaPoints) {
 		assert canHaveAsStaminaPoints(staminaPoints);
 		this.staminaPoints = staminaPoints;
 	}

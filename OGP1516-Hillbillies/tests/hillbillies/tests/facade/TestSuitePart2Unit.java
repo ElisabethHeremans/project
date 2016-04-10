@@ -641,69 +641,78 @@ public class TestSuitePart2Unit {
 //		Assert.assertEquals(Status.MOVING, StandardUnit.getStatus());
 //	}
 //	
-//	@Test
-//	public final void advanceTime_Working(){
-//		StandardUnit.work(new int[] {2,1,4});
-//		double totalWorkingTime =  500.0 /25.0;
-//		advanceTimeFor(StandardUnit,totalWorkingTime, 0.1);
-//		assertEquals(StandardUnit.getStatus(),Status.DONE);
-//		
-//	}
-//	
+	@Test
+	public final void advanceTime_Working(){
+		world2.addAsUnit(Unit1InWorld);
+		Unit1InWorld.work(new int[] {0,2,2});
+		double totalWorkingTime =  500.0 /Unit1InWorld.getStrength();
+		advanceTimeFor(Unit1InWorld,totalWorkingTime, 0.1);
+		assertEquals(StandardUnit.getStatus(),Status.DONE);
+	}
+	
 //	@Test
 //	public final void advanceTime_InitialResting(){
-//		HitAndStaminaZeroUnit.rest();
-//		HitAndStaminaZeroUnit.advanceTime((float) 0.1);
-//		HitAndStaminaZeroUnit.work(new int[] {2,1,4});
-//		assertEquals((75/200.0)*5*0.1,HitAndStaminaZeroUnit.getHitpoints(),Util.DEFAULT_EPSILON);
-//		assertEquals(Status.INITIAL_RESTING,HitAndStaminaZeroUnit.getStatus());
+//		world2.addAsUnit(Unit1InWorld);
+//		Unit1InWorld.rest();
+//		Unit1InWorld.advanceTime((float) 0.1);
+//		Unit1InWorld.work(new int[] {0,2,2});
+//		assertEquals((25+Unit1InWorld.getToughness()/200.0)*5*0.1,Unit1InWorld.getHitpoints(),Util.DEFAULT_EPSILON);
+//		assertEquals(Status.INITIAL_RESTING,Unit1InWorld.getStatus());
 //		
 //	}
-//	
-//	@Test
-//	public final void advanceTime_InitialRestingToResting(){
-//		HitAndStaminaZeroUnit.rest();
-//		double step = (200.0/(75*5))/7.0;
-//		advanceTimeFor(HitAndStaminaZeroUnit,200.0/(75*5),step);
-//		assertEquals(Status.RESTING,HitAndStaminaZeroUnit.getStatus());
-//		
-//	}
-//	
-//	@Test
-//	public final void advanceTime_RestingRecoverHitpoints(){
-//		HitAndStaminaZeroUnit.setStatus(Status.RESTING);
-//		double step = (200.0/(75*5))/7.0;
-//		advanceTimeFor(HitAndStaminaZeroUnit,200.0/(75*5),step);
-//		assertEquals(Status.RESTING,HitAndStaminaZeroUnit.getStatus());
-//		
-//	}
-//	
+	
+	@Test
+	public final void advanceTime_InitialRestingToResting(){
+		world2.addAsUnit(Unit1InWorld);
+		Unit1InWorld.rest();
+		Unit1InWorld.rest();
+		double step = (200.0/(75*5))/7.0;
+		advanceTimeFor(Unit1InWorld,200.0/(75*5),step);
+		assertEquals(Status.RESTING,Unit1InWorld.getStatus());
+		
+	}
+	
+	@Test
+	public final void advanceTime_RestingRecoverHitpoints(){
+		world2.addAsUnit(Unit1InWorld);
+		Unit1InWorld.setStatus(Status.RESTING);
+		double step = (200.0/(75*5))/7.0;
+		advanceTimeFor(Unit1InWorld,200.0/(75*5),step);
+		assertEquals(Status.RESTING,Unit1InWorld.getStatus());
+		
+	}
+	
 //	@Test
 //	public final void advanceTime_RestingRecoverStamina(){
-//		HitMaxStaminaZeroUnit.setStatus(Status.RESTING);
+//		world2.addAsUnit(Unit1InWorld);
+//		Unit1InWorld.setStatus(Status.RESTING);
 //		double step = (100.0/(75*5))/7.0;
-//		advanceTimeFor(HitMaxStaminaZeroUnit,100.0/(75*5),step);
-//		assertEquals(1.0,HitMaxStaminaZeroUnit.getStaminaPoints(),Util.DEFAULT_EPSILON);
-//		assertEquals(Status.RESTING,HitMaxStaminaZeroUnit.getStatus());
-//
+//		advanceTimeFor(Unit1InWorld,100.0/(75*5),step);
+//		assertEquals(1.0,Unit1InWorld.getStaminaPoints(),Util.DEFAULT_EPSILON);
+//		assertEquals(Status.RESTING,Unit1InWorld.getStatus());
+
 //	}
-//	
-//	@Test
-//	public final void advanceTime_RestingDone(){
-//		HitMaxStaminaMaxUnit.setStatus(Status.RESTING);
-//		HitMaxStaminaMaxUnit.advanceTime((float)0.01);
-//		assertEquals(HitMaxStaminaMaxUnit.getMaxPoints(),HitMaxStaminaMaxUnit.getStaminaPoints(),Util.DEFAULT_EPSILON);
-//		assertEquals(HitMaxStaminaMaxUnit.getMaxPoints(),HitMaxStaminaMaxUnit.getHitpoints(),Util.DEFAULT_EPSILON);
-//		assertEquals(Status.DONE,HitMaxStaminaMaxUnit.getStatus());
-//		
-//	}
-//	
-//	@Test
-//	public final void advanceTime_Attacking(){
-//		StandardUnit.setStatus(Status.ATTACKING);
-//		advanceTimeFor(StandardUnit,1.0,0.1);
-//		assertEquals(Status.DONE,StandardUnit.getStatus());
-//	}
+	
+	@Test
+	public final void advanceTime_RestingDone(){
+		world2.addAsUnit(Unit1InWorld);
+		Unit1InWorld.setHitPoints(Unit1InWorld.getMaxPoints());
+		Unit1InWorld.setStaminaPoints(Unit1InWorld.getMaxPoints());
+		Unit1InWorld.setStatus(Status.RESTING);
+		Unit1InWorld.advanceTime((float)0.01);
+		assertEquals(Unit1InWorld.getMaxPoints(),Unit1InWorld.getStaminaPoints(),Util.DEFAULT_EPSILON);
+		assertEquals(Unit1InWorld.getMaxPoints(),Unit1InWorld.getHitpoints(),Util.DEFAULT_EPSILON);
+		assertEquals(Status.DONE,Unit1InWorld.getStatus());
+		
+	}
+	
+	@Test
+	public final void advanceTime_Attacking(){
+		world2.addAsUnit(Unit1InWorld);
+		Unit1InWorld.setStatus(Status.ATTACKING);
+		advanceTimeFor(Unit1InWorld,1.0,0.1);
+		assertEquals(Status.DONE,Unit1InWorld.getStatus());
+	}
 	
 	@Test
 	public void mustFall_trueCase(){
@@ -757,6 +766,18 @@ public class TestSuitePart2Unit {
 	}
 	
 	@Test
+	public final void moveTo_OneCube(){
+		world3.addAsUnit(BUnit);
+		BUnit.moveTo1(new int[] {0,0,1});
+//		double speed = Bunit.getCurrentSpeed();
+//		System.out.println(speed);
+		advanceTimeFor(BUnit,30.0,0.1);
+		System.out.print(BUnit.getStatus());
+		System.out.println(Arrays.toString(BUnit.getPosition()));
+		assertDoublePositionEquals(0.5,0.5,1.5, BUnit.getPosition());
+	}
+	
+	@Test
 	public final void moveTo_OnePath(){
 		world3.addAsUnit(BUnit);
 		BUnit.moveTo1(new int[] {0,1,1});
@@ -765,7 +786,7 @@ public class TestSuitePart2Unit {
 		advanceTimeFor(BUnit,30.0,0.1);
 		System.out.print(BUnit.getStatus());
 		System.out.println(Arrays.toString(BUnit.getPosition()));
-		assertDoublePositionEquals(0.5,0.5,1.5, BUnit.getPosition());
+		assertDoublePositionEquals(0.5,1.5,1.5, BUnit.getPosition());
 	}
 	
 //	@Test
