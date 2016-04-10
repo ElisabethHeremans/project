@@ -925,13 +925,21 @@ public class Unit {
 		}
 		
 		for (int[] cube: this.getWorld().getNeighboringCubes(this.getCubeCoordinate())){
-			//System.out.println(cube[0]+" "+ cube[1]+" "+ cube[2]);
-			//System.out.println(this.getWorld().getTerrain(cube).isPassable());
+//			System.out.println("must fall");
+//			System.out.println(cube[0]+" "+ cube[1]+" "+ cube[2]);
+//			System.out.println(this.getWorld().getTerrain(cube).isPassable());
 			if (!this.getWorld().getTerrain(cube).isPassable())
 				return false;
 					
 		}
 		
+		//must fall
+		for (int[] cube: this.getWorld().getNeighboringCubes(this.getCubeCoordinate())){
+			System.out.println("must fall");
+			System.out.println(cube[0]+" "+ cube[1]+" "+ cube[2]);
+			System.out.println(this.getWorld().getTerrain(cube).isPassable());
+			
+		}
 		return true;
 	}
 	/**
@@ -1190,7 +1198,7 @@ public class Unit {
 		if (!canHaveAsPosition(targetPosition))
 			throw new IllegalArgumentException();
 		if (canMove()) {
-			this.targetPosition = this.getWorld().getCubeCenter(targetPosition);
+			this.targetPosition = targetPosition;
 			setStatus(Status.IN_CENTER);
 			int index = 0;
 			int[] nextPosition;
@@ -1222,6 +1230,7 @@ public class Unit {
 							candidateNextArray = array;
 				}
 				System.out.println("move to adjacent");
+				System.out.print(Arrays.toString(candidateNextArray));
 				moveToAdjacent(candidateNextArray[0]-this.getCubeCoordinate()[0],
 						candidateNextArray[1]-this.getCubeCoordinate()[1],candidateNextArray[2]-this.getCubeCoordinate()[2]);
 			}
