@@ -3,6 +3,7 @@ package hillbillies.model;
 import java.lang.reflect.Array;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -481,7 +482,7 @@ public class Unit {
 	 *      | new.getHitpoints() == hitpoints
 	 */
 	@Raw
-	private void setHitPoints(double hitpoints) {
+	public void setHitPoints(double hitpoints) {
 		assert canHaveAsHitpoints(hitpoints);
 		this.hitpoints = hitpoints;
 	}
@@ -729,9 +730,8 @@ public class Unit {
 	 * 		| new.getFaction() == faction
 	 */
 	public void setFaction(@Raw Faction faction){
-		if (faction != null)
-			assert (faction.hasAsUnit(this));
-		this.faction = faction;
+		if (faction != null && faction.hasAsUnit(this))
+			this.faction = faction;
 	}
 	/**
 	 * Check whether this unit has a proper faction attached to it.
@@ -766,10 +766,8 @@ public class Unit {
 	 * 		| new.getWorld() == world
 	 */
 	public void setWorld(@Raw World world){
-		if (world != null){
-			assert (world.hasAsUnit(this));
-		}
-		this.world = world;
+		if(world != null && world.hasAsUnit(this))
+			this.world=world;
 	}
 	/**
 	 * Check whether this unit has a proper world attached to it.
@@ -867,8 +865,7 @@ public class Unit {
 		}
 		if (this.getStatus() == Status.FALLING){
 			falling(duration);
-		}	
-		// moet nog documentatie van experience points en falling
+		}
 		if (mustRest())
 			rest();
 		else if (this.getStatus() == Status.DONE && targetPosition != null && !this.isEnableDefaultBehaviour())
@@ -961,7 +958,7 @@ public class Unit {
 			setPosition(nextTargetPosition);
 			setHitPoints(this.getHitpoints() - 10);
 			double[] nextPosition = Vector.vectorAdd(this.getPosition(), new double[] {0.0,0.0,-1.0});
-			if (this.getCubeCoordinate()[2]==1.0 || !this.getWorld().getTerrain(nextPosition).isPassable()){
+			if (this.getCubeCoordinate()[2]==0.0 || !this.getWorld().getTerrain(nextPosition).isPassable()){
 				setStatus(Status.DONE);
 			}
 			else
@@ -1134,11 +1131,9 @@ public class Unit {
 	public Queue<int[]> search(int[] array){
 		int[] position = {array[0], array[1], array[2]};
 		int n = array[3];
-		System.out.print("ok");
 		List<int[]> neighboringCubes = this.getWorld().getNeighboringCubes(position);
-		System.out.print("not");
-		System.out.print(neighboringCubes);
 		for (int index= 0; index< neighboringCubes.size(); index++){
+			System.out.print(index);
 			int[] currentNeighbour = neighboringCubes.get(index);
 			if( this.getWorld().getPassable(currentNeighbour) && 
 					this.getWorld().isNeighboringSolidTerrain(currentNeighbour)){
@@ -1155,6 +1150,7 @@ public class Unit {
 				
 			}
 		}
+		System.out.print("ok");
 		return queue;
 	}
 	// ik weet niet goed hoe je de documentatie voor while loops moet doen.
@@ -1182,17 +1178,19 @@ public class Unit {
 			setStatus(Status.IN_CENTER);
 			int index = 0;
 			int[] nextPosition;
-			while (this.getPosition() != targetPosition){
+			while (!Util.fuzzyEquals(Vector.getDistance(this.getPosition(), targetPosition), 0)){
+				System.out.print("start");
 				int[] position = {(int) targetPosition[0], (int) targetPosition[1], (int) targetPosition[2]};
 				int[] positionn = {(int) targetPosition[0], (int) targetPosition[1], (int) targetPosition[2], 0};
 				queue.add(positionn);
 				queuePos.add(position);
-				while(!queuePos.contains(this.getPosition()) && queue.size()>index){ 
+				while(!queueContainsPos(queue, this.getCubeCoordinate()) && queue.size()>index){
+					System.out.println("search");
  					nextPosition = ((LinkedList<int[]>) queue).get(index);
 					search(nextPosition);
 					index = index+1;
 				}
-			if( queuePos.contains(this.getPosition())){
+			if( queueContainsPos(queue, this.getCubeCoordinate())){
 				int[] candidateNextArray = null;
 				for (int[] array: queue){
 					double[] nextPos = {(double)array[0], (double)array[1], (double)array[2]};
@@ -1206,6 +1204,16 @@ public class Unit {
 			}
 			}
 		}	
+	}
+	
+	public boolean queueContainsPos(Queue queue, int[] position){
+		for(int index= 0; index< queue.size(); index++){
+			if(position[0]==((List<int[]>) queue).get(index)[0]
+					&& position[1]==((List<int[]>) queue).get(index)[1]
+							&& position[2]==((List<int[]>) queue).get(index)[2])
+				return true;
+		}
+		return false;
 	}
 	/**
 	 * Move to the given cube.
@@ -1255,7 +1263,7 @@ public class Unit {
 	 *		|		then setExperiencePoints(this.getExperiencePoints()+1)
 	 *		|		&& setPosition(nextTargetPosition) && setStatus(Status.DONE)	   
 	 */
-	public void moving1(double duration){
+	private void moving1(double duration){
 		double d = Vector.getDistance(nextTargetPosition,startPosition);
 		double[] v = new double[] {getCurrentSpeed()*(nextTargetPosition[0]-startPosition[0])/d,
 				getCurrentSpeed()*(nextTargetPosition[1]-startPosition[1])/d,
@@ -1373,7 +1381,7 @@ public class Unit {
 	 * @return the value of progressWork
 	 * 			| result == this.progressWork
 	 */
-	protected double getProgressWork(){
+	public double getProgressWork(){
 		return progressWork;
 	}
 	/**
@@ -1389,7 +1397,7 @@ public class Unit {
 	 *	 	 | new.progressWork == (float) 0.0
 	 */
 	public void work(int[] position) throws IllegalArgumentException{
-		if(!(this.isNeighbouringCube(position)||this.getCubeCoordinate()==position))
+		if(!(this.isNeighbouringCube(position)||this.getCubeCoordinate()!=position))
 			throw new IllegalArgumentException();
 		else if (canWork()){
 			setStatus(Status.WORKING);
@@ -1578,65 +1586,7 @@ public class Unit {
 			}
 			break;
 		}
-		
-//		if (this.getBoulder() !=null) {
-//			this.getBoulder().setPosition(this.getWorld().getCubeCenter(targetPosition));
-//			this.getWorld().addAsBoulder(this.getBoulder());
-//			this.setWeight(this.getWeight()-this.getBoulder().getWeight());
-//			this.setBoulder(null);
-//			setExperiencePoints(this.getExperiencePoints()+10);
-//
-//		}
-//		else if (this.getLog() !=null) {
-//			this.getLog().setPosition(this.getWorld().getCubeCenter(targetPosition));
-//			this.getWorld().addAsLog(this.getLog());
-//			this.setWeight(this.getWeight()-this.getLog().getWeight());
-//			this.setLog(null);
-//			setExperiencePoints(this.getExperiencePoints()+10);
-//
-//		}
-//		else if (this.getWorld().getTerrain(targetPosition) == TerrainType.WORKSHOP 
-//				&& !this.getWorld().getBoulders(targetPosition).isEmpty() 
-//				&& !this.getWorld().getLogs(targetPosition).isEmpty()) {
-//			Log log = (Log) this.getWorld().inspectCube(targetPosition).get(2).get(0);
-//			Boulder boulder = (Boulder) this.getWorld().inspectCube(targetPosition).get(3).get(0);
-//			this.getWorld().removeAsBoulder(boulder);
-//			this.getWorld().removeAsLog(log);
-//			this.setWeight(this.getWeight()+1);
-//			this.setToughness(this.getToughness()+1);
-//			setExperiencePoints(this.getExperiencePoints()+10);
-//
-//		}
-//		
-//		else if (!this.getWorld().getBoulders(targetPosition).isEmpty()){
-//			Boulder boulder = (Boulder) this.getWorld().inspectCube(targetPosition).get(3).get(0);
-//			this.setBoulder(boulder);
-//			this.getWorld().removeAsBoulder(boulder);
-//			setExperiencePoints(this.getExperiencePoints()+10);
-//			this.setWeight(this.getWeight()+boulder.getWeight());
-//
-//
-//		}
-//
-//		else if (!this.getWorld().getLogs(targetPosition).isEmpty()){
-//			Log log = (Log) this.getWorld().inspectCube(targetPosition).get(2).get(0);
-//			this.getWorld().removeAsLog(log);
-//			this.setLog(log);
-//			setExperiencePoints(this.getExperiencePoints()+10);
-//			this.setWeight(this.getWeight()+log.getWeight());
-//
-//			
-//		}
-//		else if (this.getWorld().getTerrain(targetPosition)== TerrainType.TREE){
-//			this.getWorld().solidToPassableUpdate(targetPosition);
-//			setExperiencePoints(this.getExperiencePoints()+10);
-//
-//		}
-//		else if (this.getWorld().getTerrain(targetPosition)== TerrainType.ROCK){
-//			this.getWorld().solidToPassableUpdate(targetPosition);
-//			setExperiencePoints(this.getExperiencePoints()+10);
-//
-//		}
+
 		setStatus(Status.DONE);
 	}
 	/**
@@ -1690,8 +1640,9 @@ public class Unit {
 	 * 			| (!isNeighbouringCube(other.getCubePosition()))
 	 */
 	public void attack(Unit other) throws IllegalArgumentException {
-		if (!(isNeighbouringCube(other.getCubePosition())|| other.getCubeCoordinate() == this.getCubeCoordinate()) 
-				|| other.isTerminated()|| other.getFaction() == this.getFaction())
+		if (!(isNeighbouringCube(other.getCubePosition()) || other.getCubeCoordinate() != this.getCubeCoordinate()))
+			throw new IllegalArgumentException();
+		if( other.isTerminated || other.getFaction() == this.getFaction())
 			throw new IllegalArgumentException();
 		if (canAttack()) {
 			setStatus(Status.ATTACKING);
@@ -1809,7 +1760,7 @@ public class Unit {
 	 * 		   | 		status == Status.WORKING || status == Status.IN_CENTER)
 	 */
 	public boolean canRest() {
-		if(this.getStaminaPoints() <= this.getMaxPoints() || this.getHitpoints() <= this.getMaxPoints())
+		if(this.getStaminaPoints() < this.getMaxPoints() || this.getHitpoints() < this.getMaxPoints())
 			if (!isTerminated())
 				if (this.getStatus() == Status.DONE || this.getStatus() == Status.RESTING || this.getStatus() == Status.WORKING || this.getStatus() == Status.IN_CENTER)
 					return true;
@@ -1972,22 +1923,34 @@ public class Unit {
 			} 
 			if (i == 0) {
 				setStatus(Status.IN_CENTER);
-				moveTo1(new double[] { (new Random().nextDouble()) * this.getWorld().getxDimension(), 
-						(new Random().nextDouble()) * this.getWorld().getyDimension(),
-						(new Random().nextDouble()) * this.getWorld().getzDimension() });
-				startSprinting();
+//				try {
+//					moveTo1(new double[] { (new Random().nextDouble()) * this.getWorld().getxDimension(), 
+//						(new Random().nextDouble()) * this.getWorld().getyDimension(),
+//						(new Random().nextDouble()) * this.getWorld().getzDimension() });
+//						startSprinting();
+//				}
+//				catch (IllegalArgumentException exc){
+//					startDefaultBehaviour();
+//				}
 			}
 			if (i == 1) {
 				setStatus(Status.IN_CENTER);
-				moveTo1(new double[] { (new Random().nextDouble()) * this.getWorld().getxDimension(), 
-						(new Random().nextDouble()) * this.getWorld().getyDimension(),
-						(new Random().nextDouble()) * this.getWorld().getzDimension() });
-				stopSprinting();
+//				try {
+//					moveTo1(new double[] { (new Random().nextDouble()) * this.getWorld().getxDimension(), 
+//						(new Random().nextDouble()) * this.getWorld().getyDimension(),
+//						(new Random().nextDouble()) * this.getWorld().getzDimension() });
+//						stopSprinting();
+//				}
+//				catch (IllegalArgumentException exc){
+//					startDefaultBehaviour();
+//				}
 			}
 			if (i == 2){
 				List<int[]> neighbouring = this.getWorld().getNeighboringCubes(this.getCubeCoordinate());
 				neighbouring.add(this.getCubeCoordinate());
+				
 				i = new Random().nextInt(neighbouring.size());
+				System.out.print(Arrays.toString(neighbouring.get(i)));
 				work(neighbouring.get(i));
 			}
 			if (i == 3){
@@ -2100,7 +2063,7 @@ public class Unit {
 	 * 		| ! isValidBoulder(boulder)
 	 */
  	@Raw
- 	private void setBoulder(Boulder boulder) throws IllegalArgumentException{
+ 	public void setBoulder(Boulder boulder) throws IllegalArgumentException{
  		if(! isValidBoulder(boulder))
  			throw new IllegalArgumentException();
  		
@@ -2113,8 +2076,7 @@ public class Unit {
  	public int getNbBoulders(){
  		if (this.getBoulder()!=null)
  			return 1;
- 		else
- 			return 0;
+ 		return 0;
  	}
  	
  	/**
@@ -2152,7 +2114,7 @@ public class Unit {
 	 * 		| ! isValidLog(log)
 	 */
 	@Raw
-	private void setLog(Log log) throws IllegalArgumentException{
+	public void setLog(Log log) throws IllegalArgumentException{
  		if(! isValidLog(log))
  			throw new IllegalArgumentException();
  		this.log = log;
@@ -2186,7 +2148,7 @@ public class Unit {
 	 * @post The new experience points for this unit are equal to the given experience points.
 	 * 		| new.getExperiencePoints() == points;
 	 */
-	private void setExperiencePoints(int points){
+	public void setExperiencePoints(int points){
 		experiencePoints = points;
 	}
 	

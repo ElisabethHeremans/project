@@ -217,7 +217,7 @@ public class World {
 	 * @throws IllegalArgumentException
 	 * 			If the given position is not inside this world.
 	 */
-	boolean getPassable(int[] cubePosition) throws IllegalArgumentException {
+	protected boolean getPassable(int[] cubePosition) throws IllegalArgumentException {
 		return this.getTerrain(cubePosition).isPassable();
 	}
 
@@ -1284,20 +1284,21 @@ public class World {
 	 * @effect For all positions neighboring the given position, if these positions are 
 	 * 			not connected to the borders of this world anymore, they are updated to passable cubes (with this method).
 	 */
-	void solidToPassableUpdate(int[] position){
+	protected void solidToPassableUpdate(int[] position){
 		List<int[]> toChange = connectedToBorder.changeSolidToPassable(position[0],position[1],position[2]);
 		if (new Random().nextDouble() <= 0.25){
 			if (getTerrain(position) == TerrainType.ROCK){
-				Boulder boulder = new Boulder(position);
 				setTerrain(position,TerrainType.AIR);
+				Boulder boulder = new Boulder(position);
 				addAsBoulder(boulder);
 			}
 			if (getTerrain(position) == TerrainType.TREE){
-				Log log = new Log(position);
 				setTerrain(position,TerrainType.AIR);
+				Log log = new Log(position);
 				addAsLog(log);
 			}
 		}
+		setTerrain(position,TerrainType.AIR);
 		for (int[] positionToChange: toChange){
 			solidToPassableUpdate(positionToChange);
 		}
