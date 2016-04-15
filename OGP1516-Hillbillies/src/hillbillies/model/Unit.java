@@ -528,7 +528,7 @@ public class Unit {
 	 *       | new.getStaminaPoints() == staminaPoints
 	 */
 	@Raw
-	public void setStaminaPoints(double staminaPoints) {
+	private void setStaminaPoints(double staminaPoints) {
 		assert canHaveAsStaminaPoints(staminaPoints);
 		this.staminaPoints = staminaPoints;
 	}
@@ -678,13 +678,8 @@ public class Unit {
 	 *		   |			&& (Util.fuzzyEquals(Math.abs((cubePosition)[1] - this.getCubePosition()[1]),0.0))
 	 *		   |			&& (Util.fuzzyEquals(Math.abs((cubePosition)[1] - this.getCubePosition()[1]),0.0))));
 	 */
-	private boolean isNeighbouringCube(double[] cubePosition) {
-		return ((Util.fuzzyLessThanOrEqualTo(Math.abs((cubePosition)[0] - this.getCubePosition()[0]),1.0)
-				&& (Util.fuzzyLessThanOrEqualTo(Math.abs((cubePosition)[1] - this.getCubePosition()[1]),1.0))
-				&& (Util.fuzzyLessThanOrEqualTo(Math.abs((cubePosition)[1] - this.getCubePosition()[1]),1.0)))
-				&& !(Util.fuzzyEquals(Math.abs((cubePosition)[0] - this.getCubePosition()[0]),0.0)
-						&& (Util.fuzzyEquals(Math.abs((cubePosition)[1] - this.getCubePosition()[1]),0.0))
-						&& (Util.fuzzyEquals(Math.abs((cubePosition)[1] - this.getCubePosition()[1]),0.0))));
+	private boolean isNeighbouringCube(double[] position) {
+		return (isNeighbouringCube(this.getWorld().getCubeCoordinate(position)));
 	}
 	/**
 	 * Checks whether the given cube is neighboring this unit.
@@ -695,7 +690,11 @@ public class Unit {
 	 * 			| result == isNeighbouringCube(new double[] {(double)cubePosition[0],(double)cubePosition[1],(double)cubePosition[2]})
 	 */
 	private boolean isNeighbouringCube(int[] cubePosition){
-		return isNeighbouringCube(new double[] {(double)cubePosition[0],(double)cubePosition[1],(double)cubePosition[2]}); 
+		int[] unitpos = this.getWorld().getCubeCoordinate(this.getPosition());
+		return (Math.abs(cubePosition[0]- unitpos[0])<=1
+				&&Math.abs(cubePosition[1]- unitpos[1])<=1
+				&&Math.abs(cubePosition[2]- unitpos[2])<=1
+				&& !(cubePosition[0] ==unitpos[0] && cubePosition[1]==unitpos[1]&& cubePosition[2]==unitpos[2]));
 	}
 	
 	/**
@@ -923,25 +922,20 @@ public class Unit {
 		if ( (this.getCubeCoordinate()[2]==0)){
 			return false;
 		}
-		
 		for (int[] cube: this.getWorld().getNeighboringCubes(this.getCubeCoordinate())){
+			if (!this.getWorld().getTerrain(cube).isPassable())
+				return false;
+		}
+//		//must fall
+//		for (int[] cube: this.getWorld().getNeighboringCubes(this.getCubeCoordinate())){
 //			System.out.println("must fall");
 //			System.out.println(cube[0]+" "+ cube[1]+" "+ cube[2]);
 //			System.out.println(this.getWorld().getTerrain(cube).isPassable());
-			if (!this.getWorld().getTerrain(cube).isPassable())
-				return false;
-					
-		}
-		
-		//must fall
-		for (int[] cube: this.getWorld().getNeighboringCubes(this.getCubeCoordinate())){
-			System.out.println("must fall");
-			System.out.println(cube[0]+" "+ cube[1]+" "+ cube[2]);
-			System.out.println(this.getWorld().getTerrain(cube).isPassable());
-			
-		}
+//			
+//		}
 		return true;
 	}
+	
 	/**
 	 * The unit is falling.
 	 * @param duration
@@ -1023,7 +1017,7 @@ public class Unit {
 	 * 		   |	|| status == Status.IN_CENTER || status == Status.FALLING)
 	 */
 	public boolean canMove() {
-		System.out.print(this.getStatus().toString());
+		//System.out.print(this.getStatus().toString());
 		if (this.getStatus() == Status.RESTING || this.getStatus() == Status.DONE || this.getStatus() == Status.IN_CENTER || this.getStatus() == Status.FALLING)
 			return true;
 		return false;
@@ -1104,13 +1098,15 @@ public class Unit {
 					getPosition()[2] + (double) dz })
 	 */
 	public void moveToAdjacent(int dx, int dy, int dz) throws IllegalArgumentException {
-		if (!((dx >= -1 && dx <= 1) && (dy >= -1 && dy <= 1) && (dz >= -1 && dz <= 1)))
+		if (!((dx >= -1 && dx <= 1) && (dy >= -1 && dy <= 1) && (dz >= -1 && dz <= 1))){
+			//System.out.print("move to adj problem");
 			throw new IllegalArgumentException();
+		}
 		if (!canHaveAsPosition(new double[] { getPosition()[0] + (double) dx, getPosition()[1] + (double) dy,
 				getPosition()[2] + (double) dz }))
 			throw new IllegalArgumentException();
 		if (canMove()) {
-			System.out.print("can move");
+			//System.out.print("can move");
 			startPosition = new double[] {this.getPosition()[0],this.getPosition()[1],this.getPosition()[2]};
 			nextTargetPosition = this.getWorld().getCubeCenter(new double[] {this.getCubePosition()[0] + (double) dx , this.getCubePosition()[1] 
 				+ (double) dy , this.getCubePosition()[2] + (double) dz });
@@ -1143,6 +1139,7 @@ public class Unit {
 	 * 		 of the array that are passable and are neighboring solid terrain. 
 	 */
 	public Queue<int[]> search(int[] array){
+		//System.out.print("search");
 		int[] position = {array[0], array[1], array[2]};
 		int n = array[3];
 		List<int[]> neighboringCubes = this.getWorld().getNeighboringCubes(position);
@@ -1150,31 +1147,30 @@ public class Unit {
 			int[] currentNeighbour = neighboringCubes.get(index);
 			if( this.getWorld().getPassable(currentNeighbour) && 
 					this.getWorld().isNeighboringSolidTerrain(currentNeighbour)){
-				System.out.println(Arrays.toString(currentNeighbour));
-				System.out.println("Add1");
+				//System.out.print(Arrays.toString(currentNeighbour));
+				//System.out.println("Add1");
 				boolean toAdd = true;
 				for (int[] queueArray: queue){
 					if (queueArray[0]==currentNeighbour[0]&& queueArray[1] == currentNeighbour[1] 
 							&& queueArray[2] == currentNeighbour[2] && queueArray[3]>=n){
-						System.out.println("NotAdd");
+						//System.out.println("NotAdd");
 						toAdd = false;
 					}
 				}
-				System.out.println("UitFor");
-				System.out.println(toAdd);
+				//System.out.println("UitFor");
+				//System.out.print("toadd? " + toAdd);
 				if (toAdd){
-					System.out.println("Add2");
+					//System.out.println("Add2");
 					queuePos.add(currentNeighbour);
 					queue.add(new int[] {currentNeighbour[0],currentNeighbour[1],currentNeighbour[2],n+1});
 					length = length +1;
 				}
 			}
 		}
-		System.out.print("length "+ length);
-		System.out.print("ok");
+		//System.out.print("length "+ length);
+		//System.out.print("ok");
 		return queue;
 	}
-	// ik weet niet goed hoe je de documentatie voor while loops moet doen.
 	/**
 	 * Makes this unit move to a given target position.
 	 * @param targetPosition
@@ -1194,48 +1190,79 @@ public class Unit {
 	public void moveTo1(double[] targetPosition)throws IllegalArgumentException{
 		System.out.print("start pos" + Arrays.toString(this.getCubeCoordinate()));
 		System.out.print("target pos " + Arrays.toString(targetPosition));
-
-		if (!canHaveAsPosition(targetPosition))
+		queue.clear();
+		queuePos.clear();
+		if (!canHaveAsPosition(targetPosition)){
+			//System.out.print("target pos " + Arrays.toString(targetPosition));
+			//System.out.print(getWorld().isCubeInWorld(this.getWorld().getCubeCoordinate(targetPosition))); 
+			//System.out.print(getWorld().getPassable(this.getWorld().getCubeCoordinate(targetPosition)));
 			throw new IllegalArgumentException();
+			
+		}
 		if (canMove()) {
 			this.targetPosition = targetPosition;
 			setStatus(Status.IN_CENTER);
 			int index = 0;
 			int[] nextPosition;
 			while (!Util.fuzzyEquals(Vector.getDistance(this.getPosition(), targetPosition), 0) && canMove()){
-				System.out.print("start");
+				//System.out.print("start");
 				int[] position = {(int) targetPosition[0], (int) targetPosition[1], (int) targetPosition[2]};
 				int[] positionn = {(int) targetPosition[0], (int) targetPosition[1], (int) targetPosition[2], 0};
 				queue.add(positionn);
 				length = length +1;
 				queuePos.add(position);
 				while(!queueContainsPos((LinkedList<int[]>) queue, this.getCubeCoordinate()) && length>index){
-					System.out.println(queueContainsPos((LinkedList<int[]>) queue, this.getCubeCoordinate()));
-					System.out.println("search");
-					System.out.println(index);
+					//System.out.println(queueContainsPos((LinkedList<int[]>) queue, this.getCubeCoordinate()));
+					//System.out.println("search");
+					//System.out.println(index);
  					nextPosition = ((LinkedList<int[]>) queue).get(index);
 					search(nextPosition);
-					System.out.print("search done");
-					System.out.print("length "+ length);
-					System.out.print("index " + index);
+					//System.out.print("search done");
+					//System.out.print("length "+ length);
+					//System.out.print("index " + index);
 					index = index+1;
 				}
 			if( queueContainsPos((LinkedList<int[]>) queue, this.getCubeCoordinate())){
 				int[] candidateNextArray = null;
 				for (int[] array: queue){
-					double[] nextPos = {(double)array[0], (double)array[1], (double)array[2]};
+					int[] nextPos = {array[0],array[1],array[2]};
 					int n = array[3];
-					if (this.isNeighbouringCube(nextPos))
-						if (candidateNextArray == null || candidateNextArray[3]> n)
+					if (this.isNeighbouringCube(nextPos)){
+						if (candidateNextArray == null || candidateNextArray[3]> n){
 							candidateNextArray = array;
+							//System.out.print("candidate " + Arrays.toString(candidateNextArray));
+						}
+					}
 				}
-				System.out.println("move to adjacent");
-				System.out.print(Arrays.toString(candidateNextArray));
+				//System.out.println("move to adjacent");
+				//System.out.print(Arrays.toString(candidateNextArray));
 				moveToAdjacent(candidateNextArray[0]-this.getCubeCoordinate()[0],
 						candidateNextArray[1]-this.getCubeCoordinate()[1],candidateNextArray[2]-this.getCubeCoordinate()[2]);
 			}
 			}
 		}	
+	}
+	
+	private void moveToNext1(){
+		if( queueContainsPos((LinkedList<int[]>) queue, this.getCubeCoordinate())){
+			int[] candidateNextArray = null;
+			for (int[] array: queue){
+				double[] nextPos = {(double)array[0], (double)array[1], (double)array[2]};
+				int n = array[3];
+				if (this.isNeighbouringCube(nextPos)){
+					if (candidateNextArray == null || candidateNextArray[3]> n){
+						System.out.print("candidate " + Arrays.toString(candidateNextArray));
+						candidateNextArray = array;
+
+					}
+				}
+			}
+			//System.out.println("move to adjacent");
+			//System.out.print(Arrays.toString(candidateNextArray));
+			moveToAdjacent(candidateNextArray[0]-this.getCubeCoordinate()[0],
+					candidateNextArray[1]-this.getCubeCoordinate()[1],candidateNextArray[2]-this.getCubeCoordinate()[2]);
+		}
+
 	}
 	
 	public boolean queueContainsPos(LinkedList<int[]> queue, int[] position){
@@ -1330,6 +1357,7 @@ public class Unit {
 			if (targetPosition != null){
 				//System.out.println("moveto" + targetPosition +"huidige loc" + this.getPosition());
 				setStatus(Status.IN_CENTER);
+				//moveToNext1();
 				moveTo1(targetPosition);
 			}
 			else
