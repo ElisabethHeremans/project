@@ -32,28 +32,18 @@ public class Log extends RawMaterial {
 		this.weight = new Random().nextInt(41) + 10;
 	}
 
-//	private int NbLogs = 0;
-//
-//	public int getNbLogs() {
-//		return NbLogs;
-//	}
+	/**
+	 * Return the weight of this log.
+	 */
+	@Override @Basic @Raw
+	public final int getWeight() {
+		return this.weight;
+	}
 
 	/**
-	 * Return the position of this log.
+	 * Variable registering the weight of this log.
 	 */
-	@Basic
-	@Raw
-	@Override
-	public double[] getPosition() {
-		return this.position;
-	}
-	
-	protected int[] getCubeCoordinate() {
-		return new int[] { (int) Math.floor(this.getPosition()[0]), (int) Math.floor(this.getPosition()[1]),
-				(int) Math.floor(this.getPosition()[2]) };
-	}
-
-
+	private final int weight;
 
 	/**
 	 * Set the position of this log to the given position.
@@ -64,7 +54,7 @@ public class Log extends RawMaterial {
 	 *       new.getPosition() == position
 	 * @throws IllegalArgumentException
 	 *             The given position is not a valid position for any log. | !
-	 *             isValidPosition(getPosition())
+	 *             canHaveAsPosition(getPosition())
 	 */
 	@Raw
 	@Override
@@ -89,31 +79,17 @@ public class Log extends RawMaterial {
 	 */
 	@Override
 	public boolean canHaveAsPosition(double[] position){
+		if (super.canHaveAsPosition(position)){
 		if (getWorld()!= null){
-		return (getWorld().isCubeInWorld(this.getWorld().getCubeCoordinate(position)) &&
-				this.getWorld().getTerrain(position).isPassable());
+			return (this.getWorld().getTerrain(position).isPassable());
 		}
 		else
 			return true;
+		}
+		return false;
 	}
 
-
-	/**
-	 * Variable registering the position of this log.
-	 */
-	private double[] position;
-	/**
-	 * Return the weight of this log.
-	 */
-	@Override
-	public final int getWeight() {
-		return this.weight;
-	}
-
-	/**
-	 * Variable registering the weight of this log.
-	 */
-	private final int weight;
+	
 	/**
 	 * Update the position and activity status of a log.
 	 * @param duration
@@ -217,19 +193,19 @@ public class Log extends RawMaterial {
 	protected void setWorld(@Raw World world) {
 		if (world != null)
 			assert (world.hasAsLog(this));
-		// nog condities?
 		this.world = world;
 	}
 	/**
 	 * Check whether this log has a proper world attached to it.
-	 * @return True if and only if this log does not reference an effective world
+	 * @return True if and only if this log can have its world as its world and (does not reference an effective world
 	 * 		or if the world referenced by this log in turn references this log as 
-	 * 		one of the logs to which it is attached.
+	 * 		one of the logs to which it is attached).
 	 */
 	@Raw
 	@Override
-	protected boolean hasProperWorld() {
-		return (this.getWorld()== null || this.getWorld().hasAsLog(this));
+	public boolean hasProperWorld() {
+		return (super.hasProperWorld()&&
+				(this.getWorld()== null || this.getWorld().hasAsLog(this)));
 	}
 
 
@@ -242,23 +218,8 @@ public class Log extends RawMaterial {
 	public void terminate() {
 		if (this.getWorld()!=null)
 			this.getWorld().removeAsLog(this);
-		this.setWorld(null);
 		this.isTerminated = true;
 	}
 
-	/**
-	 * Return a boolean indicating whether or not this log is terminated.
-	 */
-	@Basic
-	@Raw
-	@Override
-	public boolean isTerminated() {
-		return this.isTerminated;
-	}
-
-	/**
-	 * Variable registering whether this log is terminated.
-	 */
-	private boolean isTerminated = false;
 
 }

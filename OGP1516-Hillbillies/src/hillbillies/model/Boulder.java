@@ -46,22 +46,18 @@ public class Boulder extends RawMaterial {
 
 	
 	/**
-	 * Return the position of this boulder.
+	 * Return the weight of this boulder.
 	 */
-	@Basic @Raw @Override
-	public double[] getPosition() {
-		return this.position;
+	@Override @Basic @Raw
+	public final int getWeight() {
+		return this.weight;
 	}
-	
+
 	/**
-	 * Return the cube coordinate of this boulder.
-	 * 
-	 * @return The cube coordinate of this boulder, which means that each coordinate is rounded down to an integer.
+	 * Variable registering the weight of this boulder.
 	 */
-	protected int[] getCubeCoordinate() {
-		return new int[] { (int) Math.floor(this.getPosition()[0]), (int) Math.floor(this.getPosition()[1]),
-				(int) Math.floor(this.getPosition()[2]) };
-	}
+	private final int weight;
+
 	
 	
 	/**
@@ -75,7 +71,7 @@ public class Boulder extends RawMaterial {
 	 * @throws IllegalArgumentException
 	 *         The given position is not a valid position for any
 	 *         log.
-	 *       | ! isValidPosition(getPosition())
+	 *       | ! canHaveAsPosition(getPosition())
 	 */
 	@Raw @Override
 	protected void setPosition(double[] position) 
@@ -96,36 +92,21 @@ public class Boulder extends RawMaterial {
 	 *            The position to check.
 	 * @return if this log has a world, true if and only if the cube in which this boulder is located is in the world, 
 	 * 			and the terrain type of this cube is passable.
+	 * @return else true
 	 */
 	@Override
 	public boolean canHaveAsPosition(double[] position){
+		if (super.canHaveAsPosition(position)){
 		if (getWorld()!= null){
-		return (getWorld().isCubeInWorld(this.getWorld().getCubeCoordinate(position)) &&
-				this.getWorld().getTerrain(position).isPassable());
+			return (this.getWorld().getTerrain(position).isPassable());
 		}
 		else
 			return true;
+		}
+		return false;
 	}
 
 	
-	/**
-	 * Variable registering the position of this boulder.
-	 */
-	private double[] position;
-	
-	/**
-	 *Return the weight of this boulder.
-	 */
-	@Override
-	public final int getWeight() {
-		return this.weight;
-	}
-	/**
-	 * Variable registering the weight of this boulder.
-	 */
-	private final int weight;
-
-
 	/**
 	 * Update the position and activity status of this boulder.
 	 * @param duration
@@ -236,14 +217,14 @@ public class Boulder extends RawMaterial {
 	}
 	/**
 	 * Check whether this boulder has a proper world attached to it.
-	 * @return True if and only if this boulder does not reference an effective world
-	 * 		or if the world referenced by this boulder in turn references this boulder as 
-	 * 		one of the boulders to which it is attached.
+	 * @return True if and only if this boulder can have its world as its world and (does not reference an effective world
+	 * 		or the world referenced by this boulder in turn references this boulder as 
+	 * 		one of the boulders to which it is attached.)
 	 */
 	@Raw
 	@Override
-	protected boolean hasProperWorld(){
-		return (this.getWorld() == null || this.getWorld().hasAsBoulder(this));
+	public boolean hasProperWorld(){
+		return (super.hasProperWorld()&&(this.getWorld() == null || this.getWorld().hasAsBoulder(this)));
 	}
 	
 	
@@ -256,23 +237,8 @@ public class Boulder extends RawMaterial {
 	 public void terminate() {
 		if (this.getWorld()!=null)
 			this.getWorld().removeAsBoulder(this);
-		//this.setWorld(null);
-		this.setWorld(null);
 		this.isTerminated = true;
 	 }
 	 
-	 /**
-	  * Return a boolean indicating whether or not this boulder
-	  * is terminated.
-	  */
-	 @Basic @Raw @Override
-	 public boolean isTerminated() {
-		 return this.isTerminated;
-	 }
-	 
-	 /**
-	  * Variable registering whether this boulder is terminated.
-	  */
-	 private boolean isTerminated = false;
 	 
 }

@@ -389,8 +389,9 @@ public class World {
 	 */
 	@Raw
 	public boolean canHaveAsUnit(Unit unit){
-		return (unit != null) 
-				&&(! this.isTerminated() || unit.isTerminated());
+		if (this.isTerminated())
+			return unit == null;
+		return (unit != null && !unit.isTerminated()); 
 	}
 
 
@@ -588,9 +589,23 @@ public class World {
 	}
 	
 	/**
-	 * A variable which is a map of positions of the world as keys and sets of the units occupying those cubes as values.
+	 * A variable referencing a map collecting the sets of units of this world with their cube position as keys.
+	 * 
+	 * @invar The map is effective
+     * @invar   Each key registered in the map is an effective
+     *          Position.
+	 * @invar Each unit in a set associated with a position is a valid unit for this world.
 	 */
 	private Map<Position,Set<Unit>> unitsAtCubeMap = new HashMap<Position, Set<Unit>>();
+
+
+	/**
+	 * A variable referencing a set collecting all the units of this world.
+	 * @invar The set of units is effective.
+	 * @invar Each element in the set of units references a unit that
+	 * 		is an acceptable unit for this world.
+	 */
+	private final Set<Unit> units = new HashSet<Unit>();
 
 
 	/**
@@ -677,12 +692,20 @@ public class World {
 	 * Checks whether this world can have the given faction as one of his factions.
 	 * @param faction
 	 * 		The faction to check.
-	 * @return True if and only if the given faction is effective and neither the world or the faction is terminated
-	 * 		and the number of units in the faction is a number between 0 and 50 (0 not included, 50 included).
+	 * @return True if and only if 
+	 * 		* if this world is terminated, the faction is null
+	 * 		* if this faction is null
+	 * 		* else if this faction is not terminated and 
+	 * 			the number of units in the faction is a number between 0 and 50 (0 not included, 50 included).
 	 */
 	@Raw
 	public boolean canHaveAsFaction(Faction faction){
-		return (faction != null && (!this.isTerminated() || faction.isTerminated()) &&faction.getNbUnits() <=MAX_UNITS_PER_FACTION);
+		if (this.isTerminated())
+			return faction == null;
+		if (faction == null)
+			return true;
+		return (!faction.isTerminated() && faction.getNbUnits() <=MAX_UNITS_PER_FACTION); 
+
 	}
 	
 	/**
@@ -766,7 +789,9 @@ public class World {
 	 */
 	@Raw
 	public boolean canHaveAsBoulder(Boulder boulder){
-		return (boulder != null) && (! this.isTerminated() || boulder.isTerminated());
+		if (this.isTerminated())
+			return boulder == null;
+		return (boulder != null && !boulder.isTerminated() ); 
 	}
 	/**
 	 * Check whether this world has proper boulders attached to it.
@@ -907,17 +932,21 @@ public class World {
 		}
 	}
 	/**
-	 * The map registering the sets of boulders of this world with their cube position as keys.
+	 * A variable referencing a map collecting the sets of boulders of this world with their cube position as keys.
+	 * 
+	 * @invar The map is effective
+     * @invar   Each key registered in the map is an effective
+     *          Position.
+	 * @invar Each boulder in a set associated with a position is a valid boulder for this world.
 	 */
 	private Map<Position,Set<Boulder>> bouldersAtCubeMap = new HashMap<Position,Set<Boulder>>();
 
 	/**
-	 * Set collecting references to boulders attached to this world.
+	 * Variable referencing a set collecting references to boulders attached to this world.
+	 * 
 	 * @invar The set of boulders is effective.
 	 * @invar Each element in the set of boulders references a boulder that
 	 * 		is an acceptable boulder for this world.
-	 * @invar Each boulder in the set of boulders references this world as the world
-	 * 		to which it is attached.
 	 */
 	private Set<Boulder> boulders = new HashSet<Boulder>();
 	
@@ -949,7 +978,9 @@ public class World {
 	 */
 	@Raw
 	public boolean canHaveAsLog(Log log){
-		return (log != null) && (! this.isTerminated() || log.isTerminated());
+		if (this.isTerminated())
+			return log == null;
+		return (log != null && !log.isTerminated()); 
 	}
 	/**
 	 * Check whether this world has proper logs attached to it.
@@ -1092,17 +1123,20 @@ public class World {
 	}
 	
 	/**
-	 * The map registering the sets of logs of this world with their cube position as keys.
+	 * A variable referencing a map collecting the sets of logs of this world with their cube position as keys.
+	 * 
+	 * @invar The map is effective
+     * @invar   Each key registered in the map is an effective
+     *          Position.
+	 * @invar Each log in a set associated with a position is a valid log for this world.
 	 */
 	private Map<Position,Set<Log>> logsAtCubeMap = new HashMap<Position,Set<Log>>();
 
 	/**
-	 * Set collecting references to logs attached to this world.
+	 * Variable referencing a set collecting references to logs attached to this world.
 	 * @invar The set of logs is effective.
 	 * @invar Each element in the set of logs references a log that
 	 * 		is an acceptable log for this world.
-	 * @invar Each log in the set of logs references this world as the world
-	 * 		to which it is attached.
 	 */
 	private Set<Log> logs = new HashSet<Log>();
 	
@@ -1156,16 +1190,6 @@ public class World {
 	
 		return list;
 	}
-	/**
-	 * A variable registering all the units of this world.
-	 * @invar The set of units is effective.
-	 * @invar Each element in the set of units references a unit that
-	 * 		is an acceptable unit for this world.
-	 * @invar Each unit in the set of units references this world as the world
-	 * 		to which it is attached.
-	 */
-	private final Set<Unit> units = new HashSet<Unit>();
-	
 	/**
 	 * A constant: the maximum number of units in this world
 	 */

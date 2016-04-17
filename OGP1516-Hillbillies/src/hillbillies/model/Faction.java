@@ -73,9 +73,12 @@ public class Faction {
 	 * 		this faction is not yet terminated or the given unit is also terminated. 
 	 */
 	@Raw
-	protected boolean canHaveAsUnit(Unit unit){
-		return (unit != null) && (! this.isTerminated() || unit.isTerminated());
+	public boolean canHaveAsUnit(Unit unit){
+		if (this.isTerminated())
+			return unit == null;
+		return (unit != null && !unit.isTerminated()); 
 	}
+	
 	/**
 	 * Check whether this faction has proper units attached to it.
 	 * @return False if the total number of units is greater than fifty.
@@ -84,7 +87,7 @@ public class Faction {
 	 * 		as their faction.
 	 */
 	@Raw
-	protected boolean hasProperUnits(){
+	public boolean hasProperUnits(){
 		if (this.getNbUnits() >50)
 			return false;
 		for (Unit unit: this.units){

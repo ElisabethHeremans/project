@@ -43,6 +43,7 @@ import ogp.framework.util.Util;
  *        |isValidPosition(targetPosition)
  * @invar The nextTargetPosition is a position in a neighbouring cube of this units position, and a position inside the game world.
  * 		  |isValidPosition(nextTargetPosition) && this.isNeighbouringCube(getCubePosition(nextTargetPosition))
+ * @invar
  * @version 2.0
  * @author adminheremans
  */
@@ -729,8 +730,9 @@ public class Unit {
 	 * 		| new.getFaction() == faction
 	 */
 	public void setFaction(@Raw Faction faction){
-		if (faction != null && faction.hasAsUnit(this))
-			this.faction = faction;
+		if (faction !=null)
+			assert world.hasAsUnit(this);
+		this.faction = faction;
 	}
 	/**
 	 * Check whether this unit has a proper faction attached to it.
@@ -740,7 +742,7 @@ public class Unit {
 	 * 		| result == (this.getFaction() == null || this.getFaction().hasAsUnit(this))
 	 */
 	@Raw
-	protected boolean hasProperFaction(){
+	public boolean hasProperFaction(){
 		return (this.getFaction() == null || this.getFaction().hasAsUnit(this));
 	}
 	/**
@@ -754,6 +756,8 @@ public class Unit {
 	 * Variable referencing the faction of this unit.
 	 */
 	private Faction faction;
+	
+
 	/**
 	 * Set the world attached to this unit to the given world.
 	 * @param world
@@ -765,9 +769,12 @@ public class Unit {
 	 * 		| new.getWorld() == world
 	 */
 	public void setWorld(@Raw World world){
-		if(world != null && world.hasAsUnit(this))
-			this.world=world;
+		if (world !=null)
+			assert world.hasAsUnit(this);
+		this.world = world;
 	}
+	
+	
 	/**
 	 * Check whether this unit has a proper world attached to it.
 	 * @return True if and only if this unit does not reference an effective world
@@ -776,7 +783,7 @@ public class Unit {
 	 * 		| result == (this.getWorld()== null) || (getWorld().hasAsUnit(this))
 	 */
 	@Raw
-	protected boolean hasProperWorld(){
+	public boolean hasProperWorld(){
 		return (this.getWorld()== null) || (getWorld().hasAsUnit(this));
 	}
 	/**
@@ -2110,8 +2117,23 @@ public class Unit {
  	 * 		| result == (boulder == null) || (boulder.getPosition() == this.getPosition())||(this.isNeighbouringCube(boulder.getPosition()))
  	 */
  	private boolean isValidBoulder(Boulder boulder){
- 		return (boulder == null) || (boulder.getPosition() == this.getPosition())||(this.isNeighbouringCube(boulder.getPosition()));
+ 		if (this.isTerminated())
+ 			return boulder == null;
+ 		return (boulder == null) || (!boulder.isTerminated() && (boulder.getPosition() == this.getPosition())||(this.isNeighbouringCube(boulder.getPosition())));
  	}
+ 	
+	/**
+	 * Check whether this unit has a proper boulder.
+	 * 
+	 * @return True if and only if this unit can have its boulder as its
+	 *         boulder.
+	 */
+ 	@Raw
+	public boolean hasProperBoulder() {
+		return isValidBoulder(getBoulder());
+	}
+
+ 	
  	/**
 	 * Set the boulder for this unit to the given boulder.
 	 * @param boulder
@@ -2161,8 +2183,20 @@ public class Unit {
  	// Hier de voorwaarde dat de log in dezelfde cube als de unit moet zijn. Maakt de methode wel niet 
  	// meer static. 
  	private boolean isValidLog(Log log){
- 		return (log == null) || (log.getPosition() == this.getPosition())|| this.isNeighbouringCube(log.getPosition());
+ 		return (log == null) ||(!log.isTerminated() && (log.getPosition() == this.getPosition())|| this.isNeighbouringCube(log.getPosition()));
  	}
+ 	
+	/**
+	 * Check whether this unit has a proper log.
+	 * 
+	 * @return True if and only if this unit can have its log as its
+	 *         log.
+	 */
+ 	@Raw
+	public boolean hasProperLog() {
+		return isValidLog(getLog());
+	}
+
  	/**
 	 * Set the log for this unit to the given log.
 	 * @param log
