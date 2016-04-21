@@ -48,12 +48,8 @@ public class ConnectedToBorder {
 		this.nbY = nbY;
 		this.nbZ = nbZ;
 		this.passable = new boolean[nbX * nbY * nbZ];
-		
 		this.notConnected = new boolean[nbX * nbY * nbZ];
-		}
-		
-		
-	
+	}
 
 	/**
 	 * Returns whether the cube at the given position is a solid cube that is
@@ -150,7 +146,6 @@ public class ConnectedToBorder {
 	 */
 	public List<int[]> changeSolidToPassable(int x, int y, int z) {
 		int index = getIndex(x, y, z);
-
 		if (passable[index])
 			return Collections.emptyList();
 
