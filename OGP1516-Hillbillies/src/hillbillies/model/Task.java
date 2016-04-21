@@ -35,7 +35,6 @@ public class Task {
 	 * @effect The activities of this new task is set to the given activities. |
 	 *         this.setActivities(activities)
 	 */
-
 	public Task(String name, int priority, Statement activities) throws IllegalArgumentException {
 		if (!canHaveAsName(name))
 			name = "task";
@@ -102,7 +101,7 @@ public class Task {
 	 * @return | result ==
 	 */
 	public static boolean isValidPriority(int priority) {
-		return false;
+		return true;
 	}
 
 	/**
