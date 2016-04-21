@@ -4,9 +4,10 @@ import be.kuleuven.cs.som.annotate.*;
 
 public enum TerrainType {
 	AIR(0,true),
-	WORKSHOP(3,true),
+	
 	ROCK(1,false),
-	TREE(2,false);
+	TREE(2,false),
+	WORKSHOP(3,true);
 	
 	@Raw
 	private TerrainType(int type, boolean passable){
