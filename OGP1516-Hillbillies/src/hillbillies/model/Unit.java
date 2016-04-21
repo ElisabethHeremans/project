@@ -2119,7 +2119,7 @@ public class Unit {
  	private boolean isValidBoulder(Boulder boulder){
  		if (this.isTerminated())
  			return boulder == null;
- 		return (boulder == null) || (!boulder.isTerminated() && (boulder.getPosition() == this.getPosition())||(this.isNeighbouringCube(boulder.getPosition())));
+ 		return (boulder == null) || (!boulder.isTerminated() && (boulder.getWorld().getCubePosition(boulder.getPosition()) == this.getWorld().getCubePosition(this.getPosition()))||(this.isNeighbouringCube(boulder.getPosition())));
  	}
  	
 	/**
@@ -2183,7 +2183,7 @@ public class Unit {
  	// Hier de voorwaarde dat de log in dezelfde cube als de unit moet zijn. Maakt de methode wel niet 
  	// meer static. 
  	private boolean isValidLog(Log log){
- 		return (log == null) ||(!log.isTerminated() && (log.getPosition() == this.getPosition())|| this.isNeighbouringCube(log.getPosition()));
+ 		return (log == null) ||(!log.isTerminated() && (log.getWorld().getCubePosition(log.getPosition()) == this.getWorld().getCubePosition(this.getPosition()))|| this.isNeighbouringCube(log.getPosition()));
  	}
  	
 	/**
