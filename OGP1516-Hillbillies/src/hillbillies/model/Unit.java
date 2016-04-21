@@ -1990,27 +1990,27 @@ public class Unit {
 			} 
 			if (i == 0) {
 				setStatus(Status.IN_CENTER);
-//				try {
-//					moveTo1(new double[] { (new Random().nextDouble()) * this.getWorld().getxDimension(), 
-//						(new Random().nextDouble()) * this.getWorld().getyDimension(),
-//						(new Random().nextDouble()) * this.getWorld().getzDimension() });
-//						startSprinting();
-//				}
-//				catch (IllegalArgumentException exc){
-//					startDefaultBehaviour();
-//				}
+				try {
+					moveTo1(new double[] { (new Random().nextDouble()) * this.getWorld().getxDimension(), 
+						(new Random().nextDouble()) * this.getWorld().getyDimension(),
+						(new Random().nextDouble()) * this.getWorld().getzDimension() });
+						startSprinting();
+				}
+				catch (IllegalArgumentException exc){
+					startDefaultBehaviour();
+				}
 			}
 			if (i == 1) {
 				setStatus(Status.IN_CENTER);
-//				try {
-//					moveTo1(new double[] { (new Random().nextDouble()) * this.getWorld().getxDimension(), 
-//						(new Random().nextDouble()) * this.getWorld().getyDimension(),
-//						(new Random().nextDouble()) * this.getWorld().getzDimension() });
-//						stopSprinting();
-//				}
-//				catch (IllegalArgumentException exc){
-//					startDefaultBehaviour();
-//				}
+				try {
+					moveTo1(new double[] { (new Random().nextDouble()) * this.getWorld().getxDimension(), 
+						(new Random().nextDouble()) * this.getWorld().getyDimension(),
+						(new Random().nextDouble()) * this.getWorld().getzDimension() });
+						stopSprinting();
+				}
+				catch (IllegalArgumentException exc){
+					startDefaultBehaviour();
+				}
 			}
 			if (i == 2){
 				List<int[]> neighbouring = this.getWorld().getNeighboringCubes(this.getCubeCoordinate());
