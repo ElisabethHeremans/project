@@ -2119,6 +2119,10 @@ public class Unit {
  	private boolean isValidBoulder(Boulder boulder){
  		if (this.isTerminated())
  			return boulder == null;
+ 		System.out.println(boulder == null);
+ 		System.out.println(!boulder.isTerminated());
+ 		System.out.println(boulder.getWorld().getCubePosition(boulder.getPosition()) == this.getWorld().getCubePosition(this.getPosition()));
+ 		System.out.println(this.isNeighbouringCube(boulder.getPosition()));
  		return (boulder == null) || (!boulder.isTerminated() && (boulder.getWorld().getCubePosition(boulder.getPosition()) == this.getWorld().getCubePosition(this.getPosition()))||(this.isNeighbouringCube(boulder.getPosition())));
  	}
  	
