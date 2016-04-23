@@ -1472,6 +1472,8 @@ public class Unit {
 			workingTime = (float) 0.0;
 			totalWorkingTime = (float) 500.0 / this.getStrength();
 			progressWork = (float) 0.0;
+			this.setOrientation((float) Math.atan2(workTargetPosition[1]+0.5 - this.getPosition()[1],
+					workTargetPosition[0]+0.5 - this.getPosition()[0]));
 		}
 
 	}
@@ -2116,14 +2118,10 @@ public class Unit {
  	 * 		or the position of the given boulder equals the position of this unit.
  	 * 		| result == (boulder == null) || (boulder.getPosition() == this.getPosition())||(this.isNeighbouringCube(boulder.getPosition()))
  	 */
- 	private boolean isValidBoulder(Boulder boulder){
- 		if (this.isTerminated())
- 			return boulder == null;
- 		System.out.println(boulder == null);
- 		System.out.println(!boulder.isTerminated());
- 		System.out.println(boulder.getWorld().getCubePosition(boulder.getPosition()) == this.getWorld().getCubePosition(this.getPosition()));
- 		System.out.println(this.isNeighbouringCube(boulder.getPosition()));
- 		return (boulder == null) || (!boulder.isTerminated() && (boulder.getWorld().getCubePosition(boulder.getPosition()) == this.getWorld().getCubePosition(this.getPosition()))||(this.isNeighbouringCube(boulder.getPosition())));
+ 	public boolean isValidBoulder(Boulder boulder){
+// 		if (this.isTerminated())
+// 			return boulder == null;
+ 		return ((boulder == null) || (!boulder.isTerminated() && this.getWorld()==boulder.getWorld()));
  	}
  	
 	/**
@@ -2186,8 +2184,8 @@ public class Unit {
  	 */
  	// Hier de voorwaarde dat de log in dezelfde cube als de unit moet zijn. Maakt de methode wel niet 
  	// meer static. 
- 	private boolean isValidLog(Log log){
- 		return (log == null) ||(!log.isTerminated() && (log.getWorld().getCubePosition(log.getPosition()) == this.getWorld().getCubePosition(this.getPosition()))|| this.isNeighbouringCube(log.getPosition()));
+ 	public boolean isValidLog(Log log){
+ 		return (log == null) ||(!log.isTerminated() && (log.getWorld() == this.getWorld()));
  	}
  	
 	/**
