@@ -7,6 +7,8 @@ import java.util.Set;
 import hillbillies.model.Boulder;
 import hillbillies.model.Faction;
 import hillbillies.model.Log;
+import hillbillies.model.Scheduler;
+import hillbillies.model.Task;
 import hillbillies.model.Unit;
 import hillbillies.model.World;
 import hillbillies.part2.listener.TerrainChangeListener;
@@ -430,11 +432,6 @@ public class Facade implements IFacade{
 		return 0;
 	}
 
-	@Override
-	public Scheduler getScheduler(Faction faction) throws ModelException {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
 	public Task getAssignedTask(Unit unit) throws ModelException {

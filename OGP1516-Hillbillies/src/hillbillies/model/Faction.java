@@ -47,15 +47,6 @@ public class Faction {
 		return (0<= Units && Units<= 50);
 	}
 	/**
-	 * Set collecting references to units attached to this faction.
-	 * @invar The set of units is effective.
-	 * @invar Each element in the set of units references a unit that
-	 * 		is an acceptable unit for this faction.
-	 * @invar Each unit in the set of units references this faction as the faction
-	 * 		to which it is attached.
-	 */
-	protected Set<Unit> units =  Collections.synchronizedSet(new HashSet<Unit>());
-	/**
 	 * Check whether this faction has the given unit as one of the units attached to it.
 	 * @param unit
 	 * 		The unit to check.
@@ -153,6 +144,16 @@ public class Faction {
 	}
 	
 	/**
+	 * Set collecting references to units attached to this faction.
+	 * @invar The set of units is effective.
+	 * @invar Each element in the set of units references a unit that
+	 * 		is an acceptable unit for this faction.
+	 * @invar Each unit in the set of units references this faction as the faction
+	 * 		to which it is attached.
+	 */
+	protected Set<Unit> units =  Collections.synchronizedSet(new HashSet<Unit>());
+	
+	/**
 	 * Terminate this faction.
 	 * @post   The units attached to this faction no longer references
 	 * 			any faction.
@@ -179,5 +180,67 @@ public class Faction {
 	  * Variable registering whether this faction is terminated.
 	  */
 	 private boolean isTerminated = false;
+	 
+	 
+	 /**
+	 * Return the scheduler attached to this faction.
+	 */
+	 @Basic @Raw
+	 public final Scheduler getScheduler() {
+		return scheduler;
+	 }
+
+
+	 /**
+	 * Set the scheduler for this faction to the given scheduler. 
+	 * @param scheduler 
+	 * 			the scheduler for this new faction
+	 * @post The new scheduler for this faction is the same as the given scheduler.
+	 * 		| new.getScheduler() == scheduler
+	 * @throws IllegalArgumentException()
+	 * 		The given scheduler is not a valid scheduler for any faction.
+	 * 		| ! isValidScheduler(scheduler)		
+	 * 
+	 */
+	 @Raw
+	 public final void setScheduler(Scheduler scheduler) throws IllegalArgumentException {
+			if(! isValidScheduler(scheduler))
+	 			throw new IllegalArgumentException();
+		this.scheduler = scheduler;
+		scheduler.setFaction(this);
+	 }
+	 
+	 /**
+	  * Check whether the given scheduler is a valid scheduler for any faction.
+	  * @param scheduler
+	  * 		The scheduler to check.
+	  * @return If this faction is terminated, true if and only if the scheduler is null. Else, true.
+	  * 		|if (this.isTerminated())
+	  *			|	result == ( scheduler == null)
+	  *			|else
+	  *			|	result == true
+	  */
+	  private boolean isValidScheduler(Scheduler scheduler) {
+			if (this.isTerminated())
+				return scheduler == null;
+	 		return true;
+	  }
+	  
+	/**
+	 * Check whether this faction has a proper scheduler.
+	 * 
+	 * @return True if and only if this faction can have its scheduler as its
+	 *         scheduler.
+	 */
+ 	@Raw
+	public boolean hasProperScheduler() {
+		return isValidScheduler(getScheduler());
+	}
+
+
+	/**
+	 * Variable registering the scheduler of this faction
+	 */
+	 private Scheduler scheduler;
 	 
 }

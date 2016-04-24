@@ -44,6 +44,7 @@ public class Task {
 		setPriority(priority);
 		this.setActivities(activities);
 	}
+	
 
 	/**
 	 * Return the name of this task.
@@ -166,5 +167,17 @@ public class Task {
 	 * Variable registering the activities of this task.
 	 */
 	private Statement activities;
+	
+	public boolean isWellFormed(){
+		return true;
+	}
+
+
+	void scheduleForUnit(Unit unit) {
+		scheduledUnit = unit;
+		
+	}
+	
+	private Unit scheduledUnit;
 
 }
