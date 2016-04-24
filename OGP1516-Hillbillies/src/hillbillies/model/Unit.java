@@ -2118,10 +2118,12 @@ public class Unit {
  	 * 		or the position of the given boulder equals the position of this unit.
  	 * 		| result == (boulder == null) || (boulder.getPosition() == this.getPosition())||(this.isNeighbouringCube(boulder.getPosition()))
  	 */
+
  	public boolean isValidBoulder(Boulder boulder){
-// 		if (this.isTerminated())
-// 			return boulder == null;
+	if (this.isTerminated())
+			return boulder == null;
  		return ((boulder == null) || (!boulder.isTerminated() && this.getWorld()==boulder.getWorld()));
+
  	}
  	
 	/**
@@ -2186,6 +2188,7 @@ public class Unit {
  	// meer static. 
  	public boolean isValidLog(Log log){
  		return (log == null) ||(!log.isTerminated() && (log.getWorld() == this.getWorld()));
+
  	}
  	
 	/**

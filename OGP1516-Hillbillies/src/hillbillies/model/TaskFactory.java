@@ -5,15 +5,24 @@ import java.util.List;
 import hillbillies.part3.programs.ITaskFactory;
 import hillbillies.part3.programs.SourceLocation;
 
-public class TaskFactory implements ITaskFactory<E, S, T> {
+public class TaskFactory implements ITaskFactory<Expression, Statement, Task> {
 
 	@Override
-	public List<T> createTasks(String name, int priority, S activity, List<int[]> selectedCubes) {
-		for (int[] selectedCube: selectedCubes){
-			
+	public List<Task> createTasks(String name, int priority, Statement activity, List<int[]> selectedCubes) {
+		List<Task> tasks = new List<Task>();
+		if (selectedCubes.isEmpty()&&Statement.hasExpression(selected)){
+			tasks.add(new Task(name,priority,activity));
+
 		}
-		List<T> tasks = new List<T> 
-		return null;
+		else{
+			for (int[] selectedCube: selectedCubes){
+				Task task = new Task(name,priority,activity);
+				//in activity moet selectedCube ingevuld worden op de plaats van selected?
+				tasks.add(task);
+			}
+		}
+		
+		return tasks;
 	}
 
 	@Override
