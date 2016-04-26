@@ -1,4 +1,4 @@
-package hillbillies.model;
+package hillbillies.model.expression;
 
 import hillbillies.part3.programs.SourceLocation;
 

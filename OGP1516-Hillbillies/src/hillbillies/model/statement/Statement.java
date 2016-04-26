@@ -1,6 +1,6 @@
 package hillbillies.model.statement;
 
-import hillbillies.model.Expression;
+import hillbillies.model.expression.Expression;
 
 public class Statement {
 	
@@ -9,5 +9,7 @@ public class Statement {
 			return true;
 		return false;
 	}
+	
+	
 
 }

@@ -3,6 +3,7 @@ package hillbillies.model;
 import java.util.ArrayList;
 import java.util.*;
 
+import hillbillies.model.expression.Expression;
 import hillbillies.model.statement.Statement;
 import hillbillies.part3.programs.ITaskFactory;
 import hillbillies.part3.programs.SourceLocation;
