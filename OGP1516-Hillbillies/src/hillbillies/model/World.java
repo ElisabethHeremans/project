@@ -156,7 +156,7 @@ public class World {
 	 * @return the coordinates of the cube in which the given position is located.
 	 * 
 	 */
-	int[] getCubePosition(double[] position){
+	public int[] getCubePosition(double[] position){
 		return  new int[] { (int) Math.floor(position[0]/L), (int) Math.floor(position[1]/L),
 				(int) Math.floor(position[2]/L) };
 	}

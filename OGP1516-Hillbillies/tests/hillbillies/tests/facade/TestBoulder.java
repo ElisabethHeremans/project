@@ -9,6 +9,7 @@ import hillbillies.model.Boulder;
 import hillbillies.model.Unit;
 import hillbillies.model.World;
 import hillbillies.part2.listener.DefaultTerrainChangeListener;
+import ogp.framework.util.Util;
 
 public class TestBoulder {
 	
@@ -28,6 +29,7 @@ public class TestBoulder {
 	
 	private static World world1;
 	private World world2;
+	private World world3;
 	
 	private  Unit Aunit;
 	private  Unit Bunit;
@@ -39,7 +41,12 @@ public class TestBoulder {
 	public static void setUpBeforeClass(){
 		DoubleBoulder = new Boulder(new double[] {1.5,4.5,3.5});
 		IntegerBoulder = new Boulder(new int[] {1,2,3});
-		world1 = new World(types, new DefaultTerrainChangeListener());
+		int[][][] types1 = new int[4][4][4];
+		types1[1][1][0] = TYPE_ROCK;
+		types1[1][1][1] = TYPE_TREE;
+		types1[1][1][2] = TYPE_WORKSHOP;
+		types1[1][0][1] = TYPE_ROCK;
+		world1 = new World(types1, new DefaultTerrainChangeListener());
 	}
 	/**
 	 * Set up an mutable test fixture
@@ -52,20 +59,72 @@ public class TestBoulder {
 		types[1][1][1] = TYPE_TREE;
 		types[1][1][2] = TYPE_WORKSHOP;
 		world2 = new World(types, new DefaultTerrainChangeListener());
-		ABoulder = new Boulder(new double[] {1.5,1.5,1.5});
+		int[][][] types2 = new int[2][2][2];
+		types2[1][1][0] = TYPE_ROCK;
+		types2[0][1][0] = TYPE_ROCK;
+		types2[1][0][0] = TYPE_ROCK;
+		types2[0][0][0] = TYPE_ROCK;
+		types2[1][0][1] = TYPE_ROCK;
+		world3 = new World(types2, new DefaultTerrainChangeListener());
+		ABoulder = new Boulder(new double[] {0.5,1.5,1.5});
 		BBoulder = new Boulder(new double[] {6.5,3.5,0.5});
 		BBoulder = new Boulder(new double[] {6.5,3.5,0.5});
 		CBoulder = new Boulder(new double[] {1.5,1.5,2.5});
 		DBoulder = new Boulder(new double[] {1.5,2.5,1.5});
 		EBoulder = new Boulder(new double[] {2.5,2.5,2.5});
 		Aunit = new Unit("Aunit",new double[] {1.5,2.5,2.5},50,50,50,50,false,25.0,25.0,Math.PI/2);
-		Bunit = new Unit("Bunit",new double[] {1.5,2.5,2.5},50,50,50,50,false,25.0,25.0,Math.PI/2);
+		Bunit = new Unit("Bunit",new double[] {0.5,1.5,1.5},50,50,50,50,false,25.0,25.0,Math.PI/2);
 	}
 	
 	@Test
-	public final void isValidBoulder_terminate(){
-		Aunit.setBoulder(null);
-		Assert.assertTrue(Aunit.isValidBoulder(ABoulder));
+	public final void isValidBoulder_null(){
+		Assert.assertTrue(Aunit.isValidBoulder(null));
 	}
+	
+	@Test
+	public final void isValidBoulder_terminateU(){
+		world3.addAsUnit(Bunit);
+		Bunit.terminate();
+		Assert.assertTrue(Bunit.isValidBoulder(null));
+	}
+	
+//	return (boulder == null) || (!boulder.isTerminated() && 
+//				(boulder.getWorld().getCubePosition(boulder.getPosition()) == this.getWorld().getCubePosition(this.getPosition()))
+//				||(this.isNeighbouringCube(boulder.getPosition())));
+
+	
+	@Test
+	public final void isValidBoulder_terminateB(){
+		world3.addAsBoulder(ABoulder);
+		world3.addAsUnit(Bunit);
+		ABoulder.terminate();
+		Assert.assertFalse(ABoulder == null);
+		Assert.assertTrue(ABoulder.isTerminated());
+		int[] BPosition = world3.getCubePosition(ABoulder.getPosition());
+		int[] UPosition = Bunit.getWorld().getCubePosition(Bunit.getPosition());
+		Assert.assertTrue(BPosition[0] == UPosition[0]);
+		Assert.assertTrue(BPosition[1] == UPosition[1]);
+		Assert.assertTrue(BPosition[2] == UPosition[2]);
+		Assert.assertFalse(Bunit.isNeighbouringCube(ABoulder.getPosition()));
+		Assert.assertFalse(Bunit.isValidBoulder(ABoulder));
+	}
+	
+	@Test
+	public final void isValidBoulder_LegalCase(){
+		world3.addAsBoulder(ABoulder);
+		world3.addAsUnit(Bunit);
+		Assert.assertFalse(ABoulder == null);
+		Assert.assertFalse(ABoulder.isTerminated());
+		Assert.assertArrayEquals(world3.getCubePosition(ABoulder.getPosition()), Bunit.getWorld().getCubePosition(Bunit.getPosition()));
+//		int[] BPosition = world3.getCubePosition(ABoulder.getPosition());
+//		int[] UPosition = Bunit.getWorld().getCubePosition(Bunit.getPosition());
+//		Assert.assertTrue(BPosition[0] == UPosition[0]);
+//		Assert.assertTrue(BPosition[1] == UPosition[1]);
+//		Assert.assertTrue(BPosition[2] == UPosition[2]);
+		Assert.assertFalse(Bunit.isNeighbouringCube(ABoulder.getPosition()));
+		Assert.assertFalse(Bunit.isTerminated());
+		Assert.assertTrue(Bunit.isValidBoulder(ABoulder));
+	}
+	
 
 }

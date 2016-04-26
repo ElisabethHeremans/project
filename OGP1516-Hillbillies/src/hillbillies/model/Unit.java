@@ -679,7 +679,7 @@ public class Unit {
 	 *		   |			&& (Util.fuzzyEquals(Math.abs((cubePosition)[1] - this.getCubePosition()[1]),0.0))
 	 *		   |			&& (Util.fuzzyEquals(Math.abs((cubePosition)[1] - this.getCubePosition()[1]),0.0))));
 	 */
-	private boolean isNeighbouringCube(double[] position) {
+	public boolean isNeighbouringCube(double[] position) {
 		return (isNeighbouringCube(this.getWorld().getCubeCoordinate(position)));
 	}
 	/**
@@ -2120,9 +2120,15 @@ public class Unit {
  	 */
 
  	public boolean isValidBoulder(Boulder boulder){
-	if (this.isTerminated())
-			return boulder == null;
- 		return ((boulder == null) || (!boulder.isTerminated() && this.getWorld()==boulder.getWorld()));
+ 		if (this.isTerminated()){
+			return (boulder == null);
+ 		}
+ 		if (boulder.isTerminated())
+ 			return false;
+// 		return (boulder == null) || ((!(boulder.isTerminated())) && 
+// 				((boulder.getWorld().getCubePosition(boulder.getPosition()) == this.getWorld().getCubePosition(this.getPosition()))
+// 				||(this.isNeighbouringCube(boulder.getPosition()))));
+ 		return ((boulder == null) || (boulder.getWorld().getCubePosition(boulder.getPosition()) == this.getWorld().getCubePosition(this.getPosition())||(this.isNeighbouringCube(boulder.getPosition()))));
 
  	}
  	
