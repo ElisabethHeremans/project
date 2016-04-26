@@ -106,7 +106,7 @@ public class TestBoulder {
 		Assert.assertTrue(BPosition[1] == UPosition[1]);
 		Assert.assertTrue(BPosition[2] == UPosition[2]);
 		Assert.assertFalse(Bunit.isNeighbouringCube(ABoulder.getPosition()));
-		Assert.assertFalse(Bunit.isValidBoulder(ABoulder));
+		Assert.assertFalse(Bunit.isValidBoulder(Bunit.getBoulder()));
 	}
 	
 	@Test

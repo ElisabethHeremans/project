@@ -2123,12 +2123,12 @@ public class Unit {
  		if (this.isTerminated()){
 			return (boulder == null);
  		}
- 		if (boulder.isTerminated())
- 			return false;
+ 		return ((boulder == null) || ((boulder.getWorld().getCubePosition(boulder.getPosition())==this.getWorld().getCubeCoordinate(this.getPosition())) 
+ 				|| this.isNeighbouringCube(boulder.getPosition())));
 // 		return (boulder == null) || ((!(boulder.isTerminated())) && 
 // 				((boulder.getWorld().getCubePosition(boulder.getPosition()) == this.getWorld().getCubePosition(this.getPosition()))
 // 				||(this.isNeighbouringCube(boulder.getPosition()))));
- 		return ((boulder == null) || (boulder.getWorld().getCubePosition(boulder.getPosition()) == this.getWorld().getCubePosition(this.getPosition())||(this.isNeighbouringCube(boulder.getPosition()))));
+ 		//return ((boulder == null) || (boulder.getWorld().getCubePosition(boulder.getPosition()) == this.getWorld().getCubePosition(this.getPosition())||(this.isNeighbouringCube(boulder.getPosition()))));
 
  	}
  	
