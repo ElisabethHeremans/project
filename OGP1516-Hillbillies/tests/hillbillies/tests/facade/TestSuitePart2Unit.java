@@ -1062,6 +1062,7 @@ public class TestSuitePart2Unit {
 		world1.addAsUnit(Unit1InWorld);
 		world1.addAsBoulder(Boulder);
 		Boulder.terminate();
+		Assert.assertTrue(Boulder.isTerminated());
 		Assert.assertFalse(Unit1InWorld.isValidBoulder(Boulder));
 	}
 	
