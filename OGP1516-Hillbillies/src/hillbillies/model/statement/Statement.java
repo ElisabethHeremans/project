@@ -1,4 +1,6 @@
-package hillbillies.model;
+package hillbillies.model.statement;
+
+import hillbillies.model.Expression;
 
 public class Statement {
 	

@@ -3,6 +3,7 @@ package hillbillies.model;
 import java.util.List;
 
 import be.kuleuven.cs.som.annotate.*;
+import hillbillies.model.statement.Statement;
 
 /**
  * @invar Each task can have its name as name . | canHaveAsName(this.getName())
