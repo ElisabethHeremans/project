@@ -25,5 +25,9 @@ public class Expression {
 	
 	private SourceLocation sourceLocation;
 	
+	public boolean isValidExpression(){
+		return true;
+	}
+	
 
 }
