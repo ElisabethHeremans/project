@@ -2120,12 +2120,19 @@ public class Unit {
  	 */
 
  	public boolean isValidBoulder(Boulder boulder){
+ 		
  		if (this.isTerminated()){
 			return (boulder == null);
  		}
- 		System.out.println(name);
- 		return ((boulder == null) || (boulder.getWorld()==this.getWorld() && !boulder.isTerminated() &&(boulder.getWorld().getCubePosition(boulder.getPosition())==this.getWorld().getCubeCoordinate(this.getPosition()) 
+ 		else if (boulder == null)
+ 			return true;
+ 		else{
+ 			return (((boulder.getWorld()==this.getWorld()) && (!boulder.isTerminated()) &&
+ 					((boulder.getWorld().getCubePosition(boulder.getPosition())[0]==this.getWorld().getCubeCoordinate(this.getPosition())[0] 
+ 					&& boulder.getWorld().getCubePosition(boulder.getPosition())[1]==this.getWorld().getCubeCoordinate(this.getPosition())[1] 
+ 							&& boulder.getWorld().getCubePosition(boulder.getPosition())[2]==this.getWorld().getCubeCoordinate(this.getPosition())[2]) 
  				|| this.isNeighbouringCube(boulder.getPosition()))));
+ 		}
 // 		return (boulder == null) || ((!(boulder.isTerminated())) && 
 // 				((boulder.getWorld().getCubePosition(boulder.getPosition()) == this.getWorld().getCubePosition(this.getPosition()))
 // 				||(this.isNeighbouringCube(boulder.getPosition()))));
