@@ -679,7 +679,7 @@ public class Unit {
 	 *		   |			&& (Util.fuzzyEquals(Math.abs((cubePosition)[1] - this.getCubePosition()[1]),0.0))
 	 *		   |			&& (Util.fuzzyEquals(Math.abs((cubePosition)[1] - this.getCubePosition()[1]),0.0))));
 	 */
-	public boolean isNeighbouringCube(double[] position) {
+	private boolean isNeighbouringCube(double[] position) {
 		return (isNeighbouringCube(this.getWorld().getCubeCoordinate(position)));
 	}
 	/**

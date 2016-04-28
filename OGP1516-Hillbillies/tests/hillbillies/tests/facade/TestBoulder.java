@@ -100,14 +100,6 @@ public class TestBoulder {
 		world3.addAsBoulder(ABoulder);
 		world3.addAsUnit(Bunit);
 		ABoulder.terminate();
-		Assert.assertFalse(ABoulder == null);
-		Assert.assertTrue(ABoulder.isTerminated());
-//		int[] BPosition = world3.getCubePosition(ABoulder.getPosition());
-//		int[] UPosition = Bunit.getWorld().getCubePosition(Bunit.getPosition());
-//		Assert.assertTrue(BPosition[0] == UPosition[0]);
-//		Assert.assertTrue(BPosition[1] == UPosition[1]);
-//		Assert.assertTrue(BPosition[2] == UPosition[2]);
-		Assert.assertTrue(Bunit.isNeighbouringCube(ABoulder.getPosition()));
 		Assert.assertFalse(Bunit.isValidBoulder(ABoulder));
 	}
 
@@ -116,16 +108,6 @@ public class TestBoulder {
 	public final void isValidBoulder_LegalCase(){
 		world3.addAsBoulder(ABoulder);
 		world3.addAsUnit(Bunit);
-		Assert.assertFalse(ABoulder == null);
-		Assert.assertFalse(ABoulder.isTerminated());
-//		Assert.assertArrayEquals(world3.getCubePosition(ABoulder.getPosition()), Bunit.getWorld().getCubePosition(Bunit.getPosition()));
-//		int[] BPosition = world3.getCubePosition(ABoulder.getPosition());
-//		int[] UPosition = Bunit.getWorld().getCubePosition(Bunit.getPosition());
-//		Assert.assertTrue(BPosition[0] == UPosition[0]);
-//		Assert.assertTrue(BPosition[1] == UPosition[1]);
-//		Assert.assertTrue(BPosition[2] == UPosition[2]);
-		Assert.assertTrue(Bunit.isNeighbouringCube(ABoulder.getPosition()));
-		Assert.assertFalse(Bunit.isTerminated());
 		Assert.assertTrue(Bunit.isValidBoulder(ABoulder));
 	}
 	
@@ -135,16 +117,6 @@ public class TestBoulder {
 		System.out.println(world3.isCubeInWorld(world3.getCubeCoordinate(BBoulder.getPosition())));
 		System.out.println(Arrays.toString(world3.getCubeCoordinate(BBoulder.getPosition())));
 		world3.addAsBoulder(BBoulder);
-		Assert.assertFalse(BBoulder == null);
-		Assert.assertFalse(BBoulder.isTerminated());
-		Assert.assertArrayEquals(world3.getCubePosition(BBoulder.getPosition()), Bunit.getWorld().getCubePosition(Bunit.getPosition()));
-		int[] BPosition = world3.getCubePosition(BBoulder.getPosition());
-		int[] UPosition = Bunit.getWorld().getCubePosition(Bunit.getPosition());
-		Assert.assertTrue(BPosition[0] == UPosition[0]);
-		Assert.assertTrue(BPosition[1] == UPosition[1]);
-		Assert.assertTrue(BPosition[2] == UPosition[2]);
-		Assert.assertFalse(Bunit.isNeighbouringCube(BBoulder.getPosition()));
-		Assert.assertFalse(Bunit.isTerminated());
 		Assert.assertTrue(Bunit.isValidBoulder(BBoulder));
 	}
 

@@ -156,7 +156,7 @@ public class World {
 	 * @return the coordinates of the cube in which the given position is located.
 	 * 
 	 */
-	public int[] getCubePosition(double[] position){
+	int[] getCubePosition(double[] position){
 		return  new int[] { (int) Math.floor(position[0]/L), (int) Math.floor(position[1]/L),
 				(int) Math.floor(position[2]/L) };
 	}
@@ -217,7 +217,7 @@ public class World {
 	 * @throws IllegalArgumentException
 	 * 			If the given position is not inside this world.
 	 */
-	public boolean getPassable(int[] cubePosition) throws IllegalArgumentException {
+	protected boolean getPassable(int[] cubePosition) throws IllegalArgumentException {
 		return this.getTerrain(cubePosition).isPassable();
 	}
 

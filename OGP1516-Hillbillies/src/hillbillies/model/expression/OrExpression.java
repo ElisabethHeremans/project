@@ -6,7 +6,7 @@ public class OrExpression extends BinaryBExpression {
 		// TODO Auto-generated constructor stub
 	}
 
-	public boolean isValidExpression(){
-		
-	}
+//	public boolean isValidExpression(){
+//		
+//	}
 }
