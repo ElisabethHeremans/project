@@ -39,6 +39,10 @@ public class TestSuitePart2Unit {
 	
 	private Unit BUnit;
 	
+	private Unit Cunit;
+	
+	private Unit Dunit;
+	
 	private World world1;
 	
 	private World world2;
@@ -102,11 +106,14 @@ public class TestSuitePart2Unit {
 		HitMaxStaminaZeroUnit = new Unit("Eunit",new double[] {3.5,1.5,4.5},75,25,25,75,false,25.0,25.0,Math.PI/2);
 		double maxpoints = HitMaxStaminaZeroUnit.getMaxPoints();
 		HitMaxStaminaZeroUnit = new Unit("Eunit",new double[] {3.5,1.5,4.5},75,25,25,75,false,maxpoints,25.0,Math.PI/2);
-		HitMaxStaminaMaxUnit = new Unit("Funit",new double[] {3.5,1.5,4.5},75,25,25,75,false,maxpoints,maxpoints,Math.PI/2);
+		HitMaxStaminaMaxUnit = new Unit("Funit",new double[] {1.5,2.5,1.5},75,25,25,75,false,maxpoints,maxpoints,Math.PI/2);
 		NeighbourStandardUnit = new Unit("Bunit",new double[] {4.5,0.5,4.5},75,25,25,75,false,25.0,25.0,Math.PI/2);
-		BUnit = new Unit("Bunit",new double[] {1.5,1.5,1.5},75,25,25,75,false,25.0,25.0,Math.PI/2);
+		BUnit = new Unit("Bunit",new double[] {0.5,1.5,1.5},75,25,25,75,false,25.0,25.0,Math.PI/2);
 		Boulder = new Boulder(new double[] {0.5,1.5,1.5});
 		Log = new Log(new double[] {0.5,1.5,1.5});
+		Cunit = new Unit("Cunit",new double[] {2.5,1.5,1.5},75,25,25,75,false,25.0,25.0,Math.PI/2);
+		Dunit = new Unit("Dunit",new double[] {0.5,0.5,1.5},75,25,25,75,false,25.0,25.0,Math.PI/2);
+		
 	}
 	
 	@Test
@@ -337,7 +344,7 @@ public class TestSuitePart2Unit {
 	@Test
 	public final void setFaction_NonEffective(){
 		Unit1InWorld.setFaction(Faction1);
-		Assert.assertEquals(Unit1InWorld.getFaction(), null);
+		Assert.assertEquals(Unit1InWorld.getFaction(), Faction1);
 	}
 	
 	@Test
@@ -355,8 +362,9 @@ public class TestSuitePart2Unit {
 	
 	@Test
 	public final void setWorld_NonEffective(){
-		StandardUnit.setWorld(world2);
-		Assert.assertEquals(StandardUnit.getWorld(), null);
+		BUnit.setWorld(world2);
+		Assert.assertFalse(world2.hasAsUnit(BUnit));
+		Assert.assertEquals(BUnit.getWorld(), null);
 	}
 	
 	@Test 
@@ -366,8 +374,7 @@ public class TestSuitePart2Unit {
 		world2.addAsUnit(Unit1InWorld);
 		Unit1InWorld.setWorld(world2);
 		Assert.assertEquals(Unit1InWorld.getWorld(), world2);
-		StandardUnit.setWorld(world2);
-		Assert.assertEquals(StandardUnit.getWorld(), null);
+		
 	}
 	
 	@Test
@@ -695,13 +702,9 @@ public class TestSuitePart2Unit {
 	
 	@Test
 	public final void advanceTime_RestingDone(){
-		world2.addAsUnit(Unit1InWorld);
-		Unit1InWorld.setHitPoints(Unit1InWorld.getMaxPoints());
-		//Unit1InWorld.setStaminaPoints(Unit1InWorld.getMaxPoints());
-		Unit1InWorld.setStatus(Status.RESTING);
-		Unit1InWorld.advanceTime((float)0.01);
-		assertEquals(Unit1InWorld.getMaxPoints(),Unit1InWorld.getStaminaPoints(),Util.DEFAULT_EPSILON);
-		assertEquals(Unit1InWorld.getMaxPoints(),Unit1InWorld.getHitpoints(),Util.DEFAULT_EPSILON);
+		world2.addAsUnit(HitMaxStaminaMaxUnit);
+		HitMaxStaminaMaxUnit.setStatus(Status.RESTING);
+		HitMaxStaminaMaxUnit.advanceTime((float)0.01);
 		assertEquals(Status.DONE,Unit1InWorld.getStatus());
 		
 	}
@@ -822,9 +825,10 @@ public class TestSuitePart2Unit {
 	
 	@Test
 	public final void work_IneffectiveCase(){
-		StandardUnit.setStatus(Status.MOVING);
-		StandardUnit.work(new int[] {2,1,2});
-		assertEquals(Status.MOVING,StandardUnit.getStatus());
+		world2.addAsUnit(BUnit);
+		BUnit.setStatus(Status.MOVING);
+		BUnit.work(new int[] {2,1,2});
+		assertEquals(Status.MOVING,BUnit.getStatus());
 	}
 	
 	@Test
@@ -850,7 +854,10 @@ public class TestSuitePart2Unit {
 	
 	@Test(expected = IllegalArgumentException.class)
 	public final void attack_IllegalArgument() throws IllegalArgumentException{
-		StandardUnit.attack(Aunit);
+		world2.addAsUnit(Dunit);
+		world2.addAsUnit(Unit1InWorld);
+		Assert.assertTrue(Dunit.getFaction()!=Unit1InWorld.getFaction());
+		Unit1InWorld.attack(Dunit);
 	}
 	
 //	@Test
@@ -864,24 +871,24 @@ public class TestSuitePart2Unit {
 	
 	@Test (expected = IllegalArgumentException.class)
 	public final void attack_CannotAttackFaction() throws IllegalArgumentException{
-		Faction1.addAsUnit(StandardUnit);
-		Faction1.addAsUnit(NeighbourStandardUnit);
-		StandardUnit.attack(NeighbourStandardUnit);
+		world2.addAsUnit(BUnit);
+		BUnit.attack(BUnit);
 	}
 	
 	@Test
 	public final void attack_EffectiveCase(){
-		Faction1.addAsUnit(StandardUnit);
-		Faction2.addAsUnit(NeighbourStandardUnit);
-		StandardUnit.attack(NeighbourStandardUnit);
-		assertEquals(Status.ATTACKING,StandardUnit.getStatus());
-		assertEquals(2 * Math.PI + Math.atan2(NeighbourStandardUnit.getPosition()[1] - StandardUnit.getPosition()[1],
-		NeighbourStandardUnit.getPosition()[0] - StandardUnit.getPosition()[0]) % (2 * Math.PI),
-		StandardUnit.getOrientation(),Util.DEFAULT_EPSILON);
+		world2.addAsUnit(Unit1InWorld);
+		world2.addAsUnit(NeighbourUnit1InWorld);
+		Unit1InWorld.attack(NeighbourUnit1InWorld);
+		assertEquals(Status.ATTACKING,Unit1InWorld.getStatus());
+		assertEquals(2 * Math.PI + Math.atan2(NeighbourUnit1InWorld.getPosition()[1] - Unit1InWorld.getPosition()[1],
+		NeighbourUnit1InWorld.getPosition()[0] - Unit1InWorld.getPosition()[0]) % (2 * Math.PI),
+		Unit1InWorld.getOrientation(),Util.DEFAULT_EPSILON);
+		
 
-		assertEquals(Math.atan2(StandardUnit.getPosition()[1] - NeighbourStandardUnit.getPosition()[1],
-				StandardUnit.getPosition()[0] - NeighbourStandardUnit.getPosition()[0]),
-				NeighbourStandardUnit.getOrientation(),Util.DEFAULT_EPSILON);
+		assertEquals(Math.atan2(Unit1InWorld.getPosition()[1] - NeighbourUnit1InWorld.getPosition()[1],
+				Unit1InWorld.getPosition()[0] - NeighbourUnit1InWorld.getPosition()[0]),
+				NeighbourUnit1InWorld.getOrientation(),Util.DEFAULT_EPSILON);
 //this test sometimes fails!
 	}
 	
@@ -903,12 +910,12 @@ public class TestSuitePart2Unit {
 	
 	@Test
 	public final void defend(){
-		NeighbourStandardUnit.defend(StandardUnit);
-		assertEquals((float)Math.atan2(StandardUnit.getPosition()[1] - NeighbourStandardUnit.getPosition()[1],
-				StandardUnit.getPosition()[0] - NeighbourStandardUnit.getPosition()[0]),
-				NeighbourStandardUnit.getOrientation(),Util.DEFAULT_EPSILON);
-		assertTrue((Util.fuzzyEquals(NeighbourStandardUnit.getHitpoints(), 25.0))||
-				(Util.fuzzyEquals(NeighbourStandardUnit.getHitpoints(), 25.0-StandardUnit.getStrength()/10.0)));
+		Unit1InWorld.defend(NeighbourUnit1InWorld);
+		assertEquals((float)Math.atan2(NeighbourUnit1InWorld.getPosition()[1] - Unit1InWorld.getPosition()[1],
+				NeighbourUnit1InWorld.getPosition()[0] - Unit1InWorld.getPosition()[0]),
+				Unit1InWorld.getOrientation(),Util.DEFAULT_EPSILON);
+		assertTrue((Util.fuzzyEquals(Unit1InWorld.getHitpoints(), 25.0))||
+				(Util.fuzzyEquals(Unit1InWorld.getHitpoints(), 25.0-NeighbourUnit1InWorld.getStrength()/10.0)));
 		
 	}
 	
@@ -973,7 +980,7 @@ public class TestSuitePart2Unit {
 		world2.addAsUnit(Unit1InWorld);
 		Unit1InWorld.startDefaultBehaviour();
 		assertTrue(Unit1InWorld.isEnableDefaultBehaviour());
-		assertTrue(Unit1InWorld.getStatus()==Status.IN_CENTER || Unit1InWorld.getStatus() == Status.INITIAL_RESTING ||Unit1InWorld.getStatus()==Status.WORKING);
+		assertTrue(Unit1InWorld.getStatus()==Status.MOVING || Unit1InWorld.getStatus() == Status.INITIAL_RESTING ||Unit1InWorld.getStatus()==Status.WORKING);
 	}
 	
 	@Test
@@ -983,7 +990,7 @@ public class TestSuitePart2Unit {
 		Assert.assertFalse(Unit1InWorld.getFaction() == NeighbourUnit1InWorld.getFaction());
 		Unit1InWorld.startDefaultBehaviour();
 		assertTrue(Unit1InWorld.isEnableDefaultBehaviour());
-		assertTrue(Unit1InWorld.getStatus()==Status.IN_CENTER || Unit1InWorld.getStatus() == Status.INITIAL_RESTING 
+		assertTrue(Unit1InWorld.getStatus()==Status.MOVING || Unit1InWorld.getStatus() == Status.INITIAL_RESTING 
 				||Unit1InWorld.getStatus()==Status.WORKING || Unit1InWorld.getStatus() == Status.ATTACKING);
 		
 	}
@@ -1028,14 +1035,17 @@ public class TestSuitePart2Unit {
 	
 	@Test
 	public final void getBoulder_NotNull(){
-		Boulder boulder1 = new Boulder(StandardUnit.getPosition());
-		StandardUnit.setBoulder(boulder1);
-		Assert.assertEquals(boulder1, StandardUnit.getBoulder());
+		world2.addAsBoulder(Boulder);
+		world2.addAsUnit(BUnit);
+		BUnit.setBoulder(Boulder);
+		Assert.assertEquals(Boulder, BUnit.getBoulder());
 	}
 	
 	@Test (expected = IllegalArgumentException.class)
 	public final void setBoulder_IllegalArgument() throws IllegalArgumentException{
-		StandardUnit.setBoulder(Boulder);
+		world2.addAsUnit(Unit1InWorld);
+		world3.addAsBoulder(Boulder);
+		Unit1InWorld.setBoulder(Boulder);
 	}
 	
 	@Test
@@ -1046,9 +1056,10 @@ public class TestSuitePart2Unit {
 	
 	@Test
 	public final void getNbBoulders_1(){
-		Boulder boulder1 = new Boulder(StandardUnit.getPosition());
-		StandardUnit.setBoulder(boulder1);
-		Assert.assertEquals(1, StandardUnit.getNbBoulders());
+		world2.addAsBoulder(Boulder);
+		world2.addAsUnit(BUnit);
+		BUnit.setBoulder(Boulder);
+		Assert.assertEquals(1, BUnit.getNbBoulders());
 	}
 	
 	@Test
@@ -1073,14 +1084,17 @@ public class TestSuitePart2Unit {
 	
 	@Test
 	public final void getLog_NotNull(){
-		Log log1 = new Log(StandardUnit.getPosition());
-		StandardUnit.setLog(log1);
-		Assert.assertEquals(log1, StandardUnit.getLog());
+		world2.addAsLog(Log);
+		world2.addAsUnit(Unit1InWorld);
+		Unit1InWorld.setLog(Log);
+		Assert.assertEquals(Log, Unit1InWorld.getLog());
 	}
 	
 	@Test (expected = IllegalArgumentException.class)
 	public final void setLog_IllegalArgument() throws IllegalArgumentException{
-		StandardUnit.setLog(Log);
+		world2.addAsUnit(Unit1InWorld);
+		world1.addAsLog(Log);
+		Unit1InWorld.setLog(Log);
 	}
 	
 	@Test
