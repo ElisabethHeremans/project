@@ -1,5 +1,5 @@
 package hillbillies.model.expression;
 
-public class NegationExpression extends UnaryExpression {
+public class NegationExpression extends BooleanBExpression {
 
 }

@@ -1,8 +1,8 @@
 package hillbillies.model.expression;
 
-public class BinaryExpression extends ComposedExpression {
+public class BinaryBExpression extends ComposedBExpression {
 	
-	public BinaryExpression(Expression right, Expression left){
+	public BinaryBExpression(Expression right, Expression left){
 		this.rightExp = right;
 		this.leftExp = left;
 				

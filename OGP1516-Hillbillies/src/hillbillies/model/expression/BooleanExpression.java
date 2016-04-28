@@ -1,5 +1,5 @@
 package hillbillies.model.expression;
 
-public class BooleanExpression extends BasicExpression {
+public class BooleanExpression extends Expression {
 
 }
