@@ -1709,7 +1709,9 @@ public class Unit {
 	 * 			| (!isNeighbouringCube(other.getCubePosition()))
 	 */
 	public void attack(Unit other) throws IllegalArgumentException {
-		if (!(isNeighbouringCube(other.getCubePosition()) || other.getCubeCoordinate() != this.getCubeCoordinate()))
+		if (!(isNeighbouringCube(other.getCubePosition()) || ((other.getCubeCoordinate()[0] == this.getCubeCoordinate()[0])
+				&&(other.getCubeCoordinate()[1] == this.getCubeCoordinate()[1]) 
+				&& (other.getCubeCoordinate()[2] == this.getCubeCoordinate()[2]))))
 			throw new IllegalArgumentException();
 		if( other.isTerminated || other.getFaction() == this.getFaction())
 			throw new IllegalArgumentException();

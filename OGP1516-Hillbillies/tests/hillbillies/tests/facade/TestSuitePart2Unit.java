@@ -41,6 +41,8 @@ public class TestSuitePart2Unit {
 	
 	private Unit Cunit;
 	
+	private Unit Dunit;
+	
 	private World world1;
 	
 	private World world2;
@@ -109,7 +111,8 @@ public class TestSuitePart2Unit {
 		BUnit = new Unit("Bunit",new double[] {0.5,1.5,1.5},75,25,25,75,false,25.0,25.0,Math.PI/2);
 		Boulder = new Boulder(new double[] {0.5,1.5,1.5});
 		Log = new Log(new double[] {0.5,1.5,1.5});
-		BUnit = new Unit("Bunit",new double[] {2.5,1.5,1.5},75,25,25,75,false,25.0,25.0,Math.PI/2);
+		Cunit = new Unit("Cunit",new double[] {2.5,1.5,1.5},75,25,25,75,false,25.0,25.0,Math.PI/2);
+		Dunit = new Unit("Dunit",new double[] {0.5,0.5,1.5},75,25,25,75,false,25.0,25.0,Math.PI/2);
 		
 	}
 	
@@ -851,9 +854,10 @@ public class TestSuitePart2Unit {
 	
 	@Test(expected = IllegalArgumentException.class)
 	public final void attack_IllegalArgument() throws IllegalArgumentException{
-		world2.addAsUnit(Cunit);
+		world2.addAsUnit(Dunit);
 		world2.addAsUnit(Unit1InWorld);
-		Unit1InWorld.attack(Cunit);
+		Assert.assertTrue(Dunit.getFaction()!=Unit1InWorld.getFaction());
+		Unit1InWorld.attack(Dunit);
 	}
 	
 //	@Test
@@ -906,12 +910,12 @@ public class TestSuitePart2Unit {
 	
 	@Test
 	public final void defend(){
-		NeighbourStandardUnit.defend(StandardUnit);
-		assertEquals((float)Math.atan2(StandardUnit.getPosition()[1] - NeighbourStandardUnit.getPosition()[1],
-				StandardUnit.getPosition()[0] - NeighbourStandardUnit.getPosition()[0]),
-				NeighbourStandardUnit.getOrientation(),Util.DEFAULT_EPSILON);
-		assertTrue((Util.fuzzyEquals(NeighbourStandardUnit.getHitpoints(), 25.0))||
-				(Util.fuzzyEquals(NeighbourStandardUnit.getHitpoints(), 25.0-StandardUnit.getStrength()/10.0)));
+		Unit1InWorld.defend(NeighbourUnit1InWorld);
+		assertEquals((float)Math.atan2(NeighbourUnit1InWorld.getPosition()[1] - Unit1InWorld.getPosition()[1],
+				NeighbourUnit1InWorld.getPosition()[0] - Unit1InWorld.getPosition()[0]),
+				Unit1InWorld.getOrientation(),Util.DEFAULT_EPSILON);
+		assertTrue((Util.fuzzyEquals(Unit1InWorld.getHitpoints(), 25.0))||
+				(Util.fuzzyEquals(Unit1InWorld.getHitpoints(), 25.0-NeighbourUnit1InWorld.getStrength()/10.0)));
 		
 	}
 	
