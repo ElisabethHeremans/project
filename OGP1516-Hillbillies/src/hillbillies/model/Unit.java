@@ -926,7 +926,7 @@ public class Unit {
 	 */
 	public boolean mustFall() {
 		//System.out.println(this.getCubeCoordinate()[2]);
-		if ( (this.getCubeCoordinate()[2]==0)){
+		if ( isTerminated()||(this.getCubeCoordinate()[2]==0)){
 			return false;
 		}
 		for (int[] cube: this.getWorld().getNeighboringCubes(this.getCubeCoordinate())){
@@ -2201,8 +2201,18 @@ public class Unit {
  	// Hier de voorwaarde dat de log in dezelfde cube als de unit moet zijn. Maakt de methode wel niet 
  	// meer static. 
  	public boolean isValidLog(Log log){
- 		return (log == null) ||(!log.isTerminated() && (log.getWorld() == this.getWorld()));
-
+ 		if (this.isTerminated()){
+			return (log == null);
+ 		}
+ 		else if (log == null)
+ 			return true;
+ 		else{
+ 			return (((log.getWorld()==this.getWorld()) && (!log.isTerminated()) &&
+ 					((log.getWorld().getCubePosition(log.getPosition())[0]==this.getWorld().getCubeCoordinate(this.getPosition())[0] 
+ 					&& log.getWorld().getCubePosition(log.getPosition())[1]==this.getWorld().getCubeCoordinate(this.getPosition())[1] 
+ 							&& log.getWorld().getCubePosition(log.getPosition())[2]==this.getWorld().getCubeCoordinate(this.getPosition())[2]) 
+ 				|| this.isNeighbouringCube(log.getPosition()))));
+ 		}
  	}
  	
 	/**
