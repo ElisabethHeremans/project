@@ -217,7 +217,7 @@ public class World {
 	 * @throws IllegalArgumentException
 	 * 			If the given position is not inside this world.
 	 */
-	protected boolean getPassable(int[] cubePosition) throws IllegalArgumentException {
+	public boolean getPassable(int[] cubePosition) throws IllegalArgumentException {
 		return this.getTerrain(cubePosition).isPassable();
 	}
 
@@ -838,7 +838,7 @@ public class World {
 	public void addAsBoulder(Boulder boulder) throws IllegalArgumentException{
 		if(! canHaveAsBoulder(boulder))
 			throw new IllegalArgumentException();
-		if( !(this.isCubeInWorld(boulder.getCubeCoordinate())) || !(this.getPassable(boulder.getCubeCoordinate())))
+		if( (!(this.isCubeInWorld(boulder.getCubeCoordinate()))) || (!(this.getPassable(boulder.getCubeCoordinate()))))
 			throw new IllegalArgumentException();
 		if( boulder.getWorld()!=null)
 			throw new IllegalArgumentException();
