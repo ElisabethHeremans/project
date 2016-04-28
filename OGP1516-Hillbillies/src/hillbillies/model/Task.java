@@ -162,6 +162,7 @@ public class Task {
 		if (!isValidActivities(activities))
 			throw new IllegalArgumentException();
 		this.activities = activities;
+		activities.setTask(this);
 	}
 
 	/**
@@ -174,11 +175,44 @@ public class Task {
 	}
 
 
-	void scheduleForUnit(Unit unit) {
-		scheduledUnit = unit;
-		
-	}
 	
+	/**
+	 * @return the scheduledUnit
+	 */
+	@Basic @Raw
+	public Unit getScheduledUnit() {
+		return scheduledUnit;
+	}
+
+
+	/**
+	 * @param scheduledUnit the scheduledUnit to set
+	 */
+	@Raw
+	public void setScheduledUnit(Unit scheduledUnit) {
+		this.scheduledUnit = scheduledUnit;
+	}
+
+
 	private Unit scheduledUnit;
+
+	/**
+	 * @return the executingUnit
+	 */
+	@Basic @Raw
+	public Unit getExecutingUnit() {
+		return executingUnit;
+	}
+
+
+	/**
+	 * @param executingUnit the executingUnit to set
+	 */
+	@Raw
+	public void setExecutingUnit(Unit executingUnit) {
+		this.executingUnit = executingUnit;
+	}
+
+	private Unit executingUnit;
 
 }

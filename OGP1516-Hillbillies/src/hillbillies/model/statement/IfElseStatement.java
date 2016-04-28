@@ -3,7 +3,7 @@ package hillbillies.model.statement;
 import hillbillies.model.expression.BooleanExpression;
 import hillbillies.model.expression.Expression;
 
-public class IfElseStatement extends ComposedStatement {
+public class IfElseStatement extends ComposedEStatement {
 	
 	public IfElseStatement(BooleanExpression condition, Statement ifBody, Statement elseBody){
 		setCondition(condition);

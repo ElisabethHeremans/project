@@ -2,7 +2,7 @@ package hillbillies.model.statement;
 
 import hillbillies.model.expression.Expression;
 
-public class WhileStatement extends ComposedStatement {
+public class WhileStatement extends ComposedEStatement {
 	
 	public WhileStatement( Expression conditie, Statement body){
 		setConditie(conditie);

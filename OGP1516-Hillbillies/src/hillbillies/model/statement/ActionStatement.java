@@ -2,7 +2,7 @@ package hillbillies.model.statement;
 
 import hillbillies.model.expression.Expression;
 
-public class ActionStatement extends BasicStatement {
+public class ActionStatement extends BasicEStatement {
 
 	public ActionStatement(Expression expression){
 		setExpression(expression);

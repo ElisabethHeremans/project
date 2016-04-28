@@ -150,11 +150,12 @@ public class Scheduler {
 		if (!hasAsTask(toReplace) || !canHaveAsTask(replacement))
 			throw new IllegalArgumentException();
 		else{
+			if (toReplace.getExecutingUnit()!=null){
+				toReplace.getExecutingUnit().setStatus(null);
+			}
 			addAsTask(replacement,getPriority(toReplace));
 			removeAsTask(toReplace);
 		}
-		
-		// if is being executed must first stop executing!!
 	}
 
 
@@ -210,7 +211,7 @@ public class Scheduler {
 		if (! this.hasAsTask(task))
 			throw new IllegalArgumentException();
 		else
-			task.scheduleForUnit(unit);
+			task.setScheduledUnit(unit);
 
 	}
 

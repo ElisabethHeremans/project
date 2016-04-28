@@ -1250,27 +1250,27 @@ public class Unit {
 		}	
 	}
 	
-	private void moveToNext1(){
-		if( queueContainsPos((LinkedList<int[]>) queue, this.getCubeCoordinate())){
-			int[] candidateNextArray = null;
-			for (int[] array: queue){
-				double[] nextPos = {(double)array[0], (double)array[1], (double)array[2]};
-				int n = array[3];
-				if (this.isNeighbouringCube(nextPos)){
-					if (candidateNextArray == null || candidateNextArray[3]> n){
-						System.out.print("candidate " + Arrays.toString(candidateNextArray));
-						candidateNextArray = array;
-
-					}
-				}
-			}
-			//System.out.println("move to adjacent");
-			//System.out.print(Arrays.toString(candidateNextArray));
-			moveToAdjacent(candidateNextArray[0]-this.getCubeCoordinate()[0],
-					candidateNextArray[1]-this.getCubeCoordinate()[1],candidateNextArray[2]-this.getCubeCoordinate()[2]);
-		}
-
-	}
+//	private void moveToNext1(){
+//		if( queueContainsPos((LinkedList<int[]>) queue, this.getCubeCoordinate())){
+//			int[] candidateNextArray = null;
+//			for (int[] array: queue){
+//				double[] nextPos = {(double)array[0], (double)array[1], (double)array[2]};
+//				int n = array[3];
+//				if (this.isNeighbouringCube(nextPos)){
+//					if (candidateNextArray == null || candidateNextArray[3]> n){
+//						System.out.print("candidate " + Arrays.toString(candidateNextArray));
+//						candidateNextArray = array;
+//
+//					}
+//				}
+//			}
+//			//System.out.println("move to adjacent");
+//			//System.out.print(Arrays.toString(candidateNextArray));
+//			moveToAdjacent(candidateNextArray[0]-this.getCubeCoordinate()[0],
+//					candidateNextArray[1]-this.getCubeCoordinate()[1],candidateNextArray[2]-this.getCubeCoordinate()[2]);
+//		}
+//
+//	}
 	
 	public boolean queueContainsPos(LinkedList<int[]> queue, int[] position){
 		for(int[] queueArray: queue){
