@@ -19,16 +19,16 @@ public class BinaryBExpression extends ComposedBExpression {
 	private Expression rightExp;
 	private Expression leftExp;
 	
-	public isValidExpression(Expression expression){
-		if (this.leftExp instanceof PositionExpression)
-			return this.rightExp instanceof PositionExpression;
-		if (this.leftExp instanceof UnitExpression)
-			return this.rightExp instanceof UnitExpression;
-		if (this.leftExp instanceof BooleanExpression)
-			return this.rightExp instanceof BooleanExpression;
-		if (this.leftExp instanceof VariableExpression)
-			return this.rightExp instanceof VariableExpression;
-		//?
-					
-	}
+//	public isValidExpression(Expression expression){
+//		if (this.leftExp instanceof PositionExpression)
+//			return this.rightExp instanceof PositionExpression;
+//		if (this.leftExp instanceof UnitExpression)
+//			return this.rightExp instanceof UnitExpression;
+//		if (this.leftExp instanceof BooleanExpression)
+//			return this.rightExp instanceof BooleanExpression;
+//		if (this.leftExp instanceof VariableExpression)
+//			return this.rightExp instanceof VariableExpression;
+//		//?
+//					
+//	}
 }
