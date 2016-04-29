@@ -606,9 +606,7 @@ public class Unit {
 	 */
 	public boolean canHaveAsPosition(double[] position) {
 		if (this.getWorld()!= null){
-		System.out.println("canHaveAsPosition");
-		System.out.println(getWorld().isCubeInWorld(this.getWorld().getCubeCoordinate(position)));
-		return (getWorld().isCubeInWorld(this.getWorld().getCubeCoordinate(position)) 
+			return (getWorld().isCubeInWorld(this.getWorld().getCubeCoordinate(position)) 
 				&& getWorld().getPassable(this.getWorld().getCubeCoordinate(position)));
 		}
 		else
