@@ -1,28 +1,25 @@
 package hillbillies.model.statement;
 
+import be.kuleuven.cs.som.annotate.*;
 import hillbillies.model.expression.Expression;
+import hillbillies.model.expression.VariableExpression;
 
 public class AssignmentStatement extends BasicEStatement {
-	public AssignmentStatement(String name , Expression expression){
-		setName(name);
+	public AssignmentStatement(VariableExpression variable , Expression expression){
 		setExpression(expression);
+		setVariable(variable);
 	}
-
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
+	@Basic @Raw
+	public VariableExpression getVariable() {
+		return variable;
 	}
 	
-	private String name;
-
-	public Expression getExpression() {
-		return expression;
-	}
-	public void setExpression(Expression expression) {
-		this.expression = expression;
+	@Raw
+	public void setVariable(VariableExpression name) {
+		this.variable = name;
 	}
 	
-	private Expression expression;
+	private VariableExpression variable;
+
+	
 }

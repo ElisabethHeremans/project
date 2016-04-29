@@ -1,5 +1,7 @@
 package hillbillies.model.statement;
 
-public class BasicStatement extends Statement {
-
+public abstract class BasicStatement extends Statement {
+	public BasicStatement(){
+		
+	}
 }
