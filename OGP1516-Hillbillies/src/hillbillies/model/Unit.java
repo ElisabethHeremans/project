@@ -606,6 +606,8 @@ public class Unit {
 	 */
 	public boolean canHaveAsPosition(double[] position) {
 		if (this.getWorld()!= null){
+		System.out.println("canHaveAsPosition");
+		System.out.println(getWorld().isCubeInWorld(this.getWorld().getCubeCoordinate(position)));
 		return (getWorld().isCubeInWorld(this.getWorld().getCubeCoordinate(position)) 
 				&& getWorld().getPassable(this.getWorld().getCubeCoordinate(position)));
 		}
@@ -1206,6 +1208,9 @@ public class Unit {
 			throw new IllegalArgumentException();
 			
 		}
+		if (!this.getWorld().isNeighboringSolidTerrain(this.getWorld().getCubeCoordinate(targetPosition))){
+			throw new IllegalArgumentException();
+		}
 		if (canMove()) {
 			this.targetPosition = targetPosition;
 			setStatus(Status.IN_CENTER);
@@ -1244,7 +1249,8 @@ public class Unit {
 				//System.out.println("move to adjacent");
 				//System.out.print(Arrays.toString(candidateNextArray));
 				moveToAdjacent(candidateNextArray[0]-this.getCubeCoordinate()[0],
-						candidateNextArray[1]-this.getCubeCoordinate()[1],candidateNextArray[2]-this.getCubeCoordinate()[2]);
+						candidateNextArray[1]-this.getCubeCoordinate()[1],
+						candidateNextArray[2]-this.getCubeCoordinate()[2]);
 			}
 			}
 		}	
@@ -1977,7 +1983,7 @@ public class Unit {
 	public void startDefaultBehaviour() {
 		if (this.getStatus() == Status.DONE) {
 			setEnableDefaultBehaviour(true);
-			Set<Unit> potentialEnemies = new HashSet<>();
+			List<Unit> potentialEnemies = new ArrayList<>();
 			List<int[]> potEnemyPos = this.getWorld().getNeighboringCubes(this.getCubeCoordinate());
 			potEnemyPos.add(this.getCubeCoordinate());		
 			for (int[] neighbouringCube: potEnemyPos)
@@ -1988,6 +1994,7 @@ public class Unit {
 			int i = 0;
 			if (! (potentialEnemies.size()==0)){
 				i = new Random().nextInt(5);
+
 			}
 			else{
 				i = new Random().nextInt(4);
@@ -1995,9 +2002,10 @@ public class Unit {
 			if (i == 0) {
 				setStatus(Status.IN_CENTER);
 				try {
-					moveTo1(new double[] { (new Random().nextDouble()) * this.getWorld().getxDimension(), 
-						(new Random().nextDouble()) * this.getWorld().getyDimension(),
-						(new Random().nextDouble()) * this.getWorld().getzDimension() });
+					double[] pos = new double[] { (new Random().nextDouble()) * this.getWorld().getxDimension(), 
+							(new Random().nextDouble()) * this.getWorld().getyDimension(),
+							(new Random().nextDouble()) * this.getWorld().getzDimension() };
+					moveTo1(pos);
 						startSprinting();
 				}
 				catch (IllegalArgumentException exc){
@@ -2007,10 +2015,11 @@ public class Unit {
 			if (i == 1) {
 				setStatus(Status.IN_CENTER);
 				try {
-					moveTo1(new double[] { (new Random().nextDouble()) * this.getWorld().getxDimension(), 
-						(new Random().nextDouble()) * this.getWorld().getyDimension(),
-						(new Random().nextDouble()) * this.getWorld().getzDimension() });
-						stopSprinting();
+					double[] pos = new double[] { (new Random().nextDouble()) * this.getWorld().getxDimension(), 
+							(new Random().nextDouble()) * this.getWorld().getyDimension(),
+							(new Random().nextDouble()) * this.getWorld().getzDimension() };
+					moveTo1(pos);
+					stopSprinting();
 				}
 				catch (IllegalArgumentException exc){
 					startDefaultBehaviour();
@@ -2028,7 +2037,10 @@ public class Unit {
 				rest();
 			}
 			if (i==4){
-				attack(potentialEnemies.iterator().next());
+				System.out.println(potentialEnemies);
+				int index = new Random().nextInt(potentialEnemies.size());
+				System.out.println(index);
+				attack(potentialEnemies.get(index));
 			}
 				
 		} else
