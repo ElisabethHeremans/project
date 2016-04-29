@@ -4,14 +4,8 @@ import be.kuleuven.cs.som.annotate.*;
 import hillbillies.model.Task;
 import hillbillies.model.expression.Expression;
 
-public class Statement {
-	
-	public boolean hasExpression(Expression e){
-		if (this.toString().contains(e.toString()))
-			return true;
-		return false;
-	}
-	
+public abstract class Statement {
+		
 	public void setTask(@Raw Task task){
 		if (task.getActivities() == this)
 			this.task = task;

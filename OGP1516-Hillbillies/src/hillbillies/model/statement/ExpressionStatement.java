@@ -3,9 +3,11 @@ package hillbillies.model.statement;
 import be.kuleuven.cs.som.annotate.*;
 import hillbillies.model.expression.Expression;
 
-public class ExpressionStatement extends Statement {
-	public ExpressionStatement(Expression e){
-		setExpression(e);
+public abstract class ExpressionStatement extends Statement {
+	
+	
+	public ExpressionStatement(){
+		//setExpression(e);
 	}
 	
 	/**
@@ -23,6 +25,8 @@ public class ExpressionStatement extends Statement {
 	public final void setExpression(Expression expression) {
 		this.expression = expression;
 	}
+	
+	//public abstract boolean isValidExpression(Expression e);
 
 	private Expression expression;
 }

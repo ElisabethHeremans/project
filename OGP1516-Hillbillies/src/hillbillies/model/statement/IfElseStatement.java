@@ -5,33 +5,39 @@ import hillbillies.model.expression.Expression;
 
 public class IfElseStatement extends ComposedEStatement {
 	
-	public IfElseStatement(BooleanExpression condition, Statement ifBody, Statement elseBody){
-		setCondition(condition);
-		setIfBody(ifBody);
+	public IfElseStatement(BooleanExpression condition, Statement thenBody, Statement elseBody){
+		setExpression(condition);
+		setStatement(thenBody);
 		setElseBody(elseBody);
 	}
 	
-	public BooleanExpression getCondition() {
-		return condition;
+	public IfElseStatement(BooleanExpression condition, Statement thenBody){
+		this(condition, thenBody, new BreakStatement());
 	}
-	public void setCondition(BooleanExpression condition) {
-		this.condition = condition;
+	
+	public Expression getCondition() {
+		return getExpression();
 	}
-	public Statement getIfBody() {
-		return ifBody;
+	//mag je casten naar een boolean? en dan BooleanExpression teruggeven?
+	
+//	public void setCondition(BooleanExpression condition) {
+//		this.condition = condition;
+//	}
+	public Statement getThenBody() {
+		return getStatement();
 	}
-	public void setIfBody(Statement ifBody) {
-		this.ifBody = ifBody;
-	}
+//	public void setIfBody(Statement ifBody) {
+//		this.ifBody = ifBody;
+//	}
 	public Statement getElseBody() {
 		return elseBody;
 	}
 	public void setElseBody(Statement elseBody) {
 		this.elseBody = elseBody;
 	}
-
-	private BooleanExpression condition;
-	private Statement ifBody;
+//
+//	private BooleanExpression condition;
+//	private Statement ifBody;
 	private Statement elseBody;
 
 }

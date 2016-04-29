@@ -1,5 +1,12 @@
 package hillbillies.model.statement;
 
-public class BasicEStatement extends ExpressionStatement {
+import hillbillies.model.expression.Expression;
+
+public abstract class BasicEStatement extends ExpressionStatement {
+
+	public BasicEStatement() {
+	}
+	
+	
 
 }
