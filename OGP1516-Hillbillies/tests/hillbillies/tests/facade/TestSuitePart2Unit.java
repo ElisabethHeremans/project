@@ -578,26 +578,26 @@ public class TestSuitePart2Unit {
 		Assert.assertEquals(Status.DONE, Unit1InWorld.getStatus());
 	}
 	
-//	@Test
-//	public final void advanceTime_InterruptedMovement(){
-//		world2.addAsUnit(Unit1InWorld);
-//		Unit1InWorld.moveTo1(new int[] {0,0,2});
-//		Unit1InWorld.setStatus(Status.DONE);
-//		advanceTimeFor(Unit1InWorld,20.0,0.1);
-//		assertIntegerPositionEquals(0,0,2,Unit1InWorld.getCubeCoordinate());
-//	}
+	@Test
+	public final void advanceTime_InterruptedMovement(){
+		world2.addAsUnit(Unit1InWorld);
+		Unit1InWorld.moveTo1(new int[] {0,0,2});
+		Unit1InWorld.setStatus(Status.DONE);
+		advanceTimeFor(Unit1InWorld,20.0,0.1);
+		assertIntegerPositionEquals(0,0,2,Unit1InWorld.getCubeCoordinate());
+	}
 	
-//	@Test
-//	public final void advanceTime_ActivateDefaultBehaviourNoEnemies(){
-//		world1.addAsUnit(Unit1InWorld);
-//		Unit1InWorld.setStatus(Status.DONE);
-//		Unit1InWorld.startDefaultBehaviour();
-//		Unit1InWorld.advanceTime((float)0.05);
-//		System.out.println(Unit1InWorld.getStatus());
-//		assertTrue(Unit1InWorld.getStatus()== Status.INITIAL_RESTING||Unit1InWorld.getStatus()==Status.MOVING||Unit1InWorld.getStatus()==Status.WORKING);
-//
-//	}
-//	
+	@Test
+	public final void advanceTime_ActivateDefaultBehaviourNoEnemies(){
+		world1.addAsUnit(Unit1InWorld);
+		Unit1InWorld.setStatus(Status.DONE);
+		Unit1InWorld.startDefaultBehaviour();
+		Unit1InWorld.advanceTime((float)0.05);
+		System.out.println(Unit1InWorld.getStatus());
+		assertTrue(Unit1InWorld.getStatus()== Status.INITIAL_RESTING||Unit1InWorld.getStatus()==Status.MOVING||Unit1InWorld.getStatus()==Status.WORKING||Unit1InWorld.getStatus() == Status.IN_CENTER);
+
+	}
+	
 //	@Test
 //	public final void search(){
 //		world2.addAsUnit(Unit1InWorld);
@@ -605,49 +605,48 @@ public class TestSuitePart2Unit {
 //				(int) Unit1InWorld.getPosition()[2], (int) 0};
 //		Assert.assertEquals(4, Unit1InWorld.search(array).size());
 //	}
-//	
-//	@Test
-//	public final void advanceTime_MovingToNextCube(){
-//		Unit1InWorld.moveTo1(new int[]{0,2,2});
-//		double speed = Unit1InWorld.getCurrentSpeed();
-//		double time = 1.0 / speed;
-//		Unit1InWorld.advanceTime((float) 0.1);
-//		assertDoublePositionEquals(1.5-speed*0.1,2.5,2.5,Unit1InWorld.getPosition());
-//		assertEquals(0.0, Unit1InWorld.getOrientation(),Util.DEFAULT_EPSILON);
-//		advanceTimeFor(Unit1InWorld,time-0.1,0.1);
-//		Assert.assertArrayEquals(new double[] {0.5,2.5,2.5}, Unit1InWorld.getPosition(), Util.DEFAULT_EPSILON);
-//		Assert.assertEquals(Status.DONE, Unit1InWorld.getStatus());
-//		
-//	}
-//	
-//	@Test
-//	public final void advanceTime_Sprinting(){
-//		StandardUnit.moveTo1(new int[]{4,1,4});
-//		StandardUnit.startSprinting();
-//		double speed = StandardUnit.getCurrentSpeed();
-//		double time = 1.0 / speed;
-//		StandardUnit.advanceTime((float) 0.1);
-//		assertDoublePositionEquals(3.5+speed*0.1,1.5,4.5,StandardUnit.getPosition());
-//		assertEquals(0.0, StandardUnit.getOrientation(),Util.DEFAULT_EPSILON);
-//		advanceTimeFor(StandardUnit,time-0.1,0.1);
-//		Assert.assertArrayEquals(new double[] {4.5,1.5,4.5}, StandardUnit.getPosition(), Util.DEFAULT_EPSILON);
-//		Assert.assertEquals(Status.DONE, StandardUnit.getStatus());
-//		Assert.assertEquals(25.0-10.0*time,StandardUnit.getStaminaPoints(),Util.DEFAULT_EPSILON);
-//	}
-//
-//	@Test
-//	public final void advanceTime_MovingTwoCubes(){
-//		StandardUnit.moveTo1(new int[]{5,1,4});
-//		double speed = StandardUnit.getCurrentSpeed();
-//		double time = 1.0 / speed;
-//		StandardUnit.advanceTime((float) 0.1);
-//		assertDoublePositionEquals(3.5+speed*0.1,1.5,4.5,StandardUnit.getPosition());
-//		assertEquals(0.0, StandardUnit.getOrientation(),Util.DEFAULT_EPSILON);
-//		advanceTimeFor(StandardUnit,time-0.1,0.1);
-//		Assert.assertArrayEquals(new double[] {4.5,1.5,4.5}, StandardUnit.getPosition(), Util.DEFAULT_EPSILON);
-//		Assert.assertEquals(Status.MOVING, StandardUnit.getStatus());
-//	}
-//	
+	
+	@Test
+	public final void advanceTime_MovingToNextCube(){
+		world2.addAsUnit(Unit1InWorld);
+		Unit1InWorld.moveTo1(new int[]{0,2,2});
+		double speed = Unit1InWorld.getCurrentSpeed();
+		double time = 1.0 / speed;
+		Unit1InWorld.advanceTime((float) 0.1);
+		assertDoublePositionEquals(1.5-speed*0.1,2.5,2.5,Unit1InWorld.getPosition());
+		advanceTimeFor(Unit1InWorld,time-0.1,0.1);
+		Assert.assertArrayEquals(new double[] {0.5,2.5,2.5}, Unit1InWorld.getPosition(), Util.DEFAULT_EPSILON);
+		Assert.assertEquals(Status.DONE, Unit1InWorld.getStatus());
+		
+	}
+	
+	@Test
+	public final void advanceTime_Sprinting(){
+		world2.addAsUnit(Unit1InWorld);
+		Unit1InWorld.moveTo1(new int[]{0,2,2});
+		Unit1InWorld.startSprinting();
+		double speed = Unit1InWorld.getCurrentSpeed();
+		double time = 1.0 / speed;
+		advanceTimeFor(Unit1InWorld,time,0.1);
+		Assert.assertArrayEquals(new double[] {0.5,2.5,2.5}, Unit1InWorld.getPosition(), Util.DEFAULT_EPSILON);
+		Assert.assertEquals(Status.DONE, Unit1InWorld.getStatus());
+		Assert.assertEquals(25.0-10.0*time,Unit1InWorld.getStaminaPoints(),Util.DEFAULT_EPSILON);
+	}
+
+	@Test
+	public final void advanceTime_MovingTwoCubes(){
+		world2.addAsUnit(Unit1InWorld);
+		Unit1InWorld.moveTo1(new int[]{0,1,2});
+		double speed = Unit1InWorld.getCurrentSpeed();
+		double time = 1.0 / speed;
+		Unit1InWorld.advanceTime((float) 0.1);
+		assertArrayEquals(new double[] {1.5,1.5+speed*0.1,2.5},Unit1InWorld.getPosition(),Util.DEFAULT_EPSILON);
+		//assertEquals(0.0, StandardUnit.getOrientation(),Util.DEFAULT_EPSILON);
+		advanceTimeFor(Unit1InWorld,time-0.1,0.1);
+		Assert.assertArrayEquals(new double[] {0.5,1.5,2.5}, Unit1InWorld.getPosition(), Util.DEFAULT_EPSILON);
+		Assert.assertEquals(Status.MOVING, Unit1InWorld.getStatus());
+	}
+	
 	@Test
 	public final void advanceTime_Working(){
 		world2.addAsUnit(Unit1InWorld);
@@ -657,16 +656,16 @@ public class TestSuitePart2Unit {
 		assertEquals(StandardUnit.getStatus(),Status.DONE);
 	}
 	
-//	@Test
-//	public final void advanceTime_InitialResting(){
-//		world2.addAsUnit(Unit1InWorld);
-//		Unit1InWorld.rest();
-//		Unit1InWorld.advanceTime((float) 0.1);
-//		Unit1InWorld.work(new int[] {0,2,2});
-//		assertEquals((25+Unit1InWorld.getToughness()/200.0)*5*0.1,Unit1InWorld.getHitpoints(),Util.DEFAULT_EPSILON);
-//		assertEquals(Status.INITIAL_RESTING,Unit1InWorld.getStatus());
-//		
-//	}
+	@Test
+	public final void advanceTime_InitialResting(){
+		world2.addAsUnit(Unit1InWorld);
+		Unit1InWorld.rest();
+		Unit1InWorld.advanceTime((float) 0.1);
+		Unit1InWorld.work(new int[] {0,2,2});
+		assertEquals((25+(Unit1InWorld.getToughness()/200.0)*5*0.1),Unit1InWorld.getHitpoints(),Util.DEFAULT_EPSILON);
+		assertEquals(Status.INITIAL_RESTING,Unit1InWorld.getStatus());
+	
+	}
 	
 	@Test
 	public final void advanceTime_InitialRestingToResting(){
@@ -743,6 +742,12 @@ public class TestSuitePart2Unit {
 		Unit1InWorld.moveTo1(new double[] {1.5,0.5,1.5});
 	}
 	
+	@Test(expected = IllegalArgumentException.class)
+	public final void moveTo_IllegalArgumentUnreachable() throws IllegalArgumentException{
+		world1.addAsUnit(Unit1InWorld);
+		Unit1InWorld.moveTo1(new double[] {3.5,3.5,3.5});
+	}
+	
 	@Test
 	public final void moveTo_CannotMove(){
 		world1.addAsUnit(Unit1InWorld);
@@ -787,17 +792,28 @@ public class TestSuitePart2Unit {
 //		double speed = Bunit.getCurrentSpeed();
 //		System.out.println(speed);
 		advanceTimeFor(BUnit,30.0,0.1);
-		System.out.print(BUnit.getStatus());
-		System.out.println(Arrays.toString(BUnit.getPosition()));
+//		System.out.print(BUnit.getStatus());
+//		System.out.println(Arrays.toString(BUnit.getPosition()));
 		assertDoublePositionEquals(0.5,1.5,1.5, BUnit.getPosition());
 	}
 	
-//	@Test
-//	public final void moveTo_IntegerPosition(){
-//		StandardUnit.moveTo1(new int[] {10,1,4});
-//		advanceTimeFor(StandardUnit,14.0,0.1);
-//		assertDoublePositionEquals(10.5,1.5,4.5, StandardUnit.getPosition());
-//	}
+	@Test
+	public final void moveTo_Path(){
+		world1.addAsUnit(BUnit);
+		BUnit.moveTo1(new int[] {2,0,2});
+		advanceTimeFor(BUnit,30.0,0.1);
+		assertDoublePositionEquals(2.5,0.5,2.5, BUnit.getPosition());
+	}
+	
+	@Test
+	public final void moveTo_Here(){
+		world1.addAsUnit(BUnit);
+		BUnit.moveTo1(BUnit.getPosition());
+		advanceTimeFor(BUnit,30.0,0.1);
+		assertDoublePositionEquals(0.5,1.5,1.5, BUnit.getPosition());
+		
+	}
+
 	
 	@Test
 	public final void canMove_TrueCase(){
@@ -860,14 +876,14 @@ public class TestSuitePart2Unit {
 		Unit1InWorld.attack(Dunit);
 	}
 	
-//	@Test
-//	public final void attack_CannotAttackStatus(){
-//		Faction1.addAsUnit(StandardUnit);
-//		Faction2.addAsUnit(NeighbourStandardUnit);
-//		StandardUnit.setStatus(Status.MOVING);
-//		StandardUnit.attack(NeighbourStandardUnit);
-//		assertEquals(Status.MOVING,StandardUnit.getStatus());
-//	}
+	@Test
+	public final void attack_CannotAttackStatus(){
+		world2.addAsUnit(Unit1InWorld);
+		world2.addAsUnit(NeighbourUnit1InWorld);
+		Unit1InWorld.setStatus(Status.MOVING);
+		Unit1InWorld.attack(NeighbourUnit1InWorld);
+		assertEquals(Status.MOVING,Unit1InWorld.getStatus());
+	}
 	
 	@Test (expected = IllegalArgumentException.class)
 	public final void attack_CannotAttackFaction() throws IllegalArgumentException{
@@ -881,10 +897,12 @@ public class TestSuitePart2Unit {
 		world2.addAsUnit(NeighbourUnit1InWorld);
 		Unit1InWorld.attack(NeighbourUnit1InWorld);
 		assertEquals(Status.ATTACKING,Unit1InWorld.getStatus());
-		assertEquals(2 * Math.PI + Math.atan2(NeighbourUnit1InWorld.getPosition()[1] - Unit1InWorld.getPosition()[1],
-		NeighbourUnit1InWorld.getPosition()[0] - Unit1InWorld.getPosition()[0]) % (2 * Math.PI),
-		Unit1InWorld.getOrientation(),Util.DEFAULT_EPSILON);
-		
+//		assertEquals(2 * Math.PI + Math.atan2(NeighbourUnit1InWorld.getPosition()[1] - Unit1InWorld.getPosition()[1],
+//		NeighbourUnit1InWorld.getPosition()[0] - Unit1InWorld.getPosition()[0]) % (2 * Math.PI),
+//		Unit1InWorld.getOrientation(),Util.DEFAULT_EPSILON);
+		assertEquals( Math.atan2(NeighbourUnit1InWorld.getPosition()[1] - Unit1InWorld.getPosition()[1],
+				NeighbourUnit1InWorld.getPosition()[0] - Unit1InWorld.getPosition()[0]) % (2 * Math.PI),
+				Unit1InWorld.getOrientation(),Util.DEFAULT_EPSILON);
 
 		assertEquals(Math.atan2(Unit1InWorld.getPosition()[1] - NeighbourUnit1InWorld.getPosition()[1],
 				Unit1InWorld.getPosition()[0] - NeighbourUnit1InWorld.getPosition()[0]),
@@ -978,9 +996,12 @@ public class TestSuitePart2Unit {
 	@Test
 	public final void startDefaultBehaviour_EffectiveNoEnemies(){
 		world2.addAsUnit(Unit1InWorld);
+		Unit1InWorld.setStatus(Status.DONE);
 		Unit1InWorld.startDefaultBehaviour();
+		System.out.println("DefaultBehaviour");
+		System.out.println(Unit1InWorld.getStatus());
 		assertTrue(Unit1InWorld.isEnableDefaultBehaviour());
-		assertTrue(Unit1InWorld.getStatus()==Status.MOVING || Unit1InWorld.getStatus() == Status.INITIAL_RESTING ||Unit1InWorld.getStatus()==Status.WORKING);
+		assertTrue(Unit1InWorld.getStatus()==Status.MOVING || Unit1InWorld.getStatus() == Status.INITIAL_RESTING ||Unit1InWorld.getStatus()==Status.WORKING || Unit1InWorld.getStatus()== Status.IN_CENTER);
 	}
 	
 	@Test
@@ -989,6 +1010,8 @@ public class TestSuitePart2Unit {
 		world2.addAsUnit(NeighbourUnit1InWorld);
 		Assert.assertFalse(Unit1InWorld.getFaction() == NeighbourUnit1InWorld.getFaction());
 		Unit1InWorld.startDefaultBehaviour();
+		System.out.println("DefaultBehaviourEnemies");
+		System.out.println(Unit1InWorld.getStatus());
 		assertTrue(Unit1InWorld.isEnableDefaultBehaviour());
 		assertTrue(Unit1InWorld.getStatus()==Status.MOVING || Unit1InWorld.getStatus() == Status.INITIAL_RESTING 
 				||Unit1InWorld.getStatus()==Status.WORKING || Unit1InWorld.getStatus() == Status.ATTACKING);
