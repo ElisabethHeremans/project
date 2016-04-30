@@ -690,7 +690,7 @@ public class Unit {
 	 * 			and the difference between the respective x,y and z coordinates are not all 0.
 	 * 			| result == isNeighbouringCube(new double[] {(double)cubePosition[0],(double)cubePosition[1],(double)cubePosition[2]})
 	 */
-	private boolean isNeighbouringCube(int[] cubePosition){
+	public boolean isNeighbouringCube(int[] cubePosition){
 		int[] unitpos = this.getWorld().getCubeCoordinate(this.getPosition());
 		return (Math.abs(cubePosition[0]- unitpos[0])<=1
 				&&Math.abs(cubePosition[1]- unitpos[1])<=1

@@ -3,10 +3,10 @@ package hillbillies.model.expression;
 import hillbillies.model.Unit;
 
 public class PositionOfExpression extends ComposedPExpression {
-	public PositionOfExpression(PositionExpression position){
-		setExpression(position);
-		setValue(getPositionOfPosition());
-	}
+//	public PositionOfExpression(PositionExpression position){
+//		setExpression(position);
+//		setValue(getPositionOfPosition());
+//	}
 	
 	public PositionOfExpression(UnitExpression unit){
 		setExpression(unit);
@@ -19,8 +19,8 @@ public class PositionOfExpression extends ComposedPExpression {
 				getWorld().getCubeCoordinate(((Unit) getExpression().getValue()).getPosition()) ;
 	}
 
-	private int[] getPositionOfPosition() {
-		return (int[]) getExpression().getValue();
-	}
+//	private int[] getPositionOfPosition() {
+//		return (int[]) getExpression().getValue();
+//	}
 
 }

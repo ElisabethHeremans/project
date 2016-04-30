@@ -1,10 +1,22 @@
 package hillbillies.model.expression;
 
 public class BasicVExpression extends VariableExpression {
-	public BasicVExpression(Object variable){
+	public BasicVExpression(String variableName){
+		setName(variableName);
 		//setValue in AssignmentStatement gedaan
 		//?? setVariable(variable);
 	}
+
+	private void setName(String variableName) {
+		this.name = variableName;
+		
+	}
+	
+	public String getName(){
+		return name;
+	}
+	
+	private String name;
 	
 //??? is x een object of gewoon niets?	
 	

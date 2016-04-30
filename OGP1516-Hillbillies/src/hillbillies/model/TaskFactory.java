@@ -10,7 +10,7 @@ import hillbillies.part3.programs.SourceLocation;
 
 public class TaskFactory implements ITaskFactory<Expression, Statement, Task> {
 
-	public TaskFactory(Expression,Statement,Task){
+	public TaskFactory(Expression e,Statement s,Task t){
 		
 	}
 	
@@ -38,12 +38,12 @@ public class TaskFactory implements ITaskFactory<Expression, Statement, Task> {
 
 	@Override
 	public Statement createWhile(Expression condition, Statement body, SourceLocation sourceLocation) {
-		return new WhileStatement(condition, body);
+		return new WhileStatement((BooleanExpression)condition, body);
 	}
 
 	@Override
 	public Statement createIf(Expression condition, Statement ifBody, Statement elseBody, SourceLocation sourceLocation) {
-		return new IfElseStatement(condition, ifBody, elseBody);
+		return new IfElseStatement((BooleanExpression) condition, ifBody, elseBody);
 	}
 
 	@Override
@@ -53,7 +53,7 @@ public class TaskFactory implements ITaskFactory<Expression, Statement, Task> {
 
 	@Override
 	public Statement createPrint(Expression value, SourceLocation sourceLocation) {
-		return new PrintStatement();
+		return new PrintStatement(value);
 	}
 
 	@Override
@@ -63,22 +63,22 @@ public class TaskFactory implements ITaskFactory<Expression, Statement, Task> {
 
 	@Override
 	public Statement createMoveTo(Expression position, SourceLocation sourceLocation) {
-		return new MoveToStatement(position);
+		return new MoveToStatement((PositionExpression) position);
 	}
 
 	@Override
 	public Statement createWork(Expression position, SourceLocation sourceLocation) {
-		return new WorkStatement(position);
+		return new WorkStatement((PositionExpression) position);
 	}
 
 	@Override
 	public Statement createFollow(Expression unit, SourceLocation sourceLocation) {
-		return new FollowStatement(unit);
+		return new FollowStatement((UnitExpression) unit);
 	}
 
 	@Override
 	public Statement createAttack(Expression unit, SourceLocation sourceLocation) {
-		return new AttackStatement(unit);
+		return new AttackStatement((UnitExpression) unit);
 	}
 
 	@Override
@@ -88,47 +88,47 @@ public class TaskFactory implements ITaskFactory<Expression, Statement, Task> {
 
 	@Override
 	public Expression createIsSolid(Expression position, SourceLocation sourceLocation) {
-		return new IsSolidExpression(position);
+		return new IsSolidExpression((PositionExpression) position);
 	}
 
 	@Override
 	public Expression createIsPassable(Expression position, SourceLocation sourceLocation) {
-		return new IsPassableExpression(position);
+		return new IsPassableExpression((PositionExpression) position);
 	}
 
 	@Override
 	public Expression createIsFriend(Expression unit, SourceLocation sourceLocation) {
-		return new IsFriendExpression(unit);
+		return new IsFriendExpression((UnitExpression) unit);
 	}
 
 	@Override
 	public Expression createIsEnemy(Expression unit, SourceLocation sourceLocation) {
-		return new IsEnemyExpression(unit);
+		return new IsEnemyExpression((UnitExpression) unit);
 	}
 
 	@Override
 	public Expression createIsAlive(Expression unit, SourceLocation sourceLocation) {
-		return new IsAliveExpression(unit);
+		return new IsAliveExpression((UnitExpression) unit);
 	}
 
 	@Override
 	public Expression createCarriesItem(Expression unit, SourceLocation sourceLocation) {
-		return new CarriesItemExpression(unit);
+		return new CarriesItemExpression((UnitExpression) unit);
 	}
 
 	@Override
 	public Expression createNot(Expression expression, SourceLocation sourceLocation) {
-		return new NegationExpression(expression);
+		return new NegationExpression((BooleanExpression) expression);
 	}
 
 	@Override
 	public Expression createAnd(Expression left, Expression right, SourceLocation sourceLocation) {
-		return new AndExpression(left, right);
+		return new AndExpression((BooleanExpression)left, (BooleanExpression)right);
 	}
 
 	@Override
 	public Expression createOr(Expression left, Expression right, SourceLocation sourceLocation) {
-		return new OrExpression(left, right);
+		return new OrExpression((BooleanExpression)left, (BooleanExpression)right);
 	}
 
 	@Override
@@ -158,7 +158,7 @@ public class TaskFactory implements ITaskFactory<Expression, Statement, Task> {
 
 	@Override
 	public Expression createNextToPosition(Expression position, SourceLocation sourceLocation) {
-		return new NextToExpression(position);
+		return new NextToExpression((PositionExpression) position);
 	}
 
 	@Override
@@ -188,16 +188,17 @@ public class TaskFactory implements ITaskFactory<Expression, Statement, Task> {
 
 	@Override
 	public Expression createTrue(SourceLocation sourceLocation) {
-		BasicBExpression expression = new BasicBExpression();
-		expression.setValue(true);
-		expression.setSourceLocation(sourceLocation);
-		return expression;
+		return new TrueExpression();
 	}
 
 	@Override
 	public Expression createFalse(SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new FalseExpression();
+	}
+
+	@Override
+	public Expression createPositionOf(Expression unit, SourceLocation sourceLocation) {
+		return new PositionOfExpression((UnitExpression) unit);
 	}
 
 

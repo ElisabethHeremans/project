@@ -1,10 +1,11 @@
 package hillbillies.model.statement;
 
+import hillbillies.model.expression.BooleanExpression;
 import hillbillies.model.expression.Expression;
 
 public class WhileStatement extends ComposedEStatement {
 	
-	public WhileStatement(Expression condition, Statement body){
+	public WhileStatement(BooleanExpression condition, Statement body){
 		setExpression(condition);
 		setStatement(body);
 	}

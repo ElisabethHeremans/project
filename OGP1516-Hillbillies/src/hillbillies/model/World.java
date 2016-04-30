@@ -217,7 +217,7 @@ public class World {
 	 * @throws IllegalArgumentException
 	 * 			If the given position is not inside this world.
 	 */
-	protected boolean getPassable(int[] cubePosition) throws IllegalArgumentException {
+	public boolean getPassable(int[] cubePosition) throws IllegalArgumentException {
 		return this.getTerrain(cubePosition).isPassable();
 	}
 
@@ -264,7 +264,7 @@ public class World {
 	 * @throws IllegalArgumentException
 	 * 			If the given position is not inside this world.
 	 */
-	boolean isNeighboringSolidTerrain( int[] position)throws IllegalArgumentException{
+	public boolean isNeighboringSolidTerrain( int[] position)throws IllegalArgumentException{
 		if (!this.isCubeInWorld(position))
 			throw new IllegalArgumentException();
 		List<int[]> neighboringCubes = getNeighboringCubes(position);

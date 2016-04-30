@@ -1,14 +1,15 @@
 package hillbillies.model.statement;
 
 import be.kuleuven.cs.som.annotate.*;
+import hillbillies.model.expression.BasicVExpression;
 import hillbillies.model.expression.Expression;
 import hillbillies.model.expression.VariableExpression;
 
 public class AssignmentStatement extends BasicEStatement {
-	public AssignmentStatement(VariableExpression variable , Expression expression){
+	public AssignmentStatement(String variableName , Expression expression){
 		setExpression(expression);
+		BasicVExpression variable = new BasicVExpression(variableName);
 		setVariable(variable);
-		//moet je dat hier ook toekennen?
 		variable.setValue(expression.getValue());
 	}
 	@Basic @Raw
