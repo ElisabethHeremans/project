@@ -1,6 +1,6 @@
 package hillbillies.model.expression;
 
-public class BasicBExpression extends BooleanExpression {
+public abstract class BasicBExpression extends BooleanExpression {
 	
 	public BasicBExpression(){
 		

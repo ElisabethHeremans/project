@@ -30,13 +30,15 @@ public class Task {
 	 *       new.getName() == name | else new.getName() == "task"
 	 * @post If the given priority is a valid priority for any task, the
 	 *       priority of this new task is equal to the given priority.
-	 *       Otherwise, the priority of this new task is equal to 0. | if
-	 *       (isValidPriority(priority)) | then new.getPriority() == priority |
-	 *       else new.getPriority() == 0
+	 *       Otherwise, the priority of this new task is equal to 0. 
+	 *       | if (isValidPriority(priority)) 
+	 *       | then new.getPriority() == priority 
+	 *       |else new.getPriority() == 0
 	 * @effect The activities of this new task is set to the given activities. |
 	 *         this.setActivities(activities)
+	 * @effect The selected cube of this new task is set to the given selected cube
 	 */
-	public Task(String name, int priority, Statement activities) throws IllegalArgumentException {
+	public Task(String name, int priority, Statement activities, int[] selectedCube) throws IllegalArgumentException {
 		if (!canHaveAsName(name))
 			name = "task";
 		this.name = name;
@@ -44,6 +46,11 @@ public class Task {
 			priority = 0;
 		setPriority(priority);
 		this.setActivities(activities);
+		this.setSelectedCube(selectedCube);
+	}
+	
+	public Task(String name, int priority, Statement activities){
+		this(name,  priority, activities, null);
 	}
 	
 
@@ -213,6 +220,27 @@ public class Task {
 		this.executingUnit = executingUnit;
 	}
 
+
 	private Unit executingUnit;
+	
+	
+	/**
+	 * Return the selected Cube for this task.
+	 */
+	@Basic @Raw
+	public int[] getSelectedCube() {
+		return selectedCube;
+	}
+
+
+	/**
+	 * @param selectedCube the selectedCube to set
+	 */
+	@Raw
+	private void setSelectedCube(int[] selectedCube) {
+		this.selectedCube = selectedCube;
+	}
+	
+	private int[] selectedCube;
 
 }

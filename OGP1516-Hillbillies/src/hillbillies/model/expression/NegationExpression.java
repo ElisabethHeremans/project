@@ -1,19 +1,11 @@
 package hillbillies.model.expression;
 
 public class NegationExpression extends BooleanBExpression {
-	
-	public NegationExpression(Expression expression){
-		setExpression(expression);
-	}
-	
-	public Expression getExpression() {
-		return expression;
-	}
 
-	public void setExpression(Expression expression) {
-		this.expression = expression;
+	public NegationExpression(BooleanExpression e) {
+		super(e);
+		setValue(! (Boolean)e.getValue());
 	}
-
-	private Expression expression;
+	
 
 }

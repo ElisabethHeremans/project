@@ -1,5 +1,9 @@
 package hillbillies.model.expression;
 
-public class PositionBExpression extends UnaryBExpression {
+public abstract class PositionBExpression extends UnaryBExpression {
+	public PositionBExpression(PositionExpression e){
+		setExpression(e);
+		
+	}
 
 }

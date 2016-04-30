@@ -1,9 +1,9 @@
 package hillbillies.model.expression;
 
 public class OrExpression extends BinaryBExpression {
-	public OrExpression(Expression right, Expression left) {
+	public OrExpression(BooleanExpression right, BooleanExpression left) {
 		super(right, left);
-		// TODO Auto-generated constructor stub
+		setValue((boolean)right.getValue()||(boolean)left.getValue());
 	}
 
 //	public boolean isValidExpression(){

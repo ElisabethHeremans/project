@@ -8,6 +8,8 @@ public class AssignmentStatement extends BasicEStatement {
 	public AssignmentStatement(VariableExpression variable , Expression expression){
 		setExpression(expression);
 		setVariable(variable);
+		//moet je dat hier ook toekennen?
+		variable.setValue(expression.getValue());
 	}
 	@Basic @Raw
 	public VariableExpression getVariable() {
@@ -20,6 +22,8 @@ public class AssignmentStatement extends BasicEStatement {
 	}
 	
 	private VariableExpression variable;
+	
+	
 
 	
 }

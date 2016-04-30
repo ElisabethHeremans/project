@@ -1,34 +1,34 @@
 package hillbillies.model.expression;
 
-public class BinaryBExpression extends ComposedBExpression {
+public abstract class BinaryBExpression extends ComposedBExpression  {
 	
-	public BinaryBExpression(Expression right, Expression left){
-		this.rightExp = right;
-		this.leftExp = left;
+	public BinaryBExpression(BooleanExpression right, BooleanExpression left){
+		setRightExpression(right);
+		setLeftExpression(left);
 				
 	}
 	
 	
-	public Expression getRightExpression(){
+	public BooleanExpression getRightExpression(){
 		return rightExp;
 	}
-	public Expression getLeftExpression(){
+	
+	private BooleanExpression rightExp;
+	
+
+	public void setRightExpression(BooleanExpression rightExp) {
+		this.rightExp = rightExp;
+	}
+
+	public BooleanExpression getLeftExpression(){
 		return leftExp;
 	}
+
+	public void setLeftExpression(BooleanExpression leftExp) {
+		this.leftExp = leftExp;
+	}
+
+	private BooleanExpression leftExp;
 	
-	private Expression rightExp;
-	private Expression leftExp;
-	
-//	public isValidExpression(Expression expression){
-//		if (this.leftExp instanceof PositionExpression)
-//			return this.rightExp instanceof PositionExpression;
-//		if (this.leftExp instanceof UnitExpression)
-//			return this.rightExp instanceof UnitExpression;
-//		if (this.leftExp instanceof BooleanExpression)
-//			return this.rightExp instanceof BooleanExpression;
-//		if (this.leftExp instanceof VariableExpression)
-//			return this.rightExp instanceof VariableExpression;
-//		//?
-//					
-//	}
+
 }

@@ -1,19 +1,13 @@
 package hillbillies.model.expression;
+import hillbillies.model.Unit;
 
 public class CarriesItemExpression extends UnitBExpression {
-	
-	public CarriesItemExpression(UnitExpression unit){
-		setUnit(unit);
-	}
-	
-	public UnitExpression getUnit() {
-		return unit;
-	}
 
-	public void setUnit(UnitExpression unit) {
-		this.unit = unit;
-	}
+	public CarriesItemExpression(UnitExpression e) {
+		super(e);
+		setValue(((Unit) e.getValue()).getLog() !=null ||((Unit) e.getValue()).getBoulder() !=null);
 
-	private UnitExpression unit;
+	}
+	
 
 }

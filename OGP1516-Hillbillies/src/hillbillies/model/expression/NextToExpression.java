@@ -1,19 +1,22 @@
 package hillbillies.model.expression;
 
+import java.util.List;
+
 public class NextToExpression extends ComposedPExpression {
 	
 	public NextToExpression(PositionExpression position){
-		setPosition(position);
+		setExpression(position);
+		setValue(getNextTo());
+	}
+
+	private int[] getNextTo() {
+		int[] pos = (int[]) getExpression().getValue();
+		List<int[]> neighbouringPositions = this.getStatement().getTask().getExecutingUnit().getWorld().getNeighboringCubes(pos);
+		if (neighbouringPositions.isEmpty())
+			return null;
+		else
+			return neighbouringPositions.get(0);
 	}
 	
-	public PositionExpression getPosition() {
-		return position;
-	}
-
-	public void setPosition(PositionExpression position) {
-		this.position = position;
-	}
-
-	private PositionExpression position;
 
 }

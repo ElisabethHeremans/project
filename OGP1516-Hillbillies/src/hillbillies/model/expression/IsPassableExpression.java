@@ -1,19 +1,12 @@
 package hillbillies.model.expression;
 
 public class IsPassableExpression extends PositionBExpression {
-	
-	public IsPassableExpression(PositionExpression position){
-		setPosition(position);
+
+	public IsPassableExpression(PositionExpression e) {
+		super(e);
+		setValue(this.getStatement().getTask().getExecutingUnit().
+				getWorld().getTerrain((int[]) e.getValue()).isPassable());
+
 	}
 	
-	public PositionExpression getPosition() {
-		return position;
-	}
-
-	public void setPosition(PositionExpression position) {
-		this.position = position;
-	}
-
-	private PositionExpression position;
-
 }

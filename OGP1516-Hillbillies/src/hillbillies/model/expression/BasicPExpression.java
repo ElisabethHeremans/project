@@ -1,6 +1,6 @@
 package hillbillies.model.expression;
 
-public class BasicPExpression extends PositionExpression {
+public abstract class BasicPExpression extends PositionExpression {
 	
 	public BasicPExpression(){
 		

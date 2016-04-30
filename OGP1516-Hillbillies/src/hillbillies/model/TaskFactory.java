@@ -17,14 +17,13 @@ public class TaskFactory implements ITaskFactory<Expression, Statement, Task> {
 	@Override
 	public List<Task> createTasks(String name, int priority, Statement activity, List<int[]> selectedCubes) {
 		List<Task> tasks = new ArrayList<Task>();
-		if (selectedCubes.isEmpty()&&Statement.hasExpression(selected)){
-			//in activity moet selectedCube ingevuld worden op de plaats van selected?
+		if (selectedCubes.isEmpty()){
 			tasks.add(new Task(name,priority,activity));
 
 		}
 		else{
 			for (int[] selectedCube: selectedCubes){
-				Task task = new Task(name,priority,activity);
+				Task task = new Task(name,priority,activity,selectedCube);
 				tasks.add(task);
 			}
 		}

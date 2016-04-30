@@ -2,9 +2,9 @@ package hillbillies.model.expression;
 
 public class AndExpression extends BinaryBExpression {
 
-	public AndExpression(Expression right, Expression left) {
+	public AndExpression(BooleanExpression right, BooleanExpression left) {
 		super(right, left);
-		// TODO Auto-generated constructor stub
+		setValue((boolean)right.getValue()&&(boolean)left.getValue());
 	}
 
 }

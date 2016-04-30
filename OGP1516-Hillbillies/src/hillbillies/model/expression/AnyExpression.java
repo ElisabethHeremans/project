@@ -5,38 +5,37 @@ import hillbillies.model.*;
 public class AnyExpression extends UnitExpression {
 	
 	public AnyExpression(){
-		setAnyUnit(findAnyUnit());
+		setValue(findNearestAnyUnit());
 	}
 	
-	/**
-	 * @return the anyUnit
-	 */
-	public Unit getAnyUnit() {
-		return anyUnit;
-	}
+//	/**
+//	 * @return the anyUnit
+//	 */
+//	public Unit getAnyUnit() {
+//		return anyUnit;
+//	}
+//	
+//	/**
+//	 * @param anyUnit the anyUnit to set
+//	 */
+//	public void setAnyUnit(Unit anyUnit) {
+//		this.anyUnit = anyUnit;
+//	}
+//	
+//	private Unit anyUnit;
 	
-	/**
-	 * @param anyUnit the anyUnit to set
-	 */
-	public void setAnyUnit(Unit anyUnit) {
-		this.anyUnit = anyUnit;
-	}
-	
-	private Unit anyUnit;
-	
-	public Unit findAnyUnit(){
+	public Unit findNearestAnyUnit(){
 		Unit unit = this.getStatement().getTask().getExecutingUnit();
 		assert (unit!=null);
-//		if (unit == null){
-//			throw new 
-//		}
 		Unit nearest = null;
 		double nearestDist = 0;
 		for (Unit other: unit.getWorld().listAllUnits()){
-			double dist = Vector.getDistance(unit.getPosition(), other.getPosition());
-			if (nearest == null || nearestDist > dist){
-				nearestDist = dist;
-				nearest = other;
+			if (other!=unit){
+				double dist = Vector.getDistance(unit.getPosition(), other.getPosition());
+				if (nearest == null || nearestDist > dist){
+					nearestDist = dist;
+					nearest = other;
+				}
 			}
 		}
 		return nearest;

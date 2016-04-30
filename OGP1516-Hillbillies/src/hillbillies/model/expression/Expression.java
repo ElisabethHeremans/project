@@ -7,8 +7,9 @@ import hillbillies.model.statement.ExpressionStatement;
 import hillbillies.model.statement.Statement;
 import hillbillies.part3.programs.SourceLocation;
 
-public class Expression {
+public abstract class Expression {
 	
+
 	public void setValue(Object object){
 		value = object;
 	}
@@ -19,7 +20,7 @@ public class Expression {
 	/**
 	 * @return the value
 	 */
-	private final Object getValue() {
+	public final Object getValue() {
 		return value;
 	}
 
@@ -28,11 +29,15 @@ public class Expression {
 		
 	}
 	
+	public SourceLocation getSourceLocation(){
+		return sourceLocation;
+	}
+	
 	private SourceLocation sourceLocation;
 	
-	public boolean isValidExpression(){
-		return true;
-	}
+//	public boolean isValidExpression(){
+//		return true;
+//	}
 	
 	public void setStatement(@Raw ExpressionStatement statement){
 		if (statement.getExpression() == this)

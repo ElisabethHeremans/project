@@ -1,5 +1,7 @@
 package hillbillies.model.expression;
 
-public class UnitExpression extends Expression {
-
+public abstract class UnitExpression extends Expression {
+	public UnitExpression(){
+		
+	}
 }
