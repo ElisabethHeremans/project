@@ -697,6 +697,22 @@ public class Unit {
 				&&Math.abs(cubePosition[2]- unitpos[2])<=1
 				&& !(cubePosition[0] ==unitpos[0] && cubePosition[1]==unitpos[1]&& cubePosition[2]==unitpos[2]));
 	}
+	/**
+	 * Checks whether the given cube is neighboring this unit or 
+	 * 	has the same cubecoördinates as this unit.
+	 * @param cubePosition
+	 * 		The cube to check.
+	 * @return True if and only if the difference between the respective x, y and z -coordinates of the cubeCenters are equal to 0, 1 or -1.
+	 * 			| result == (Math.abs(cubePosition[0]- unitpos[0])<=1
+	 *			|	&&Math.abs(cubePosition[1]- unitpos[1])<=1
+	 *			|	&&Math.abs(cubePosition[2]- unitpos[2])<=1)
+	 */
+	public boolean isNeighbouringOrSameCube(int[] cubePosition){
+		int[] unitpos = this.getWorld().getCubeCoordinate(this.getPosition());
+		return (Math.abs(cubePosition[0]- unitpos[0])<=1
+				&&Math.abs(cubePosition[1]- unitpos[1])<=1
+				&&Math.abs(cubePosition[2]- unitpos[2])<=1);
+	}
 	
 	/**
 	 * A variable registering the position of this unit.
@@ -872,6 +888,9 @@ public class Unit {
 		if (this.getStatus() == Status.FALLING){
 			falling(duration);
 		}
+		if (followedUnit != null && this.isNeighbouringOrSameCube(followedUnit.getCubeCoordinate())){
+			this.stopFollowing();
+		}
 		if (mustRest())
 			rest();
 		else if (this.getStatus() == Status.DONE && targetPosition != null && !this.isEnableDefaultBehaviour())
@@ -969,6 +988,8 @@ public class Unit {
 			double[] nextPosition = Vector.vectorAdd(this.getPosition(), new double[] {0.0,0.0,-1.0});
 			if (this.getCubeCoordinate()[2]==0.0 || !this.getWorld().getTerrain(nextPosition).isPassable()){
 				setStatus(Status.DONE);
+				if (followingUnit != null)
+					followingUnit.moveTo1(this.getPosition());
 			}
 			else
 				fall();
@@ -1206,14 +1227,17 @@ public class Unit {
 			throw new IllegalArgumentException();
 			
 		}
-		if (!this.getWorld().isNeighboringSolidTerrain(this.getWorld().getCubeCoordinate(targetPosition))){
-			throw new IllegalArgumentException();
-		}
+//		if (!this.getWorld().isNeighboringSolidTerrain(this.getWorld().getCubeCoordinate(targetPosition))){
+//			throw new IllegalArgumentException();
+//		}
+		
 		if (canMove()) {
 			this.targetPosition = targetPosition;
 			setStatus(Status.IN_CENTER);
 			int index = 0;
 			int[] nextPosition;
+			if (isFollowedBy() != null)
+				isFollowedBy().moveTo1(targetPosition);
 			while (!Util.fuzzyEquals(Vector.getDistance(this.getPosition(), targetPosition), 0) && canMove()){
 				//System.out.print("start");
 				int[] position = {(int) targetPosition[0], (int) targetPosition[1], (int) targetPosition[2]};
@@ -1376,6 +1400,25 @@ public class Unit {
 		}
 	}
 
+	private Unit isFollowedBy(){
+		return followingUnit;
+	}
+	
+	public void startFollowing(Unit other){
+		followedUnit = other;
+		other.followingUnit = this;
+		moveTo1(other.getPosition());
+	}
+	
+	private void stopFollowing(){
+		followedUnit.followingUnit = null;
+		followedUnit = null;
+		this.setStatus(Status.DONE);
+	}
+	
+	private Unit followedUnit;
+	private Unit followingUnit;
+	
 	/**
 	 * Return the walking speed of this unit.
 	 */
