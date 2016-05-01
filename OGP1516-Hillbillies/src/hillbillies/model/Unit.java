@@ -972,6 +972,11 @@ public class Unit {
 	 * 		his position is set at the targetposition. 
 	 * 		| if (Vector.getDistance(nextTargetPosition, startPosition)-Vector.getDistance(startPosition, this.getPosition())<=0.0)
 	 * 		|	then setPosition(nextTargetPosition) && setHitPoints(this.getHitpoints() - 10)
+	 * @effect If the unit arrived or passed the targetposition and this unit had another unit following him,
+	 * 			the other unit will move to this unit's new position.
+	 * 		| if (this.getCubeCoordinate()[2]==0.0 || !this.getWorld().getTerrain(nextPosition).isPassable()
+	 * 		|		&& followingUnit != null)
+	 * 		|		then followingUnit.moveTo1(this.getPosition())
 	 * @effect And if the position a z-level lower than the units position is the lowest z-level or
 	 * 		the terrain is not passable, the status is set to done. Otherwise, the unit keeps falling.
 	 * 			| if (this.getCubeCoordinate()[2]==1.0 || !this.getWorld().getTerrain(nextPosition).isPassable())
@@ -1206,6 +1211,9 @@ public class Unit {
 	 * @effect If a unit can move, his status is IN_CENTER.
 	 * 		| if canMove()
 	 * 		|	then setStatus(Status.IN_CENTER)
+	 * @effect If this unit is followed by another unit, the other unit will start moving to the same target position.
+	 * 		| if (isFollowedBy() != null)
+	 * 		|	then isFollowedBy().moveTo1(targetPosition)
 	 * @effect A list with possible positions for different path is created and 
 	 * 			the unit will move to an adjacent cube that's in the list.
 	 * 		| search(nextPosition)
@@ -1399,17 +1407,34 @@ public class Unit {
 				setStatus(Status.DONE);
 		}
 	}
-
+	
+	/**
+	 * Returns the unit that follows this unit.
+	 * @return The following unit.
+	 * 		| result == followingUnit
+	 */
 	private Unit isFollowedBy(){
 		return followingUnit;
 	}
 	
+	/**
+	 * The given unit starts following this unit.
+	 * @param other
+	 * 		The unit that needs to follow this unit.
+	 * @effect The given unit will start moving to this unit.
+	 * 		| moveTo1(other.getPosition())
+	 */
 	public void startFollowing(Unit other){
 		followedUnit = other;
 		other.followingUnit = this;
 		moveTo1(other.getPosition());
 	}
 	
+	/**
+	 * This unit will stop following any other unit.
+	 * @effect This unit status will be set to done.
+	 * 		| this.setStatus(Status.DONE)
+	 */
 	private void stopFollowing(){
 		followedUnit.followingUnit = null;
 		followedUnit = null;
