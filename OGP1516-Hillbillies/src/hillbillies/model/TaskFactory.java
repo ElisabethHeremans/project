@@ -8,7 +8,7 @@ import hillbillies.model.statement.*;
 import hillbillies.part3.programs.ITaskFactory;
 import hillbillies.part3.programs.SourceLocation;
 
-public class TaskFactory implements ITaskFactory<Expression, Statement, Task> {
+public class TaskFactory implements ITaskFactory<Expression<?>, Statement, Task> {
 
 	public TaskFactory(Expression e,Statement s,Task t){
 		
@@ -32,12 +32,12 @@ public class TaskFactory implements ITaskFactory<Expression, Statement, Task> {
 	}
 
 	@Override
-	public Statement createAssignment(String variableName, Expression value, SourceLocation sourceLocation) {
-		return new AssignmentStatement(variableName, value);
+	public Statement createAssignment(String variableName, Expression<?> value, SourceLocation sourceLocation) {
+		return new AssignmentStatement(variableName, value); // correct? 
 	}
 
 	@Override
-	public Statement createWhile(Expression condition, Statement body, SourceLocation sourceLocation) {
+	public Statement createWhile(Expression<?> condition, Statement body, SourceLocation sourceLocation) {
 		return new WhileStatement((BooleanExpression)condition, body);
 	}
 

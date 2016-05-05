@@ -1,18 +1,20 @@
 package hillbillies.model.expression;
 
-public abstract class UnaryBExpression<T> extends ComposedBExpression {
+public abstract class UnaryBExpression<T extends Expression<?>> 
+extends ComposedBExpression /*implements ComposedUnaryExpression<T>*/ {
 	public UnaryBExpression(){
 	}
 	
 
-	public Expression getExpression() {
+	public Expression<?> getExpression() {
 		return expression;
 	}
 
-	public void setExpression(Expression e) {
+	public void setExpression(Expression<?> e) {
 		this.expression = e;
 	}
 	
-	private Expression expression;
+	private Expression<?> expression;
+	//??
 
 }

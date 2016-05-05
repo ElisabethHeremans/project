@@ -1,10 +1,10 @@
 package hillbillies.model.expression;
 
-public interface ComposedUnaryExpression {
+public interface ComposedUnaryExpression<T extends Expression<?>> {
 	
-		Expression getExpression();
+		T getExpression();
 
-		void setExpression(Expression e);
+		void setExpression(T e);
 		
 
 }

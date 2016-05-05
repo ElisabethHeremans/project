@@ -36,17 +36,17 @@ public abstract class Expression<T> {
 //		return true;
 //	}
 	
-	public void setStatement( T statement){
+	public void setStatement(Statement statement){
 		if (((ExpressionStatement) statement).getExpression() == this)
 			this.statement = statement;
 	}
 	
 	@Basic @Raw
-	public final T getStatement() {
+	public final Statement getStatement() {
 		return statement;
 	}
 
-	private T statement;
+	private Statement statement;
 	
 
 }

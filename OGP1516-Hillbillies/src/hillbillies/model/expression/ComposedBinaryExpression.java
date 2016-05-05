@@ -1,11 +1,11 @@
 package hillbillies.model.expression;
 
-public interface ComposedBinaryExpression {
-	Expression getRightExpression();
+public interface ComposedBinaryExpression<T extends Expression<?>> {
+	T getRightExpression();
 	
-	void setRightExpression(Expression e);
+	void setRightExpression(T e);
 	
-	Expression getLeftExpression();
+	T getLeftExpression();
 	
-	void setLeftExpression(Expression e);
+	void setLeftExpression(T e);
 }
