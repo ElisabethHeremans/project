@@ -1,6 +1,6 @@
 package hillbillies.model.expression;
 
-public abstract class UnaryBExpression extends ComposedBExpression {
+public abstract class UnaryBExpression<T> extends ComposedBExpression {
 	public UnaryBExpression(){
 	}
 	

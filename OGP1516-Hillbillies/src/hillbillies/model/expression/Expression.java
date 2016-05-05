@@ -7,20 +7,17 @@ import hillbillies.model.statement.ExpressionStatement;
 import hillbillies.model.statement.Statement;
 import hillbillies.part3.programs.SourceLocation;
 
-public abstract class Expression {
+public abstract class Expression<T> {
 	
+	public abstract T evaluateExpression();
 
-	public void setValue(Object object){
+	public void setValue(T object){
 		value = object;
 	}
 	
-	
-	private Object value;
+	private T value;
 
-	/**
-	 * @return the value
-	 */
-	public final Object getValue() {
+	public final T getValue() {
 		return value;
 	}
 
@@ -39,17 +36,17 @@ public abstract class Expression {
 //		return true;
 //	}
 	
-	public void setStatement(@Raw ExpressionStatement statement){
-		if (statement.getExpression() == this)
+	public void setStatement( T statement){
+		if (((ExpressionStatement) statement).getExpression() == this)
 			this.statement = statement;
 	}
 	
 	@Basic @Raw
-	public final ExpressionStatement getStatement() {
+	public final T getStatement() {
 		return statement;
 	}
 
-	private ExpressionStatement statement;
+	private T statement;
 	
 
 }

@@ -12,5 +12,9 @@ public class IsEnemyExpression extends UnitBExpression {
 
 	}
 	
+	public boolean evaluateExpression(Unit unit){
+		
+	}
+	
 
 }

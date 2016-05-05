@@ -1,8 +1,12 @@
 package hillbillies.model.expression;
 
-public abstract class UnitBExpression extends UnaryBExpression {
+import hillbillies.model.Unit;
+
+public abstract class UnitBExpression extends UnaryBExpression<Boolean> {
 	public UnitBExpression(UnitExpression e){
 		setExpression(e);
 	}
+	
+	public abstract 
 
 }

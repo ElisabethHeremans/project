@@ -11,5 +11,8 @@ public class IsAliveExpression extends UnitBExpression {
 
 	}
 	
+	public boolean evaluateExpression(Unit unit){
+		return !unit.isTerminated();
+	}
 
 }

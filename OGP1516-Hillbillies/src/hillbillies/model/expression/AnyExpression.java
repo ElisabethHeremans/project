@@ -30,6 +30,12 @@ public class AnyExpression extends UnitExpression {
 		}
 		return nearest;
 	}
+
+	@Override
+	public Unit evaluateExpression() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 
 	
