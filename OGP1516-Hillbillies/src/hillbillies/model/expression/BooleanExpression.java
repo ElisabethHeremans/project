@@ -1,6 +1,9 @@
 package hillbillies.model.expression;
 
-public abstract class BooleanExpression extends Expression<Boolean> {
+public abstract class BooleanExpression<T extends BooleanExpression,R extends Boolean> extends Expression<T,R> {
+	
+	//private T expression;
+	
 	public BooleanExpression(){
 		
 	}

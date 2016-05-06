@@ -53,6 +53,7 @@ public class World {
 		this.listener = listener;
 		this.connectedToBorder = new ConnectedToBorder(this.getxDimension(),this.getyDimension(),this.getzDimension());
 		initializeCubeTerrains();
+		
 	}
 	
 	

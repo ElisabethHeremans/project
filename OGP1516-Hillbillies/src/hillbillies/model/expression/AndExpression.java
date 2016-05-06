@@ -1,10 +1,16 @@
 package hillbillies.model.expression;
 
-public class AndExpression extends BinaryBExpression {
+public class AndExpression<T extends BooleanExpression<T,R>,R extends Boolean, E extends BooleanExpression<T,R>> extends BinaryBExpression<T,R,E> {
 
-	public AndExpression(BooleanExpression right, BooleanExpression left) {
+	public AndExpression(E right, E left) {
 		super(right, left);
-		setValue((boolean)right.getValue()&&(boolean)left.getValue());
+		setValue(right.getValue()&& left.getValue());
+	}
+
+	@Override
+	public R evaluateExpression() {
+		// TODO Auto-generated method stub
+		return getRightExpression().getValue()&& getLeftExpression().getValue();
 	}
 
 }

@@ -1,34 +1,35 @@
 package hillbillies.model.expression;
 
-public abstract class BinaryBExpression<T extends BooleanExpression> extends ComposedBExpression<BooleanExpression<T>>  {
+public abstract class BinaryBExpression<T extends BooleanExpression<T,R>,R extends Boolean, E extends BooleanExpression<T,R>> 
+extends BooleanExpression<T,R> implements IComposedBinaryExpression<E> {
 	
-	public BinaryBExpression(BooleanExpression right, BooleanExpression left){
+	public BinaryBExpression(E right, E left){
 		setRightExpression(right);
 		setLeftExpression(left);
 				
 	}
 	
 	
-	public BooleanExpression getRightExpression(){
+	public E getRightExpression(){
 		return rightExp;
 	}
 	
-	private BooleanExpression rightExp;
+	private E rightExp;
 	
 
-	public void setRightExpression(BooleanExpression rightExp) {
+	public void setRightExpression(E rightExp) {
 		this.rightExp = rightExp;
 	}
 
-	public BooleanExpression getLeftExpression(){
+	public E getLeftExpression(){
 		return leftExp;
 	}
 
-	public void setLeftExpression(BooleanExpression leftExp) {
+	public void setLeftExpression(E leftExp) {
 		this.leftExp = leftExp;
 	}
 
-	private BooleanExpression leftExp;
+	private E leftExp;
 	
 
 }
