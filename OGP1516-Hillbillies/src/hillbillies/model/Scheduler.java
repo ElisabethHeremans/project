@@ -104,8 +104,21 @@ public class Scheduler {
 	 * @throws IllegalArgumentException
 	 * 		If the given task is not well formed. (???)
 	 */
-	public void addAsTask(Task task, int priority) throws IllegalArgumentException{
-		if (priority > this.getTasks().size()+1)
+//	public void addAsTask(Task task, int priority) throws IllegalArgumentException{
+//		if (priority > this.getTasks().size()+1)
+//			throw new IllegalArgumentException();
+//		if(! canHaveAsTask(task)){
+//			throw new IllegalArgumentException();
+//		}
+//		
+//		if(! task.isWellFormed()){
+//			throw new IllegalArgumentException();
+//		}
+//		this.tasks.add(priority-1, task);
+//	}
+	
+	public void addAsTask(Task task) throws IllegalArgumentException{
+		if (task.getPriority() > this.getTasks().size()+1)
 			throw new IllegalArgumentException();
 		if(! canHaveAsTask(task)){
 			throw new IllegalArgumentException();
@@ -114,7 +127,7 @@ public class Scheduler {
 		if(! task.isWellFormed()){
 			throw new IllegalArgumentException();
 		}
-		this.tasks.add(priority-1, task);
+		this.tasks.add(task.getPriority()-1, task);
 	}
 
 
@@ -146,7 +159,7 @@ public class Scheduler {
 	 * @param toReplace
 	 * @param replacement
 	 */
-	void replaceAsTask(Task toReplace, Task replacement){
+	public void replaceAsTask(Task toReplace, Task replacement){
 		if (!hasAsTask(toReplace) || !canHaveAsTask(replacement))
 			throw new IllegalArgumentException();
 		else{
@@ -166,6 +179,32 @@ public class Scheduler {
 	public List<Task> getTasks(){
 		return tasks;
 	}
+	
+	public class SchedulerIterator<T> implements Iterator<T>{
+		
+		private int index;
+		
+		public SchedulerIterator(){
+			index =0;
+		}
+		
+		@Override
+		public boolean hasNext() {
+			return index < tasks.size();
+		}
+
+		@Override
+		public T next() {
+			return (T) tasks.get(index++);
+		}
+		
+		public void remove(){
+			if (index > 0)
+				tasks.remove(index-1);
+		}
+	}
+	
+	
 	
 	/**
 	 * Return the priority of the given task in this scheduler.
