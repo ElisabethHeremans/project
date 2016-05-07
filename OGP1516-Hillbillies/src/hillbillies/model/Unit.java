@@ -888,8 +888,12 @@ public class Unit {
 		if (this.getStatus() == Status.FALLING){
 			falling(duration);
 		}
-		if (followedUnit != null && this.isNeighbouringOrSameCube(followedUnit.getCubeCoordinate())){
-			this.stopFollowing();
+		if (this.isFollowing() != null) {
+			if(this.isNeighbouringOrSameCube(this.isFollowing().getCubeCoordinate())){
+				this.stopFollowing();
+			}
+			else
+				moveTo1(this.isFollowing().getPosition());
 		}
 		if (mustRest())
 			rest();
@@ -993,8 +997,6 @@ public class Unit {
 			double[] nextPosition = Vector.vectorAdd(this.getPosition(), new double[] {0.0,0.0,-1.0});
 			if (this.getCubeCoordinate()[2]==0.0 || !this.getWorld().getTerrain(nextPosition).isPassable()){
 				setStatus(Status.DONE);
-				if (followingUnit != null)
-					followingUnit.moveTo1(this.getPosition());
 			}
 			else
 				fall();
@@ -1244,8 +1246,6 @@ public class Unit {
 			setStatus(Status.IN_CENTER);
 			int index = 0;
 			int[] nextPosition;
-			if (isFollowedBy() != null)
-				isFollowedBy().moveTo1(targetPosition);
 			while (!Util.fuzzyEquals(Vector.getDistance(this.getPosition(), targetPosition), 0) && canMove()){
 				//System.out.print("start");
 				int[] position = {(int) targetPosition[0], (int) targetPosition[1], (int) targetPosition[2]};
@@ -1408,14 +1408,8 @@ public class Unit {
 		}
 	}
 	
-	/**
-	 * Returns the unit that follows this unit.
-	 * @return The following unit.
-	 * 		| result == followingUnit
-	 */
-	private Unit isFollowedBy(){
-		return followingUnit;
-	}
+
+	
 	
 	/**
 	 * The given unit starts following this unit.
@@ -1426,8 +1420,11 @@ public class Unit {
 	 */
 	public void startFollowing(Unit other){
 		followedUnit = other;
-		other.followingUnit = this;
 		moveTo1(other.getPosition());
+	}
+	
+	private Unit isFollowing(){
+		return this.followedUnit;
 	}
 	
 	/**
@@ -1436,13 +1433,12 @@ public class Unit {
 	 * 		| this.setStatus(Status.DONE)
 	 */
 	private void stopFollowing(){
-		followedUnit.followingUnit = null;
 		followedUnit = null;
 		this.setStatus(Status.DONE);
 	}
 	
 	private Unit followedUnit;
-	private Unit followingUnit;
+	
 	
 	/**
 	 * Return the walking speed of this unit.
