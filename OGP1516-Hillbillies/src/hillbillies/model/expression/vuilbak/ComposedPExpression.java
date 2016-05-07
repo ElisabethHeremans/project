@@ -1,4 +1,7 @@
-package hillbillies.model.expression;
+package hillbillies.model.expression.vuilbak;
+
+import hillbillies.model.expression.Expression;
+import hillbillies.model.expression.PositionExpression;
 
 public abstract class ComposedPExpression extends PositionExpression {
 	public ComposedPExpression(){

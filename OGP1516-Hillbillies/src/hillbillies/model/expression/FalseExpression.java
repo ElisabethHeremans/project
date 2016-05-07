@@ -1,6 +1,8 @@
 package hillbillies.model.expression;
 
-public class FalseExpression extends BasicBExpression {
+import hillbillies.model.expression.BooleanExpression;
+
+public class FalseExpression<E> extends BooleanExpression<E> {
 	public FalseExpression(){
 		setValue(false);
 	}

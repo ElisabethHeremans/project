@@ -1,9 +1,9 @@
 package hillbillies.model.expression;
 
-public abstract class BinaryBExpression<T extends BooleanExpression<T,R>,R extends Boolean, E extends BooleanExpression<T,R>> 
-extends BooleanExpression<T,R> implements IComposedBinaryExpression<E> {
+public abstract class BinaryBooleanExpression<E extends BooleanExpression<?>> 
+extends BooleanExpression<E> implements IComposedBinaryExpression<E> {
 	
-	public BinaryBExpression(E right, E left){
+	public BinaryBooleanExpression(E right, E left){
 		setRightExpression(right);
 		setLeftExpression(left);
 				

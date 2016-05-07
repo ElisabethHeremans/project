@@ -3,7 +3,7 @@ package hillbillies.model.expression;
 import hillbillies.model.Unit;
 import hillbillies.model.Vector;
 
-public class EnemyExpression extends UnitExpression {
+public class EnemyExpression<E> extends UnitExpression<E>{
 	
 	public EnemyExpression(){
 		setValue(findEnemyUnit());
@@ -24,6 +24,12 @@ public class EnemyExpression extends UnitExpression {
 			}
 		}
 		return nearest;
+	}
+
+	@Override
+	public Unit evaluateExpression() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

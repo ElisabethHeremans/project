@@ -122,7 +122,7 @@ public class TaskFactory implements ITaskFactory<Expression<?,?>, Statement, Tas
 	}
 
 	@Override
-	public Expression createAnd(Expression left, Expression right, SourceLocation sourceLocation) {
+	public Expression createAnd(Expression<?,?> left, Expression<?,?> right, SourceLocation sourceLocation) {
 		return new AndExpression((BooleanExpression)left, (BooleanExpression)right);
 	}
 

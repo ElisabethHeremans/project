@@ -1,10 +1,10 @@
 package hillbillies.model.expression;
 import hillbillies.model.Unit;
 
-public class CarriesItemExpression extends UnitBExpression {
+public class CarriesItemExpression<E extends UnitExpression<?>> extends UnaryBooleanExpression<E> {
 
-	public CarriesItemExpression(UnitExpression e) {
-		super(e);
+	public CarriesItemExpression(E e) {
+		setExpression(e);
 		setValue(((Unit) e.getValue()).getLog() !=null ||((Unit) e.getValue()).getBoulder() !=null);
 
 	}

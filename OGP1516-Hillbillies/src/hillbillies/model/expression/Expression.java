@@ -7,17 +7,17 @@ import hillbillies.model.statement.ExpressionStatement;
 import hillbillies.model.statement.Statement;
 import hillbillies.part3.programs.SourceLocation;
 
-public abstract class Expression<T,R> {
+public abstract class Expression<V,E> {
 	
-	public abstract R evaluateExpression();
+	public abstract V evaluateExpression();
 
-	public void setValue(R object){
+	public void setValue(V object){
 		value = object;
 	}
 	
-	private R value;
+	private V value;
 
-	public final R getValue() {
+	public final V getValue() {
 		return value;
 	}
 

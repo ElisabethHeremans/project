@@ -8,7 +8,7 @@ import java.util.Queue;
 import hillbillies.model.*;
 import ogp.framework.util.Util;
 
-public class AnyExpression extends UnitExpression {
+public class AnyExpression<E> extends UnitExpression<E>{
 	
 	public AnyExpression(){
 		setValue(findNearestAnyUnit());
