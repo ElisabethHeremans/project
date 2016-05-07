@@ -204,7 +204,9 @@ public class Scheduler {
 		}
 	}
 	
-	
+	public Iterator<Task> getAllTasksIterator(){
+		return new SchedulerIterator<Task>();
+	}
 	
 	/**
 	 * Return the priority of the given task in this scheduler.
