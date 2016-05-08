@@ -1,10 +1,10 @@
 package hillbillies.model;
-
 import java.util.ArrayList;
 import java.util.*;
 
 import hillbillies.model.expression.*;
 import hillbillies.model.statement.*;
+import hillbillies.model.Position;
 import hillbillies.part3.programs.ITaskFactory;
 import hillbillies.part3.programs.SourceLocation;
 
@@ -163,7 +163,7 @@ public class TaskFactory implements ITaskFactory<Expression<?,?>, Statement, Tas
 
 	@Override
 	public Expression createLiteralPosition(int x, int y, int z, SourceLocation sourceLocation) {
-		return new XYZExpression(x,y,z);
+		return new XYZExpression(new Position(new int[] {x,y,z}));
 	}
 
 	@Override

@@ -5,14 +5,10 @@ import hillbillies.model.Unit;
 import hillbillies.model.expression.vuilbak.ComposedPExpression;
 
 public class PositionOfExpression<E extends UnitExpression<?>> extends UnaryPositionExpression<E> {
-//	public PositionOfExpression(PositionExpression position){
-//		setExpression(position);
-//		setValue(getPositionOfPosition());
-//	}
-	
+
 	public PositionOfExpression(E unit){
 		setExpression(unit);
-		setValue((getPositionOfUnit()));
+		setValue(new Position(getPositionOfUnit()));
 
 	}
 

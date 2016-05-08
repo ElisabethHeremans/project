@@ -1,15 +1,17 @@
 package hillbillies.model.expression;
 
 import hillbillies.model.Log;
+import hillbillies.model.Position;
 import hillbillies.model.Unit;
 import hillbillies.model.Vector;
+import hillbillies.model.expression.vuilbak.BasicPExpression;
 
-public class LogExpression extends BasicPExpression {
+public class LogExpression<E> extends PositionExpression<E> {
 	public LogExpression(){
 		setValue(findNearestLog());
 	}
 
-	private int[] findNearestLog() {
+	private Position findNearestLog() {
 		Unit unit = this.getStatement().getTask().getExecutingUnit();
 		Log nearest = null;
 		double nearestDist = 0;
@@ -20,6 +22,12 @@ public class LogExpression extends BasicPExpression {
 				nearest = log;
 			}
 		}
-		return nearest.getWorld().getCubeCoordinate(nearest.getPosition());
+		return new Position(nearest.getWorld().getCubeCoordinate(nearest.getPosition()));
+	}
+
+	@Override
+	public Position evaluateExpression() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

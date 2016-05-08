@@ -2,8 +2,9 @@ package hillbillies.model.expression;
 
 
 import hillbillies.model.Position;
+import hillbillies.model.expression.vuilbak.BasicPExpression;
 
-public class HereExpression extends BasicPExpression {
+public class HereExpression<E> extends PositionExpression<E> {
 	public HereExpression(){
 		setValue(here());
 	}

@@ -18,7 +18,7 @@ public class NextToExpression<E extends PositionExpression<?>> extends UnaryPosi
 		if (neighbouringPositions.isEmpty())
 			return null;
 		else
-			return Position(neighbouringPositions.get(0));
+			return new Position(neighbouringPositions.get(0));
 	}
 
 	@Override

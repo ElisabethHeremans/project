@@ -1,10 +1,22 @@
 package hillbillies.model.expression;
 
-public class XYZExpression extends BasicPExpression {
+import hillbillies.model.Position;
+
+public class XYZExpression extends PositionExpression<Position> {
 	
-	public XYZExpression(int x, int y, int z){
-		setValue(new int[] {x,y,z});
+//	public XYZExpression(int x, int y, int z){
+//		setValue(Position(new int[] {x,y,z}));
+//	
+//	}
 	
+	public XYZExpression(Position pos){
+		setValue(pos);
+	}
+
+	@Override
+	public Position evaluateExpression() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	
