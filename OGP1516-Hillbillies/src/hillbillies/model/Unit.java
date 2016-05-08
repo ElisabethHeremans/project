@@ -2045,6 +2045,10 @@ public class Unit {
 	public void startDefaultBehaviour() {
 		if (this.getStatus() == Status.DONE) {
 			setEnableDefaultBehaviour(true);
+			if (this.getFaction().getScheduler() != null && this.getFaction().getScheduler().hasNext()){
+				this.getFaction().getScheduler().getNextTask();
+			}
+			else{
 			List<Unit> potentialEnemies = new ArrayList<>();
 			List<int[]> potEnemyPos = this.getWorld().getNeighboringCubes(this.getCubeCoordinate());
 			potEnemyPos.add(this.getCubeCoordinate());		
@@ -2105,7 +2109,8 @@ public class Unit {
 				attack(potentialEnemies.get(index));
 			}
 				
-		} else
+		}}
+		else
 			enableDefaultBehaviour = false;
 
 	}
@@ -2363,5 +2368,42 @@ public class Unit {
 	
 	//test
 	
+	/**
+	 * Set the task assigned to this unit to the given task.
+	 * @param task
+	 * 		The task to be assigned to this unit.
+	 * @pre If the given task is effective, the unit's faction must reference
+	 * 		to a scheduler that contains this task.
+	 * 		| assert (faction.getScheduler().hasAsTask(task))
+	 * @post This unit references the given task as the task assigned to it.
+	 * 		| new.getTask() == task
+	 */
+	public void setTask(@Raw Task task){
+		if (task !=null)
+			assert this.getFaction().getScheduler().hasAsTask(task);
+		this.task = task;
+	}
+	/**
+	 * Check whether this unit has a proper task assigned to it.
+	 * @return True if and only if this unit does not reference an effective task
+	 * 		or if the faction referenced by this unit references a scheduler that
+	 * 		contains this task.
+	 * 		| result == (this.getTask() == null || this.getFaction().getScheduler().hasAsTask(task))
+	 */
+	@Raw
+	public boolean hasProperTask(){
+		return (this.getTask() == null || this.getFaction().getScheduler().hasAsTask(task));
+	}
+	/**
+	 * Return the task that is assigned to this unit.
+	 */
+	@Basic @Raw
+	public Task getTask(){
+		return this.task;
+	}
+	/**
+	 * Variable referencing the task that is assigned to this unit.
+	 */
+	private Task task;
 	
 }
