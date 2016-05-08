@@ -1,5 +1,5 @@
 package hillbillies.model.expression;
 
-public class VariableExpression extends Expression<Object> {
+public abstract class VariableExpression<E> extends Expression<Object,E> {
 
 }

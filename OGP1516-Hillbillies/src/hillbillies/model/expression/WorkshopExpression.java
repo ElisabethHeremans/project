@@ -1,11 +1,13 @@
 package hillbillies.model.expression;
 
+import hillbillies.model.Position;
 import hillbillies.model.Unit;
 import hillbillies.model.Vector;
+import hillbillies.model.expression.vuilbak.BasicPExpression;
 
-public class WorkshopExpression extends BasicPExpression {
+public class WorkshopExpression<E> extends PositionExpression<E> {
 	public WorkshopExpression(){
-		setValue(findNearestWorkshop());
+		setValue(new Position(findNearestWorkshop()));
 	}
 
 	private int[] findNearestWorkshop() {
@@ -31,5 +33,11 @@ public class WorkshopExpression extends BasicPExpression {
 	
 						
 		return nearest;
+	}
+
+	@Override
+	public Position evaluateExpression() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

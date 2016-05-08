@@ -1,12 +1,14 @@
 package hillbillies.model.expression;
 
 import hillbillies.model.Boulder;
+import hillbillies.model.Position;
 import hillbillies.model.Unit;
 import hillbillies.model.Vector;
+import hillbillies.model.expression.vuilbak.BasicPExpression;
 
-public class BoulderExpression extends BasicPExpression {
+public class BoulderExpression<E> extends PositionExpression<E> {
 		public BoulderExpression(){
-			setValue(findNearestBoulder());
+			setValue(new Position(findNearestBoulder()));
 		}
 
 		private int[] findNearestBoulder() {
@@ -21,6 +23,12 @@ public class BoulderExpression extends BasicPExpression {
 				}
 			}
 			return nearest.getWorld().getCubeCoordinate(nearest.getPosition());
+		}
+
+		@Override
+		public Position evaluateExpression() {
+			// TODO Auto-generated method stub
+			return null;
 		}
 
 
