@@ -2,9 +2,9 @@ package hillbillies.model.statement;
 
 import hillbillies.model.expression.PositionExpression;
 
-public class WorkStatement extends ActionStatement {
+public class WorkStatement<E extends PositionExpression<?>,S> extends ActionStatement<E,S>{
 	
-	public WorkStatement(PositionExpression position){
+	public WorkStatement(E position){
 		setExpression(position);
 	}
 	

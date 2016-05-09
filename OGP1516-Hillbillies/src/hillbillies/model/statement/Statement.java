@@ -4,7 +4,7 @@ import be.kuleuven.cs.som.annotate.*;
 import hillbillies.model.Task;
 import hillbillies.model.expression.Expression;
 
-public abstract class Statement {
+public abstract class Statement<E, S> {
 		
 	public void setTask(@Raw Task task){
 		if (task.getActivities() == this)

@@ -2,9 +2,9 @@ package hillbillies.model.statement;
 
 import hillbillies.model.expression.Expression;
 
-public class PrintStatement extends BasicEStatement {
+public class PrintStatement<E extends Expression<?,?>,S> extends ExpressionStatement<E, S> {
 
-	public PrintStatement(Expression e) {
+	public PrintStatement(E e) {
 		setExpression(e);
 	}
 	

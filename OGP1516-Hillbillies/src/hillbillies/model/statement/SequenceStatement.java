@@ -5,19 +5,19 @@ import java.util.List;
 
 import be.kuleuven.cs.som.annotate.*;
 
-public class SequenceStatement extends Statement {
+public class SequenceStatement<E, S extends ComposedStatement<?, ?>> extends ComposedStatement<E, S> {
 	
-	public SequenceStatement(List<Statement> statements){
+	public SequenceStatement(List<S> statements){
 		setStatements(statements);
 	}
 	@Basic @Raw
-	public List<Statement> getStatements() {
+	public List<S> getStatements() {
 		return statements;
 	}
 	@Basic
-	public void setStatements(List<Statement> statements) {
+	public void setStatements(List<S> statements) {
 		this.statements = statements;
 	}
 
-	private List<Statement> statements = new ArrayList <>();
+	private List<S> statements = new ArrayList <>();
 }

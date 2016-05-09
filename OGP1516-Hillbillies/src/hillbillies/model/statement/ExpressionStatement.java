@@ -3,18 +3,21 @@ package hillbillies.model.statement;
 import be.kuleuven.cs.som.annotate.*;
 import hillbillies.model.expression.Expression;
 
-public abstract class ExpressionStatement extends Statement {
+public abstract class ExpressionStatement<E extends Expression<?,?>, S > 
+extends ComposedStatement<E, S> implements IExpressionStatement<E>{
 	
 	
 	public ExpressionStatement(){
 		//setExpression(e);
 	}
 	
+
+	
 	/**
 	 * @return the expression
 	 */
 	@Basic @Raw
-	public final Expression getExpression() {
+	public final E getExpression() {
 		return expression;
 	}
 
@@ -22,11 +25,11 @@ public abstract class ExpressionStatement extends Statement {
 	 * @param expression the expression to set
 	 */
 	@Raw
-	public final void setExpression(Expression expression) {
+	public final void setExpression(E expression) {
 		this.expression = expression;
 	}
 	
 	//public abstract boolean isValidExpression(Expression e);
 
-	private Expression expression;
+	private E expression;
 }
