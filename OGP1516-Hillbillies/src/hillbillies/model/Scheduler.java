@@ -166,7 +166,8 @@ public class Scheduler {
 			if (toReplace.getExecutingUnit()!=null){
 				toReplace.getExecutingUnit().setStatus(null);
 			}
-			addAsTask(replacement,getPriority(toReplace));
+			//addAsTask(replacement,getPriority(toReplace));
+			addAsTask(replacement);
 			removeAsTask(toReplace);
 		}
 	}
@@ -230,11 +231,12 @@ public class Scheduler {
 	 * @return 
 	 */
 	public Task getHighestPriorityTask(){
-		for (int i;i<getTasks().size();i++){
-			if (getTasks()[i] not being executed)
-				return getTasks()[i];
-		}
-		return null;
+//		for (int i;i<getTasks().size();i++){
+//			if (getTasks()[i] not being executed)
+//				return getTasks()[i];
+//		}
+//		return null;
+		return tasks.getLast();
 			
 	}
 	
