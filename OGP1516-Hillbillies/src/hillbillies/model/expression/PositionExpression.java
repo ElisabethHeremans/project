@@ -2,7 +2,7 @@ package hillbillies.model.expression;
 
 import hillbillies.model.Position;
 
-public abstract class PositionExpression<E> extends Expression<Position,E> {
+public abstract class PositionExpression extends Expression {
 	public PositionExpression(){
 		
 	}

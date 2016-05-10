@@ -4,7 +4,7 @@ import hillbillies.model.Unit;
 import hillbillies.model.Vector;
 import hillbillies.model.types.EnemyType;
 
-public class EnemyExpression<E> extends UnitExpression<EnemyType,E>{
+public class EnemyExpression extends UnitExpression{
 	
 	public EnemyExpression(){
 		setValue(findEnemyUnit());

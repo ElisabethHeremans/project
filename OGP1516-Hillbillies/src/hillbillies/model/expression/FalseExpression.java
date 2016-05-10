@@ -2,7 +2,7 @@ package hillbillies.model.expression;
 
 import hillbillies.model.expression.BooleanExpression;
 
-public class FalseExpression<E> extends BooleanExpression<E> {
+public class FalseExpression extends BooleanExpression {
 	public FalseExpression(){
 		setValue(false);
 	}
