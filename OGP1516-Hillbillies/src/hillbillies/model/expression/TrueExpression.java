@@ -1,6 +1,6 @@
 package hillbillies.model.expression;
 
-public class TrueExpression<E> extends BooleanExpression<E> {
+public class TrueExpression extends BooleanExpression {
 	public TrueExpression(){
 		setValue(true);
 	}

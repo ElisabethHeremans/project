@@ -9,7 +9,7 @@ import hillbillies.model.*;
 import hillbillies.model.types.UnitType;
 import ogp.framework.util.Util;
 
-public class AnyExpression<E> extends UnitExpression<UnitType, E>{
+public class AnyExpression extends UnitExpression{
 	
 	public AnyExpression(){
 		setValue(findNearestAnyUnit());

@@ -4,7 +4,7 @@ import hillbillies.model.Unit;
 import hillbillies.model.Vector;
 import hillbillies.model.types.FriendType;
 
-public class FriendExpression< E> extends UnitExpression<FriendType,E>{
+public class FriendExpression extends UnitExpression{
 	
 	public FriendExpression(){
 		setValue(findFriendUnit());
