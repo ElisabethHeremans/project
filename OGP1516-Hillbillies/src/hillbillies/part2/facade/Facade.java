@@ -463,6 +463,8 @@ public class Facade implements IFacade{
 	public void setCubeType(World world, int x, int y, int z, int value) throws ModelException {
 		try{
 			world.setTerrain(new int[] {x,y,z},TerrainType.getTerrain(value));
+			//System.out.println(TerrainType.getTerrain(value));
+
 		}
 		catch(NullPointerException exc){
 			throw new ModelException();

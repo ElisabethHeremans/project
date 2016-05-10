@@ -699,7 +699,7 @@ public class Unit {
 	}
 	/**
 	 * Checks whether the given cube is neighboring this unit or 
-	 * 	has the same cubecoördinates as this unit.
+	 * 	has the same cubecoï¿½rdinates as this unit.
 	 * @param cubePosition
 	 * 		The cube to check.
 	 * @return True if and only if the difference between the respective x, y and z -coordinates of the cubeCenters are equal to 0, 1 or -1.

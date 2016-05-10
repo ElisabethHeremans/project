@@ -47,13 +47,23 @@ public class World {
 	 */
 	public World(int[][][] terrainTypes, TerrainChangeListener listener) {
 		this.setTerrainTypes(terrainTypes);
+		System.out.println("terraintypes: "+ Arrays.toString(getTerrainTypes()));
 		this.xDimension = terrainTypes.length;
 		this.yDimension = terrainTypes[0].length;
 		this.zDimension = terrainTypes[0][0].length;
 		this.listener = listener;
 		this.connectedToBorder = new ConnectedToBorder(this.getxDimension(),this.getyDimension(),this.getzDimension());
 		initializeCubeTerrains();
-		
+//		for (int[][] i : getTerrainTypes()){
+//			for (int[] j: i){
+//				for (int k: j){
+//					if (k != 0 &&k != 1 &&k != 2&&k!= 3)
+//						throw new IllegalArgumentException();
+//					System.out.println(TerrainType.getTerrain(k));
+//				}
+//			}
+//		}
+
 	}
 	
 	
@@ -136,11 +146,15 @@ public class World {
 	 * 			that do not reference terrain types (integers other than 0,1,2 and 3)
 	 */
 	public final void setTerrainTypes(int[][][] terrainTypes) throws IllegalArgumentException {
-		for (int[][] i : terrainTypes)
-			for (int[] j: i)
-				for (int k: j)
+		for (int[][] i : terrainTypes){
+			for (int[] j: i){
+				for (int k: j){
 					if (k != 0 &&k != 1 &&k != 2&&k!= 3)
 						throw new IllegalArgumentException();
+					//System.out.println(k );
+				}
+			}
+		}
 		this.terrainTypes = terrainTypes;
 	}
 	
