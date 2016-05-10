@@ -2,7 +2,7 @@ package hillbillies.model.expression;
 
 import hillbillies.model.Position;
 
-public class XYZExpression extends PositionExpression<Position> {
+public class XYZExpression extends PositionExpression {
 	
 //	public XYZExpression(int x, int y, int z){
 //		setValue(Position(new int[] {x,y,z}));

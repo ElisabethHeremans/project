@@ -4,7 +4,7 @@ import hillbillies.model.Position;
 import hillbillies.model.Unit;
 import hillbillies.model.expression.vuilbak.ComposedPExpression;
 
-public class PositionOfExpression<E extends UnitExpression<?>> extends UnaryPositionExpression<E> {
+public class PositionOfExpression<E extends UnitExpression> extends UnaryPositionExpression<E> {
 
 	public PositionOfExpression(E unit){
 		setExpression(unit);

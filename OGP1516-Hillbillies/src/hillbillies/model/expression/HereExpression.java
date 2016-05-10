@@ -4,7 +4,7 @@ package hillbillies.model.expression;
 import hillbillies.model.Position;
 import hillbillies.model.expression.vuilbak.BasicPExpression;
 
-public class HereExpression<E> extends PositionExpression<E> {
+public class HereExpression extends PositionExpression {
 	public HereExpression(){
 		setValue(here());
 	}

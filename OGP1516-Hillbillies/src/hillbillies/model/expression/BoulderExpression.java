@@ -6,7 +6,7 @@ import hillbillies.model.Unit;
 import hillbillies.model.Vector;
 import hillbillies.model.expression.vuilbak.BasicPExpression;
 
-public class BoulderExpression<E> extends PositionExpression<E> {
+public class BoulderExpression extends PositionExpression {
 		public BoulderExpression(){
 			setValue(new Position(findNearestBoulder()));
 		}

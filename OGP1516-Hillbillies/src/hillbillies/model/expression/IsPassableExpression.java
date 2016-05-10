@@ -1,6 +1,6 @@
 package hillbillies.model.expression;
 
-public class IsPassableExpression<E extends PositionExpression<?>> extends UnaryBooleanExpression<E> {
+public class IsPassableExpression<E extends PositionExpression> extends UnaryBooleanExpression<E> {
 
 	public IsPassableExpression(E e) {
 		setExpression(e);

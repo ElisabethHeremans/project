@@ -2,7 +2,7 @@ package hillbillies.model.expression;
 
 import hillbillies.model.Unit;
 
-public class IsAliveExpression<E extends UnitExpression<?>> extends UnaryBooleanExpression<E> {
+public class IsAliveExpression<E extends UnitExpression> extends UnaryBooleanExpression<E> {
 
 	public IsAliveExpression(E e) {
 		setExpression(e);

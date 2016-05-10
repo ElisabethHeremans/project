@@ -6,7 +6,7 @@ import hillbillies.model.Unit;
 import hillbillies.model.Vector;
 import hillbillies.model.expression.vuilbak.BasicPExpression;
 
-public class LogExpression<E> extends PositionExpression<E> {
+public class LogExpression extends PositionExpression {
 	public LogExpression(){
 		setValue(findNearestLog());
 	}

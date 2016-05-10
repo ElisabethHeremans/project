@@ -1,6 +1,6 @@
 package hillbillies.model.expression;
 
-public class BasicVariableExpression<E> extends VariableExpression<E> {
+public class BasicVariableExpression extends VariableExpression {
 	public BasicVariableExpression(String variableName){
 		setName(variableName);
 		//setValue in AssignmentStatement gedaan
