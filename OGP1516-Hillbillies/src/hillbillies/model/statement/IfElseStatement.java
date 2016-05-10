@@ -1,21 +1,25 @@
 package hillbillies.model.statement;
 
+import be.kuleuven.cs.som.annotate.Basic;
+import be.kuleuven.cs.som.annotate.Raw;
 import hillbillies.model.expression.BooleanExpression;
 import hillbillies.model.expression.Expression;
 
-public class IfElseStatement extends ComposedEStatement {
+public class IfElseStatement<E extends BooleanExpression<?>, S extends ComposedStatement<?,?>>
+extends ExpressionStatement<E,S> {
 	
-	public IfElseStatement(BooleanExpression condition, Statement thenBody, Statement elseBody){
+	public IfElseStatement(E condition, S thenBody, S elseBody){
 		setExpression(condition);
 		setStatement(thenBody);
 		setElseBody(elseBody);
 	}
 	
-	public IfElseStatement(BooleanExpression condition, Statement thenBody){
-		this(condition, thenBody, new BreakStatement());
+	public IfElseStatement(E condition, S thenBody){
+		setExpression(condition);
+		setStatement(thenBody);
 	}
 	
-	public Expression getCondition() {
+	public E getCondition() {
 		return getExpression();
 	}
 	//mag je casten naar een boolean? en dan BooleanExpression teruggeven?
@@ -23,21 +27,34 @@ public class IfElseStatement extends ComposedEStatement {
 //	public void setCondition(BooleanExpression condition) {
 //		this.condition = condition;
 //	}
-	public Statement getThenBody() {
+	public S getThenBody() {
 		return getStatement();
 	}
 //	public void setIfBody(Statement ifBody) {
 //		this.ifBody = ifBody;
 //	}
-	public Statement getElseBody() {
+	public S getElseBody() {
 		return elseBody;
 	}
-	public void setElseBody(Statement elseBody) {
+	public void setElseBody(S elseBody) {
 		this.elseBody = elseBody;
 	}
 //
 //	private BooleanExpression condition;
 //	private Statement ifBody;
-	private Statement elseBody;
+	private S elseBody;
+	
+	@Basic @Raw
+	public final S getStatement() {
+		return statement;
+	}
+
+	@Raw
+	public final void setStatement(S statement) {
+		this.statement = statement;
+	}
+	
+
+	private S statement;
 
 }
