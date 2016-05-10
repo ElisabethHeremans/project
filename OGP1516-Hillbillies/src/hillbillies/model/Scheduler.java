@@ -236,7 +236,7 @@ public class Scheduler {
 //				return getTasks()[i];
 //		}
 //		return null;
-		return tasks.getLast();
+		return ((LinkedList<Task>) getTasks()).getLast();
 			
 	}
 	

@@ -2,14 +2,15 @@ package hillbillies.model.expression;
 
 import hillbillies.model.Unit;
 import hillbillies.model.Vector;
+import hillbillies.model.types.FriendType;
 
-public class FriendExpression<E> extends UnitExpression<E>{
+public class FriendExpression< E> extends UnitExpression<FriendType,E>{
 	
 	public FriendExpression(){
 		setValue(findFriendUnit());
 	}
 
-	private Unit findFriendUnit() {
+	private FriendType findFriendUnit() {
 		Unit unit = this.getStatement().getTask().getExecutingUnit();
 		assert (unit!=null);
 		Unit nearest = null;
@@ -23,11 +24,11 @@ public class FriendExpression<E> extends UnitExpression<E>{
 				}
 			}
 		}
-		return nearest;
+		return new FriendType(nearest);
 	}
 
 	@Override
-	public Unit evaluateExpression() {
+	public FriendType evaluateExpression() {
 		// TODO Auto-generated method stub
 		return null;
 	}
