@@ -5,7 +5,7 @@ import hillbillies.model.Unit;
 import hillbillies.model.Vector;
 import hillbillies.model.expression.vuilbak.BasicPExpression;
 
-public class WorkshopExpression<E> extends PositionExpression<E> {
+public class WorkshopExpression extends PositionExpression {
 	public WorkshopExpression(){
 		setValue(new Position(findNearestWorkshop()));
 	}

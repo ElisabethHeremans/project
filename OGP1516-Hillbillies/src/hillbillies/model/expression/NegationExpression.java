@@ -1,6 +1,6 @@
 package hillbillies.model.expression;
 
-public class NegationExpression<E extends BooleanExpression<?>> extends UnaryBooleanExpression<E> {
+public class NegationExpression<E extends BooleanExpression> extends UnaryBooleanExpression<E> {
 
 	public NegationExpression(E e) {
 		setExpression(e);

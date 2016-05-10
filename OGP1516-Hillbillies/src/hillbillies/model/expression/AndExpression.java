@@ -1,6 +1,6 @@
 package hillbillies.model.expression;
 
-public class AndExpression<E extends BooleanExpression<?>> extends BinaryBooleanExpression<E> {
+public class AndExpression<E extends BooleanExpression> extends BinaryBooleanExpression<E> {
 
 	public AndExpression(E right, E left) {
 		super(right, left);

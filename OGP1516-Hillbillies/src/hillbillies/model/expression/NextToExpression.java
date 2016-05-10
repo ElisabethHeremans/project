@@ -5,7 +5,7 @@ import java.util.List;
 import hillbillies.model.Position;
 import hillbillies.model.expression.vuilbak.ComposedPExpression;
 
-public class NextToExpression<E extends PositionExpression<?>> extends UnaryPositionExpression<E> {
+public class NextToExpression<E extends PositionExpression> extends UnaryPositionExpression<E> {
 	
 	public NextToExpression(E position){
 		setExpression(position);

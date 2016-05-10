@@ -1,6 +1,6 @@
 package hillbillies.model.expression;
 
-public class BracketBooleanExpression<E extends BooleanExpression<?>> extends UnaryBooleanExpression<E> {
+public class BracketBooleanExpression<E extends BooleanExpression> extends UnaryBooleanExpression<E> {
 
 	public BracketBooleanExpression(E e) {
 		setExpression(e);

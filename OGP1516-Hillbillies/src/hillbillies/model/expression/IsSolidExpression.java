@@ -1,6 +1,6 @@
 package hillbillies.model.expression;
 
-public class IsSolidExpression<E extends PositionExpression<?>> extends UnaryBooleanExpression<E> {
+public class IsSolidExpression<E extends PositionExpression> extends UnaryBooleanExpression<E> {
 
 	public IsSolidExpression(E e) {
 		setExpression(e);

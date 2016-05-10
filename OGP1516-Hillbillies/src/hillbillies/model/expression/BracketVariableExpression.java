@@ -1,7 +1,7 @@
 package hillbillies.model.expression;
 
-public class BracketVariableExpression<E extends VariableExpression<?>> extends VariableExpression<E> {
-	public BracketVariableExpression(E v){
+public class BracketVariableExpression extends VariableExpression{
+	public BracketVariableExpression(Expression v){
 		setExpression(v);
 		
 	}
@@ -9,18 +9,18 @@ public class BracketVariableExpression<E extends VariableExpression<?>> extends 
 	/**
 	 * @return the expression
 	 */
-	public E getExpression() {
+	public Expression getExpression() {
 		return expression;
 	}
 
 	/**
 	 * @param expression the expression to set
 	 */
-	public void setExpression(E expression) {
+	public void setExpression(Expression expression) {
 		this.expression = expression;
 	}
 
-	private E expression;
+	private Expression expression;
 
 	@Override
 	public Object evaluateExpression() {
