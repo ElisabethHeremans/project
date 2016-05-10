@@ -6,15 +6,16 @@ import java.util.List;
 import java.util.Queue;
 
 import hillbillies.model.*;
+import hillbillies.model.types.UnitType;
 import ogp.framework.util.Util;
 
-public class AnyExpression<E> extends UnitExpression<E>{
+public class AnyExpression<E> extends UnitExpression<UnitType, E>{
 	
 	public AnyExpression(){
 		setValue(findNearestAnyUnit());
 	}
 	
-	public Unit findNearestAnyUnit(){
+	public UnitType findNearestAnyUnit(){
 		Unit unit = this.getStatement().getTask().getExecutingUnit();
 		assert (unit!=null);
 		Unit nearest = null;
@@ -28,11 +29,11 @@ public class AnyExpression<E> extends UnitExpression<E>{
 				}
 			}
 		}
-		return nearest;
+		return new UnitType(nearest);
 	}
 
 	@Override
-	public Unit evaluateExpression() {
+	public UnitType evaluateExpression() {
 		// TODO Auto-generated method stub
 		return null;
 	}

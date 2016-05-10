@@ -2,14 +2,15 @@ package hillbillies.model.expression;
 
 import hillbillies.model.Unit;
 import hillbillies.model.Vector;
+import hillbillies.model.types.EnemyType;
 
-public class EnemyExpression<E> extends UnitExpression<E>{
+public class EnemyExpression<E> extends UnitExpression<EnemyType,E>{
 	
 	public EnemyExpression(){
 		setValue(findEnemyUnit());
 	}
 
-	private Unit findEnemyUnit() {
+	private EnemyType findEnemyUnit() {
 		Unit unit = this.getStatement().getTask().getExecutingUnit();
 		assert (unit!=null);
 		Unit nearest = null;
@@ -23,11 +24,11 @@ public class EnemyExpression<E> extends UnitExpression<E>{
 				}
 			}
 		}
-		return nearest;
+		return new EnemyType(nearest);
 	}
 
 	@Override
-	public Unit evaluateExpression() {
+	public EnemyType evaluateExpression() {
 		// TODO Auto-generated method stub
 		return null;
 	}
