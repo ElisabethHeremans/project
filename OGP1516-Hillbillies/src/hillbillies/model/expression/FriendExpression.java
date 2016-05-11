@@ -10,7 +10,7 @@ public class FriendExpression extends UnitExpression{
 		setValue(findFriendUnit());
 	}
 
-	private FriendType findFriendUnit() {
+	private Unit findFriendUnit() {
 		Unit unit = this.getStatement().getTask().getExecutingUnit();
 		assert (unit!=null);
 		Unit nearest = null;
@@ -24,11 +24,11 @@ public class FriendExpression extends UnitExpression{
 				}
 			}
 		}
-		return new FriendType(nearest);
+		return nearest;
 	}
 
-	@Override
-	public FriendType evaluateExpression() {
+	
+	public Unit evaluateExpression() {
 		// TODO Auto-generated method stub
 		return null;
 	}

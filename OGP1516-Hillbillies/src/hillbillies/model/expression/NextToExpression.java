@@ -21,10 +21,16 @@ public class NextToExpression<E extends PositionExpression> extends UnaryPositio
 			return new Position(neighbouringPositions.get(0));
 	}
 
-	@Override
+	
 	public Position evaluateExpression() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	
+	public void setValue(Object object) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 

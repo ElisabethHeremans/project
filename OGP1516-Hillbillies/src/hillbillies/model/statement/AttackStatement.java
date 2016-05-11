@@ -2,7 +2,7 @@ package hillbillies.model.statement;
 
 import hillbillies.model.expression.UnitExpression;
 
-public class AttackStatement<E extends UnitExpression<?>,S> extends ActionStatement<E,S> {
+public class AttackStatement<E extends UnitExpression> extends ActionStatement<E> {
 
 	public AttackStatement(E e) {
 		setExpression(e);

@@ -2,6 +2,7 @@ package hillbillies.model.statement;
 
 public interface IComposedStatement<S> {
 	
-	//ll
-
+	void setStatement(S statement);
+	
+	S getStatement();
 }

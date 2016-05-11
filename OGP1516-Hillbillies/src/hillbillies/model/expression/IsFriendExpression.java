@@ -11,7 +11,7 @@ public class IsFriendExpression<E extends UnitExpression> extends UnaryBooleanEx
 		setValue(thisUnit.getFaction() == other.getFaction());
 	}
 
-	@Override
+	
 	public Boolean evaluateExpression() {
 		Unit thisUnit = this.getStatement().getTask().getExecutingUnit();
 		Unit other = (Unit) getExpression().getValue();

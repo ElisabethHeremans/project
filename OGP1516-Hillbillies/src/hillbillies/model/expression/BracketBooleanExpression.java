@@ -7,7 +7,7 @@ public class BracketBooleanExpression<E extends BooleanExpression> extends Unary
 		setValue(e.getValue());
 	}
 
-	@Override
+
 	public Boolean evaluateExpression() {
 		// TODO Auto-generated method stub
 		return null;

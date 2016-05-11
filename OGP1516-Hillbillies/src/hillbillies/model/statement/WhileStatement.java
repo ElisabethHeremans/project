@@ -5,8 +5,8 @@ import be.kuleuven.cs.som.annotate.Raw;
 import hillbillies.model.expression.BooleanExpression;
 import hillbillies.model.expression.Expression;
 
-public class WhileStatement<E extends BooleanExpression<?>, S extends Statement<?,?>>
-extends ExpressionStatement<E,S> {
+public class WhileStatement<E extends BooleanExpression, S extends Statement>
+extends ExpressionStatement<E> implements IComposedStatement<S> {
 	
 	public WhileStatement(E condition, S body){
 		setExpression(condition);
@@ -24,12 +24,12 @@ extends ExpressionStatement<E,S> {
 		
 	}
 	
-	@Basic @Raw
+	@Basic @Raw @Override
 	public final S getStatement() {
 		return statement;
 	}
 
-	@Raw
+	@Raw @Override
 	public final void setStatement(S statement) {
 		this.statement = statement;
 	}

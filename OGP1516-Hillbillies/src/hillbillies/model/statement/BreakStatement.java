@@ -1,6 +1,6 @@
 package hillbillies.model.statement;
 
-public class BreakStatement<E, S> extends Statement<E,S> {
+public class BreakStatement extends Statement {
 	public BreakStatement(){
 		
 	}

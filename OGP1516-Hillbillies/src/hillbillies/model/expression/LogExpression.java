@@ -25,7 +25,7 @@ public class LogExpression extends PositionExpression {
 		return new Position(nearest.getWorld().getCubeCoordinate(nearest.getPosition()));
 	}
 
-	@Override
+	
 	public Position evaluateExpression() {
 		// TODO Auto-generated method stub
 		return null;

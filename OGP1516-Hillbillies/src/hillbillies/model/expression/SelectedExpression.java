@@ -8,7 +8,7 @@ public class SelectedExpression extends PositionExpression {
 		this.setValue(new Position(this.getStatement().getTask().getSelectedCube()));
 	}
 
-	@Override
+	
 	public Position evaluateExpression() {
 		// TODO Auto-generated method stub
 		return null;

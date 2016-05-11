@@ -9,17 +9,7 @@ import hillbillies.part3.programs.SourceLocation;
 
 public abstract class Expression{
 	
-	public abstract Object evaluateExpression();
-
-	public void setValue(Object object){
-		value = object;
-	}
-	
-	private Object value;
-
-	public Object getValue() {
-		return value;
-	}
+	public abstract Object getValue() ;
 
 	public void setSourceLocation(SourceLocation sourceLocation) {
 		this.sourceLocation = sourceLocation;

@@ -15,7 +15,7 @@ public class AnyExpression extends UnitExpression{
 		setValue(findNearestAnyUnit());
 	}
 	
-	public UnitType findNearestAnyUnit(){
+	public Unit findNearestAnyUnit(){
 		Unit unit = this.getStatement().getTask().getExecutingUnit();
 		assert (unit!=null);
 		Unit nearest = null;
@@ -29,11 +29,11 @@ public class AnyExpression extends UnitExpression{
 				}
 			}
 		}
-		return new UnitType(nearest);
+		return nearest;
 	}
 
-	@Override
-	public UnitType evaluateExpression() {
+
+	public Unit evaluateExpression() {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -5,8 +5,8 @@ import be.kuleuven.cs.som.annotate.Raw;
 import hillbillies.model.expression.BooleanExpression;
 import hillbillies.model.expression.Expression;
 
-public class IfElseStatement<E extends BooleanExpression<?>, S extends ComposedStatement<?,?>>
-extends ExpressionStatement<E,S> {
+public class IfElseStatement<E extends BooleanExpression, S extends ComposedStatement>
+extends ExpressionStatement<E> implements IComposedStatement<S>{
 	
 	public IfElseStatement(E condition, S thenBody, S elseBody){
 		setExpression(condition);
@@ -44,12 +44,12 @@ extends ExpressionStatement<E,S> {
 //	private Statement ifBody;
 	private S elseBody;
 	
-	@Basic @Raw
+	@Basic @Raw @Override
 	public final S getStatement() {
 		return statement;
 	}
 
-	@Raw
+	@Raw @Override
 	public final void setStatement(S statement) {
 		this.statement = statement;
 	}

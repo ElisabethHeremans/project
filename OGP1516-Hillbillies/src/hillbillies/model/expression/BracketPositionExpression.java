@@ -9,7 +9,7 @@ public class BracketPositionExpression<E extends PositionExpression> extends Una
 		setValue(e.getValue());
 	}
 
-	@Override
+
 	public Position evaluateExpression() {
 		// TODO Auto-generated method stub
 		return null;

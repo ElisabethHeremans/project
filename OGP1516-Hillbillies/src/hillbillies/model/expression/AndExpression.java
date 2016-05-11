@@ -7,7 +7,6 @@ public class AndExpression<E extends BooleanExpression> extends BinaryBooleanExp
 		setValue(right.getValue()&& left.getValue());
 	}
 
-	@Override
 	public Boolean evaluateExpression() {
 		return getRightExpression().getValue()&& getLeftExpression().getValue();
 	}

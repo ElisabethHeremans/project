@@ -7,7 +7,7 @@ public class NegationExpression<E extends BooleanExpression> extends UnaryBoolea
 		setValue(! (Boolean)e.getValue());
 	}
 
-	@Override
+	
 	public Boolean evaluateExpression() {
 		// TODO Auto-generated method stub
 		return null;

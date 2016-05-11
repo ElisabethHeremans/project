@@ -10,7 +10,7 @@ public class EnemyExpression extends UnitExpression{
 		setValue(findEnemyUnit());
 	}
 
-	private EnemyType findEnemyUnit() {
+	private Unit findEnemyUnit() {
 		Unit unit = this.getStatement().getTask().getExecutingUnit();
 		assert (unit!=null);
 		Unit nearest = null;
@@ -24,11 +24,11 @@ public class EnemyExpression extends UnitExpression{
 				}
 			}
 		}
-		return new EnemyType(nearest);
+		return nearest;
 	}
 
-	@Override
-	public EnemyType evaluateExpression() {
+
+	public Unit evaluateExpression() {
 		// TODO Auto-generated method stub
 		return null;
 	}
