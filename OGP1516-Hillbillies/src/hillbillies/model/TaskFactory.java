@@ -8,11 +8,11 @@ import hillbillies.model.Position;
 import hillbillies.part3.programs.ITaskFactory;
 import hillbillies.part3.programs.SourceLocation;
 
-public class TaskFactory implements ITaskFactory<Expression<?,?>, Statement, Task> {
+public class TaskFactory implements ITaskFactory<Expression, Statement, Task> {
 
-	public TaskFactory(Expression<?,?> e,Statement s,Task t){
+	public TaskFactory(Expression e,Statement s,Task t){
 		
-	}
+	
 	
 	@Override
 	public List<Task> createTasks(String name, int priority, Statement activity, List<int[]> selectedCubes) {

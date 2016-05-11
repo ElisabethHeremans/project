@@ -243,4 +243,8 @@ public class Task {
 	
 	private int[] selectedCube;
 
+	public void executeTask() {
+		getActivities().executeStatement(getExecutingUnit());
+	}
+
 }

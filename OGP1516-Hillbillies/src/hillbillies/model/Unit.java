@@ -2045,8 +2045,8 @@ public class Unit {
 	public void startDefaultBehaviour() {
 		if (this.getStatus() == Status.DONE) {
 			setEnableDefaultBehaviour(true);
-			if (this.getFaction().getScheduler() != null && this.getFaction().getScheduler().hasNext()){
-				this.getFaction().getScheduler().getNextTask();
+			if (this.getFaction().getScheduler() != null && this.getFaction().getScheduler().getAllTasksIterator().hasNext()){
+				this.getFaction().getScheduler().getAllTasksIterator().next().executeTask();
 			}
 			else{
 			List<Unit> potentialEnemies = new ArrayList<>();
