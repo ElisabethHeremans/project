@@ -1,5 +1,7 @@
 package hillbillies.model.expression;
 
+import hillbillies.model.Position;
+
 public abstract class UnaryPositionExpression<E extends Expression> 
 extends PositionExpression implements IComposedUnaryExpression<E> {
 	
