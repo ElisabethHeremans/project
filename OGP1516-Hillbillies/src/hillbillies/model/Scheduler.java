@@ -118,8 +118,6 @@ public class Scheduler {
 //	}
 	
 	public void addAsTask(Task task) throws IllegalArgumentException{
-		if (task.getPriority() > this.getTasks().size()+1)
-			throw new IllegalArgumentException();
 		if(! canHaveAsTask(task)){
 			throw new IllegalArgumentException();
 		}
@@ -127,7 +125,7 @@ public class Scheduler {
 		if(! task.isWellFormed()){
 			throw new IllegalArgumentException();
 		}
-		this.tasks.add(task.getPriority()-1, task);
+		this.tasks.add(task);
 	}
 
 
@@ -177,36 +175,14 @@ public class Scheduler {
 	 * Return the set collecting all tasks attached to this scheduler.
 	 * 	@return The set of tasks of this scheduler.
 	 */
-	public List<Task> getTasks(){
+	public TreeSet<Task> getTasks(){
 		return tasks;
 	}
-	
-	public class SchedulerIterator<T> implements Iterator<T>{
-		
-		private int index;
-		
-		public SchedulerIterator(){
-			index =0;
-		}
-		
-		@Override
-		public boolean hasNext() {
-			return index < tasks.size();
-		}
 
-		@Override
-		public T next() {
-			return (T) tasks.get(index++);
-		}
-		
-		public void remove(){
-			if (index > 0)
-				tasks.remove(index-1);
-		}
-	}
 	
 	public Iterator<Task> getAllTasksIterator(){
-		return new SchedulerIterator<Task>();
+		//return new SchedulerIterator<Task>();
+		return tasks.descendingIterator();
 	}
 	
 	/**
@@ -223,7 +199,7 @@ public class Scheduler {
 		if (! this.hasAsTask(task))
 			throw new IllegalArgumentException();
 		else
-			return getTasks().indexOf(task)+1;
+			return task.getPriority();
 	}
 	
 	/**
@@ -236,17 +212,14 @@ public class Scheduler {
 //				return getTasks()[i];
 //		}
 //		return null;
-		return ((LinkedList<Task>) getTasks()).getLast();
+		return getTasks().last();
 			
 	}
 	
 	public Set<Task> getTasksSatisfying(lambda uitdrukking){
 		
 	}
-	
-	public Task getNextTask(){
-		//iterator die van meer naar minder prioritair task teruggeeft
-	}
+
 	
 	public void markTaskForUnit(Task task,Unit unit){
 		if (!this.getFaction().hasAsUnit(unit))
@@ -265,9 +238,17 @@ public class Scheduler {
 	 * @invar Each element in the set of tasks references a task that
 	 * 		is an acceptable task for this scheduler.
 	 */
-	List<Task> tasks = new LinkedList<>();
+	TreeSet<Task> tasks = new TreeSet<Task>(new Comp());
 
-	
+	public class Comp implements Comparator<Task>{
+		
+		@Override
+		public int compare(Task task1, Task task2){
+			return ((Integer)task1.getPriority()).compareTo(task2.getPriority());
+		}
+
+		
+	}
 	// methodes voor faction verder uitbreiden
 	
 	Faction getFaction(){
@@ -280,4 +261,48 @@ public class Scheduler {
 	
 	private Faction faction;
 
-}
+//	@Override
+//	public Iterator<Task> iterator() {
+//		return new Iterator<Task>(){
+//
+//			@Override
+//			public boolean hasNext() {
+//				// TODO Auto-generated method stub
+//				return false;
+//			}
+//
+//			@Override
+//			public Task next() {
+//				// TODO Auto-generated method stub
+//				return null;
+//			}
+//			
+//		};
+	
+//	
+//	public class SchedulerIterator<T> implements Iterator<T>{
+//		
+//		private int index;
+//		
+//		public SchedulerIterator(){
+//			index =0;
+//		}
+//		
+//		@Override
+//		public boolean hasNext() {
+//			return index < tasks.size();
+//		}
+//
+//		@Override
+//		public T next() {
+//			return (T) ( tasks).get(index++);
+//		}
+//		
+//		public void remove(){
+//			if (index > 0)
+//				tasks.remove(index-1);
+//		}
+//	}
+	}
+
+

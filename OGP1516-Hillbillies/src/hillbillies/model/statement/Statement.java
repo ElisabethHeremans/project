@@ -2,6 +2,7 @@ package hillbillies.model.statement;
 
 import be.kuleuven.cs.som.annotate.*;
 import hillbillies.model.Task;
+import hillbillies.model.Unit;
 import hillbillies.model.expression.Expression;
 
 public abstract class Statement{
@@ -17,5 +18,7 @@ public abstract class Statement{
 	}
 
 	private Task task;
+
+	public abstract void executeStatement(Unit executingUnit); 
 
 }

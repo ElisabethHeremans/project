@@ -1,11 +1,18 @@
 package hillbillies.model.statement;
 
+import hillbillies.model.Unit;
 import hillbillies.model.expression.UnitExpression;
 
 public class AttackStatement<E extends UnitExpression> extends ActionStatement<E> {
 
 	public AttackStatement(E e) {
 		setExpression(e);
+	}
+
+	@Override
+	public void executeStatement(Unit executingUnit) {
+		executingUnit.attack(getExpression().getValue());
+		
 	}
 	
 //	public AttackStatement(UnitExpression unit){

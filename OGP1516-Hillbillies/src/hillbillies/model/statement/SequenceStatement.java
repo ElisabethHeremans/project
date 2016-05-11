@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import be.kuleuven.cs.som.annotate.*;
+import hillbillies.model.Unit;
 
 public class SequenceStatement<E extends ComposedStatement> extends ComposedStatement  
 	implements ISequenceStatement<E>{
@@ -21,6 +22,14 @@ public class SequenceStatement<E extends ComposedStatement> extends ComposedStat
 	}
 
 	private List<E> statements = new ArrayList <>();
+
+	@Override
+	public void executeStatement(Unit executingUnit) {
+		for( Statement statement: getStatements()){
+			executeStatement(executingUnit);
+		}
+		
+	}
 
 
 }
