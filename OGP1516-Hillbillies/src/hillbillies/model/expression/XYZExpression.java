@@ -1,5 +1,6 @@
 package hillbillies.model.expression;
 
+import hillbillies.model.ExecutionContext;
 import hillbillies.model.Position;
 
 public class XYZExpression extends PositionExpression {
@@ -13,37 +14,10 @@ public class XYZExpression extends PositionExpression {
 		setValue(pos);
 	}
 
-	
-	public Position evaluateExpression() {
-		// TODO Auto-generated method stub
-		return null;
+	@Override
+	public Position evaluateExpression(ExecutionContext context) {
+		return getValue();
 	}
-	
-	
-	
-//	public int getX() {
-//		return x;
-//	}
-//	private void setX(int x) {
-//		this.x = x;
-//	}
-//	public int getY() {
-//		return y;
-//	}
-//	private void setY(int y) {
-//		this.y = y;
-//	}
-//	public int getZ() {
-//		return z;
-//	}
-//	private void setZ(int z) {
-//		this.z = z;
-//	}
-//
-//
-//
-//	private int x;
-//	private int y;
-//	private int z;
+
 
 }

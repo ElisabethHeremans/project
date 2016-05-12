@@ -1,5 +1,6 @@
 package hillbillies.model.expression;
 
+import hillbillies.model.ExecutionContext;
 import hillbillies.model.Position;
 
 public abstract class PositionExpression extends Expression {
@@ -16,4 +17,7 @@ public abstract class PositionExpression extends Expression {
 	public Position getValue() {
 		return value;
 	}
+	
+	@Override
+	public abstract Position evaluateExpression(ExecutionContext context);
 }
