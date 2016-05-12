@@ -1,21 +1,17 @@
 package hillbillies.model.expression;
 
-import hillbillies.model.Unit;
+import hillbillies.model.ExecutionContext;
 
 public class IsAliveExpression<E extends UnitExpression> extends UnaryBooleanExpression<E> {
 
 	public IsAliveExpression(E e) {
 		setExpression(e);
-		Unit thisUnit = this.getStatement().getTask().getExecutingUnit();
-		setValue(!thisUnit.isTerminated());
-
 	}
-	
 
-	
-	public Boolean evaluateExpression() {
-		// TODO Auto-generated method stub
-		return null;
+	@Override
+	public Boolean evaluateExpression(ExecutionContext context) {
+		setValue(!context.getExecutingUnit().isTerminated());
+		return getValue();
 	}
 
 }

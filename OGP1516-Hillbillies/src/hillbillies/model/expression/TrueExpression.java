@@ -1,14 +1,15 @@
 package hillbillies.model.expression;
 
+import hillbillies.model.ExecutionContext;
+
 public class TrueExpression extends BooleanExpression {
 	public TrueExpression(){
-		setValue(true);
 	}
 
-	
-	public Boolean evaluateExpression() {
-		// TODO Auto-generated method stub
-		return true;
+	@Override
+	public Boolean evaluateExpression(ExecutionContext context) {
+		setValue(true);
+		return getValue();
 	}
 
 }

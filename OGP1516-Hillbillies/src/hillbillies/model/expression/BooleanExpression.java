@@ -1,5 +1,7 @@
 package hillbillies.model.expression;
 
+import hillbillies.model.ExecutionContext;
+
 public abstract class BooleanExpression extends Expression {
 	
 	
@@ -17,5 +19,8 @@ public abstract class BooleanExpression extends Expression {
 	public final Boolean getValue() {
 		return value;
 	}
+	
+	@Override
+	public abstract Boolean evaluateExpression(ExecutionContext context);
 
 }

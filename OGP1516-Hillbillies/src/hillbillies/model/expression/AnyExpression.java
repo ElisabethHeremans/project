@@ -1,22 +1,14 @@
 package hillbillies.model.expression;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-
 import hillbillies.model.*;
-import hillbillies.model.types.UnitType;
-import ogp.framework.util.Util;
 
 public class AnyExpression extends UnitExpression{
 	
 	public AnyExpression(){
-		setValue(findNearestAnyUnit());
 	}
 	
-	public Unit findNearestAnyUnit(){
-		Unit unit = this.getStatement().getTask().getExecutingUnit();
+	public Unit findNearestAnyUnit(Unit unit){
+		//Unit unit = this.getStatement().getTask().getExecutingUnit();
 		assert (unit!=null);
 		Unit nearest = null;
 		double nearestDist = 0;
@@ -32,10 +24,10 @@ public class AnyExpression extends UnitExpression{
 		return nearest;
 	}
 
-
-	public Unit evaluateExpression() {
-		// TODO Auto-generated method stub
-		return null;
+	@Override
+	public Unit evaluateExpression(ExecutionContext context) {
+		setValue(findNearestAnyUnit(context.getExecutingUnit()));
+		return getValue();
 	}
 	
 

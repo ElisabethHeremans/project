@@ -1,14 +1,17 @@
 package hillbillies.model.expression;
 
+import hillbillies.model.ExecutionContext;
+
 public class AndExpression<E extends BooleanExpression> extends BinaryBooleanExpression<E> {
 
 	public AndExpression(E right, E left) {
 		super(right, left);
-		setValue(right.getValue()&& left.getValue());
 	}
 
-	public Boolean evaluateExpression() {
-		return getRightExpression().getValue()&& getLeftExpression().getValue();
+	@Override
+	public Boolean evaluateExpression(ExecutionContext context) {
+		setValue(getRightExpression().getValue() && getLeftExpression().getValue());
+		return getValue();
 	}
 
 }

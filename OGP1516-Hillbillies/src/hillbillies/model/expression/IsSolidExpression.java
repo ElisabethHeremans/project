@@ -1,17 +1,17 @@
 package hillbillies.model.expression;
 
+import hillbillies.model.ExecutionContext;
+
 public class IsSolidExpression<E extends PositionExpression> extends UnaryBooleanExpression<E> {
 
 	public IsSolidExpression(E e) {
 		setExpression(e);
-		setValue(!this.getStatement().getTask().getExecutingUnit().
-				getWorld().getTerrain(e.getValue().getCoords()).isPassable());
 	}
 
-	
-	public Boolean evaluateExpression() {
-		return !this.getStatement().getTask().getExecutingUnit().
-				getWorld().getTerrain(getExpression().getValue().getCoords()).isPassable();
+	@Override
+	public Boolean evaluateExpression(ExecutionContext context) {
+		setValue(context.getExecutingUnit().getWorld().getTerrain(getExpression().getValue().getCoords()).isPassable());
+		return getValue();
 	}
 	
 	
