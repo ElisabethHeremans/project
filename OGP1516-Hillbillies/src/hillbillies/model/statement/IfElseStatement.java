@@ -1,12 +1,7 @@
 package hillbillies.model.statement;
 
-import java.util.List;
-
-import be.kuleuven.cs.som.annotate.Basic;
-import be.kuleuven.cs.som.annotate.Raw;
-import hillbillies.model.Unit;
+import hillbillies.model.ExecutionContext;
 import hillbillies.model.expression.BooleanExpression;
-import hillbillies.model.expression.Expression;
 
 public class IfElseStatement<E extends BooleanExpression, S extends ComposedStatement,T extends ComposedStatement>
 extends ExpressionStatement<E> implements IComposedBinaryStatement<S,T>{
@@ -29,15 +24,6 @@ extends ExpressionStatement<E> implements IComposedBinaryStatement<S,T>{
 	
 
 	private S thenBody;
-
-	@Override
-	public void executeStatement(Unit executingUnit) {
-		if (getExpression().getValue())
-			getFirstStatement().executeStatement(executingUnit);
-		else
-			getSecondStatement().executeStatement(executingUnit);
-		
-	}
 
 	@Override
 	public void setFirstStatement(S statement) {
@@ -63,10 +49,13 @@ extends ExpressionStatement<E> implements IComposedBinaryStatement<S,T>{
 		return elseBody;
 	}
 
+
 	@Override
-	public void executeStatement(List<Object> context) {
-		// TODO Auto-generated method stub
-		
+	public void executeStatement(ExecutionContext context) {
+		if (getExpression().getValue())
+			getFirstStatement().executeStatement(context);
+		else
+			getSecondStatement().executeStatement(context);		
 	}
 
 }

@@ -1,5 +1,6 @@
 package hillbillies.model.statement;
 
+import hillbillies.model.ExecutionContext;
 import hillbillies.model.Unit;
 import hillbillies.model.expression.Expression;
 
@@ -10,7 +11,7 @@ public class PrintStatement<E extends Expression> extends ExpressionStatement<E>
 	}
 
 	@Override
-	public void executeStatement(Unit executingUnit) {
+	public void executeStatement(ExecutionContext context) {
 		System.out.println(getExpression().toString());
 		
 	}
