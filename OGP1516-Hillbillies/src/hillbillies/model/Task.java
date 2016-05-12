@@ -51,7 +51,7 @@ public class Task {
 			priority = 0;
 		setPriority(priority);
 		this.setActivities(activities);
-		this.setSelectedCube(selectedCube);
+		this.setExecutionContext(new ExecutionContext(null,selectedCube,null));
 	}
 	
 	public Task(String name, int priority, Statement activities){
@@ -174,7 +174,7 @@ public class Task {
 		if (!isValidActivities(activities))
 			throw new IllegalArgumentException();
 		this.activities = activities;
-		activities.setTask(this);
+		//activities.setE;
 	}
 
 	/**
@@ -211,76 +211,62 @@ public class Task {
 	/**
 	 * @return the executingUnit
 	 */
-	@Basic @Raw
 	public Unit getExecutingUnit() {
-		return (Unit) executionContext.get(0);
+		return this.getExecutionContext().getExecutingUnit();
 	}
 
 
 	/**
 	 * @param executingUnit the executingUnit to set
 	 */
-	@Raw
 	public void setExecutingUnit(Unit executingUnit) {
-		executionContext.add(0, executingUnit);
+		this.getExecutionContext().setExecutingUnit(executingUnit);
 		
 	}
 
-
-	//private Unit executingUnit;
 	
 	
 	/**
 	 * Return the selected Cube for this task.
 	 */
-	@Basic @Raw
 	public int[] getSelectedCube() {
-		return (int[]) executionContext.get(1);
+		return this.getExecutionContext().getSelectedCube();
 	}
 
 
 	/**
 	 * @param selectedCube the selectedCube to set
 	 */
-	@Raw
 	private void setSelectedCube(int[] selectedCube) {
-		executionContext.add(1, selectedCube);
+		 this.getExecutionContext().setSelectedCube(selectedCube);
 	}
 	
 	
-	//private int[] selectedCube;
 	
 	public void addVariable(String variableName,Expression expr){
-		if (executionContext.get(2) == null){
-			Map<String,Expression> map = new HashMap<String,Expression>();
-			map.put(variableName,expr);
-			executionContext.add(2, map);
-		}
-		else{
-			((HashMap<String,Expression>)executionContext.get(2)).put(variableName,expr);
-		}
+		 this.getExecutionContext().addVariable(variableName,expr);
 	}
 	
-	public Expression lookForVariable(String variableName){
-		return ((HashMap<String,Expression>)getExecutionContext()).get(variableName);
-		
-	}
+//	public Expression lookForVariable(String variableName){
+//		return ((HashMap<String,Expression>)getExecutionContext()).get(variableName);
+//		
+//	}
 
 	public void executeTask() {
 		getActivities().executeStatement(getExecutionContext());
 	}
 	
 	@Raw @Basic
-	public List<Object> getExecutionContext(){
+	public ExecutionContext getExecutionContext(){
 		return executionContext;
 	}
 	
 	
-//	
-//	public void setExecutionContext(List<Object> executionContext) {
-//		this.executionContext = executionContext;
-//	}
+	@Raw
+	public void setExecutionContext(ExecutionContext executionContext) {
+		this.executionContext = executionContext;
+	}
 
-	private List<Object> executionContext= new ArrayList<Object>(3);
+	private ExecutionContext executionContext;
 
 }
