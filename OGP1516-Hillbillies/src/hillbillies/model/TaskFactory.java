@@ -35,12 +35,12 @@ public class TaskFactory implements ITaskFactory<Expression, Statement, Task> {
 
 	@Override
 	public Statement createAssignment(String variableName, Expression value, SourceLocation sourceLocation) {
-		return new AssignmentStatement(variableName, value); // correct? 
+		return new AssignmentStatement<>(variableName, value); // correct? 
 	}
 
 	@Override
 	public Statement createWhile(Expression condition, Statement body, SourceLocation sourceLocation) {
-		return new WhileStatement((BooleanExpression) condition,(ComposedStatement) body);
+		return new WhileStatement<>((BooleanExpression) condition,(ComposedStatement) body);
 	}
 
 	@Override
@@ -55,7 +55,7 @@ public class TaskFactory implements ITaskFactory<Expression, Statement, Task> {
 
 	@Override
 	public Statement createPrint(Expression value, SourceLocation sourceLocation) {
-		return new PrintStatement(value);
+		return new PrintStatement<>(value);
 	}
 
 	@Override
@@ -65,12 +65,12 @@ public class TaskFactory implements ITaskFactory<Expression, Statement, Task> {
 
 	@Override
 	public Statement createMoveTo(Expression position, SourceLocation sourceLocation) {
-		return new MoveToStatement((PositionExpression) position);
+		return new MoveToStatement<>((PositionExpression) position);
 	}
 
 	@Override
 	public Statement createWork(Expression position, SourceLocation sourceLocation) {
-		return new WorkStatement((PositionExpression) position);
+		return new WorkStatement<>((PositionExpression) position);
 	}
 
 	@Override
@@ -86,55 +86,55 @@ public class TaskFactory implements ITaskFactory<Expression, Statement, Task> {
 	@Override
 	public Expression createReadVariable(String variableName, SourceLocation sourceLocation) {
 		Expression expr = new BasicVariableExpression(variableName);
-		expr.getAssignedExpression()
-		for (Expression expr: getTask().getExecutionContext().get(2).keySet())
+		expr.getAssignedExpression();
+		for (Expression express: getTask().getExecutionContext().get(2).keySet())
 			//if value == variableName
 		return new BasicVariableExpression(variableName);
 	}
 
 	@Override
 	public Expression createIsSolid(Expression position, SourceLocation sourceLocation) {
-		return new IsSolidExpression((PositionExpression) position);
+		return new IsSolidExpression<>((PositionExpression) position);
 	}
 
 	@Override
 	public Expression createIsPassable(Expression position, SourceLocation sourceLocation) {
-		return new IsPassableExpression((PositionExpression) position);
+		return new IsPassableExpression<>((PositionExpression) position);
 	}
 
 	@Override
 	public Expression createIsFriend(Expression unit, SourceLocation sourceLocation) {
-		return new IsFriendExpression((UnitExpression) unit);
+		return new IsFriendExpression<>((UnitExpression) unit);
 	}
 
 	@Override
 	public Expression createIsEnemy(Expression unit, SourceLocation sourceLocation) {
-		return new IsEnemyExpression((UnitExpression) unit);
+		return new IsEnemyExpression<>((UnitExpression) unit);
 	}
 
 	@Override
 	public Expression createIsAlive(Expression unit, SourceLocation sourceLocation) {
-		return new IsAliveExpression((UnitExpression) unit);
+		return new IsAliveExpression<>((UnitExpression) unit);
 	}
 
 	@Override
 	public Expression createCarriesItem(Expression unit, SourceLocation sourceLocation) {
-		return new CarriesItemExpression((UnitExpression) unit);
+		return new CarriesItemExpression<>((UnitExpression) unit);
 	}
 
 	@Override
 	public Expression createNot(Expression expression, SourceLocation sourceLocation) {
-		return new NegationExpression((BooleanExpression) expression);
+		return new NegationExpression<>((BooleanExpression) expression);
 	}
-
+	
 	@Override
-	public Expression createAnd(Expression<?,?> left, Expression<?,?> right, SourceLocation sourceLocation) {
-		return new AndExpression((BooleanExpression)left, (BooleanExpression)right);
+	public Expression createAnd(Expression left, Expression right, SourceLocation sourceLocation) {
+		return new AndExpression<>((BooleanExpression)left, (BooleanExpression)right);
 	}
 
 	@Override
 	public Expression createOr(Expression left, Expression right, SourceLocation sourceLocation) {
-		return new OrExpression((BooleanExpression)left, (BooleanExpression)right);
+		return new OrExpression<>((BooleanExpression)left, (BooleanExpression)right);
 	}
 
 	@Override
@@ -164,7 +164,7 @@ public class TaskFactory implements ITaskFactory<Expression, Statement, Task> {
 
 	@Override
 	public Expression createNextToPosition(Expression position, SourceLocation sourceLocation) {
-		return new NextToExpression((PositionExpression) position);
+		return new NextToExpression<>((PositionExpression) position);
 	}
 
 	@Override
@@ -204,8 +204,12 @@ public class TaskFactory implements ITaskFactory<Expression, Statement, Task> {
 
 	@Override
 	public Expression createPositionOf(Expression unit, SourceLocation sourceLocation) {
-		return new PositionOfExpression((UnitExpression) unit);
+		return new PositionOfExpression<>((UnitExpression) unit);
 	}
+
+
+
+
 
 
 
