@@ -1,5 +1,7 @@
 package hillbillies.model.expression;
 
+import java.util.List;
+
 import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Raw;
 import hillbillies.model.Task;
@@ -10,6 +12,8 @@ import hillbillies.part3.programs.SourceLocation;
 public abstract class Expression{
 	
 	public abstract Object getValue() ;
+	
+	public abstract Object evaluateExpression(List<Object> executionContext);
 
 	public void setSourceLocation(SourceLocation sourceLocation) {
 		this.sourceLocation = sourceLocation;

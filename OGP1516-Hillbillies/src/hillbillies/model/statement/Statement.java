@@ -1,5 +1,7 @@
 package hillbillies.model.statement;
 
+import java.util.List;
+
 import be.kuleuven.cs.som.annotate.*;
 import hillbillies.model.Task;
 import hillbillies.model.Unit;
@@ -19,6 +21,6 @@ public abstract class Statement{
 
 	private Task task;
 
-	public abstract void executeStatement(Unit executingUnit); 
+	public abstract void executeStatement(List<Object> context); 
 
 }

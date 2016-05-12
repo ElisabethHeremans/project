@@ -24,7 +24,7 @@ public class BasicVariableExpression extends VariableExpression {
 		return null;
 	}
 	
-
+	public Expression get
 	
 	
 }

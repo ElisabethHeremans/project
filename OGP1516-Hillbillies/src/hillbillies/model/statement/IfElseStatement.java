@@ -2,59 +2,63 @@ package hillbillies.model.statement;
 
 import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Raw;
+import hillbillies.model.Unit;
 import hillbillies.model.expression.BooleanExpression;
 import hillbillies.model.expression.Expression;
 
-public class IfElseStatement<E extends BooleanExpression, S extends ComposedStatement>
-extends ExpressionStatement<E> implements IComposedStatement<S>{
+public class IfElseStatement<E extends BooleanExpression, S extends ComposedStatement,T extends ComposedStatement>
+extends ExpressionStatement<E> implements IComposedBinaryStatement<S,T>{
 	
-	public IfElseStatement(E condition, S thenBody, S elseBody){
+	public IfElseStatement(E condition, S thenBody, T elseBody){
 		setExpression(condition);
-		setStatement(thenBody);
-		setElseBody(elseBody);
+		setFirstStatement(thenBody);
+		setSecondStatement(elseBody);
 	}
 	
 	public IfElseStatement(E condition, S thenBody){
-		setExpression(condition);
-		setStatement(thenBody);
+		this(condition,thenBody,null);
 	}
 	
 	public E getCondition() {
 		return getExpression();
 	}
-	//mag je casten naar een boolean? en dan BooleanExpression teruggeven?
+
+	private T elseBody;
 	
-//	public void setCondition(BooleanExpression condition) {
-//		this.condition = condition;
-//	}
-	public S getThenBody() {
-		return getStatement();
+
+	private S thenBody;
+
+	@Override
+	public void executeStatement(Unit executingUnit) {
+		if (getExpression().getValue())
+			getFirstStatement().executeStatement(executingUnit);
+		else
+			getSecondStatement().executeStatement(executingUnit);
+		
 	}
-//	public void setIfBody(Statement ifBody) {
-//		this.ifBody = ifBody;
-//	}
-	public S getElseBody() {
+
+	@Override
+	public void setFirstStatement(S statement) {
+		this.thenBody = statement;
+		
+	}
+
+	@Override
+	public S getFirstStatement() {
+		// TODO Auto-generated method stub
+		return thenBody;
+	}
+
+	@Override
+	public void setSecondStatement(T statement) {
+		this.elseBody = statement;
+		
+	}
+
+	@Override
+	public T getSecondStatement() {
+		// TODO Auto-generated method stub
 		return elseBody;
 	}
-	public void setElseBody(S elseBody) {
-		this.elseBody = elseBody;
-	}
-//
-//	private BooleanExpression condition;
-//	private Statement ifBody;
-	private S elseBody;
-	
-	@Basic @Raw @Override
-	public final S getStatement() {
-		return statement;
-	}
-
-	@Raw @Override
-	public final void setStatement(S statement) {
-		this.statement = statement;
-	}
-	
-
-	private S statement;
 
 }

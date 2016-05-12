@@ -1,6 +1,6 @@
 package hillbillies.model.statement;
 
-public interface IComposedStatement<S> {
+public interface IComposedUnaryStatement<S> {
 	
 	void setStatement(S statement);
 	

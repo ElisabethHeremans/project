@@ -4,7 +4,7 @@ import java.util.*;
 
 import be.kuleuven.cs.som.annotate.*;
 
-public class Scheduler {
+public class Scheduler implements Iterable<Task> {
 	@Raw
 	public Scheduler(){
 	
@@ -180,10 +180,6 @@ public class Scheduler {
 	}
 
 	
-	public Iterator<Task> getAllTasksIterator(){
-		//return new SchedulerIterator<Task>();
-		return tasks.descendingIterator();
-	}
 	
 	/**
 	 * Return the priority of the given task in this scheduler.
@@ -249,6 +245,12 @@ public class Scheduler {
 
 		
 	}
+	
+	public Iterator<Task> getAllTasksIterator(){
+		//return new SchedulerIterator<Task>();
+		return tasks.descendingIterator();
+	}
+
 	// methodes voor faction verder uitbreiden
 	
 	Faction getFaction(){
@@ -261,9 +263,10 @@ public class Scheduler {
 	
 	private Faction faction;
 
-//	@Override
-//	public Iterator<Task> iterator() {
-//		return new Iterator<Task>(){
+	@Override
+	public Iterator<Task> iterator() {
+		return tasks.descendingIterator();
+//				new Iterator<Task>(){
 //
 //			@Override
 //			public boolean hasNext() {
@@ -276,8 +279,8 @@ public class Scheduler {
 //				// TODO Auto-generated method stub
 //				return null;
 //			}
-//			
-//		};
+			
+		};
 	
 //	
 //	public class SchedulerIterator<T> implements Iterator<T>{

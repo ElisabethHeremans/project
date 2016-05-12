@@ -1,6 +1,11 @@
 package hillbillies.model;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import hillbillies.model.expression.*;
 import java.util.List;
+import java.util.Map;
 
 import be.kuleuven.cs.som.annotate.*;
 import hillbillies.model.statement.Statement;
@@ -208,7 +213,7 @@ public class Task {
 	 */
 	@Basic @Raw
 	public Unit getExecutingUnit() {
-		return executingUnit;
+		return (Unit) executionContext.get(0);
 	}
 
 
@@ -217,11 +222,12 @@ public class Task {
 	 */
 	@Raw
 	public void setExecutingUnit(Unit executingUnit) {
-		this.executingUnit = executingUnit;
+		executionContext.add(0, executingUnit);
+		
 	}
 
 
-	private Unit executingUnit;
+	//private Unit executingUnit;
 	
 	
 	/**
@@ -229,7 +235,7 @@ public class Task {
 	 */
 	@Basic @Raw
 	public int[] getSelectedCube() {
-		return selectedCube;
+		return (int[]) executionContext.get(1);
 	}
 
 
@@ -238,13 +244,43 @@ public class Task {
 	 */
 	@Raw
 	private void setSelectedCube(int[] selectedCube) {
-		this.selectedCube = selectedCube;
+		executionContext.add(1, selectedCube);
 	}
 	
-	private int[] selectedCube;
+	
+	//private int[] selectedCube;
+	
+	public void addVariable(String variableName,Expression expr){
+		if (executionContext.get(2) == null){
+			Map<String,Expression> map = new HashMap<String,Expression>();
+			map.put(variableName,expr);
+			executionContext.add(2, map);
+		}
+		else{
+			((HashMap<String,Expression>)executionContext.get(2)).put(variableName,expr);
+		}
+	}
+	
+	public Expression lookForVariable(String variableName){
+		return ((HashMap<String,Expression>)getExecutionContext()).get(variableName);
+		
+	}
 
 	public void executeTask() {
-		getActivities().executeStatement(getExecutingUnit());
+		getActivities().executeStatement(getExecutionContext());
 	}
+	
+	@Raw @Basic
+	public List<Object> getExecutionContext(){
+		return executionContext;
+	}
+	
+	
+//	
+//	public void setExecutionContext(List<Object> executionContext) {
+//		this.executionContext = executionContext;
+//	}
+
+	private List<Object> executionContext= new ArrayList<Object>(3);
 
 }

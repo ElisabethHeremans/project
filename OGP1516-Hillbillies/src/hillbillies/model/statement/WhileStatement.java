@@ -2,11 +2,11 @@ package hillbillies.model.statement;
 
 import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Raw;
+import hillbillies.model.Unit;
 import hillbillies.model.expression.BooleanExpression;
-import hillbillies.model.expression.Expression;
 
 public class WhileStatement<E extends BooleanExpression, S extends Statement>
-extends ExpressionStatement<E> implements IComposedStatement<S> {
+extends ExpressionStatement<E> implements IComposedUnaryStatement<S> {
 	
 	public WhileStatement(E condition, S body){
 		setExpression(condition);
@@ -16,9 +16,7 @@ extends ExpressionStatement<E> implements IComposedStatement<S> {
 	public E getCondition() {
 		return getExpression();
 	}
-//	public void setConditie(Expression conditie) {
-//		this.conditie = conditie;
-//	}
+
 	public S getBody() {
 		return getStatement();
 		
@@ -36,10 +34,12 @@ extends ExpressionStatement<E> implements IComposedStatement<S> {
 	
 
 	private S statement;
-//	public void setBody(Statement body) {
-//		this.body = body;
-//	}
-//
-//	private Expression conditie;
-//	private Statement body;
+
+	@Override
+	public void executeStatement(Unit executingUnit) {
+		while (getExpression().getValue()){
+			getStatement().executeStatement(executingUnit);
+		}
+		
+	}
 }

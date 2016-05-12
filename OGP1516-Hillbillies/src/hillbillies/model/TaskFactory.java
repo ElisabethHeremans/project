@@ -11,6 +11,8 @@ import hillbillies.part3.programs.SourceLocation;
 public class TaskFactory implements ITaskFactory<Expression, Statement, Task> {
 
 	public TaskFactory(Expression e,Statement s,Task t){
+	
+	}
 		
 	
 	
@@ -32,18 +34,18 @@ public class TaskFactory implements ITaskFactory<Expression, Statement, Task> {
 	}
 
 	@Override
-	public Statement createAssignment(String variableName, Expression<?> value, SourceLocation sourceLocation) {
+	public Statement createAssignment(String variableName, Expression value, SourceLocation sourceLocation) {
 		return new AssignmentStatement(variableName, value); // correct? 
 	}
 
 	@Override
-	public Statement createWhile(Expression<?,?> condition, Statement body, SourceLocation sourceLocation) {
-		return new WhileStatement((BooleanExpression) condition, body);
+	public Statement createWhile(Expression condition, Statement body, SourceLocation sourceLocation) {
+		return new WhileStatement((BooleanExpression) condition,(ComposedStatement) body);
 	}
 
 	@Override
 	public Statement createIf(Expression condition, Statement ifBody, Statement elseBody, SourceLocation sourceLocation) {
-		return new IfElseStatement((BooleanExpression) condition, ifBody, elseBody);
+		return new IfElseStatement((BooleanExpression) condition,(ComposedStatement) ifBody, (S)elseBody);
 	}
 
 	@Override
@@ -73,17 +75,21 @@ public class TaskFactory implements ITaskFactory<Expression, Statement, Task> {
 
 	@Override
 	public Statement createFollow(Expression unit, SourceLocation sourceLocation) {
-		return new FollowStatement((UnitExpression) unit);
+		return new FollowStatement<UnitExpression>((UnitExpression) unit);
 	}
 
 	@Override
 	public Statement createAttack(Expression unit, SourceLocation sourceLocation) {
-		return new AttackStatement((UnitExpression) unit);
+		return new AttackStatement<UnitExpression>((UnitExpression) unit);
 	}
 
 	@Override
 	public Expression createReadVariable(String variableName, SourceLocation sourceLocation) {
-		return null;
+		Expression expr = new BasicVariableExpression(variableName);
+		expr.getAssignedExpression()
+		for (Expression expr: getTask().getExecutionContext().get(2).keySet())
+			//if value == variableName
+		return new BasicVariableExpression(variableName);
 	}
 
 	@Override
@@ -201,11 +207,6 @@ public class TaskFactory implements ITaskFactory<Expression, Statement, Task> {
 		return new PositionOfExpression((UnitExpression) unit);
 	}
 
-	@Override
-	public Statement createAssignment(String variableName, Expression value, SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 
 

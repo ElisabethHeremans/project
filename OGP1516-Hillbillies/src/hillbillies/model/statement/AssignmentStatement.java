@@ -1,15 +1,21 @@
 package hillbillies.model.statement;
 
+
+import java.util.List;
+
 import be.kuleuven.cs.som.annotate.*;
 import hillbillies.model.Unit;
 import hillbillies.model.expression.BasicVariableExpression;
-import hillbillies.model.expression.Expression;
+import hillbillies.model.expression.*;
 import hillbillies.model.expression.VariableExpression;
 
 public class AssignmentStatement<E extends Expression> extends ExpressionStatement<E> {
 	public AssignmentStatement(String variableName , E expression){
+//		if (expression.getValue() instanceof Boolean)
+//			BooleanExpression expr = (BooleanExpression)expression;
+//			setExpression(expr)
 		setExpression(expression);
-		
+		BasicVariableExpression variable = new BasicVariableExpression(getVariableName());
 		setVariable(variable);
 		variable.setValue(expression.getValue());
 	}
@@ -34,7 +40,8 @@ public class AssignmentStatement<E extends Expression> extends ExpressionStateme
 		this.variableName = variableName;
 	}
 	@Override
-	public void executeStatement(Unit executingUnit) {
+	public void executeStatement(List<Object> context) {
+		
 		BasicVariableExpression variable = new BasicVariableExpression(getVariableName());
 		variable.setValue(getExpression().getValue());
 	}
