@@ -45,7 +45,7 @@ public class TaskFactory implements ITaskFactory<Expression, Statement, Task> {
 
 	@Override
 	public Statement createIf(Expression condition, Statement ifBody, Statement elseBody, SourceLocation sourceLocation) {
-		return new IfElseStatement((BooleanExpression) condition,(ComposedStatement) ifBody, (S)elseBody);
+		return new IfElseStatement<BooleanExpression,ComposedStatement,ComposedStatement>((BooleanExpression) condition,(ComposedStatement) ifBody, (ComposedStatement)elseBody);
 	}
 
 	@Override
