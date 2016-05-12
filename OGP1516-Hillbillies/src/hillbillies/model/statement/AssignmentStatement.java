@@ -4,6 +4,7 @@ package hillbillies.model.statement;
 import java.util.List;
 
 import be.kuleuven.cs.som.annotate.*;
+import hillbillies.model.ExecutionContext;
 import hillbillies.model.Unit;
 import hillbillies.model.expression.BasicVariableExpression;
 import hillbillies.model.expression.*;
@@ -15,9 +16,9 @@ public class AssignmentStatement<E extends Expression> extends ExpressionStateme
 //			BooleanExpression expr = (BooleanExpression)expression;
 //			setExpression(expr)
 		setExpression(expression);
-		BasicVariableExpression variable = new BasicVariableExpression(getVariableName());
-		setVariable(variable);
-		variable.setValue(expression.getValue());
+//		BasicVariableExpression variable = new BasicVariableExpression(getVariableName());
+//		setVariable(variable);
+//		variable.setValue(expression.getValue());
 	}
 	@Basic @Raw
 	public VariableExpression getVariable() {
@@ -40,8 +41,12 @@ public class AssignmentStatement<E extends Expression> extends ExpressionStateme
 		this.variableName = variableName;
 	}
 	@Override
-	public void executeStatement(List<Object> context) {
-		
+	public void executeStatement(ExecutionContext context) {
+		context.addVariable(getVariableName(), getExpression());
+		Object value = getExpression().evaluateExpression(context);
+//		if (value==Boolean.TRUE){
+//			setExpression(new TrueExpression());
+//		}
 		BasicVariableExpression variable = new BasicVariableExpression(getVariableName());
 		variable.setValue(getExpression().getValue());
 	}

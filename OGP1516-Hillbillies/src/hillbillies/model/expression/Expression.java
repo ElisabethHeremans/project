@@ -4,6 +4,7 @@ import java.util.List;
 
 import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Raw;
+import hillbillies.model.ExecutionContext;
 import hillbillies.model.Task;
 import hillbillies.model.statement.ExpressionStatement;
 import hillbillies.model.statement.Statement;
@@ -13,7 +14,7 @@ public abstract class Expression{
 	
 	public abstract Object getValue() ;
 	
-	public abstract Object evaluateExpression(List<Object> executionContext);
+	public abstract Object evaluateExpression(ExecutionContext context);
 
 	public void setSourceLocation(SourceLocation sourceLocation) {
 		this.sourceLocation = sourceLocation;

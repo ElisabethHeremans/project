@@ -2,6 +2,7 @@ package hillbillies.model;
 
 import be.kuleuven.cs.som.annotate.*;
 
+@Value
 public enum TerrainType {
 	AIR(0,true),
 	ROCK(1,false),

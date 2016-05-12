@@ -2,6 +2,7 @@ package hillbillies.model.statement;
 
 import java.util.List;
 
+import hillbillies.model.ExecutionContext;
 import hillbillies.model.Unit;
 import hillbillies.model.expression.UnitExpression;
 
@@ -12,8 +13,8 @@ public class AttackStatement<E extends UnitExpression> extends ActionStatement<E
 	}
 
 	@Override
-	public void executeStatement(List<Object>executionContext) {
-		((Unit)executionContext.get(0)).attack(getExpression().getValue());
+	public void executeStatement(ExecutionContext context) {
+		context.getExecutingUnit().attack(getExpression().getValue());
 		
 	}
 	

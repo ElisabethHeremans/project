@@ -1,5 +1,6 @@
 package hillbillies.model;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import hillbillies.model.expression.Expression;
@@ -15,9 +16,13 @@ public class ExecutionContext {
 	
 	private int[] selectedCube;
 	
-	private Map<String,Expression> variables = new HashMap<String,Expression>;
+	private Map<String,Expression> variables = new HashMap<String,Expression>();
 
-	public addVariable()
+	public void addVariable(String variableName,Expression expr){
+		variables.put(variableName, expr);
+			
+	}
+
 
 	/**
 	 * @return the executingUnit

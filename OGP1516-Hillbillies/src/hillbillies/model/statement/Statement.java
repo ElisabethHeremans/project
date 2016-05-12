@@ -3,6 +3,7 @@ package hillbillies.model.statement;
 import java.util.List;
 
 import be.kuleuven.cs.som.annotate.*;
+import hillbillies.model.ExecutionContext;
 import hillbillies.model.Task;
 import hillbillies.model.Unit;
 import hillbillies.model.expression.Expression;
@@ -21,6 +22,6 @@ public abstract class Statement{
 
 	private Task task;
 
-	public abstract void executeStatement(List<Object> context); 
+	public abstract void executeStatement(ExecutionContext context); 
 
 }
