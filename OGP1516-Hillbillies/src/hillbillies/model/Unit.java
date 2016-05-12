@@ -2406,4 +2406,8 @@ public class Unit {
 	 */
 	private Task task;
 	
+	public String toString(){
+		return getName();
+	}
+	
 }
