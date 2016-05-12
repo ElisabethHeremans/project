@@ -1,22 +1,17 @@
 package hillbillies.model.expression;
 
-import hillbillies.model.Unit;
+import hillbillies.model.ExecutionContext;
 
 public class IsEnemyExpression<E extends UnitExpression> extends UnaryBooleanExpression<E> {
 
 	public IsEnemyExpression(E e) {
 		setExpression(e);
-		Unit thisUnit = this.getStatement().getTask().getExecutingUnit();
-		Unit other = (Unit) e.getValue();
-		setValue(thisUnit.getFaction() != other.getFaction());
-
 	}
-	
 
-	
-	public Boolean evaluateExpression() {
-		// TODO Auto-generated method stub
-		return null;
+	@Override
+	public Boolean evaluateExpression(ExecutionContext context) {
+		setValue(context.getExecutingUnit().getFaction() != getExpression().getValue().getFaction());
+		return getValue();
 	}
 	
 

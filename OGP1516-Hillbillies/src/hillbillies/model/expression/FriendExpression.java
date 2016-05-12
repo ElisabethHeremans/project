@@ -1,5 +1,6 @@
 package hillbillies.model.expression;
 
+import hillbillies.model.ExecutionContext;
 import hillbillies.model.Unit;
 import hillbillies.model.Vector;
 import hillbillies.model.types.FriendType;
@@ -7,11 +8,10 @@ import hillbillies.model.types.FriendType;
 public class FriendExpression extends UnitExpression{
 	
 	public FriendExpression(){
-		setValue(findFriendUnit());
 	}
 
-	private Unit findFriendUnit() {
-		Unit unit = this.getStatement().getTask().getExecutingUnit();
+	private Unit findFriendUnit(Unit unit) {
+		//Unit unit = this.getStatement().getTask().getExecutingUnit();
 		assert (unit!=null);
 		Unit nearest = null;
 		double nearestDist = 0;
@@ -27,9 +27,9 @@ public class FriendExpression extends UnitExpression{
 		return nearest;
 	}
 
-	
-	public Unit evaluateExpression() {
-		// TODO Auto-generated method stub
-		return null;
+	@Override
+	public Unit evaluateExpression(ExecutionContext context) {
+		setValue(findFriendUnit(context.getExecutingUnit()));
+		return getValue();
 	}
 }

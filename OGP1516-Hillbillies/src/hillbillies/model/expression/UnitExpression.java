@@ -1,5 +1,6 @@
 package hillbillies.model.expression;
 
+import hillbillies.model.ExecutionContext;
 import hillbillies.model.Unit;
 
 public abstract class UnitExpression extends Expression {
@@ -16,4 +17,6 @@ public abstract class UnitExpression extends Expression {
 	public Unit getValue() {
 		return value;
 	}
+	@Override
+	public abstract Unit evaluateExpression(ExecutionContext context);
 }

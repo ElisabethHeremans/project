@@ -1,12 +1,12 @@
 package hillbillies.model.expression;
 
+import hillbillies.model.ExecutionContext;
 import hillbillies.model.Unit;
 import hillbillies.model.types.UnitType;
 
 public class BracketUnitExpression<E extends UnitExpression> extends UnitExpression implements IComposedUnaryExpression<E>{
 	public BracketUnitExpression(E e){
 		setExpression(e);
-		setValue(e.getValue());
 	}
 	
 	public E getExpression() {
@@ -19,9 +19,9 @@ public class BracketUnitExpression<E extends UnitExpression> extends UnitExpress
 	
 	private E expression;
 
-
-	public Unit evaluateExpression() {
-		// TODO Auto-generated method stub
-		return null;
+	@Override
+	public Unit evaluateExpression(ExecutionContext context) {
+		setValue(getExpression().getValue());
+		return getValue();
 	}
 }
