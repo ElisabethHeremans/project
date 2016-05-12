@@ -29,7 +29,6 @@ extends ComposedStatement implements IExpressionStatement<E>{
 		this.expression = expression;
 	}
 	
-	//public abstract boolean isValidExpression(Expression e);
 
 	private E expression;
 	

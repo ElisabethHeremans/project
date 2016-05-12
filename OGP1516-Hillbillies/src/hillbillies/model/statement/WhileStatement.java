@@ -2,6 +2,7 @@ package hillbillies.model.statement;
 
 import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Raw;
+import hillbillies.model.ExecutionContext;
 import hillbillies.model.Unit;
 import hillbillies.model.expression.BooleanExpression;
 
@@ -35,11 +36,12 @@ extends ExpressionStatement<E> implements IComposedUnaryStatement<S> {
 
 	private S statement;
 
+
 	@Override
-	public void executeStatement(Unit executingUnit) {
+	public void executeStatement(ExecutionContext context) {
 		while (getExpression().getValue()){
-			getStatement().executeStatement(executingUnit);
+			getStatement().executeStatement(context);
 		}
-		
+			
 	}
 }
