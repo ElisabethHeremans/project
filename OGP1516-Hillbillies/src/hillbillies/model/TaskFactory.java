@@ -10,7 +10,7 @@ import hillbillies.part3.programs.SourceLocation;
 
 public class TaskFactory implements ITaskFactory<Expression, Statement, Task> {
 
-	public TaskFactory(Expression e,Statement s,Task t){
+	public TaskFactory(){
 	
 	}
 		

@@ -1,5 +1,6 @@
 package hillbillies.model.statement;
 
+import hillbillies.model.ExecutionContext;
 import hillbillies.model.Unit;
 
 public class BreakStatement extends Statement {
@@ -7,9 +8,10 @@ public class BreakStatement extends Statement {
 		
 	}
 
+
 	@Override
-	public void executeStatement(Unit executingUnit) {
-		
+	public void executeStatement(ExecutionContext context) {
+		//?
 		
 	}
 }

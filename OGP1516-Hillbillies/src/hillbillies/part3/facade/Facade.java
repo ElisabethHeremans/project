@@ -10,6 +10,7 @@ import hillbillies.model.Log;
 import hillbillies.model.Scheduler;
 import hillbillies.model.Status;
 import hillbillies.model.Task;
+import hillbillies.model.TaskFactory;
 import hillbillies.model.TerrainType;
 import hillbillies.model.Unit;
 import hillbillies.model.World;
@@ -658,13 +659,9 @@ public class Facade implements IFacade{
 	}
 
 	@Override
-	public ITaskFactory<?, ?, Task> createTaskFactory() {
-		try{
-			return new TaskFactory();
-		}
-		catch (NullPointerException exc) {
-			throw new ModelException();
-		}
+	public ITaskFactory<?, ?, Task> createTaskFactory()  {
+		return new TaskFactory();
+		
 	}
 
 	@Override
