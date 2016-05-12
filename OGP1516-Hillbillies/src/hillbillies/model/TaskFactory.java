@@ -85,10 +85,10 @@ public class TaskFactory implements ITaskFactory<Expression, Statement, Task> {
 
 	@Override
 	public Expression createReadVariable(String variableName, SourceLocation sourceLocation) {
-		Expression expr = new BasicVariableExpression(variableName);
-		expr.getAssignedExpression();
-		for (Expression express: getTask().getExecutionContext().get(2).keySet())
-			//if value == variableName
+//		Expression expr = new BasicVariableExpression(variableName);
+//		expr.getAssociatedExpression();
+//		for (Expression express: getTask().getExecutionContext().get(2).keySet())
+//			//if value == variableName
 		return new BasicVariableExpression(variableName);
 	}
 

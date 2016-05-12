@@ -1,5 +1,7 @@
 package hillbillies.model.expression;
 
+import hillbillies.model.ExecutionContext;
+
 public class BasicVariableExpression extends VariableExpression {
 	public BasicVariableExpression(String variableName){
 		setName(variableName);
@@ -18,13 +20,14 @@ public class BasicVariableExpression extends VariableExpression {
 	
 	private String name;
 
-
-	public Object evaluateExpression() {
-		// TODO Auto-generated method stub
-		return null;
+	@Override
+	public Object evaluateExpression(ExecutionContext context) {
+		return context.getVariables().get(getName()).evaluateExpression(context);
 	}
 	
-	public Expression get
+	public Expression getAssociatedExpression(ExecutionContext context){
+		return context.getVariables().get(getName());
+	}
 	
 	
 }

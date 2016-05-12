@@ -43,12 +43,13 @@ public class AssignmentStatement<E extends Expression> extends ExpressionStateme
 	@Override
 	public void executeStatement(ExecutionContext context) {
 		context.addVariable(getVariableName(), getExpression());
-		Object value = getExpression().evaluateExpression(context);
+		
+//		Object value = getExpression().evaluateExpression(context);
 //		if (value==Boolean.TRUE){
 //			setExpression(new TrueExpression());
 //		}
-		BasicVariableExpression variable = new BasicVariableExpression(getVariableName());
-		variable.setValue(getExpression().getValue());
+//		BasicVariableExpression variable = new BasicVariableExpression(getVariableName());
+//		variable.setValue(getExpression().getValue());
 	}
 	
 	
