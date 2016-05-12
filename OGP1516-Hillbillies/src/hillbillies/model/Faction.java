@@ -15,6 +15,7 @@ public class Faction {
 	 * Initialize this new faction.
 	 */
 	public Faction() {
+		setScheduler(new Scheduler());
 	}
 
 

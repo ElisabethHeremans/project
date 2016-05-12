@@ -468,6 +468,7 @@ public class World {
 			throw new IllegalArgumentException();
 		}
 		this.units.add(unit);
+		System.out.print("unit added");
 		this.addUnitToUnitsAtCubeMap(unit);
 		unit.setWorld(this);
 		addToFaction(unit);
@@ -509,6 +510,9 @@ public class World {
 	 * 	@return The set of units of this world.
 	 */
 	public Set<Unit> listAllUnits(){
+		System.out.print("units " + units.toString());
+		System.out.print("units size " + units.size());
+
 		return units;
 	}
 
@@ -620,7 +624,7 @@ public class World {
 	 * @invar Each element in the set of units references a unit that
 	 * 		is an acceptable unit for this world.
 	 */
-	private final Set<Unit> units = new HashSet<Unit>();
+	private Set<Unit> units = new HashSet<Unit>();
 
 
 	/**
@@ -1355,17 +1359,21 @@ public class World {
 	 * 			If the duration is not valid, not between 0 and 0.2.
 	 */
 	public void advanceTime(double duration) throws IllegalArgumentException{
+		//System.out.print("1");
 		if (!(Util.fuzzyGreaterThanOrEqualTo(duration, 0.0-Util.DEFAULT_EPSILON )&& Util.fuzzyLessThanOrEqualTo((double)duration, 0.2+Util.DEFAULT_EPSILON))){
-			System.out.println(duration);
 			throw new IllegalArgumentException();
 		}
 		updateCubeTerrains();
-		for (Unit unit : this.listAllUnits()){
-			unit.advanceTime((float)duration);
+		if (!listAllUnits().isEmpty()){
+			for (Unit unit : this.listAllUnits()){
+				unit.advanceTime((float)duration);
+			}
 		}
+		System.out.print("3");
 		for (Boulder boulder: boulders){
 			boulder.advanceTime((float) duration);
 		}
+		System.out.print("4");
 		for (Log log: logs){
 			log.advanceTime((float) duration);
 		}

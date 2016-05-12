@@ -866,6 +866,11 @@ public class Unit {
 	 *             If the duration is less than zero or exceeds or equals 0.2 s.
 	 */
 	public void advanceTime(float duration) throws IllegalArgumentException {
+		System.out.print(" 1: "+ this.getExperiencePoints());
+		System.out.print(" 2 " + this.getHitpoints());
+		
+		
+
 		if (!(Util.fuzzyGreaterThanOrEqualTo(duration, 0.0-Util.DEFAULT_EPSILON )&& Util.fuzzyLessThanOrEqualTo((double)duration, 0.2+Util.DEFAULT_EPSILON))){
 			System.out.println(duration);
 			throw new IllegalArgumentException();
@@ -888,6 +893,7 @@ public class Unit {
 		if (this.getStatus() == Status.FALLING){
 			falling(duration);
 		}
+		System.out.print(" 3 ");
 		if (this.isFollowing() != null) {
 			if(this.isNeighbouringOrSameCube(this.isFollowing().getCubeCoordinate())){
 				this.stopFollowing();
@@ -895,15 +901,24 @@ public class Unit {
 			else
 				moveTo1(this.isFollowing().getPosition());
 		}
-		if (mustRest())
+		System.out.print(" 4.1 ");
+		if (mustRest()){
 			rest();
-		else if (this.getStatus() == Status.DONE && targetPosition != null && !this.isEnableDefaultBehaviour())
+			System.out.print(" 4.2 ");
+		}
+		else if (this.getStatus() == Status.DONE && targetPosition != null && !this.isEnableDefaultBehaviour()){
 			moveTo1(targetPosition);
-		else if (this.isEnableDefaultBehaviour() && this.getStatus() == Status.DONE)
+			System.out.print(" 4.3 ");
+
+		}
+		else if (this.isEnableDefaultBehaviour() && this.getStatus() == Status.DONE){
 			startDefaultBehaviour();
+			System.out.print(" 4.4 ");
+		}
 		else if (this.getStatus() == Status.MOVING) {
 			moving1(duration);
 		}
+		
 		else if (this.getStatus() == Status.WORKING) {
 			working(duration);
 		} 
@@ -918,6 +933,7 @@ public class Unit {
 			if (attackTimer >= 1.0)
 				setStatus(Status.DONE);
 		}
+		System.out.print(" 4 ");
 		if (this.getLog() != null)
 			this.getLog().setPosition(this.getPosition());
 		if (this.getBoulder() != null)

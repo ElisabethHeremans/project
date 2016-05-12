@@ -118,13 +118,17 @@ public class Scheduler implements Iterable<Task> {
 //	}
 	
 	public void addAsTask(Task task) throws IllegalArgumentException{
+		System.out.print("add");
 		if(! canHaveAsTask(task)){
+			System.out.print("problem 1");
 			throw new IllegalArgumentException();
 		}
 		
-		if(! task.isWellFormed()){
+		if(!task.isWellFormed()){
+			System.out.print("problem 2");
 			throw new IllegalArgumentException();
 		}
+		System.out.println("Tasks "+ tasks.toString());
 		this.tasks.add(task);
 	}
 

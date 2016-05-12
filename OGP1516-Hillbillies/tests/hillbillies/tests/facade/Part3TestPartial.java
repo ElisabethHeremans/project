@@ -61,7 +61,7 @@ public class Part3TestPartial {
 		assertEquals("work task", facade.getName(task));
 		// test priority
 		assertEquals(1, facade.getPriority(task));
-
+		
 		facade.schedule(scheduler, task);
 		advanceTimeFor(facade, world, 100, 0.02);
 

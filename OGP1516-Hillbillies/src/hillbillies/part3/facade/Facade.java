@@ -66,6 +66,8 @@ public class Facade implements IFacade{
 	@Override
 	public void advanceTime(World world, double dt) throws ModelException {
 		try{
+			System.out.print(dt);
+			System.out.print(world);
 			world.advanceTime(dt);
 		}
 		catch(NullPointerException exc){
