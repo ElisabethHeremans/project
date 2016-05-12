@@ -1,36 +1,29 @@
 package hillbillies.model.expression;
 
 import java.util.List;
-
+import hillbillies.model.ExecutionContext;
 import hillbillies.model.Position;
-import hillbillies.model.expression.vuilbak.ComposedPExpression;
+import hillbillies.model.Unit;
 
 public class NextToExpression<E extends PositionExpression> extends UnaryPositionExpression<E> {
 	
 	public NextToExpression(E position){
 		setExpression(position);
-		setValue(getNextTo());
 	}
 
-	private Position getNextTo() {
+	private Position getNextTo(Unit unit) {
 		int[] pos = getExpression().getValue().getCoords();
-		List<int[]> neighbouringPositions = this.getStatement().getTask().getExecutingUnit().getWorld().getNeighboringCubes(pos);
+		List<int[]> neighbouringPositions = unit.getWorld().getNeighboringCubes(pos);
 		if (neighbouringPositions.isEmpty())
 			return null;
 		else
 			return new Position(neighbouringPositions.get(0));
 	}
 
-	
-	public Position evaluateExpression() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	
-	public void setValue(Object object) {
-		// TODO Auto-generated method stub
-		
+	@Override
+	public Position evaluateExpression(ExecutionContext context) {
+		setValue(getNextTo(context.getExecutingUnit()));
+		return getValue();
 	}
 	
 

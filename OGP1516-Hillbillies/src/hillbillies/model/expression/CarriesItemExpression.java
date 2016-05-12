@@ -1,19 +1,17 @@
 package hillbillies.model.expression;
+import hillbillies.model.ExecutionContext;
 import hillbillies.model.Unit;
 
 public class CarriesItemExpression<E extends UnitExpression> extends UnaryBooleanExpression<E> {
 
 	public CarriesItemExpression(E e) {
 		setExpression(e);
-		setValue(((Unit) e.getValue()).getLog() !=null ||((Unit) e.getValue()).getBoulder() !=null);
-
 	}
-	public Boolean evaluateExpression(Unit unit){
-		return (unit.getBoulder()!= null || unit.getLog()!=null);
-	}
-
-	public Boolean evaluateExpression() {
-		// TODO Auto-generated method stub
+	
+	@Override
+	public Boolean evaluateExpression(ExecutionContext context) {
+		Unit unit = getExpression().getValue();
+		setValue(unit.getBoulder()!= null|| unit.getLog()!=null);
 		return null;
 	}
 

@@ -1,5 +1,6 @@
 package hillbillies.model.expression;
 
+import hillbillies.model.ExecutionContext;
 import hillbillies.model.Position;
 import hillbillies.model.Unit;
 import hillbillies.model.Vector;
@@ -7,11 +8,10 @@ import hillbillies.model.expression.vuilbak.BasicPExpression;
 
 public class WorkshopExpression extends PositionExpression {
 	public WorkshopExpression(){
-		setValue(new Position(findNearestWorkshop()));
+	
 	}
 
-	private int[] findNearestWorkshop() {
-		Unit unit = this.getStatement().getTask().getExecutingUnit();
+	private Position findNearestWorkshop(Unit unit) {
 		int[] nearest = null;
 		double nearestDist = 0;
 		for (int i=0; i< unit.getWorld().getTerrainTypes().length; i++){
@@ -27,17 +27,13 @@ public class WorkshopExpression extends PositionExpression {
 					}
 				}
 			}
-		}
-					
-					
-	
-						
-		return nearest;
+		}				
+		return new Position(nearest);
 	}
 
-	
-	public Position evaluateExpression() {
-		// TODO Auto-generated method stub
-		return null;
+	@Override
+	public Position evaluateExpression(ExecutionContext context) {
+		setValue(findNearestWorkshop(context.getExecutingUnit()));
+		return getValue();
 	}
 }

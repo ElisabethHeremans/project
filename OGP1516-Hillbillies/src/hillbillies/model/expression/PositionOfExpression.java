@@ -1,5 +1,6 @@
 package hillbillies.model.expression;
 
+import hillbillies.model.ExecutionContext;
 import hillbillies.model.Position;
 import hillbillies.model.Unit;
 import hillbillies.model.expression.vuilbak.ComposedPExpression;
@@ -8,23 +9,17 @@ public class PositionOfExpression<E extends UnitExpression> extends UnaryPositio
 
 	public PositionOfExpression(E unit){
 		setExpression(unit);
-		setValue(new Position(getPositionOfUnit()));
-
 	}
 
 	private int[] getPositionOfUnit() {
-		return (((Unit) getExpression().getValue()).
-				getWorld().getCubeCoordinate(((Unit) getExpression().getValue()).getPosition())) ;
+		return (getExpression().getValue().
+				getWorld().getCubeCoordinate(getExpression().getValue().getPosition())) ;
 	}
 
-	
-	public Position evaluateExpression() {
-		// TODO Auto-generated method stub
-		return null;
+	@Override
+	public Position evaluateExpression(ExecutionContext context) {
+		setValue(new Position(getPositionOfUnit()));
+		return getValue();
 	}
-
-//	private int[] getPositionOfPosition() {
-//		return (int[]) getExpression().getValue();
-//	}
 
 }

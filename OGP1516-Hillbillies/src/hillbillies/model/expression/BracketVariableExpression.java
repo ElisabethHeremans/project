@@ -1,30 +1,25 @@
 package hillbillies.model.expression;
 
+import hillbillies.model.ExecutionContext;
+
 public class BracketVariableExpression extends VariableExpression{
 	public BracketVariableExpression(Expression v){
-		setExpression(v);
-		
+		setExpression(v);	
 	}
-	
-	/**
-	 * @return the expression
-	 */
+
 	public Expression getExpression() {
 		return expression;
 	}
 
-	/**
-	 * @param expression the expression to set
-	 */
 	public void setExpression(Expression expression) {
 		this.expression = expression;
 	}
 
 	private Expression expression;
 
-
-	public Object evaluateExpression() {
-		// TODO Auto-generated method stub
-		return null;
+	@Override
+	public Object evaluateExpression(ExecutionContext context) {
+		setValue(getExpression().getValue());
+		return getValue();
 	}
 }

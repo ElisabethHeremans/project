@@ -1,18 +1,17 @@
 package hillbillies.model.expression;
 
 import hillbillies.model.Boulder;
+import hillbillies.model.ExecutionContext;
 import hillbillies.model.Position;
 import hillbillies.model.Unit;
 import hillbillies.model.Vector;
-import hillbillies.model.expression.vuilbak.BasicPExpression;
 
 public class BoulderExpression extends PositionExpression {
 		public BoulderExpression(){
-			setValue(new Position(findNearestBoulder()));
+		
 		}
 
-		private int[] findNearestBoulder() {
-			Unit unit = this.getStatement().getTask().getExecutingUnit();
+		private Position findNearestBoulder(Unit unit) {
 			Boulder nearest = null;
 			double nearestDist = 0;
 			for (Boulder boulder: unit.getWorld().listAllBoulders() ){
@@ -22,13 +21,13 @@ public class BoulderExpression extends PositionExpression {
 					nearest = boulder;
 				}
 			}
-			return nearest.getWorld().getCubeCoordinate(nearest.getPosition());
+			return new Position(nearest.getWorld().getCubeCoordinate(nearest.getPosition()));
 		}
 
-	
-		public Position evaluateExpression() {
-			// TODO Auto-generated method stub
-			return null;
+		@Override
+		public Position evaluateExpression(ExecutionContext context) {
+			setValue(findNearestBoulder(context.getExecutingUnit()));
+			return getValue();
 		}
 
 
