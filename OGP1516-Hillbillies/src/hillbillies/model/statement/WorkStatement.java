@@ -14,6 +14,7 @@ public class WorkStatement<E extends PositionExpression> extends ActionStatement
 
 	@Override
 	public void executeStatement(ExecutionContext context) {
+		super.executeStatement(context);
 		getExpression().evaluateExpression(context);
 //		System.out.print(" expr "+getExpression());
 //		System.out.print(" coords "+getExpression().getValue().getCoords());

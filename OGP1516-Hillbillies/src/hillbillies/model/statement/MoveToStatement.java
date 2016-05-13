@@ -14,6 +14,7 @@ public class MoveToStatement<E extends PositionExpression> extends ActionStateme
 
 	@Override
 	public void executeStatement(ExecutionContext context) {
+		getExpression().evaluateExpression(context);
 		context.getExecutingUnit().moveTo1(getExpression().getValue().getCoords());
 		
 	}

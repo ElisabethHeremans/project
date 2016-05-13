@@ -39,6 +39,7 @@ extends ExpressionStatement<E> implements IComposedUnaryStatement<S> {
 
 	@Override
 	public void executeStatement(ExecutionContext context) {
+		super.executeStatement(context);
 		while (getExpression().getValue()){
 			getStatement().executeStatement(context);
 		}

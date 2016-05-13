@@ -12,6 +12,7 @@ public class PrintStatement<E extends Expression> extends ExpressionStatement<E>
 
 	@Override
 	public void executeStatement(ExecutionContext context) {
+		getExpression().evaluateExpression(context);
 		System.out.println(getExpression().getValue().toString());
 		
 	}
