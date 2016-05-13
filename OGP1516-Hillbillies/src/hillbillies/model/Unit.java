@@ -917,10 +917,12 @@ public class Unit {
 		}
 		else if (this.getStatus() == Status.MOVING) {
 			moving1(duration);
+			System.out.print(" 4.5 ");
 		}
 		
 		else if (this.getStatus() == Status.WORKING) {
 			working(duration);
+			System.out.print(" 4.5 ");
 		} 
 		else if (getStatus() == Status.INITIAL_RESTING) {
 			initialResting(duration);
