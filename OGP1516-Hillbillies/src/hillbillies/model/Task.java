@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import be.kuleuven.cs.som.annotate.*;
+import hillbillies.model.statement.SequenceStatement;
 import hillbillies.model.statement.Statement;
 
 /**
@@ -137,6 +138,22 @@ public class Task {
 	 * Variable registering the priority of this task.
 	 */
 	private int priority;
+	
+	/**
+	 * @return the isComplete
+	 */
+	public boolean isComplete() {
+		return isComplete;
+	}
+
+	/**
+	 * @param isComplete the isComplete to set
+	 */
+	public void setComplete(boolean isComplete) {
+		this.isComplete = isComplete;
+	}
+
+	private boolean isComplete;
 
 	/**
 	 * Return the activities of this task.
@@ -155,7 +172,7 @@ public class Task {
 	 * @return | result == (activities != null)
 	 */
 	public static boolean isValidActivities(Statement activities) {
-		return (activities != null);
+		return true;
 	}
 
 	/**
@@ -174,7 +191,20 @@ public class Task {
 		if (!isValidActivities(activities))
 			throw new IllegalArgumentException();
 		this.activities = activities;
-		//activities.setE;
+	}
+	
+	public void removeFirstStatement(){
+		if (this.getActivities() instanceof SequenceStatement){
+			((SequenceStatement<?>) this.getActivities()).removeFirstStatement();
+			if (this.getActivities().isStatementExecuted()){
+				this.setActivities(null);
+				this.setComplete(true);
+			}
+		}
+		else{
+			this.setActivities(null);
+			this.setComplete(true);
+		}
 	}
 
 	/**

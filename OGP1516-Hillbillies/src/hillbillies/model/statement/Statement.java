@@ -20,6 +20,26 @@ public abstract class Statement{
 //
 //	private Task task;
 
-	public abstract void executeStatement(ExecutionContext context); 
+	public abstract void executeStatement(ExecutionContext context);
+
+//	public abstract void removeFirstStatement();
+//	
+//	public abstract void stopExecutingStatement();
+	
+	private boolean statementExecuted = false;
+
+	/**
+	 * @return the statementExecuted
+	 */
+	public boolean isStatementExecuted() {
+		return statementExecuted;
+	}
+
+	/**
+	 * @param statementExecuted the statementExecuted to set
+	 */
+	public void setStatementExecuted(boolean statementExecuted) {
+		this.statementExecuted = statementExecuted;
+	}
 
 }

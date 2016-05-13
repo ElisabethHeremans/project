@@ -26,9 +26,23 @@ public class SequenceStatement<E extends ComposedStatement> extends ComposedStat
 
 	@Override
 	public void executeStatement(ExecutionContext context) {
-		for( Statement statement: getStatements()){
-			statement.executeStatement(context);
+		getStatements().get(0).executeStatement(context);
+//		for( Statement statement: getStatements()){
+//			statement.executeStatement(context);
+//		}
+		
+	}
+	
+	public void removeFirstStatement() {
+		List<E> statements = (List<E>) getStatements().remove(0);
+		setStatements(statements);
+		if (getStatements().size()==0){
+			setStatementExecuted(true);
 		}
+	}
+	
+	public void stopExecutingStatement() {
+		// TODO Auto-generated method stub
 		
 	}
 

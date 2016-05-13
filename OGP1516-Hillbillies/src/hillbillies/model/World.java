@@ -47,7 +47,7 @@ public class World {
 	 */
 	public World(int[][][] terrainTypes, TerrainChangeListener listener) {
 		this.setTerrainTypes(terrainTypes);
-		System.out.println("terraintypes: "+ Arrays.toString(getTerrainTypes()));
+		//System.out.println("terraintypes: "+ Arrays.toString(getTerrainTypes()));
 		this.xDimension = terrainTypes.length;
 		this.yDimension = terrainTypes[0].length;
 		this.zDimension = terrainTypes[0][0].length;
@@ -468,7 +468,7 @@ public class World {
 			throw new IllegalArgumentException();
 		}
 		this.units.add(unit);
-		System.out.print("unit added");
+		//System.out.print("unit added");
 		this.addUnitToUnitsAtCubeMap(unit);
 		unit.setWorld(this);
 		addToFaction(unit);
@@ -510,8 +510,8 @@ public class World {
 	 * 	@return The set of units of this world.
 	 */
 	public Set<Unit> listAllUnits(){
-		System.out.print("units " + units.toString());
-		System.out.print("units size " + units.size());
+		//System.out.print("units " + units.toString());
+		//System.out.print("units size " + units.size());
 
 		return units;
 	}
@@ -1369,11 +1369,11 @@ public class World {
 				unit.advanceTime((float)duration);
 			}
 		}
-		System.out.print("3");
+		//System.out.print("3");
 		for (Boulder boulder: boulders){
 			boulder.advanceTime((float) duration);
 		}
-		System.out.print("4");
+		//System.out.print("4");
 		for (Log log: logs){
 			log.advanceTime((float) duration);
 		}

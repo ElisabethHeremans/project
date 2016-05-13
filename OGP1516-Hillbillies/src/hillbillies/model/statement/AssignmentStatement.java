@@ -52,7 +52,4 @@ public class AssignmentStatement<E extends Expression> extends ExpressionStateme
 //		variable.setValue(getExpression().getValue());
 	}
 	
-	
-
-	
 }
