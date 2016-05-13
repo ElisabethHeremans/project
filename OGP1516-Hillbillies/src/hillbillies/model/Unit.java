@@ -692,7 +692,7 @@ public class Unit {
 	}
 	/**
 	 * Checks whether the given cube is neighboring this unit or 
-	 * 	has the same cubecoördinates as this unit.
+	 * 	has the same cubecoï¿½rdinates as this unit.
 	 * @param cubePosition
 	 * 		The cube to check.
 	 * @return True if and only if the difference between the respective x, y and z -coordinates of the cubeCenters are equal to 0, 1 or -1.
@@ -839,11 +839,8 @@ public class Unit {
 	 *             If the duration is less than zero or exceeds or equals 0.2 s.
 	 */
 	public void advanceTime(float duration) throws IllegalArgumentException {
-		System.out.print(" 1: "+ this.getExperiencePoints());
-		System.out.print(" 2 " + this.getHitpoints());
-		
-		
-
+//		System.out.print(" 1: "+ this.getExperiencePoints());
+//		System.out.print(" 2 " + this.getHitpoints());
 		if (!(Util.fuzzyGreaterThanOrEqualTo(duration, 0.0-Util.DEFAULT_EPSILON )&& Util.fuzzyLessThanOrEqualTo((double)duration, 0.2+Util.DEFAULT_EPSILON))){
 			System.out.println(duration);
 			throw new IllegalArgumentException();
@@ -866,7 +863,11 @@ public class Unit {
 		if (this.getStatus() == Status.FALLING){
 			falling(duration);
 		}
-		System.out.print(" 3 ");
+		if (this.isExecutingTask && this.getStatus() == Status.DONE){
+			this.getFaction().getScheduler().getAllTasksIterator().next().executeTask(this);
+			
+		}
+		//System.out.print(" 3 ");
 		if (this.isFollowing() != null) {
 			if(this.isNeighbouringOrSameCube(this.isFollowing().getCubeCoordinate())){
 				this.stopFollowing();
@@ -874,28 +875,31 @@ public class Unit {
 			else
 				moveTo1(this.isFollowing().getPosition());
 		}
-		System.out.print(" 4.1 ");
+		//System.out.print(" 4.1 ");
+//		System.out.print(Arrays.toString(targetPosition));
+//		System.out.print(this.isEnableDefaultBehaviour());
+//		System.out.print(this.getStatus());
 		if (mustRest()){
 			rest();
-			System.out.print(" 4.2 ");
+			//System.out.print(" 4.2 ");
 		}
 		else if (this.getStatus() == Status.DONE && targetPosition != null && !this.isEnableDefaultBehaviour()){
 			moveTo1(targetPosition);
-			System.out.print(" 4.3 ");
+			//System.out.print(" 4.3 ");
 
 		}
 		else if (this.isEnableDefaultBehaviour() && this.getStatus() == Status.DONE){
 			startDefaultBehaviour();
-			System.out.print(" 4.4 ");
+			//System.out.print(" 4.4 ");
 		}
 		else if (this.getStatus() == Status.MOVING) {
 			moving1(duration);
-			System.out.print(" 4.5 ");
+			//System.out.print(" 4.5 ");
 		}
 		
 		else if (this.getStatus() == Status.WORKING) {
 			working(duration);
-			System.out.print(" 4.5 ");
+			//System.out.print(" 4.5 ");
 		} 
 		else if (getStatus() == Status.INITIAL_RESTING) {
 			initialResting(duration);
@@ -908,7 +912,7 @@ public class Unit {
 			if (attackTimer >= 1.0)
 				setStatus(Status.DONE);
 		}
-		System.out.print(" 4 ");
+		//System.out.print(" 4 ");
 		if (this.getLog() != null)
 			this.getLog().setPosition(this.getPosition());
 		if (this.getBoulder() != null)
@@ -1202,8 +1206,8 @@ public class Unit {
 	 * 		| !canHaveAsPosition(targetPosition)
 	 */
 	public void moveTo1(double[] targetPosition)throws IllegalArgumentException{
-		System.out.print("start pos" + Arrays.toString(this.getCubeCoordinate()));
-		System.out.print("target pos " + Arrays.toString(targetPosition));
+		//System.out.print("start pos" + Arrays.toString(this.getCubeCoordinate()));
+		//System.out.print("target pos " + Arrays.toString(targetPosition));
 		queue.clear();
 		queuePos.clear();
 		if (!canHaveAsPosition(targetPosition)){
@@ -1861,8 +1865,9 @@ public class Unit {
 	 * 		   | result == (restTimer >= 180)
 	 */
 	public boolean mustRest() {
-		if (restTimer >= 180 )
+		if (Math.floor(restTimer) >= 180 ){
 			return true;
+		}
 		return false;
 	}
 	/**
@@ -1970,7 +1975,6 @@ public class Unit {
 	 * A variable registering the passed game time since the last rest.
 	 */
 	private double restTimer = 0.0;
-	
 	/**
 	 * Check whether the default behavior is enabled.
 	 * 
@@ -2022,9 +2026,14 @@ public class Unit {
 		if (this.getStatus() == Status.DONE) {
 			setEnableDefaultBehaviour(true);
 			if (this.getFaction().getScheduler() != null && this.getFaction().getScheduler().getAllTasksIterator().hasNext()){
-				this.getFaction().getScheduler().getAllTasksIterator().next().executeTask();
+				this.isExecutingTask = true;
+				setTask(this.getFaction().getScheduler().getAllTasksIterator().next());
+				//System.out.println(" 6 ");
+				//System.out.println(getFaction().getScheduler().getAllTasksIterator().next());
+				
 			}
 			else{
+			//System.out.println(" 7 ");
 			List<Unit> potentialEnemies = new ArrayList<>();
 			List<int[]> potEnemyPos = this.getWorld().getNeighboringCubes(this.getCubeCoordinate());
 			potEnemyPos.add(this.getCubeCoordinate());		
@@ -2072,16 +2081,16 @@ public class Unit {
 				neighbouring.add(this.getCubeCoordinate());
 				
 				i = new Random().nextInt(neighbouring.size());
-				System.out.print(Arrays.toString(neighbouring.get(i)));
+				//System.out.print(Arrays.toString(neighbouring.get(i)));
 				work(neighbouring.get(i));
 			}
 			if (i == 3){
 				rest();
 			}
 			if (i==4){
-				System.out.println(potentialEnemies);
+				//System.out.println(potentialEnemies);
 				int index = new Random().nextInt(potentialEnemies.size());
-				System.out.println(index);
+				//System.out.println(index);
 				attack(potentialEnemies.get(index));
 			}
 				
@@ -2110,6 +2119,8 @@ public class Unit {
 	 */
 	private boolean enableDefaultBehaviour;
 	
+	private boolean isExecutingTask;
+
 	/**
  	 * Terminate this unit.
  	 *

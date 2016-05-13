@@ -252,7 +252,11 @@ public class Task {
 //		
 //	}
 
-	public void executeTask() {
+	public void executeTask(Unit unit) {
+		this.getExecutionContext().setExecutingUnit(unit);
+//		System.out.print(getActivities() + "   ");
+//		System.out.print(this.getExecutionContext().getSelectedCube());
+//		System.out.print(this.getExecutionContext().getExecutingUnit());
 		getActivities().executeStatement(getExecutionContext());
 	}
 	
