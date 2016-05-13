@@ -47,23 +47,12 @@ public class World {
 	 */
 	public World(int[][][] terrainTypes, TerrainChangeListener listener) {
 		this.setTerrainTypes(terrainTypes);
-		//System.out.println("terraintypes: "+ Arrays.toString(getTerrainTypes()));
 		this.xDimension = terrainTypes.length;
 		this.yDimension = terrainTypes[0].length;
 		this.zDimension = terrainTypes[0][0].length;
 		this.listener = listener;
 		this.connectedToBorder = new ConnectedToBorder(this.getxDimension(),this.getyDimension(),this.getzDimension());
 		initializeCubeTerrains();
-//		for (int[][] i : getTerrainTypes()){
-//			for (int[] j: i){
-//				for (int k: j){
-//					if (k != 0 &&k != 1 &&k != 2&&k!= 3)
-//						throw new IllegalArgumentException();
-//					System.out.println(TerrainType.getTerrain(k));
-//				}
-//			}
-//		}
-
 	}
 	
 	
@@ -78,7 +67,7 @@ public class World {
 	}
 	
 	/**
-	 * A variable registrating the terrain change listener of this world.
+	 * A variable registering the terrain change listener of this world.
 	 */
 	private final TerrainChangeListener listener;
 
@@ -87,7 +76,7 @@ public class World {
 	 * Return the terrain of a cube with the given position in this world.
 	 * @param position
 	 * 		The position of the cube to check.
-	 * @effect Get the terrain type of the terrain at the given position in getTerrainTypes() of this world.
+	 * @effect Get the type of the terrain at the given position in getTerrainTypes() of this world.
 	 * @throws IllegalArgumentException
 	 * 			If the given position is not a position inside this world.
 	 * 
@@ -151,7 +140,6 @@ public class World {
 				for (int k: j){
 					if (k != 0 &&k != 1 &&k != 2&&k!= 3)
 						throw new IllegalArgumentException();
-					//System.out.println(k );
 				}
 			}
 		}
