@@ -1,6 +1,7 @@
 package hillbillies.model;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 import be.kuleuven.cs.som.annotate.*;
 
@@ -81,9 +82,6 @@ public class Scheduler implements Iterable<Task> {
 			}
 		return true;
 	}
-
-
-
 
 	/**
 	 * Add the given task with the given priority to the list of tasks attached to this scheduler.
@@ -216,8 +214,10 @@ public class Scheduler implements Iterable<Task> {
 			
 	}
 	
-	public Set<Task> getTasksSatisfying(lambda uitdrukking){
-		
+	public Set<Task> getTasksSatisfying(Predicate<Task> condition){
+		Set<Task> tasksSat = new HashSet<>();
+		this.getTasks().stream().filter(condition).forEach(tasksSat::add);
+		return tasksSat;
 	}
 
 	
