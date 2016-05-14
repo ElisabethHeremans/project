@@ -958,7 +958,7 @@ public class Unit {
 	 * @return False if the unit is terminated or the z-coordinate of this unit is equal to zero or 
 	 * 		there is a neighboring cube that is not passable. Otherwise, return true.
 	 * 		result == (this.getCubeCoordinate()[2]!=0 
-	 * 				&& !this.getWorld().getTerrain(neighborinCubes).isPassable() && ! this.isTerminated())
+	 * 				&& !this.getWorld().getTerrain(neighboringCubes).isPassable() && ! this.isTerminated())
 	 */
 	public boolean mustFall() {
 		if ( isTerminated()||(this.getCubeCoordinate()[2]==0)){
@@ -1126,8 +1126,8 @@ public class Unit {
 	 * 			If the unit needs to move more than one cube in the x-, y- or z-direction.
 	 * 			| !((dx >= -1 && dx <= 1) && (dy >= -1 && dy <= 1) && (dz >= -1 && dz <= 1))
 	 * @throws IllegalArgumentException
-	 * 			If the unit needs to move in a direction outside the game world.
-	 * 			| !isValidPosition(new double[] { getPosition()[0] + (double) dx, getPosition()[1] + (double) dy,
+	 * 			If the unit needs to move in a direction outside the game world or to a not passable cube.
+	 * 			| !canHaveAsPosition(new double[] { getPosition()[0] + (double) dx, getPosition()[1] + (double) dy,
 					getPosition()[2] + (double) dz })
 	 */
 	public void moveToAdjacent(int dx, int dy, int dz) throws IllegalArgumentException {
@@ -1167,8 +1167,8 @@ public class Unit {
 	 * are neighboring solid terrain.
 	 * @param array
 	 * 		The array to search around.
-	 * @return A collection of all the neighboring cubes with an extra index
-	 * 		 (one greater then that of the array)
+	 * @return A collection of all the neighboring cubes, with an extra index
+	 * 		 (one greater then that of the array),
 	 * 		 of the array that are passable and are neighboring solid terrain. 
 	 */
 	public Queue<int[]> search(int[] array){
@@ -1211,9 +1211,6 @@ public class Unit {
 	 * @effect If a unit can move, his status is IN_CENTER.
 	 * 		| if canMove()
 	 * 		|	then setStatus(Status.IN_CENTER)
-	 * @effect If this unit is followed by another unit, the other unit will start moving to the same target position.
-	 * 		| if (isFollowedBy() != null)
-	 * 		|	then isFollowedBy().moveTo1(targetPosition)
 	 * @effect A list with possible positions for different path is created and 
 	 * 			the unit will move to an adjacent cube that's in the list.
 	 * 		| search(nextPosition)
@@ -1224,42 +1221,27 @@ public class Unit {
 	 * 		| !canHaveAsPosition(targetPosition)
 	 */
 	public void moveTo1(double[] targetPosition)throws IllegalArgumentException{
-		//System.out.print("start pos" + Arrays.toString(this.getCubeCoordinate()));
-		//System.out.print("target pos " + Arrays.toString(targetPosition));
 		queue.clear();
 		queuePos.clear();
 		if (!canHaveAsPosition(targetPosition)){
-			//System.out.print("target pos " + Arrays.toString(targetPosition));
-			//System.out.print(getWorld().isCubeInWorld(this.getWorld().getCubeCoordinate(targetPosition))); 
-			//System.out.print(getWorld().getPassable(this.getWorld().getCubeCoordinate(targetPosition)));
 			throw new IllegalArgumentException();
 			
 		}
-//		if (!this.getWorld().isNeighboringSolidTerrain(this.getWorld().getCubeCoordinate(targetPosition))){
-//			throw new IllegalArgumentException();
-//		}
-		
+
 		if (canMove()) {
 			this.targetPosition = targetPosition;
 			setStatus(Status.IN_CENTER);
 			int index = 0;
 			int[] nextPosition;
 			while (!Util.fuzzyEquals(Vector.getDistance(this.getPosition(), targetPosition), 0) && canMove()){
-				//System.out.print("start");
 				int[] position = {(int) targetPosition[0], (int) targetPosition[1], (int) targetPosition[2]};
 				int[] positionn = {(int) targetPosition[0], (int) targetPosition[1], (int) targetPosition[2], 0};
 				queue.add(positionn);
 				length = length +1;
 				queuePos.add(position);
 				while(!queueContainsPos((LinkedList<int[]>) queue, this.getCubeCoordinate()) && length>index){
-					//System.out.println(queueContainsPos((LinkedList<int[]>) queue, this.getCubeCoordinate()));
-					//System.out.println("search");
-					//System.out.println(index);
  					nextPosition = ((LinkedList<int[]>) queue).get(index);
 					search(nextPosition);
-					//System.out.print("search done");
-					//System.out.print("length "+ length);
-					//System.out.print("index " + index);
 					index = index+1;
 				}
 			if( queueContainsPos((LinkedList<int[]>) queue, this.getCubeCoordinate())){
@@ -1270,12 +1252,9 @@ public class Unit {
 					if (this.isNeighbouringCube(nextPos)){
 						if (candidateNextArray == null || candidateNextArray[3]> n){
 							candidateNextArray = array;
-							//System.out.print("candidate " + Arrays.toString(candidateNextArray));
 						}
 					}
 				}
-				//System.out.println("move to adjacent");
-				//System.out.print(Arrays.toString(candidateNextArray));
 				moveToAdjacent(candidateNextArray[0]-this.getCubeCoordinate()[0],
 						candidateNextArray[1]-this.getCubeCoordinate()[1],
 						candidateNextArray[2]-this.getCubeCoordinate()[2]);
@@ -1306,6 +1285,17 @@ public class Unit {
 //
 //	}
 	
+	
+	/**
+	 * Check whether a given array contains a given position
+	 * @param queue
+	 * 	The array to check.
+	 * @param position
+	 *	The position to check.
+	 * @return True if and only if the given array contains the given position.
+	 * 		| if(position[0]==queueArray[0]&& position[1]==queueArray[1]&& position[2]==queueArray[2])
+	 * 		|	then return true
+	 */
 	public boolean queueContainsPos(LinkedList<int[]> queue, int[] position){
 		for(int[] queueArray: queue){
 			if(position[0]==queueArray[0]
@@ -1368,8 +1358,7 @@ public class Unit {
 		double[] v = new double[] {getCurrentSpeed()*(nextTargetPosition[0]-startPosition[0])/d,
 				getCurrentSpeed()*(nextTargetPosition[1]-startPosition[1])/d,
 				getCurrentSpeed()*(nextTargetPosition[2]-startPosition[2])/d};
-		//double[] v1 = new double[] Vector.scalarMultiplication(Vector.vectorReduction(nextTargetPosition, startPosition), getCurrentSpeed()/d);
-		
+				
 		setPosition(Vector.vectorAdd(this.getPosition(), Vector.scalarMultiplication(v, duration)));
 		setOrientation((float) Math.atan2(v[1],v[0]));
 		if (isSprinting()){
@@ -1396,24 +1385,19 @@ public class Unit {
 			setExperiencePoints(this.getExperiencePoints()+1);
 			setPosition(nextTargetPosition);
 			if (targetPosition != null){
-				//System.out.println("moveto" + targetPosition +"huidige loc" + this.getPosition());
 				setStatus(Status.IN_CENTER);
-				//moveToNext1();
 				moveTo1(targetPosition);
 			}
 			else
 				setStatus(Status.DONE);
 		}
 	}
-	
 
-	
-	
 	/**
-	 * The given unit starts following this unit.
+	 * This unit starts following the given unit.
 	 * @param other
-	 * 		The unit that needs to follow this unit.
-	 * @effect The given unit will start moving to this unit.
+	 * 		The unit to follow.
+	 * @effect This unit will start moving to the given unit.
 	 * 		| moveTo1(other.getPosition())
 	 */
 	public void startFollowing(Unit other){
@@ -1421,6 +1405,11 @@ public class Unit {
 		moveTo1(other.getPosition());
 	}
 	
+	/**
+	 * Give the unit that this unit is following.
+	 * @return this.followedUnit
+	 * 	| this.followedUnit
+	 */
 	private Unit isFollowing(){
 		return this.followedUnit;
 	}
@@ -1435,6 +1424,9 @@ public class Unit {
 		this.setStatus(Status.DONE);
 	}
 	
+	/**
+	 * A variable referencing the unit that this unit is following.
+	 */
 	private Unit followedUnit;
 	
 	
@@ -1495,9 +1487,9 @@ public class Unit {
 	/**
 	 * Check whether it's possible for a unit to work.
 	 * 
-	 * @return True if and only if the unit wasn't currently moving or 
-	 * 			wasn't initial resting or wasn't attacking an other unit.
-	 * 		   | result == (status != Status.MOVING && status != Status.INITIAL_RESTING 
+	 * @return True if and only if this unit is effective and the unit wasn't currently moving or 
+	 * 			wasn't initial resting or wasn't attacking an other unit or wasn't falling.
+	 * 		   | result == (!this.isTerminated() && status != Status.MOVING && status != Status.INITIAL_RESTING 
 	 * 		   |	&& status != Status.ATTACKING && status != Status.FALLING)
 	 */
 	public boolean canWork() {
@@ -1528,6 +1520,9 @@ public class Unit {
 	 * 		 | new.workingTime == (float) 0.0
 	 *		 | new.totalWorkingTime == (float) 500.0 / this.getStrength()
 	 *	 	 | new.progressWork == (float) 0.0
+	 * @throws IllegalArgumentException
+	 * 	The given position isn't neighboring this unit's position or isn't this unit's position.
+	 * 		 | !(this.isNeighbouringCube(position)||this.getCubeCoordinate()!=position)
 	 */
 	public void work(int[] position) throws IllegalArgumentException{
 		if(!(this.isNeighbouringCube(position)||this.getCubeCoordinate()!=position))
@@ -1721,7 +1716,6 @@ public class Unit {
 			}
 			break;
 		}
-		System.out.print(" stopped working ");
 		setStatus(Status.DONE);
 		if (this.isExecutingStatement){
 			this.isExecutingStatement = false;
@@ -1749,7 +1743,7 @@ public class Unit {
 	/**
 	 * Check whether it's possible for a unit to attack.
 	 * 
-	 * @return True if the unit is not currently moving or falling and this unit is not terminated.
+	 * @return True if the unit is not currently moving or falling and this unit is effective.
 	 * 		   | result == (status != Status.MOVING)&& this.getStatus() != Status.FALLING && !this.isTerminated()
 	 */
 	public boolean canAttack() {
@@ -1774,8 +1768,13 @@ public class Unit {
 	 *		 |		other.getPosition()[0] - this.getPosition()[0])) && other.defend(this).
 	 *		 |		(new other).defend(this)
 	 * @throws IllegalArgumentException
-	 * 			If the unit that will be attacked isn't positioned in a neighboring cube.
-	 * 			| (!isNeighbouringCube(other.getCubePosition()))
+	 * 			If the unit that will be attacked isn't positioned in a neighboring cube or in the same cube.
+	 * 			| (!(isNeighbouringCube(other.getCubePosition()) || ((other.getCubeCoordinate()[0] == this.getCubeCoordinate()[0])
+	 * 			| &&(other.getCubeCoordinate()[1] == this.getCubeCoordinate()[1])
+	 * 			| && (other.getCubeCoordinate()[2] == this.getCubeCoordinate()[2]))))
+	 * @throws IllegalArgumentException
+	 * 			If  the given unit is not effective or is from the same faction.
+	 * 			| other.isTerminated || other.getFaction() == this.getFaction()
 	 */
 	public void attack(Unit other) throws IllegalArgumentException {
 		if (!(isNeighbouringCube(other.getCubePosition()) || ((other.getCubeCoordinate()[0] == this.getCubeCoordinate()[0])
@@ -1803,8 +1802,9 @@ public class Unit {
 	 * 
 	 * @param unit
 	 * 		The attacking unit.
-	 * @effect Change the orientation of this unit so that this new unit faces the attacking unit.
-	 * 		   | this.setOrientation((float) Math.atan2(unit.getPosition()[1] - this.getPosition()[1],
+	 * @effect If this unit can defend, change the orientation of this unit so that this new unit faces the attacking unit.
+	 * 		   | if (this.canDefend())
+	 * 		   | 	then this.setOrientation((float) Math.atan2(unit.getPosition()[1] - this.getPosition()[1],
 	 *		   |	unit.getPosition()[0] - this.getPosition()[0]))
 	 * @effect If this unit is able to dodge, his position is set to a random valid neighbhouring cube 
 	 * 			and his experience points are increased by 20.
@@ -1871,8 +1871,8 @@ public class Unit {
 		}
 	}
 	/**
-	 * Check whether it's possible for a unit to defend.
-	 * @return True if and only if the unit is not currently falling and the unit is not terminated.
+	 * Check whether this unit is able to defend.
+	 * @return True if and only if the unit is not currently falling and the unit is effective.
 	 * 		| result == this.getStatus() != Status.FALLING && !this.isTerminated()
 	 */		
 	private boolean canDefend(){
@@ -1880,9 +1880,9 @@ public class Unit {
 	}
 
 	/**
-	 * Checks whether the unit needs to rest.
-	 * 
-	 * @return True if and only if 3 minutes of game time have passed or the stamina points or hitpoints or equal to zero.
+	 * Check whether this unit needs to rest.
+	 * @return True if and only if 3 minutes of game time have passed or the stamina points 
+	 * 		   or hitpoints or equal to zero.
 	 * 		   | result == (restTimer >= 180)
 	 */
 	public boolean mustRest() {
@@ -1892,8 +1892,8 @@ public class Unit {
 		return false;
 	}
 	/**
-	 * Check whether it's possible for a unit to rest.
-	 * @return True if and only if this unit is not terminared and this unit's stamina points or hitpoints are less then the maximum
+	 * Check whether it's possible for this unit to rest.
+	 * @return True if and only if this unit is effective and this unit's stamina points or hitpoints are less then the maximum
 	 * 			and if this unit is currently doing nothing or is resting or 
 	 * 			working or is moving and currently in the center of a cube.
 	 * 		   | result == (this.getStaminaPoints() <= 0 || this.getHitpoints() <= 0)&&
@@ -1945,7 +1945,7 @@ public class Unit {
 	 * 			If his recoveredHitpoints are equal to or greater than 1, this unit's status is updated to resting.
 	 * 			| this.setHitPoints((getToughness() / 200.0) * 5 * duration + getHitpoints()) && recoveredHitpoints += (getToughness() / 200.0) * 5 * duration
 	 * 			| if (this.getHitpoints() >= getMaxPoints())
-	 * 			|	then his.setHitPoints(getMaxPoints()) && setStatus(Status.RESTING)
+	 * 			|	then this.setHitPoints(getMaxPoints()) && setStatus(Status.RESTING)
 	 * 			| else if (recoveredHitpoints >= 1.0) 
 	 * 			|	then setStatus(Status.RESTING)
 	 */
@@ -2027,6 +2027,11 @@ public class Unit {
 	 * @effect If this unit's status is not done, its enableDefaultBehaviour is set to false.
 	 * 		 | if !(status == Status.DONE)
 	 * 		 |	then this.setEnableDefaultBehaviour(false)
+	 * @post If this unit can be assigned a task, this unit will start executing his task.
+	 * 		 | if (this.getFaction().getScheduler() != null 
+	 * 		 | && this.getFaction().getScheduler().getAllTasksIterator().hasNext())
+	 * 		 |		then setTask(this.getFaction().getScheduler().getAllTasksIterator().next());
+	 * 		 |		&& this.getTask().executeTask(this)
 	 * @effect If this unit's status is done, it will conduct at random an activity:
 	 * 			 - this new unit's status is moving and this unit sprints to a random position
 	 * 			 - this new unit's status is moving and this unit walks to a random position
@@ -2130,9 +2135,11 @@ public class Unit {
 	/**
 	 * Makes the unit stop with his default behaviour.
 	 * 
-	 * @post enableDefaultBehaviour of this new unit is false and this new unit's status is set to done 
+	 * @post enableDefaultBehaviour of this new unit is false 
+	 * 			and this new unit's status is set to done 
 	 * 			and this unit's targetPosition and nextTargetPosition are null.
-	 * 		 | !new.isEnableDefaultBehaviour() && new.status == Status.DONE && new.targetPosition == null && new.nextTargetPosition == null
+	 * 		 | !new.isEnableDefaultBehaviour() && new.status == Status.DONE
+	 * 		 | && new.targetPosition == null && new.nextTargetPosition == null
 	 */
 	public void stopDefaultBehaviour() {
 		setEnableDefaultBehaviour(false);
@@ -2146,10 +2153,20 @@ public class Unit {
 	 */
 	private boolean enableDefaultBehaviour;
 	
+	/**
+	 * A boolean to check if this unit is executing a task.
+	 */
+	
 	private boolean isExecutingTask;
 	
+	/**
+	 * A boolean to check if this unit is executing a statement.
+	 */
 	private boolean isExecutingStatement;
-
+	
+	/**
+	 * A variable registering the duration of a task. 
+	 */
 	private double taskTimer = 0.0;
 
 	/**
@@ -2190,8 +2207,7 @@ public class Unit {
  	 }
  	 
  	 /**
- 	  * Return a boolean indicating whether or not this unit
- 	  * is terminated.
+ 	  * Check whether this unit is terminated.
 	  */
  	 @Basic @Raw
  	 public boolean isTerminated() {
@@ -2202,6 +2218,7 @@ public class Unit {
  	  * Variable registering whether this unit is terminated.
  	  */
  	 private boolean isTerminated = false;
+ 	 
   	/**
   	 * Return the boulder attached to this unit.
   	 */
@@ -2214,8 +2231,9 @@ public class Unit {
  	 * @param boulder
  	 * 		The boulder to check.
  	 * @return True if and only if the given boulder is not effective
- 	 * 		or the position of the given boulder equals the position of this unit.
- 	 * 		| result == (boulder == null) || (boulder.getPosition() == this.getPosition())||(this.isNeighbouringCube(boulder.getPosition()))
+ 	 * 		or the position of the given boulder equals the position of this unit and they are in the same world.
+ 	 * 		| result == (boulder.getWorld()==this.getWorld()) && ((boulder == null) 
+ 	 *		|	 || (boulder.getPosition() == this.getPosition())||(this.isNeighbouringCube(boulder.getPosition())))
  	 */
 
  	public boolean isValidBoulder(Boulder boulder){
@@ -2232,11 +2250,6 @@ public class Unit {
  							&& boulder.getWorld().getCubePosition(boulder.getPosition())[2]==this.getWorld().getCubeCoordinate(this.getPosition())[2]) 
  				|| this.isNeighbouringCube(boulder.getPosition()))));
  		}
-// 		return (boulder == null) || ((!(boulder.isTerminated())) && 
-// 				((boulder.getWorld().getCubePosition(boulder.getPosition()) == this.getWorld().getCubePosition(this.getPosition()))
-// 				||(this.isNeighbouringCube(boulder.getPosition()))));
- 		//return ((boulder == null) || (boulder.getWorld().getCubePosition(boulder.getPosition()) == this.getWorld().getCubePosition(this.getPosition())||(this.isNeighbouringCube(boulder.getPosition()))));
-
  	}
  	
 	/**
@@ -2244,6 +2257,7 @@ public class Unit {
 	 * 
 	 * @return True if and only if this unit can have its boulder as its
 	 *         boulder.
+	 *         | isValidBoulder(getBoulder())
 	 */
  	@Raw
 	public boolean hasProperBoulder() {
@@ -2271,6 +2285,9 @@ public class Unit {
  	/**
  	 * Return the number of boulders this unit is carrying.
  	 * @return 1 if a boulder is attached to this unit or 0 if there's no boulder attached.
+ 	 * 		| if (this.getBoulder()!=null)
+ 	 * 		|	 then return 1
+ 	 * 		|	 else return 0
  	 */
  	public int getNbBoulders(){
  		if (this.getBoulder()!=null)
@@ -2294,11 +2311,10 @@ public class Unit {
  	 * @param log
  	 * 		The log to check.
  	 * @return True if and only if the given log is not effective
- 	 * 		or the position of the given log equals the position of this unit.
- 	 * 		| result == (log == null) || (log.getPosition() == this.getPosition())|| this.isNeighbouringCube(log.getPosition())
- 	 */
- 	// Hier de voorwaarde dat de log in dezelfde cube als de unit moet zijn. Maakt de methode wel niet 
- 	// meer static. 
+ 	 * 		or the position of the given log equals the position of this unit and they are in the same world.
+ 	 * 		| result == (log.getWorld()==this.getWorld()) && (log == null) 
+ 	 * 		|	|| (log.getPosition() == this.getPosition())|| this.isNeighbouringCube(log.getPosition())
+ 	 */ 
  	public boolean isValidLog(Log log){
  		if (this.isTerminated()){
 			return (log == null);
@@ -2319,6 +2335,7 @@ public class Unit {
 	 * 
 	 * @return True if and only if this unit can have its log as its
 	 *         log.
+	 *         | isValidLog(getLog())
 	 */
  	@Raw
 	public boolean hasProperLog() {
@@ -2345,6 +2362,9 @@ public class Unit {
 	/**
  	 * Return the number of logs this unit is carrying.
  	 * @return 1 if a log is attached to this unit or 0 if there's no log attached.
+ 	 * 		| if (this.getLog()==null)
+ 	 * 		|	then return 0
+ 	 * 		|	else return 1
  	 */
 	protected int getNbLogs(){
 		if (this.getLog()==null)
@@ -2357,9 +2377,11 @@ public class Unit {
  	 * Variable referencing the log of this unit.
  	 */
  	private Log log;
+ 	
 	/**
 	 * Return the experience points of this unit. 
 	 */
+ 	@Basic 
 	public int getExperiencePoints(){
 		return this.experiencePoints;
 	}
@@ -2424,6 +2446,11 @@ public class Unit {
 	 */
 	private Task task;
 	
+	/**
+	 * Return a string that references this unit.
+	 * @return Return this unit's name.
+	 * 		| return == getName()
+	 */
 	public String toString(){
 		return getName();
 	}
