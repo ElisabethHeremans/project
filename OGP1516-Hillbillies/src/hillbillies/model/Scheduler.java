@@ -9,8 +9,6 @@ public class Scheduler implements Iterable<Task> {
 	@Raw
 	public Scheduler(){
 	
-		
-		
 	}
 	
 	/**
@@ -116,7 +114,6 @@ public class Scheduler implements Iterable<Task> {
 //	}
 	
 	public void addAsTask(Task task) throws IllegalArgumentException{
-		System.out.print("add");
 		if(! canHaveAsTask(task)){
 			System.out.print("problem 1");
 			throw new IllegalArgumentException();
@@ -126,9 +123,9 @@ public class Scheduler implements Iterable<Task> {
 			System.out.print("problem 2");
 			throw new IllegalArgumentException();
 		}
-		
-		this.tasks.add(task);
-		System.out.println("Tasks "+ tasks.toString());
+		if( ! getTasks().contains(task)){
+			this.tasks.add(task);
+		}
 	}
 
 
@@ -174,11 +171,18 @@ public class Scheduler implements Iterable<Task> {
 	}
 
 
+//	/**
+//	 * Return the set collecting all tasks attached to this scheduler.
+//	 * 	@return The set of tasks of this scheduler.
+//	 */
+//	public TreeSet<Task> getTasks(){
+//		return tasks;
+//	}
 	/**
 	 * Return the set collecting all tasks attached to this scheduler.
 	 * 	@return The set of tasks of this scheduler.
 	 */
-	public TreeSet<Task> getTasks(){
+	public List<Task> getTasks(){
 		return tasks;
 	}
 
@@ -233,27 +237,14 @@ public class Scheduler implements Iterable<Task> {
 	}
 
 	
-	/**
-	 * A variable referencing a set collecting all the tasks of this scheduler.
-	 * @invar The set of tasks is effective.
-	 * @invar Each element in the set of tasks references a task that
-	 * 		is an acceptable task for this scheduler.
-	 */
-	TreeSet<Task> tasks = new TreeSet<Task>(new Comp());
-
-	public class Comp implements Comparator<Task>{
-		
-		@Override
-		public int compare(Task task1, Task task2){
-			return ((Integer)task1.getPriority()).compareTo(task2.getPriority());
-		}
+	
+	
+	public Iterator<Task> getAllTasksIterator(){
+		//return new SchedulerIterator<Task>();
+		//return tasks.descendingIterator();
+		return tasks.iterator();
 
 	}
-	
-//	public Iterator<Task> getAllTasksIterator(){
-//		//return new SchedulerIterator<Task>();
-//		return tasks.descendingIterator();
-//	}
 
 	// methodes voor faction verder uitbreiden
 	
@@ -267,70 +258,90 @@ public class Scheduler implements Iterable<Task> {
 	
 	private Faction faction;
 	
-
-	@Override
-	public Iterator<Task> iterator() {
-
-		return new Iterator<Task>(){
-			@Override
-			public boolean hasNext() {
-				
-				return getTasks().last() != previous;
-			}
-
-			@Override
-			public Task next() {
-				if (!hasNext()){
-					throw new NoSuchElementException();
-				}
-				else if (previous == null){
-					previous = getTasks().first();
-					return getTasks().first();
-				}
-				else{
-					System.out.print(" previous: "+previous);
-					Task task = getTasks().higher(previous);
-					previous = task;
-					return task;
-				}
-					
-				
-			}
-			//private Iterator<int> priorityIterator = 
-			private Task previous = getTasks().first();
-			
-		};
-	}
-	
-	public SchedulerIterator schedulerIterator = new SchedulerIterator();
-	
-	public class SchedulerIterator implements Iterator<Task>{
-		
-		@Override
-		public boolean hasNext() {
-			
-			return getTasks().last() != previous;
-		}
-
-		@Override
-		public Task next() {
-			if (!hasNext()){
-				throw new NoSuchElementException();
-			}
-			else if (previous == null){
-				previous = getTasks().first();
-				return getTasks().first();
-			}
-			else{
-				System.out.print(" previous: "+previous);
-				Task task = getTasks().higher(previous);
-				previous = task;
-				return task;
-			}
-				
-			
-		}
-		private Task previous = getTasks().first();
+//	/**
+//	 * A variable referencing a set collecting all the tasks of this scheduler.
+//	 * @invar The set of tasks is effective.
+//	 * @invar Each element in the set of tasks references a task that
+//	 * 		is an acceptable task for this scheduler.
+//	 */
+//	TreeSet<Task> tasks = new TreeSet<Task>(new Comp());
+//
+//	public class Comp implements Comparator<Task>{
+//		
+//		@Override
+//		public int compare(Task task1, Task task2){
+//			return ((Integer)task1.getPriority()).compareTo(task2.getPriority());
+//		}
+//
+//	}
+//
+//	@Override
+//	public Iterator<Task> iterator() {
+//
+//		return new Iterator<Task>(){
+//			
+//			
+//			
+//			@Override
+//			public boolean hasNext() {
+//				
+//				return getTasks().first() != previous;
+//			}
+//
+//			@Override
+//			public Task next() {
+//				System.out.println(hasNext());
+//				if (!hasNext()){
+//					throw new NoSuchElementException();
+//				}
+//				else if (previous == null){
+//					previous = getTasks().last();
+//					return getTasks().last();
+//				}
+//				else{
+//					System.out.print(" previous: "+previous.toString());
+//					Task task = getTasks().lower(previous);
+//					previous = task;
+//					return task;
+//				}
+//					
+//				
+//			}
+//			//private Iterator<int> priorityIterator = 
+//			private Task previous;
+//			
+//		};
+//	}
+//	
+////	SchedulerIterator schedulerIterator = new SchedulerIterator();
+//	
+//	public class SchedulerIterator implements Iterator<Task>{
+//		
+//		@Override
+//		public boolean hasNext() {
+//			
+//			return getTasks().first() != previous;
+//		}
+//
+//		@Override
+//		public Task next() {
+//			if (!hasNext()){
+//				throw new NoSuchElementException();
+//			}
+//			else if (previous == null){
+//				previous = getTasks().last();
+//				return getTasks().last();
+//			}
+//			else{
+//				System.out.print(" previous: "+previous);
+//				Task task = getTasks().lower(previous);
+//				previous = task;
+//				return task;
+//			}
+//				
+//			
+//		}
+//		private Task previous;
 		
 //		private int index;
 //		
@@ -352,7 +363,52 @@ public class Scheduler implements Iterable<Task> {
 //			if (index > 0)
 //				tasks.remove(index-1);
 //		}
+//	}
+	
+	List<Task> tasks = new ArrayList<>();
+	private List<Task> TasksExecuted = new ArrayList<Task>();
+	@Override
+	public Iterator<Task> iterator() {
+		
+		return new Iterator<Task>(){
+		
+		private Integer LastPriority;
+		private Task next;
+		
+		public boolean hasNext() {
+			System.out.println(TasksExecuted.size());
+			return TasksExecuted.size() != getTasks().size();
+			}
+
+		
+		public Task next() {
+			System.out.println(hasNext());
+			if (!hasNext()){
+				throw new NoSuchElementException();
+			}
+			else if(LastPriority == null) {
+				int priority = getTasks().get(0).getPriority();
+				next = getTasks().get(0);
+				for(Task t: getTasks()){
+					if (t.getPriority()>priority && !TasksExecuted.contains(t)){
+						next = t;
+						priority = t.getPriority();
+					}		
+				}
+				
+			}
+			TasksExecuted.add(next);
+			System.out.println(TasksExecuted.size());
+			LastPriority = null;
+			return next;	
+			
+		}
+	
+		
+	};
+
 	}
 	}
+	
 
 

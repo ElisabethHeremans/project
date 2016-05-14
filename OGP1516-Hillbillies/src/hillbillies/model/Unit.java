@@ -2056,7 +2056,7 @@ public class Unit {
 			System.out.print(this.getFaction().getScheduler().iterator().hasNext());
 			if (this.getFaction().getScheduler() != null && this.getFaction().getScheduler().iterator().hasNext()){
 				this.isExecutingTask = true;
-				System.out.print("activities " + this.getFaction().getScheduler().iterator().next().getActivities());
+				//System.out.print("activities " + this.getFaction().getScheduler().iterator().next().getActivities());
 				setTask(this.getFaction().getScheduler().iterator().next());
 				this.isExecutingStatement = true;
 				this.getTask().executeTask(this);
@@ -2452,7 +2452,7 @@ public class Unit {
 	 * 		| return == getName()
 	 */
 	public String toString(){
-		return getName();
+		return getName().toString();
 	}
 	
 }

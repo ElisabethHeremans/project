@@ -302,5 +302,9 @@ public class Task {
 	}
 
 	private ExecutionContext executionContext;
+	
+	public String toString(){
+		return getName().toString();
+	}
 
 }
