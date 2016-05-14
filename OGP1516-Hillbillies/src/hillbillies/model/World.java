@@ -155,7 +155,7 @@ public class World {
 	/**
 	 * Return the coordinates of the cube in which the given position is located.
 	 * @param position
-	 * 		A position in the gameworld.
+	 * 		A position in the game world.
 	 * @return the coordinates of the cube in which the given position is located.
 	 * 
 	 */
@@ -172,7 +172,6 @@ public class World {
 	 * 			The position of the cube.
 	 * @return The center of the given cube, a double array with 
 	 * 		   the x,y and z-coordinate of the cube position increased by half of the length of a cube. 
-	 * 		   | result == {cubePosition[0]+L/2,cubePosition[1]+L/2,cubePosition[2]+L/2}
 	 */
 	double[] getCubeCenter(int[] cubePosition) {
 		return new double[] { (double) cubePosition[0] + L/2, (double) cubePosition[1] + L/2,
@@ -181,13 +180,12 @@ public class World {
 
 
 	/**
-	 * Return position the center of the cube with the given coordinates.
+	 * Return the position of the center of the cube with given double coordinates.
 	 * 
 	 * @param cubePosition
 	 *            The position of the cube.
 	 * @return The center of the given cube, a double array with 
 	 * 		   the x,y and z-coordinate of the cube position increased by half of the length of a cube. 
-	 * 		   | result == {cubePosition[0]+L/2,cubePosition[1]+L/2,cubePosition[2]+L/2}
 	 */
 	
 	double[] getCubeCenter(double[] cubePosition) {
@@ -199,7 +197,7 @@ public class World {
 	/**
 	 * Return the coordinates of the cube in which the given position is located.
 	 * @param position
-	 * 		A position in the gameworld.
+	 * 		A position inside the game world.
 	 * @return the coordinates of the cube in which the given position is located.
 	 * 
 	 */
@@ -208,24 +206,18 @@ public class World {
 				(int) Math.floor(position[2]/L) };
 	}
 
-
-
-
 	/**
-	 * Check whether a given cube is of a passable terrain type.
+	 * Check whether the terrain of a given cube is passable.
 	 * 
 	 * @param cubePosition
 	 * 		the position of the cube.
-	 * @return True if and only if the terraintype of the given position is air or workshop.
+	 * @return True if and only if the terraintype of the given cube position is air or workshop.
 	 * @throws IllegalArgumentException
 	 * 			If the given position is not inside this world.
 	 */
 	public boolean getPassable(int[] cubePosition) throws IllegalArgumentException {
 		return this.getTerrain(cubePosition).isPassable();
 	}
-
-
-
 
 	/**
 	 * Find all neighboring cubes of a given position.
@@ -283,26 +275,24 @@ public class World {
 
 
 	/**
-	 * Checks whether the given cube is located inside this gameworld.
+	 * Checks whether the given cube is located inside this game world.
 	 * @param cubePosition
 	 * 		The position of the cube.
-	 * @return True if and only if the given x-, y-, z-coordinate are each between 0 and the x-, y-,z-dimension of this gameworld. 
+	 * @return True if and only if the given x-, y-, z-coordinate are each between 0 and the x-, y-,z-dimension of this game world. 
 	 */
 	public boolean isCubeInWorld(int[] cubePosition){
 		return ((0 <= cubePosition[0]) && (cubePosition[0] < getxDimension()) && (0 <= cubePosition[1]) 
 				&& (cubePosition[1] < getyDimension()) && (0 <= cubePosition[2]) && (cubePosition[2] < getzDimension()));
 	}
 
-
-
-
 	/**
 	 * Initialize a new unit with random name, position, weight, strength,
 	 * agility, toughness, hitpoints, stamina points
 	 * and orientation, and with the given state of default behavior.
 	 * @return The new random unit.
-	 * @effect Initialize the new random unit, 
-	 * @effect add the new unit to this world if the maximum number of units is not reached for this world.
+	 * @effect This unit is been initialized with random name, position, weight, strength,
+	 * 		agility, toughness, hitpoints, stamina points and orientation and with the given state of default behavior.
+	 * @effect If the maximum number units is not yet reached for this world, this unit is added to this world.
 	 */
 	public Unit spawnUnit(boolean enableDefaultBehavior){
 		int randomToughness = new Random().nextInt(76)+25;
@@ -316,7 +306,6 @@ public class World {
 		while (!validPosFound){
 			pos = new double[] { (new Random().nextDouble()) * getxDimension()*L, 
 					(new Random().nextDouble()) * this.getyDimension()*L,(new Random().nextDouble()) * getzDimension()*L };
-			//System.out.println(pos[0]+ " "+pos[1]+" "+pos[2]);
 			if (this.isCubeInWorld(this.getCubeCoordinate(pos)) && this.getPassable(this.getCubeCoordinate(pos))
 					&& ((int) Math.floor(pos[2]) == 0 ||
 					!this.getPassable(getCubeCoordinate(new double[] {pos[0],pos[1],pos[2]-1.0}))))
@@ -341,8 +330,6 @@ public class World {
 		String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz \'\"";
 		StringBuilder name = new StringBuilder();
 		int Length = new Random().nextInt(9)+2;
-		//System.out.println(characters.charAt(new Random().nextInt(27)));
-		//System.out.println(name.toString());
 		char character = characters.charAt(new Random().nextInt(26));
 		name.append(character);
 		for( int i = 0; i < Length; i++ ){ 
@@ -350,11 +337,9 @@ public class World {
 		}
 		return name.toString();
 	}
-	
-
 
 	/**
-	 * Return the number of units of this world.
+	 * Return the number of units in this world.
 	 */
 	@Basic
 	@Raw
@@ -362,15 +347,12 @@ public class World {
 		return this.units.size();
 	}
 
-
-
-
 	/**
 	 * Check whether this world has the given unit as one of the units attached to it.
 	 * @param unit
 	 * 		The unit to check.
 	 * @throws IllegalArgumentException
-	 * 			If the given unit is null.
+	 * 		If the given unit is not effective.
 	 */
 	@Basic
 	@Raw
@@ -398,14 +380,12 @@ public class World {
 	}
 
 
-
-
 	/**
 	 * Check whether this world has proper units attached to it.
 	 * @return False if the total number of units is greater than the maximum number of units.
 	 * 		Otherwise, true if and only if this world can have each of its units as
-	 * 		a unit attached to it, and if each of these units references this world
-	 * 		as their world.
+	 * 		a unit attached to it and if each of these units references this world
+	 * 		as their world and this unit is located at a valid position inside this world.
 	 */
 	@Raw
 	public boolean hasProperUnits(){
@@ -427,8 +407,6 @@ public class World {
 	}
 
 
-
-
 	/**
 	 * Add the given unit to the set of units attached to this world.
 	 * @param unit
@@ -440,7 +418,7 @@ public class World {
 	 * 		If this world cannot have the given unit as one of its units or 
 	 * 		the total number of units in this world is not less than 100.
 	 * @throws IllegalArgumentException
-	 * 		If the given unit is positioned outside the gameworld or in a cube that is not passable.
+	 * 		If the given unit is positioned outside this world or in a cube that is not passable.
 	 * @throws IllegalArgumentException
 	 * 		If the given unit is already attached to some world.
 	 */
@@ -456,15 +434,11 @@ public class World {
 			throw new IllegalArgumentException();
 		}
 		this.units.add(unit);
-		//System.out.print("unit added");
 		this.addUnitToUnitsAtCubeMap(unit);
 		unit.setWorld(this);
 		addToFaction(unit);
 	
 	}
-
-
-
 
 	/**
 	 * Remove the given unit from the set of units attached to this world.
@@ -479,7 +453,7 @@ public class World {
 	 * @effect If this world has the given unit as one of its units,
 	 * 		the given unit is removed from the set of units attached to its faction.
 	 * @throws IllegalArgumentException
-	 * 			If the given unit is not effective
+	 * 			If the given unit is not effective.
 	 */
 	void removeAsUnit(Unit unit) throws IllegalArgumentException{
 		if( unit == null)
@@ -495,24 +469,18 @@ public class World {
 
 	/**
 	 * Return the set collecting all units attached to this world.
-	 * 	@return The set of units of this world.
+	 * 	@return The set of all the units in this world.
 	 */
 	public Set<Unit> listAllUnits(){
-		//System.out.print("units " + units.toString());
-		//System.out.print("units size " + units.size());
-
 		return units;
 	}
-
-
-
 
 	/**
 	 * Return the set of units attached 
 	 * to this world and the given faction.
 	 * @param faction
 	 * 		The faction units need to belong to.
-	 * @effect Get the units attached to the given faction.
+	 * @effect Returns a set of the units attached to the given faction.
 	 * @throws IllegalArgumentException
 	 * 		The given faction is not attached to this world.
 	 */
@@ -526,7 +494,7 @@ public class World {
 	 * Return a set of units in this world that are located at the given position in this world.
 	 * @param position
 	 * 		The position of the units.
-	 * @return
+	 * @return All the units in this world at the given position.
 	 * @throws IllegalArgumentException
 	 * 	The given position is not located inside this world.
 	 */
@@ -541,14 +509,12 @@ public class World {
 		}
 	}
 
-
-
 	/**
 	 * Add the given unit to the unitmap at the cube position of the given unit.
 	 * 
 	 * @param unit
 	 * 			The unit to add to the unit map.
-	 * @post The given unit is added to the unitmap of this world, with its cube position as its key in the map
+	 * @post The given unit is added to the unitmap of this world, with its cube position as its key.
 	 * @throws IllegalArgumentException
 	 * 			If the given unit is not attached to this world.
 	 */
@@ -556,7 +522,6 @@ public class World {
 		if (!this.hasAsUnit(unit))
 			throw new IllegalArgumentException();
 		Set<Unit> unitsAtCube = this.unitsAtCubeMap.get(new Position(unit.getCubeCoordinate()));
-		//System.out.println("f");
 		if ( unitsAtCube != null){
 			unitsAtCube.add(unit);
 			this.unitsAtCubeMap.put(new Position(unit.getCubeCoordinate()),unitsAtCube);
@@ -565,21 +530,17 @@ public class World {
 			unitsAtCube = new HashSet<Unit>();
 			unitsAtCube.add(unit);
 			this.unitsAtCubeMap.put(new Position(unit.getCubeCoordinate()),unitsAtCube);
-			//System.out.println("g");
-			//System.out.println(unitsAtCubeMap.get(new Position(unit.getCubeCoordinate())).contains(unit));
 	
 		}
 	}
-
-
 
 	/**
 	 * Remove the given unit from the unitmap at the cube position of the given unit.
 	 * 
 	 * @param unit
 	 * 			The unit to remove from the unit map.
-	 * @post If the given unit is present in the he given unit is removed from the unitmap of this world.
-	 * @post If there are no units anymore on the previous position of the given unit, the position is removed from the map
+	 * @post If the unitmap contains the given unit, the given unit is removed from the unitmap of this world.
+	 * @post If there are no units anymore on the previous position of the given unit, the position is removed from the map.
 	 * @throws IllegalArgumentException
 	 * 			If the given unit is not attached to this world.
 	 */
@@ -616,15 +577,15 @@ public class World {
 
 
 	/**
-	 * Adds a given unit to a faction and creates a new faction in which the unit is added
+	 * Add a given unit to a faction or create a new faction in which the unit is added
 	 * if no legal faction is available.
 	 * @param unit
-	 * 		The given unit.
+	 * 		The unit to add.
 	 * @effect If The number of active factions are less than the maximum number, a new faction is created and 
 	 * 			the given unit is added to this new faction.
 	 * @effect Else the unit is added to the faction with the least number of units, 
-	 * 			if some faction has less than the maximum number of units
-	 * @throws illegalArgumentException
+	 * 			if some faction has less than the maximum number of units.
+	 * @throws IllegalArgumentException
 	 * 			If the given unit is not attached to this world.
 	 */
 	private void addToFaction(Unit unit) throws IllegalArgumentException{
@@ -684,7 +645,7 @@ public class World {
 	 * @return True if and only if this world has the given faction
 	 * 		as one of its factions.
 	 * @throws IllegalArgumentException
-	 * 			If the given faction is not effective
+	 * 			If the given faction is not effective.
 	 */
 	@Basic @Raw
 	public boolean hasAsFaction(Faction faction) throws IllegalArgumentException {
@@ -696,13 +657,13 @@ public class World {
 	}
 	
 	/**
-	 * Checks whether this world can have the given faction as one of his factions.
+	 * Check whether this world can have the given faction as one of his factions.
 	 * @param faction
 	 * 		The faction to check.
 	 * @return True if and only if 
-	 * 		* if this world is terminated, the faction is null
-	 * 		* if this faction is null
-	 * 		* else if this faction is not terminated and 
+	 * 		- if this world is terminated, the faction is null
+	 * 		- if this faction is null
+	 * 		- else if this faction is not terminated and 
 	 * 			the number of units in the faction is a number between 0 and 50 (0 not included, 50 included).
 	 */
 	@Raw
@@ -762,12 +723,14 @@ public class World {
 		if (hasAsFaction(faction))
 			this.factions.remove(faction);
 	}
+	
 	/**
 	 * Set collecting references to the factions of this world.
 	 * @invar The set of factions is effective.
 	 * @invar Each element in the set of factions references a faction that is an acceptable faction for this world.
 	 */
 	private Set<Faction> factions = new HashSet<Faction>();
+	
 	/**
 	 * Return the number of boulders of this world.
 	 */
@@ -787,6 +750,7 @@ public class World {
 	public boolean hasAsBoulder(Boulder boulder){
 		return this.boulders.contains(boulder);
 	}
+	
 	/**
 	 * Check whether this world can have the given boulder as one of its boulders.
 	 * @param boulder
@@ -800,11 +764,12 @@ public class World {
 			return boulder == null;
 		return (boulder != null && !boulder.isTerminated() ); 
 	}
+	
 	/**
 	 * Check whether this world has proper boulders attached to it.
 	 * @return True if and only if this world can have each of its boulders as
 	 * 		a boulder attached to it, and if each of these boulders references this world
-	 * 		as their world.
+	 * 		as their world and each of these boulders is located inside this world on a passable terrain.
 	 */
 	@Raw
 	public boolean hasProperBoulders(){
@@ -827,9 +792,6 @@ public class World {
 		return boulders;
 	}
 
-
-
-
 	/**
 	 * Add the given boulder to the set of boulders attached to this world.
 	 * @param boulder
@@ -839,6 +801,8 @@ public class World {
 	 * @effect the given boulder is added to the map of boulders at its position
 	 * @throws IllegalArgumentException
 	 * 		This world cannot have the given boulder as one of its boulders.
+	 * @throws IllegalArgumentException
+	 * 		The given boulder is not located inside this world or on passable terrain.
 	 * @throws IllegalArgumentException
 	 * 		The given boulder is already attached to some world.
 	 */
@@ -862,6 +826,7 @@ public class World {
 	 * 		the given boulder is no longer attached to any world.
 	 * @effect the given boulder is removed from the map of boulders at its position
 	 * @throws IllegalArgumentException
+	 * 		If the given boulder is not effective.
 	 */
 	void removeAsBoulder(Boulder boulder) throws IllegalArgumentException{
 		if( boulder == null)
@@ -876,9 +841,9 @@ public class World {
 	 * Return a set of boulders in this world that are located at the given position in this world.
 	 * @param position
 	 * 		The position of the boulders.
-	 * @return the boulders at the given position
+	 * @return The boulders in this world at the given position.
 	 * @throws IllegalArgumentException
-	 * 			if the given position is not inside this world
+	 * 		If the given position is not inside this world.
 	 */
 	public Set<Boulder> getBoulders(int[] position)throws IllegalArgumentException{
 		if (!this.isCubeInWorld(position))
@@ -894,7 +859,7 @@ public class World {
 	 * Add the given boulder to the boulder map at the cube position of the given boulder.
 	 * 
 	 * @param boulder
-	 * 			The boulder to add to the unit map.
+	 * 			The boulder to add to the boulder map.
 	 * @post The given boulder is added to the bouldermap of this world, with its cube position as its key in the map
 	 * @throws IllegalArgumentException
 	 * 			If the given boulder is not attached to this world.
@@ -923,7 +888,7 @@ public class World {
 	 * @param boulder
 	 * 			The boulder to remove from the boulder map.
 	 * @post If the given boulder is present in its position in the map, the given boulder is removed from the bouldermap of this world.
-	 * @post If there are no boulders anymore on the previous position of the given boulder, the position is removed from the map
+	 * @post If there are no boulders anymore on the previous position of the given boulder, the position is removed from the map.
 	 * @throws IllegalArgumentException
 	 * 			If the given boulder is not attached to this world.
 	 */
@@ -993,7 +958,7 @@ public class World {
 	 * Check whether this world has proper logs attached to it.
 	 * @return True if and only if this world can have each of its logs as
 	 * 		a log attached to it, and if each of these logs references this world
-	 * 		as their world.
+	 * 		as their world and these logs are located inside this world on passable terrain.
 	 */
 	@Raw
 	public boolean hasProperLogs(){
@@ -1009,14 +974,11 @@ public class World {
 	}
 	/**
 	 * Return the set collecting references to logs attached to this world.
-	 * 	@return the set of logs of this world
+	 * 	@return the set of logs in this world.
 	 */
 	public Set<Log> listAllLogs(){
 		return logs;
 	}
-
-
-
 
 	/**
 	 * Add the given log to the set of logs attached to this world.
@@ -1029,7 +991,7 @@ public class World {
 	 * @throws IllegalArgumentException
 	 * 		The given log is already attached to some world.
 	 * @throws IllegalArgumentException
-	 * 		the given log does not have a valid position for this world.
+	 * 		The given log does not have a valid position for this world.
 	 */
 	public void addAsLog(Log log) throws IllegalArgumentException{
 		if(! canHaveAsLog(log))
@@ -1051,7 +1013,7 @@ public class World {
 	 * @post If this world has the given log as one of its logs,
 	 * 		the given log is no longer attached to any world.
 	 * @throws IllegalArgumentException
-	 * 		the log is not effective
+	 * 		If the log is not effective.
 	 */
 	void removeAsLog(Log log) throws IllegalArgumentException{
 		if( log == null)
@@ -1062,13 +1024,14 @@ public class World {
 			log.setWorld(null);
 		}
 	}
+	
 	/**
 	 * Return a set of logs in this world that are located at the given position in this world.
 	 * @param position
 	 * 		The position of the logs.
-	 * @return the set of logs in this world
+	 * @return All the logs inside this world that are located at the given position.
 	 * @throws IllegalArgumentException
-	 * 	The given position is not located inside this world.
+	 * 		The given position is not located inside this world.
 	 */
 	public Set<Log> getLogs(int[] position)throws IllegalArgumentException{
 		if (!this.isCubeInWorld(position)){
@@ -1081,12 +1044,13 @@ public class World {
 			return logsAtCubeMap.get(new Position(position));
 		}
 	}
+	
 	/**
 	 * Add the given log to the logmap at the cube position of the given log.
 	 * 
 	 * @param log
 	 * 			The log to add to the log map.
-	 * @post The given log is added to the log map of this world, with its cube position as its key in the map
+	 * @post The given log is added to the log map of this world, with its cube position as its key in the map.
 	 * @throws IllegalArgumentException
 	 * 			If the given log is not attached to this world.
 	 */
@@ -1105,15 +1069,13 @@ public class World {
 		}
 	}
 
-
-
 	/**
 	 * Remove the given log from the log map at the cube position of the given log.
 	 * 
 	 * @param log
 	 * 			The log to remove from the log map.
 	 * @post If the given log is present in its position in the map, the given log is removed from the log map of this world.
-	 * @post If there are no logs anymore on the previous position of the given log, the position is removed from the map
+	 * @post If there are no logs anymore on the previous position of the given log, the position is removed from the map.
 	 * @throws IllegalArgumentException
 	 * 			If the given log is not attached to this world.
 	 */
@@ -1197,8 +1159,9 @@ public class World {
 	
 		return list;
 	}
+	
 	/**
-	 * A constant: the maximum number of units in this world
+	 * A constant representing the maximum number of units in this world
 	 */
 	private final static int MAX_UNITS = 100;
 	
@@ -1266,13 +1229,13 @@ public class World {
 	}
 	
 	/**
-	 * Return if the given cube is a solid cube connected to the border of this world.
+	 * Check if the given cube is a solid cube connected to the border of this world.
 	 * 
 	 * @param pos
 	 * 			The cube position to check
 	 * @return True if and only if the given cube position is a solid cube connected to the border of this world.
 	 * @throws IllegalArgumentException
-	 * 			If the given cube is not inside this world
+	 * 			If the given cube is not inside this world.
 	 */
 	public boolean isSolidConnectedToBorder(int[] pos) throws IllegalArgumentException{
 		if (!isCubeInWorld(pos))
