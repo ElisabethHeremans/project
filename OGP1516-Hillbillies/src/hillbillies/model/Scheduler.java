@@ -128,8 +128,9 @@ public class Scheduler implements Iterable<Task> {
 			System.out.print("problem 2");
 			throw new IllegalArgumentException();
 		}
-		System.out.println("Tasks "+ tasks.toString());
+		
 		this.tasks.add(task);
+		System.out.println("Tasks "+ tasks.toString());
 	}
 
 
@@ -247,13 +248,12 @@ public class Scheduler implements Iterable<Task> {
 			return ((Integer)task1.getPriority()).compareTo(task2.getPriority());
 		}
 
-		
 	}
 	
-	public Iterator<Task> getAllTasksIterator(){
-		//return new SchedulerIterator<Task>();
-		return tasks.descendingIterator();
-	}
+//	public Iterator<Task> getAllTasksIterator(){
+//		//return new SchedulerIterator<Task>();
+//		return tasks.descendingIterator();
+//	}
 
 	// methodes voor faction verder uitbreiden
 	
@@ -266,29 +266,72 @@ public class Scheduler implements Iterable<Task> {
 	}
 	
 	private Faction faction;
+	
 
 	@Override
 	public Iterator<Task> iterator() {
-		return tasks.descendingIterator();
-//				new Iterator<Task>(){
-//
-//			@Override
-//			public boolean hasNext() {
-//				// TODO Auto-generated method stub
-//				return false;
-//			}
-//
-//			@Override
-//			public Task next() {
-//				// TODO Auto-generated method stub
-//				return null;
-//			}
+
+		return new Iterator<Task>(){
+			@Override
+			public boolean hasNext() {
+				
+				return getTasks().last() != previous;
+			}
+
+			@Override
+			public Task next() {
+				if (!hasNext()){
+					throw new NoSuchElementException();
+				}
+				else if (previous == null){
+					previous = getTasks().first();
+					return getTasks().first();
+				}
+				else{
+					System.out.print(" previous: "+previous);
+					Task task = getTasks().higher(previous);
+					previous = task;
+					return task;
+				}
+					
+				
+			}
+			//private Iterator<int> priorityIterator = 
+			private Task previous = getTasks().first();
 			
 		};
+	}
 	
-//	
-//	public class SchedulerIterator<T> implements Iterator<T>{
-//		
+	public SchedulerIterator schedulerIterator = new SchedulerIterator();
+	
+	public class SchedulerIterator implements Iterator<Task>{
+		
+		@Override
+		public boolean hasNext() {
+			
+			return getTasks().last() != previous;
+		}
+
+		@Override
+		public Task next() {
+			if (!hasNext()){
+				throw new NoSuchElementException();
+			}
+			else if (previous == null){
+				previous = getTasks().first();
+				return getTasks().first();
+			}
+			else{
+				System.out.print(" previous: "+previous);
+				Task task = getTasks().higher(previous);
+				previous = task;
+				return task;
+			}
+				
+			
+		}
+		private Task previous = getTasks().first();
+		
 //		private int index;
 //		
 //		public SchedulerIterator(){
@@ -309,7 +352,7 @@ public class Scheduler implements Iterable<Task> {
 //			if (index > 0)
 //				tasks.remove(index-1);
 //		}
-//	}
+	}
 	}
 
 

@@ -35,7 +35,7 @@ public class TaskFactory implements ITaskFactory<Expression, Statement, Task> {
 
 	@Override
 	public Statement createAssignment(String variableName, Expression value, SourceLocation sourceLocation) {
-		return new AssignmentStatement<>(variableName, value); // correct? 
+		return new AssignmentStatement<Expression>(variableName, value); // correct? 
 	}
 
 	@Override

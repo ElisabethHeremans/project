@@ -2048,11 +2048,11 @@ public class Unit {
 			setEnableDefaultBehaviour(true);
 			System.out.print(" restart default ");
 			System.out.print(this.getFaction().getScheduler());
-			System.out.print(this.getFaction().getScheduler().getAllTasksIterator().hasNext());
-			if (this.getFaction().getScheduler() != null && this.getFaction().getScheduler().getAllTasksIterator().hasNext()){
+			System.out.print(this.getFaction().getScheduler().iterator().hasNext());
+			if (this.getFaction().getScheduler() != null && this.getFaction().getScheduler().iterator().hasNext()){
 				this.isExecutingTask = true;
-				System.out.print(this.getFaction().getScheduler().getAllTasksIterator().next());
-				setTask(this.getFaction().getScheduler().getAllTasksIterator().next());
+				System.out.print("activities " + this.getFaction().getScheduler().iterator().next().getActivities());
+				setTask(this.getFaction().getScheduler().iterator().next());
 				this.isExecutingStatement = true;
 				this.getTask().executeTask(this);
 				//System.out.println(" 6 ");

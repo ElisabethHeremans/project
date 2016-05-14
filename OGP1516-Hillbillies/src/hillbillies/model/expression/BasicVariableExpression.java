@@ -22,7 +22,7 @@ public class BasicVariableExpression extends VariableExpression {
 
 	@Override
 	public Object evaluateExpression(ExecutionContext context) {
-		return context.getVariables().get(getName()).evaluateExpression(context);
+		return context.getVariables().get(getName()).getValue();
 	}
 	
 	public Expression getAssociatedExpression(ExecutionContext context){
