@@ -903,8 +903,12 @@ public class Unit {
 			if(this.isNeighbouringOrSameCube(this.isFollowing().getCubeCoordinate())){
 				this.stopFollowing();
 			}
-			else
-				moveTo1(this.isFollowing().getPosition());
+			else{
+				if(this.isFollowing().getStatus()==status.FALLING){
+				}	
+				else
+					moveTo1(this.isFollowing().getPosition());
+			}
 		}
 		//System.out.println(" UIT FOLLOW ");
 //		System.out.print(Arrays.toString(targetPosition));
