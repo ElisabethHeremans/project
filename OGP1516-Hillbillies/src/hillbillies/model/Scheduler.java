@@ -6,6 +6,9 @@ import java.util.function.Predicate;
 import be.kuleuven.cs.som.annotate.*;
 
 public class Scheduler implements Iterable<Task> {
+	/**
+	 * Initialize a new scheduler.
+	 */
 	@Raw
 	public Scheduler(){
 	
@@ -16,7 +19,8 @@ public class Scheduler implements Iterable<Task> {
 	 * @param task
 	 * 		The task to check.
 	 * @throws IllegalArgumentException
-	 * 			If the given task is null.
+	 * 		If the given task is null.
+	 * 		| (task==null)	
 	 */
 	@Basic
 	@Raw
@@ -27,16 +31,21 @@ public class Scheduler implements Iterable<Task> {
 	}
 	
 	/**
-	 * 
+	 * Check whether this scheduler contains the given tasks.
 	 * @param tasks
-	 * @return
+	 * @return True if and only if this scheduler contains every
+	 * 	task of the given set of tasks.
+	 * 		| result == this.getTasks().contains(tasks)
 	 * @throws IllegalArgumentException
+	 * 		If these tasks are not effective.
+	 * 		| (tasks==null)
 	 */
 	public boolean hasAsTasks(Set<Task> tasks)throws IllegalArgumentException{
 		if (tasks==null)
 			throw new IllegalArgumentException();
 		for (Task task: tasks){
-			if (!this.getTasks().contains(tasks))
+			//if (!this.getTasks().contains(tasks))
+			if (!this.getTasks().contains(task))
 				return false;
 		}
 		return true;
@@ -49,7 +58,8 @@ public class Scheduler implements Iterable<Task> {
 	 * Check whether this scheduler can have the given task as one of its tasks.
 	 * @param task
 	 * 		The task to check.
-	 * @return 
+	 * @return True if and only if the given task is effective.
+	 * 		| result == (task != null)
 	 */
 	@Raw
 	public boolean canHaveAsTask(Task task){
@@ -57,15 +67,11 @@ public class Scheduler implements Iterable<Task> {
 		return (task != null); 
 	}
 
-
-
-
 	/**
 	 * Check whether this scheduler has proper tasks attached to it.
-	 * @return False if the total number of tasks is greater than the maximum number of tasks.
-	 * 		Otherwise, true if and only if this scheduler can have each of its tasks as
-	 * 		a task attached to it, and if each of these tasks references this scheduler
-	 * 		as their scheduler.
+	 * @return True if and only if this scheduler can have each of its tasks as
+	 * 		a task attached to it.
+	 * 		| result == canHaveAsTask(task)
 	 */
 	@Raw
 	public boolean hasProperTasks(){
@@ -124,6 +130,7 @@ public class Scheduler implements Iterable<Task> {
 			throw new IllegalArgumentException();
 		}
 		if( ! getTasks().contains(task)){
+			System.out.println(TasksExecuted);
 			this.tasks.add(task);
 		}
 	}
@@ -153,9 +160,19 @@ public class Scheduler implements Iterable<Task> {
 	}
 	
 	/**
-	 * 
+	 * Replace the given task by the other given task.
 	 * @param toReplace
+	 * 	The task to replace.
 	 * @param replacement
+	 * 	The new task.
+	 * @effect This scheduler does not have the old task as one of its tasks.
+	 * 		| removeAsTask(toReplace)
+	 * @effect This scheduler has the new task as one of its tasks.
+	 * 		| addAsTask(replacement)
+	 * @throws IllegalArgumentException
+	 * 	If this scheduler does not have the old task as one of its tasks,
+	 * 	or this scheduler can't have the new task as one of its tasks.
+	 * 		| !hasAsTask(toReplace) || !canHaveAsTask(replacement)
 	 */
 	public void replaceAsTask(Task toReplace, Task replacement){
 		if (!hasAsTask(toReplace) || !canHaveAsTask(replacement))
@@ -178,25 +195,25 @@ public class Scheduler implements Iterable<Task> {
 //	public TreeSet<Task> getTasks(){
 //		return tasks;
 //	}
+	
 	/**
 	 * Return the set collecting all tasks attached to this scheduler.
-	 * 	@return The set of tasks of this scheduler.
 	 */
+	@Basic @Raw
 	public List<Task> getTasks(){
 		return tasks;
 	}
 
 	
-	
 	/**
 	 * Return the priority of the given task in this scheduler.
 	 * @param task
 	 * 		  The task to check the priority of.
-	 * @return The index of this task in the list of tasks +1.
-	 * 		  |this.getTasks().indexOf(task)+1;
+	 * @return The priority of the given task.
+	 * 		  |task.getPriority()
 	 * @throws IllegalArgumentException()
 	 * 			If this scheduler does not have the given task as its task.
-	 * 			|!this.hasAsTask(task)
+	 * 		  |!this.hasAsTask(task)
 	 */
 	public int getPriority(Task task){
 		if (! this.hasAsTask(task))
@@ -215,17 +232,48 @@ public class Scheduler implements Iterable<Task> {
 //				return getTasks()[i];
 //		}
 //		return null;
-		return getTasks().last();
+//		return getTasks().last();
+		int prior = getTasks().get(0).getPriority();
+		Task HighestPriorityTask = getTasks().get(0);
+		for(Task task: getTasks()){
+			if (task.getPriority()> prior){
+				HighestPriorityTask = task;
+				prior = task.getPriority();
+			}
+				
+		}
+		return HighestPriorityTask;
 			
 	}
 	
+	/**
+	 * Search all tasks that satisfy the given condition.
+	 * @param condition
+	 * 	The condition to satisfy 
+	 * @return A set of all tasks satisfying the given condition.
+	 * 		| result == this.getTasks().stream().filter(condition)
+	 */
 	public Set<Task> getTasksSatisfying(Predicate<Task> condition){
 		Set<Task> tasksSat = new HashSet<>();
 		this.getTasks().stream().filter(condition).forEach(tasksSat::add);
 		return tasksSat;
 	}
 
-	
+	/**
+	 * Schedule the given task for the given unit.
+	 * @param task
+	 * 		The scheduled task.
+	 * @param unit
+	 * 		The scheduled unit.
+	 * @effect The given task is scheduled for the given unit.
+	 * 		| task.setScheduledUnit(unit)
+	 * @throws IllegalArgumentException
+	 * 	If the faction of this scheduler does not has the given unit as one of its units.
+	 * 		| !this.getFaction().hasAsUnit(unit)
+	 * @throws IllegalArgumentException
+	 * 	If this scheduler does not have the given task as one of its tasks.
+	 * 		| ! this.hasAsTask(task)
+	 */
 	public void markTaskForUnit(Task task,Unit unit){
 		if (!this.getFaction().hasAsUnit(unit))
 			throw new IllegalArgumentException();
@@ -236,9 +284,9 @@ public class Scheduler implements Iterable<Task> {
 
 	}
 
-	
-	
-	
+	/**
+	 * Gives an iterator 
+	 */
 	public Iterator<Task> getAllTasksIterator(){
 		//return new SchedulerIterator<Task>();
 		//return tasks.descendingIterator();
@@ -247,15 +295,27 @@ public class Scheduler implements Iterable<Task> {
 	}
 
 	// methodes voor faction verder uitbreiden
-	
+	/**
+	 * Return the faction of this scheduler.
+	 */
 	Faction getFaction(){
 		return this.faction;
 	}
 	
+	/**
+	 * Set the faction attached to this scheduler to the given faction.
+	 * @param faction
+	 * 		The faction to be attached to this scheduler.
+	 * @post This scheduler references the given faction as the faction
+	 * 		attached to it.
+	 * 		| new.getFaction() == faction 
+	 */
 	void setFaction(Faction faction) {
 		this.faction = faction;
 	}
-	
+	/**
+	 * A variable referencing the faction of this scheduler.
+	 */
 	private Faction faction;
 	
 //	/**
@@ -367,6 +427,7 @@ public class Scheduler implements Iterable<Task> {
 	
 	List<Task> tasks = new ArrayList<>();
 	private List<Task> TasksExecuted = new ArrayList<Task>();
+	
 	@Override
 	public Iterator<Task> iterator() {
 		
@@ -376,29 +437,30 @@ public class Scheduler implements Iterable<Task> {
 		private Task next;
 		
 		public boolean hasNext() {
-			System.out.println(TasksExecuted.size());
 			return TasksExecuted.size() != getTasks().size();
 			}
 
 		
 		public Task next() {
-			System.out.println(hasNext());
 			if (!hasNext()){
 				throw new NoSuchElementException();
 			}
 			else if(LastPriority == null) {
-				int priority = getTasks().get(0).getPriority();
+				int priority = 0;
+				if(TasksExecuted.size() != 0){
+					priority = TasksExecuted.get(TasksExecuted.size()-1).getPriority();
+				}
 				next = getTasks().get(0);
 				for(Task t: getTasks()){
 					if (t.getPriority()>priority && !TasksExecuted.contains(t)){
 						next = t;
 						priority = t.getPriority();
+						
 					}		
 				}
 				
 			}
 			TasksExecuted.add(next);
-			System.out.println(TasksExecuted.size());
 			LastPriority = null;
 			return next;	
 			

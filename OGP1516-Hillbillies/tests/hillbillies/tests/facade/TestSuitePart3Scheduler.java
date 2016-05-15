@@ -54,7 +54,7 @@ public class TestSuitePart3Scheduler {
 		System.out.println("task 3 "+task3);
 		faction.setScheduler(scheduler);
 		scheduler.addAsTask(task1);
-		//scheduler.addAsTask(task2);
+		scheduler.addAsTask(task2);
 		scheduler.addAsTask(task3);
 		System.out.println(scheduler.getTasks());
 	}
@@ -65,8 +65,8 @@ public class TestSuitePart3Scheduler {
 		System.out.print(scheduler.iterator().next().toString());
 		Assert.assertTrue(scheduler.iterator().hasNext());
 		System.out.print(scheduler.iterator().next().toString());
-		//Assert.assertTrue(scheduler.iterator().hasNext());
-		//scheduler.iterator().next();
+		Assert.assertTrue(scheduler.iterator().hasNext());
+		scheduler.iterator().next();
 		Assert.assertFalse(scheduler.iterator().hasNext());
 		
 //		while (scheduler.getAllTasksIterator().hasNext()){
