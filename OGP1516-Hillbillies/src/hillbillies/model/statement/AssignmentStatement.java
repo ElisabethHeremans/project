@@ -16,6 +16,7 @@ public class AssignmentStatement<E extends Expression> extends ExpressionStateme
 //			BooleanExpression expr = (BooleanExpression)expression;
 //			setExpression(expr)
 		setExpression(expression);
+		setVariableName(variableName);
 //		BasicVariableExpression variable = new BasicVariableExpression(getVariableName());
 //		setVariable(variable);
 //		variable.setValue(expression.getValue());
@@ -44,7 +45,7 @@ public class AssignmentStatement<E extends Expression> extends ExpressionStateme
 	public void executeStatement(ExecutionContext context) {
 		getExpression().evaluateExpression(context);
 		context.addVariable(getVariableName(), getExpression());
-		
+		context.getExecutingUnit().stopExecutingStatement();
 //		Object value = getExpression().evaluateExpression(context);
 //		if (value==Boolean.TRUE){
 //			setExpression(new TrueExpression());

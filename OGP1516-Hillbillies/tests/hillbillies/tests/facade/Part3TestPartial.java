@@ -110,12 +110,17 @@ public class Part3TestPartial {
 		
 		facade.schedule(scheduler, task);
 		facade.schedule(scheduler, task1);
-		advanceTimeFor(facade, world, 6, 0.02);
+		System.out.print(scheduler.getTasks().size());
+		advanceTimeFor(facade, world, 24, 0.02);
+		
 
 		// work task has been executed
 		assertEquals(TYPE_AIR, facade.getCubeType(world, 0, 1, 1));
 		// work task is removed from scheduler
+		System.out.print("remaining tasks  "+scheduler.getTasks().size());
+		//System.out.print(scheduler.);
 		assertFalse(facade.areTasksPartOf(scheduler, Collections.singleton(task)));
+		assertFalse(facade.areTasksPartOf(scheduler, Collections.singleton(task1)));
 	}
 
 	/**

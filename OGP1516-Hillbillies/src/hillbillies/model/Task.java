@@ -8,8 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import be.kuleuven.cs.som.annotate.*;
-import hillbillies.model.statement.SequenceStatement;
-import hillbillies.model.statement.Statement;
+import hillbillies.model.statement.*;
 
 /**
  * @invar Each task can have its name as name . | canHaveAsName(this.getName())
@@ -165,14 +164,15 @@ public class Task {
 	}
 
 	/**
-	 * Check whether the given activities is a valid activities for any task.
+	 * Check whether the given activities is a valid activities statement for any task.
 	 * 
 	 * @param activities
 	 *            The activities to check.
-	 * @return | result == (activities != null)
+	 * @return The activities statement of this task is well formed.
+	 * 		   | result == isWellFormed(activities)
 	 */
 	public static boolean isValidActivities(Statement activities) {
-		return true;
+		return isWellFormed(activities);
 	}
 
 	/**
@@ -193,6 +193,63 @@ public class Task {
 		this.activities = activities;
 	}
 	
+	/**
+	 * 
+	 * @param activities
+	 * @return
+	 */
+	public static boolean isWellFormed(Statement activities){
+		List<Statement> statements = new ArrayList<Statement>();
+		List<String> variableNames = new ArrayList<String>();
+	
+		if (activities instanceof SequenceStatement<?>){
+			statements = (List<Statement>) ((SequenceStatement<?>)activities).getStatements();
+		}
+		else
+			statements.add(activities);
+	
+		for (Statement stat: statements){
+			if (stat instanceof AssignmentStatement<?>){
+				variableNames.add(((AssignmentStatement<?>) stat).getVariableName());
+			}
+			else if (stat instanceof BreakStatement)
+				return false;
+			else if(stat instanceof SequenceStatement)
+				if (! isWellFormed(stat))
+					return false;
+			else{
+					Expression e = ((ExpressionStatement<?>)stat).getExpression();
+					if (e instanceof BracketVariableExpression){
+						e = ((BracketVariableExpression)e).getExpression();
+					}
+					if (e instanceof BasicVariableExpression){
+						boolean variableAssigned = false;
+						for (String name: variableNames){
+							if (name == ((BasicVariableExpression)e).getName())
+								variableAssigned = true;
+							
+						}
+						if (!variableAssigned){
+							return false;
+						}
+					}
+					if (stat instanceof IComposedUnaryStatement<?>)
+						if (!( stat instanceof WhileStatement<?,?>))
+							if(((IComposedUnaryStatement<?>)stat).getStatement() 
+									instanceof BreakStatement)
+								return false;
+					if (stat instanceof IComposedBinaryStatement<?,?>)
+						if ((((IComposedBinaryStatement<?,?>)stat).getFirstStatement() 
+								instanceof BreakStatement) ||
+								(((IComposedBinaryStatement<?,?>)stat).getSecondStatement() 
+										instanceof BreakStatement))
+							return false;
+									
+				}
+			}
+		return true;
+		}
+
 	public void removeFirstStatement(){
 		if (this.getActivities() instanceof SequenceStatement){
 			((SequenceStatement<?>) this.getActivities()).removeFirstStatement();
@@ -211,12 +268,6 @@ public class Task {
 	 * Variable registering the activities of this task.
 	 */
 	private Statement activities;
-	
-	public boolean isWellFormed(){
-		return true;
-	}
-
-
 	
 	/**
 	 * @return the scheduledUnit

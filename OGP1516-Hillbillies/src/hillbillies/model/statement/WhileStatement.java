@@ -41,8 +41,17 @@ extends ExpressionStatement<E> implements IComposedUnaryStatement<S> {
 	public void executeStatement(ExecutionContext context) {
 		super.executeStatement(context);
 		while (getExpression().getValue()){
-			getStatement().executeStatement(context);
+			if (getStatement() instanceof BreakStatement){
+				context.getExecutingUnit().stopExecutingStatement();
+			}
+			else{
+				getStatement().executeStatement(context);
+			}
 		}
+		context.getExecutingUnit().stopExecutingStatement();
+
 			
 	}
+
+
 }

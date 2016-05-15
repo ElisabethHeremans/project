@@ -42,4 +42,5 @@ public abstract class Statement{
 		this.statementExecuted = statementExecuted;
 	}
 
+
 }

@@ -120,12 +120,13 @@ public class Scheduler implements Iterable<Task> {
 //	}
 	
 	public void addAsTask(Task task) throws IllegalArgumentException{
+		//System.out.print("adding task");
 		if(! canHaveAsTask(task)){
 			System.out.print("problem 1");
 			throw new IllegalArgumentException();
 		}
 		
-		if(!task.isWellFormed()){
+		if(!Task.isWellFormed(task.getActivities())){
 			System.out.print("problem 2");
 			throw new IllegalArgumentException();
 		}
@@ -437,16 +438,20 @@ public class Scheduler implements Iterable<Task> {
 		private Task next;
 		
 		public boolean hasNext() {
-			return TasksExecuted.size() != getTasks().size();
+			return getTasks().size()!= 0;
 			}
 
 		
 		public Task next() {
+			System.out.print("executed  "+TasksExecuted.size());
+			System.out.print("tasks size  "+getTasks().size());
+
 			if (!hasNext()){
 				throw new NoSuchElementException();
 			}
+			
 			else if(LastPriority == null) {
-				int priority = 0;
+				int priority = 0; 
 				if(TasksExecuted.size() != 0){
 					priority = TasksExecuted.get(TasksExecuted.size()-1).getPriority();
 				}

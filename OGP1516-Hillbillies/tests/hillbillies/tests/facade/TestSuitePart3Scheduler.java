@@ -68,23 +68,7 @@ public class TestSuitePart3Scheduler {
 		Assert.assertTrue(scheduler.iterator().hasNext());
 		scheduler.iterator().next();
 		Assert.assertFalse(scheduler.iterator().hasNext());
-		
-//		while (scheduler.getAllTasksIterator().hasNext()){
-//			   System.out.println(scheduler.getAllTasksIterator().next().getPriority());
-//			   System.out.println(scheduler.getAllTasksIterator().next() + " OK");
-//			   }
-//		while (scheduler.getTasks().descendingIterator().hasNext()){
-//			System.out.println(scheduler.getTasks().descendingIterator().next() + " ");
-//		}
-//		System.out.print(scheduler.getTasks());
-//		//laagste prioriteit
-//		System.out.println(scheduler.getTasks().last());
-//		//hoogste prioriteit
-//		System.out.println(scheduler.getTasks().first());
-//		//eerste element hoger in de treeset, dus met lagere prioriteit teruggeven
-//		System.out.println(scheduler.getTasks().ceiling(scheduler.getTasks().first()));
-		
-		
+				
 	}
 	
 	@Test
@@ -99,7 +83,9 @@ public class TestSuitePart3Scheduler {
 	@Test
 	public void getAllTasksIterator(){
 		System.out.println("---------------------------------Test 3");
-		scheduler.getAllTasksIterator();
+		Assert.assertEquals(scheduler.getAllTasksIterator().next(),scheduler.getTasks().iterator().next());
+		Assert.assertEquals(scheduler.getAllTasksIterator().next(),scheduler.getTasks().iterator().next());
+		Assert.assertEquals(scheduler.getAllTasksIterator().next(),scheduler.getTasks().iterator().next());
 	}
 
 }

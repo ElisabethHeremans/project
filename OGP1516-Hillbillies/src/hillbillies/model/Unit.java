@@ -838,7 +838,7 @@ public class Unit {
 	 *             If the duration is less than zero or exceeds or equals 0.2 s.
 	 */
 	public void advanceTime(float duration) throws IllegalArgumentException {
-		System.out.println("-----------------------------------ADVANCETIME UNIT----------------------------------");
+		//System.out.println("-----------------------------------ADVANCETIME UNIT----------------------------------");
 //		System.out.print(" 1: "+ this.getExperiencePoints());
 //		System.out.print(" 2 " + this.getHitpoints());
 		if (!(Util.fuzzyGreaterThanOrEqualTo(duration, 0.0-Util.DEFAULT_EPSILON )&& Util.fuzzyLessThanOrEqualTo((double)duration, 0.2+Util.DEFAULT_EPSILON))){
@@ -847,6 +847,9 @@ public class Unit {
 		}
 		restTimer += duration;
 		taskTimer += duration;
+		if (this.isExecutingStatement)
+			taskTimer += duration;
+		
 		if (experiencePoints >=10){
 			setExperiencePoints(this.getExperiencePoints()-10);
 			if (isValidStrength(this.getStrength()+1) && this.getWeight()>=((this.getStrength()+1)+this.getAgility())/2 )
@@ -864,47 +867,46 @@ public class Unit {
 		if (this.getStatus() == Status.FALLING){
 			falling(duration);
 		}
+		if (this.isExecutingTask  && !isExecutingStatement)
+			executeProgram(duration);
 		if (this.isExecutingTask &&this.getTask() != null){
 			System.out.println("EXECUTING TASK");
 			System.out.println("STATUS =" +getStatus());
 		}
-		if (this.isExecutingTask &&this.getTask() != null && this.getTask().isComplete()){
-			this.isExecutingTask = false;
-			this.setTask(null);
-		}
-		if (this.isExecutingTask && !this.isExecutingStatement 
-				 && Util.fuzzyGreaterThanOrEqualTo(taskTimer, 0.001)){
-			System.out.println(" executed working ");
-			taskTimer = 0.0;
-			this.getTask().removeFirstStatement();
-			System.out.println(" 1 ");
-			if (!this.getTask().isComplete()){
-				this.isExecutingStatement = true;
-				this.getTask().executeTask(this);
-			}
-			else{
-				System.out.println(" TASK COMPLETE ");
-				this.isExecutingTask = false;
-				this.setTask(null);
-				System.out.println(" TASK RESET ");
-			}
-		}
+//		if (this.isExecutingTask && !this.isExecutingStatement) 
+//				 /*&& Util.fuzzyGreaterThanOrEqualTo(taskTimer, 0.001))*/{
+//			//System.out.println(" executed working ");
+//			//taskTimer = 0.0;
+//			this.getTask().removeFirstStatement();
+//			System.out.println(" 1 ");
+//			if (!this.getTask().isComplete()){
+//				this.isExecutingStatement = true;
+//				taskTimer += 0.001;
+//				this.getTask().executeTask(this);
+//			}
+//			else{
+//				//System.out.println(" TASK COMPLETE ");
+//				this.isExecutingTask = false;
+//				this.getFaction().getScheduler().removeAsTask(this.getTask());
+//				this.setTask(null);
+//				//System.out.println(" TASK RESET ");
+//			}
+//		}
 //		if (!this.isExecutingTask && this.getFaction().getScheduler().iterator().hasNext()){
 //			Task next = this.getFaction().getScheduler().iterator().next();
 //			System.out.println("NEW TASK ASSIGNED");
 //			System.out.println(next.getName().toString());
 //			next.executeTask(this);
 //		}
-		System.out.println(" UIT TASK ");
+		//System.out.println(" UIT TASK ");
 		if (this.isFollowing() != null) {
 			if(this.isNeighbouringOrSameCube(this.isFollowing().getCubeCoordinate())){
 				this.stopFollowing();
-				this.isExecutingStatement = false;
 			}
 			else
 				moveTo1(this.isFollowing().getPosition());
 		}
-		System.out.println(" UIT FOLLOW ");
+		//System.out.println(" UIT FOLLOW ");
 //		System.out.print(Arrays.toString(targetPosition));
 //		System.out.print(this.isEnableDefaultBehaviour());
 //		System.out.print(this.getStatus());
@@ -947,6 +949,33 @@ public class Unit {
 		if (this.getBoulder() != null)
 			this.getBoulder().setPosition(this.getPosition());
 
+	}
+	
+	public void stopExecutingStatement(){
+		this.isExecutingStatement = false;
+		this.getTask().removeFirstStatement();
+	}
+	
+	private void executeProgram(float duration) {
+		taskTimer = 0.001;
+		if (!this.getTask().isComplete()){
+			if (taskTimer > duration){
+				this.isExecutingStatement = true;
+				this.getTask().executeTask(this);
+			}
+			else{
+				while (taskTimer < duration && !isExecutingStatement && !this.getTask().isComplete()){
+					this.isExecutingStatement = true;
+					this.getTask().executeTask(this);
+					taskTimer += 0.001;
+				}
+			}
+		}
+		else{
+			this.isExecutingTask = false;
+			this.getFaction().getScheduler().removeAsTask(this.getTask());
+			this.setTask(null);
+		}
 	}
 	
 	/**
@@ -1391,6 +1420,9 @@ public class Unit {
 			queuePos = new LinkedList<>();
 			targetPosition = null;
 			setExperiencePoints(this.getExperiencePoints()+1);
+			if (this.isExecutingStatement){
+				stopExecutingStatement();
+			}
 		}
 		else if (nextTargetPosition != null && Vector.getDistance(nextTargetPosition, startPosition)-Vector.getDistance(startPosition, this.getPosition())<=0.0){
 			setExperiencePoints(this.getExperiencePoints()+1);
@@ -1433,6 +1465,7 @@ public class Unit {
 	private void stopFollowing(){
 		followedUnit = null;
 		this.setStatus(Status.DONE);
+		this.stopExecutingStatement();
 	}
 	
 	/**
@@ -1729,7 +1762,7 @@ public class Unit {
 		}
 		setStatus(Status.DONE);
 		if (this.isExecutingStatement){
-			this.isExecutingStatement = false;
+			stopExecutingStatement();
 		}
 	}
 	/**
@@ -1800,6 +1833,9 @@ public class Unit {
 					other.getPosition()[0] - this.getPosition()[0]));
 			other.defend(this);
 			attackTimer = 0.0;
+		}
+		if (this.isExecutingStatement){
+			stopExecutingStatement();
 		}
 	}
 
@@ -2168,12 +2204,12 @@ public class Unit {
 	 * A boolean to check if this unit is executing a task.
 	 */
 	
-	private boolean isExecutingTask;
+	private boolean isExecutingTask = false;
 	
 	/**
 	 * A boolean to check if this unit is executing a statement.
 	 */
-	private boolean isExecutingStatement;
+	public boolean isExecutingStatement = false;
 	
 	/**
 	 * A variable registering the duration of a task. 

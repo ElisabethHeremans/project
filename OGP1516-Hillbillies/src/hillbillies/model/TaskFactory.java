@@ -1,5 +1,4 @@
 package hillbillies.model;
-import java.util.ArrayList;
 import java.util.*;
 
 import hillbillies.model.expression.*;
@@ -10,8 +9,10 @@ import hillbillies.part3.programs.SourceLocation;
 
 public class TaskFactory implements ITaskFactory<Expression, Statement, Task> {
 
+	private List<Task> tasks;
+
 	public TaskFactory(){
-	
+		
 	}
 		
 	
@@ -21,7 +22,7 @@ public class TaskFactory implements ITaskFactory<Expression, Statement, Task> {
 		List<Task> tasks = new ArrayList<Task>();
 		if (selectedCubes.isEmpty()){
 			tasks.add(new Task(name,priority,activity));
-
+			
 		}
 		else{
 			for (int[] selectedCube: selectedCubes){
@@ -29,6 +30,7 @@ public class TaskFactory implements ITaskFactory<Expression, Statement, Task> {
 				tasks.add(task);
 			}
 		}
+		this.tasks = tasks;
 		
 		return tasks;
 	}
