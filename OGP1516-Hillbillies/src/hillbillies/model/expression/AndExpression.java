@@ -4,8 +4,8 @@ import hillbillies.model.ExecutionContext;
 
 public class AndExpression<E extends BooleanExpression> extends BinaryBooleanExpression<E> {
 
-	public AndExpression(E right, E left) {
-		super(right, left);
+	public AndExpression(E left, E right) {
+		super(left, right);
 	}
 
 	@Override

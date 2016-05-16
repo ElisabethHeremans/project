@@ -3,8 +3,8 @@ package hillbillies.model.expression;
 import hillbillies.model.ExecutionContext;
 
 public class OrExpression<E extends BooleanExpression> extends BinaryBooleanExpression<E> {
-	public OrExpression(E right, E left) {
-		super(right, left);
+	public OrExpression(E left, E right) {
+		super(left, right);
 	}
 
 	@Override

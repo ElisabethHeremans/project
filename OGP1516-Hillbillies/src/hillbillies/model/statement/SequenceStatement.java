@@ -7,7 +7,7 @@ import be.kuleuven.cs.som.annotate.*;
 import hillbillies.model.ExecutionContext;
 import hillbillies.model.Unit;
 
-public class SequenceStatement<E extends ComposedStatement> extends ComposedStatement  
+public class SequenceStatement<E extends Statement> extends ComposedStatement  
 	implements ISequenceStatement<E>{
 	
 	public SequenceStatement(List<E> statements){
