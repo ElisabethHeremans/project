@@ -965,12 +965,12 @@ public class Unit {
 		if (!this.getTask().isComplete()){
 			if (taskTimer > duration){
 				this.isExecutingStatement = true;
-				this.getTask().executeTask(this);
+				this.getTask().executeTask();
 			}
 			else{
 				while (taskTimer < duration && !isExecutingStatement && !this.getTask().isComplete()){
 					this.isExecutingStatement = true;
-					this.getTask().executeTask(this);
+					this.getTask().executeTask();
 					taskTimer += 0.001;
 				}
 			}
@@ -2107,10 +2107,10 @@ public class Unit {
 			System.out.print(this.getFaction().getScheduler().iterator().hasNext());
 			if (this.getFaction().getScheduler() != null && this.getFaction().getScheduler().iterator().hasNext()){
 				this.isExecutingTask = true;
-				//System.out.print("activities " + this.getFaction().getScheduler().iterator().next().getActivities());
-				setTask(this.getFaction().getScheduler().iterator().next());
+				Task newTask = this.getFaction().getScheduler().iterator().next();
+				newTask.setExecutingUnit(this);
 				this.isExecutingStatement = true;
-				this.getTask().executeTask(this);
+				this.getTask().executeTask();
 				//System.out.println(" 6 ");
 				//System.out.println(getFaction().getScheduler().getAllTasksIterator().next());
 				
@@ -2470,8 +2470,10 @@ public class Unit {
 	 * 		| new.getTask() == task
 	 */
 	public void setTask(@Raw Task task){
-		if (task !=null)
+		if (task !=null){
 			assert this.getFaction().getScheduler().hasAsTask(task);
+			assert task.getExecutingUnit() == this;
+		}
 		this.task = task;
 	}
 	/**

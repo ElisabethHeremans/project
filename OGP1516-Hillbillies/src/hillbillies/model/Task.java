@@ -11,11 +11,16 @@ import be.kuleuven.cs.som.annotate.*;
 import hillbillies.model.statement.*;
 
 /**
- * @invar Each task can have its name as name . | canHaveAsName(this.getName())
- * @invar The priority of each task must be a valid priority for any task. |
- *        isValidPriority(getPriority())
- * @invar The activities of each task must be a valid activities for any task. |
- *        isValidActivities(getActivities())
+ * @invar Each task can have its name as name . 
+ * 			| canHaveAsName(this.getName())
+ * @invar The priority of each task must be a valid priority for any task. 
+ * 			| isValidPriority(getPriority())
+ * @invar The activities of each task must be a valid activities for any task. 
+ *        	| isValidActivities(getActivities())
+ * @invar Each task can have its executing unit as its executing unit.
+ * 			| canHaveAsExecutingUnit(this.getExecutingUnit())
+ * @invar Each task can have its scheduled unit as its executing unit.
+ * 			| canHaveAsExecutingUnit(this.getScheduledUnit())
  */
 
 public class Task {
@@ -29,19 +34,25 @@ public class Task {
 	 *            The priority for this new task.
 	 * @param activities
 	 *            The activities for this new task.
+	 * @param selectedCube
+	 * 			  The selected cube for this new task       
 	 * @post If the given name is a valid name for any task, the name of this
 	 *       new task is equal to the given name. Otherwise, the name of this
-	 *       new task is equal to "task". | if (isValidName(name)) | then
-	 *       new.getName() == name | else new.getName() == "task"
+	 *       new task is equal to "task". 
+	 *       | if (isValidName(name)) 
+	 *       | 	then new.getName() == name 
+	 *       | else new.getName() == "task"
 	 * @post If the given priority is a valid priority for any task, the
 	 *       priority of this new task is equal to the given priority.
 	 *       Otherwise, the priority of this new task is equal to 0. 
 	 *       | if (isValidPriority(priority)) 
-	 *       | then new.getPriority() == priority 
+	 *       | 		then new.getPriority() == priority 
 	 *       |else new.getPriority() == 0
-	 * @effect The activities of this new task is set to the given activities. |
-	 *         this.setActivities(activities)
-	 * @effect The selected cube of this new task is set to the given selected cube
+	 * @effect The activities of this new task is set to the given activities. 
+	 * 		 |this.setActivities(activities)
+	 * @effect The execution context of this initialized 
+	 * 		 as an execution context with the given selected cube as its selected cube.
+	 * 		 |this.setExecutionContext(new ExecutionContext(null,selectedCube,null))
 	 */
 	public Task(String name, int priority, Statement activities, int[] selectedCube) throws IllegalArgumentException {
 		if (!canHaveAsName(name))
@@ -74,7 +85,8 @@ public class Task {
 	 * 
 	 * @param name
 	 *            The name to check.
-	 * @return | result == (name!=null)
+	 * @return 
+	 * 			| result == (name!=null)
 	 */
 	@Raw
 	public boolean canHaveAsName(String name) {
@@ -86,17 +98,6 @@ public class Task {
 	 */
 	private final String name;
 
-	/**
-	 * Initialize this new task with given priority.
-	 * 
-	 * @param priority
-	 *            The priority for this new task.
-	 * @post If the given priority is a valid priority for any task, the
-	 *       priority of this new task is equal to the given priority.
-	 *       Otherwise, the priority of this new task is equal to 0. | if
-	 *       (isValidPriority(priority)) | then new.getPriority() == priority |
-	 *       else new.getPriority() == 0
-	 */
 
 	/**
 	 * Return the priority of this task.
@@ -112,7 +113,8 @@ public class Task {
 	 * 
 	 * @param priority
 	 *            The priority to check.
-	 * @return | result ==
+	 * @return True
+	 * 		| result == true
 	 */
 	public static boolean isValidPriority(int priority) {
 		return true;
@@ -124,8 +126,9 @@ public class Task {
 	 * @param priority
 	 *            The new priority for this task.
 	 * @post If the given priority is a valid priority for any task, the
-	 *       priority of this new task is equal to the given priority. | if
-	 *       (isValidPriority(priority)) | then new.getPriority() == priority
+	 *       priority of this new task is equal to the given priority. 
+	 *       | if (isValidPriority(priority)) 
+	 *       | 	then new.getPriority() == priority
 	 */
 	@Raw
 	public void setPriority(int priority) {
@@ -139,7 +142,10 @@ public class Task {
 	private int priority;
 	
 	/**
-	 * @return the isComplete
+	 * Return whether this task is complete.
+	 * 
+	 * @return the value of isComplete
+	 * 			| result == isComplete
 	 */
 	public boolean isComplete() {
 		return isComplete;
@@ -270,7 +276,9 @@ public class Task {
 	private Statement activities;
 	
 	/**
+	 * Return the scheduled unit for this task.
 	 * @return the scheduledUnit
+	 * 			| result == scheduledUnit
 	 */
 	@Basic @Raw
 	public Unit getScheduledUnit() {
@@ -279,36 +287,76 @@ public class Task {
 
 
 	/**
-	 * @param scheduledUnit the scheduledUnit to set
+	 * Set the scheduled unit of this task to the given unit.
+	 * @param scheduledUnit 
+	 * 			the scheduledUnit to set
+	 * @post The given unit is the scheduled unit for this new task.
+	 * 		| new.getScheduledUnit == scheduledUnit
 	 */
 	@Raw
 	public void setScheduledUnit(Unit scheduledUnit) {
 		this.scheduledUnit = scheduledUnit;
 	}
 
-
+	/**
+	 * Variable registering the scheduled unit for this task.
+	 */
 	private Unit scheduledUnit;
 
 	/**
-	 * @return the executingUnit
+	 * Return the executing unit of this task.
+	 * 
+	 * @return the executing unit
+	 * 			| result == executingUnit
 	 */
+	@Raw @Basic
 	public Unit getExecutingUnit() {
 		return this.getExecutionContext().getExecutingUnit();
 	}
 
 
 	/**
-	 * @param executingUnit the executingUnit to set
+	 * Set the executing unit for this task to the given executing unit.
+	 * 
+	 * @param executingUnit 
+	 * 			the executingUnit to set
+	 * @post The executing unit of this new task is the given unit.
+	 * 			|new.getExecutingUnit() == executingUnit
 	 */
-	public void setExecutingUnit(Unit executingUnit) {
+	@Raw
+	public void setExecutingUnit(Unit executingUnit) throws IllegalArgumentException {
+		if (!canHaveAsExecutingUnit(executingUnit)){
+			throw new IllegalArgumentException();
+		}
 		this.getExecutionContext().setExecutingUnit(executingUnit);
-		
+		executingUnit.setTask(this);
 	}
 
 	
-	
+	/**
+	 * Check whether the executing unit is a valid executing unit for this task.
+	 * @param executingUnit
+	 * 			The unit to check 
+	 * @return If the selected cube of this task is not null, 
+	 * 			return true if and only if the selected cube is in the world of the given unit.
+	 * 	       Else, return true.
+	 * 			|if (this.getSelectedCube() !=null)
+	 *			|	result == executingUnit.getWorld().isCubeInWorld(this.getSelectedCube());
+	 *			|else
+	 *			|   result == true;
+	 *
+	 */
+	public boolean canHaveAsExecutingUnit(Unit executingUnit) {
+		if (this.getSelectedCube() !=null)
+			return executingUnit.getWorld().isCubeInWorld(this.getSelectedCube());
+		return true;
+	}
+
 	/**
 	 * Return the selected Cube for this task.
+	 * 
+	 * @return The selected cube of this task.
+	 * 			| result == this.getExecutionContext().getSelectedCube()
 	 */
 	public int[] getSelectedCube() {
 		return this.getExecutionContext().getSelectedCube();
@@ -316,42 +364,66 @@ public class Task {
 
 
 	/**
-	 * @param selectedCube the selectedCube to set
+	 * Set the selected cube for this task to the given selected cube.
+	 * 
+	 * @param selectedCube 
+	 * 		the selectedCube to set
+	 * @post The selected cube of this new task is the given cube.
+	 * 			|new.getSelectedCube() == selectedCube
 	 */
 	private void setSelectedCube(int[] selectedCube) {
 		 this.getExecutionContext().setSelectedCube(selectedCube);
 	}
 	
 	
-	
+	/**
+	 * Add the variable with the given name and given assigned expression to this task.
+	 * 
+	 * @param variableName
+	 * 			the name of the new variable for this new task.
+	 * @param expr
+	 * 			The assigned expression of the new variable of this new task
+	 * @effect The variable with the given name and assigned expression is 
+	 * 			added to the execution context of this new task.
+	 * 			|this.getExecutionContext().addVariable(variableName,expr);
+	 */
 	public void addVariable(String variableName,Expression expr){
 		 this.getExecutionContext().addVariable(variableName,expr);
 	}
 	
-//	public Expression lookForVariable(String variableName){
-//		return ((HashMap<String,Expression>)getExecutionContext()).get(variableName);
-//		
-//	}
-
-	public void executeTask(Unit unit) {
-		this.getExecutionContext().setExecutingUnit(unit);
+	
+	public void executeTask() throws NullPointerException{
+		if (this.getExecutingUnit() == null)
+			throw new NullPointerException();
 //		System.out.print(getActivities() + "   ");
 //		System.out.print(this.getExecutionContext().getSelectedCube());
 //		System.out.print(this.getExecutionContext().getExecutingUnit());
 		getActivities().executeStatement(getExecutionContext());
 	}
-	
+	/**
+	 * 
+	 * Return the execution context of this task.
+	 */
 	@Raw @Basic
 	public ExecutionContext getExecutionContext(){
 		return executionContext;
 	}
 	
-	
+	/**
+	 * Set the execution context of this new task to the given execution context
+	 * @param executionContext
+	 * 		| the execution context for this new task
+	 * @post The execution context of this new task is equal to the given executioncontext.
+	 * 		| new.getExecutionContext() == executionContext
+	 */
 	@Raw
-	public void setExecutionContext(ExecutionContext executionContext) {
+	private void setExecutionContext(ExecutionContext executionContext) {
 		this.executionContext = executionContext;
 	}
-
+	
+	/**
+	 * Variable registering the execution Context of this task.
+	 */
 	private ExecutionContext executionContext;
 	
 	public String toString(){
