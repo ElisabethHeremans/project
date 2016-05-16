@@ -70,7 +70,7 @@ public class Scheduler implements Iterable<Task> {
 	 * 		| result == canHaveAsTask(task)
 	 */
 	@Raw
-	public boolean hasProperTasks(){
+	private boolean hasProperTasks(){
 	
 		
 		for (Task task: this.getTasks()){
@@ -113,7 +113,7 @@ public class Scheduler implements Iterable<Task> {
 			throw new IllegalArgumentException();
 		}
 		if( ! getTasks().contains(task)){
-			System.out.println(TasksExecuted);
+			//System.out.println(TasksExecuted);
 			this.tasks.add(task);
 		}
 	}
@@ -136,7 +136,7 @@ public class Scheduler implements Iterable<Task> {
 	 * @throws IllegalArgumentException
 	 * 			If the given task is not effective
 	 */
-	void removeAsTask(Task task) throws IllegalArgumentException{
+	public void removeAsTask(Task task) throws IllegalArgumentException{
 		if( task == null)
 			throw new IllegalArgumentException();
 		this.tasks.remove(task);
@@ -190,7 +190,7 @@ public class Scheduler implements Iterable<Task> {
 	 * 			If this scheduler does not have the given task as its task.
 	 * 		  |!this.hasAsTask(task)
 	 */
-	public int getPriority(Task task){
+	private int getPriority(Task task){
 		if (! this.hasAsTask(task))
 			throw new IllegalArgumentException();
 		else
@@ -201,7 +201,7 @@ public class Scheduler implements Iterable<Task> {
 	 * Return the task with the highest priority that is currently not being executed.
 	 * @return 
 	 */
-	public Task getHighestPriorityTask(){
+	private Task getHighestPriorityTask(){
 //		for (int i;i<getTasks().size();i++){
 //			if (getTasks()[i] not being executed)
 //				return getTasks()[i];
@@ -249,7 +249,7 @@ public class Scheduler implements Iterable<Task> {
 	 * 	If this scheduler does not have the given task as one of its tasks.
 	 * 		| ! this.hasAsTask(task)
 	 */
-	public void markTaskForUnit(Task task,Unit unit){
+	private void markTaskForUnit(Task task,Unit unit){
 		if (!this.getFaction().hasAsUnit(unit))
 			throw new IllegalArgumentException();
 		if (! this.hasAsTask(task))
@@ -273,7 +273,7 @@ public class Scheduler implements Iterable<Task> {
 	/**
 	 * Return the faction of this scheduler.
 	 */
-	Faction getFaction(){
+	public Faction getFaction(){
 		return this.faction;
 	}
 	
@@ -285,7 +285,7 @@ public class Scheduler implements Iterable<Task> {
 	 * 		| result == (this.getFaction() == null || this.getFaction().getScheduler()==this)
 	 */
 	@Raw
-	public boolean hasProperFaction(){
+	private boolean hasProperFaction(){
 		return (this.getFaction() == null || this.getFaction().getScheduler()==this);
 	}
 	
@@ -297,7 +297,7 @@ public class Scheduler implements Iterable<Task> {
 	 * 		attached to it.
 	 * 		| new.getFaction() == faction 
 	 */
-	void setFaction(Faction faction) {
+	protected void setFaction(Faction faction) {
 		this.faction = faction;
 	}
 	/**

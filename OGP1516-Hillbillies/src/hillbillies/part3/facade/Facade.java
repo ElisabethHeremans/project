@@ -669,7 +669,7 @@ public class Facade implements IFacade{
 	@Override
 	public boolean isWellFormed(Task task) throws ModelException {
 		try{
-			return task.isWellFormed();
+			return task.isWellFormed(task.getActivities());
 			}
 		catch (NullPointerException exc){
 			throw new ModelException();
