@@ -31,18 +31,23 @@ public class SequenceStatement<E extends Statement> extends ComposedStatement
 		
 	}
 	
-	public void removeFirstStatement() {
+	public void addStatement(E statement){
+		List<E> list = getStatements();
+		list.add(statement);
+		setStatements(list);
+		
+	}
+	
+	public Statement removeFirstStatement() {
+		Statement first = (Statement)getStatements().get(0);
 		List<E> statements = (List<E>) getStatements().remove(0);
 		setStatements(statements);
 		if (getStatements().size()==0){
 			setStatementExecuted(true);
 		}
+		return first;
 	}
 	
-	public void stopExecutingStatement() {
-		// TODO Auto-generated method stub
-		
-	}
 
 
 }

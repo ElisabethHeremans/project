@@ -65,6 +65,17 @@ public class Task {
 		this.setExecutionContext(new ExecutionContext(null,selectedCube,null));
 	}
 	
+	/**
+	 * Initialize this new task with given name, priority and activities.
+	 * @param name
+	 *            The name for this new task.
+	 * @param priority
+	 *            The priority for this new task.
+	 * @param activities
+	 *            The activities for this new task.
+	 * @effect This new task is initialized with the given name, priority and activities, 
+	 * 			and null as its selected cubes.
+	 */
 	public Task(String name, int priority, Statement activities){
 		this(name,  priority, activities, null);
 	}
@@ -200,9 +211,39 @@ public class Task {
 	}
 	
 	/**
+	 * Variable registering the non-completed activities of this task.
+	 */
+	private Statement activities;
+
+
+	/**
+	 * Return whether the given statement is well formed.
 	 * 
 	 * @param activities
-	 * @return
+	 * 			The statement to check.
+	 * @return For all the statements in statement:
+	 * 			- if the statement is an AssignmentStatement
+	 * 				add the variable to a list of defined variables
+	 * 				|definedVariables.add(statement.getVariableName())
+	 * 			- if the statement is a BreakStatement
+	 * 				return false
+	 * 				|result == false
+	 * 			- if the statement is a SequenceStatement
+	 * 				if this statement is well formed, return false
+	 * 				|if (!isWellFormed(statement))
+	 * 				|	result == false
+	 * 			- if the statement is an ExpressionStatement
+	 * 				- if the expression in the statement is a VariableExpression
+	 * 					if the variable is not in the list of defined variables, return false
+	 * 					| if (!definedVariables.contains(expression.getName()))
+	 * 					|	result == false
+	 * 				- if the statement is a ComposedStatement
+	 * 					if the statement is not a while statement 
+	 * 					and the statement in this statement is break, return false
+	 * 					|if ((! statement instanceof WhileStatement) && statement.getStatement() instanceof BreakStatement))
+	 * 					|	result == false
+	 * @return Else, return true
+	 * 			|result == true
 	 */
 	public static boolean isWellFormed(Statement activities){
 		List<Statement> statements = new ArrayList<Statement>();
@@ -255,26 +296,71 @@ public class Task {
 			}
 		return true;
 		}
-
+	
+	/**
+	 * Remove the first statement of this task.
+	 * 
+	 * @effect If the activities is a sequencestatement, 
+	 * 			remove the first statement from this sequencestatement 
+	 * 			and add this statement to the completed activities of this task.
+	 * 			|if ((this.getActivities() instanceof SequenceStatement))
+	 * 			|completedActivities.addStatement(this.getActivities()).removeFirstStatement());
+	 * 				If the whole sequencestatement of activities is executed, 
+	 * 				set this task as complete, and set the activities of this task to null.
+	 * 				|if (this.getActivities().isStatementExecuted())
+	 * 				|this.setActivities(null)
+	 * 				|this.setComplete(true)
+	 * @effect If the activities is not a sequencestatement,
+	 * 			set the activities of this task to null and set this task to completed.
+	 * 			|if (!(this.getActivities() instanceof SequenceStatement))
+	 * 			|completedActivities.addStatement(getActivities())
+	 * 			|this.setActivities(null);
+	 *			|this.setComplete(true);
+	 */
 	public void removeFirstStatement(){
 		if (this.getActivities() instanceof SequenceStatement){
-			((SequenceStatement<?>) this.getActivities()).removeFirstStatement();
+			Statement first = ((SequenceStatement<?>) this.getActivities()).removeFirstStatement();
+			((SequenceStatement<Statement>)completedActivities).addStatement(first);
+			//setCompletedActivities(getCompletedActivities());
 			if (this.getActivities().isStatementExecuted()){
 				this.setActivities(null);
 				this.setComplete(true);
 			}
 		}
 		else{
+			((SequenceStatement<Statement>)completedActivities).addStatement(getActivities());
 			this.setActivities(null);
 			this.setComplete(true);
 		}
 	}
+	
+	/**
+	 * Return the completedActivities
+	 */
+	@Basic @Raw
+	public Statement getCompletedActivities() {
+		return completedActivities;
+	}
 
 	/**
-	 * Variable registering the activities of this task.
+	 * Set the completed activities of this task to the given statement.
+	 * 
+	 * @param completedActivities 
+	 * 			the completedActivities to set
+	 * @post The completed activities of this new task is equal to completedActivities
+	 * 			| new.getCompletedActivities() == completedActivities;
 	 */
-	private Statement activities;
+	@Raw
+	public void setCompletedActivities(Statement completedActivities) {
+		this.completedActivities = completedActivities;
+	}
 	
+	/**
+	 * Variable registering the completed activities of this task.
+	 */
+	private Statement completedActivities = new SequenceStatement<Statement>(new ArrayList<Statement>());
+
+
 	/**
 	 * Return the scheduled unit for this task.
 	 * @return the scheduledUnit
@@ -291,7 +377,7 @@ public class Task {
 	 * @param scheduledUnit 
 	 * 			the scheduledUnit to set
 	 * @post The given unit is the scheduled unit for this new task.
-	 * 		| new.getScheduledUnit == scheduledUnit
+	 * 		| new.getScheduledUnit() == scheduledUnit
 	 */
 	@Raw
 	public void setScheduledUnit(Unit scheduledUnit) {
@@ -344,7 +430,6 @@ public class Task {
 	 *			|	result == executingUnit.getWorld().isCubeInWorld(this.getSelectedCube());
 	 *			|else
 	 *			|   result == true;
-	 *
 	 */
 	public boolean canHaveAsExecutingUnit(Unit executingUnit) {
 		if (this.getSelectedCube() !=null)
@@ -391,7 +476,16 @@ public class Task {
 		 this.getExecutionContext().addVariable(variableName,expr);
 	}
 	
-	
+	/**
+	 * Execute this task.
+	 * 
+	 * @effect Execute the activities statement of this task.
+	 * 			|getActivities().executeStatement(getExecutionContext())
+	 * @throws NullPointerException
+	 * 			If the executing unit of this task is null.
+	 * 			|this.getExecutingUnit()==null
+	 * 
+	 */
 	public void executeTask() throws NullPointerException{
 		if (this.getExecutingUnit() == null)
 			throw new NullPointerException();
@@ -400,6 +494,7 @@ public class Task {
 //		System.out.print(this.getExecutionContext().getExecutingUnit());
 		getActivities().executeStatement(getExecutionContext());
 	}
+	
 	/**
 	 * 
 	 * Return the execution context of this task.
@@ -426,8 +521,15 @@ public class Task {
 	 */
 	private ExecutionContext executionContext;
 	
+	/**
+	 * Return a string representing this task: the name of this task.
+	 * 
+	 * @return the name of this task as a string
+	 * 			| result == this.getName()
+	 */
+	@Override
 	public String toString(){
-		return getName().toString();
+		return getName();
 	}
 
 }

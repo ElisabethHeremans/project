@@ -4,7 +4,6 @@ import hillbillies.model.ExecutionContext;
 import hillbillies.model.Position;
 import hillbillies.model.Unit;
 import hillbillies.model.Vector;
-import hillbillies.model.expression.vuilbak.BasicPExpression;
 
 public class WorkshopExpression extends PositionExpression {
 	public WorkshopExpression(){

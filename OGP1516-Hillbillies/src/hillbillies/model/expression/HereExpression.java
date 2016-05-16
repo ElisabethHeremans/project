@@ -3,7 +3,6 @@ package hillbillies.model.expression;
 
 import hillbillies.model.ExecutionContext;
 import hillbillies.model.Position;
-import hillbillies.model.expression.vuilbak.BasicPExpression;
 
 public class HereExpression extends PositionExpression {
 	public HereExpression(){

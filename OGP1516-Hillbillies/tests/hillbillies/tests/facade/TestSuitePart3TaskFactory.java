@@ -97,10 +97,6 @@ public class TestSuitePart3TaskFactory {
 	}
 		
 	
-	@Test(expected = ClassCastException.class)
-	public final void createIf_invalidStatement(){
-		factory.createIf(falseExpr,moveTo, breakStat,  sourceLoc);
-	}
 	
 	@Test(expected = ClassCastException.class)
 	public final void createIf_invalidExpr(){
