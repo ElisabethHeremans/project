@@ -62,38 +62,43 @@ public class TestSuitePart3Scheduler {
 	scheduler.addAsTask(task1);
 	scheduler.addAsTask(task2);
 	scheduler.addAsTask(task3);
+	System.out.println("---------------------------------Test 1");
+
 		Assert.assertTrue(scheduler.iterator().hasNext());
-		System.out.print(scheduler.iterator().next().toString());
+		System.out.println("NEXT" +scheduler.iterator().next().toString());
 		Assert.assertTrue(scheduler.iterator().hasNext());
-		System.out.print(scheduler.iterator().next().toString());
+		System.out.println("NEXT" +scheduler.iterator().next().toString());
 		Assert.assertTrue(scheduler.iterator().hasNext());
-		scheduler.iterator().next();
+		System.out.println("NEXT" +scheduler.iterator().next().toString());
+		System.out.println("NEXT FALSE" +scheduler.iterator().next().toString());
+		System.out.println("NEXT FALSE" +scheduler.iterator().next().toString());
+		System.out.println("NEXT FALSE" +scheduler.iterator().next().toString());
 		Assert.assertFalse(scheduler.iterator().hasNext());
-				
+		System.out.println("---------------------------------END 1");		
 	}
 	
-	@Test
-	public void testIterator2(){
-	scheduler.addAsTask(task1);
-	scheduler.addAsTask(task2);
-	scheduler.addAsTask(task3);
-		System.out.println("---------------------------------Test 2");
-		System.out.println(scheduler.iterator().hasNext());
-		while (scheduler.iterator().hasNext()){
-			   System.out.println(scheduler.iterator().next() + " OK");
-			   }
-	}
+//	@Test
+//	public void testIterator2(){
+//	scheduler.addAsTask(task1);
+//	scheduler.addAsTask(task2);
+//	scheduler.addAsTask(task3);
+//		System.out.println("---------------------------------Test 2");
+//		System.out.println(scheduler.iterator().hasNext());
+//		while (scheduler.iterator().hasNext()){
+//			   System.out.println(scheduler.iterator().next() + " OK");
+//			   }
+//	}
 	
-	@Test
-	public void getAllTasksIterator(){
-	scheduler.addAsTask(task1);
-	scheduler.addAsTask(task2);
-	scheduler.addAsTask(task3);
-		System.out.println("---------------------------------Test 3");
-		Assert.assertEquals(scheduler.getAllTasksIterator().next(),scheduler.getTasks().iterator().next());
-		Assert.assertEquals(scheduler.getAllTasksIterator().next(),scheduler.getTasks().iterator().next());
-		Assert.assertEquals(scheduler.getAllTasksIterator().next(),scheduler.getTasks().iterator().next());
-	}
+//	@Test
+//	public void getAllTasksIterator(){
+//	scheduler.addAsTask(task1);
+//	scheduler.addAsTask(task2);
+//	scheduler.addAsTask(task3);
+//		System.out.println("---------------------------------Test 3");
+//		Assert.assertEquals(scheduler.getAllTasksIterator().next(),scheduler.getTasks().iterator().next());
+//		Assert.assertEquals(scheduler.getAllTasksIterator().next(),scheduler.getTasks().iterator().next());
+//		Assert.assertEquals(scheduler.getAllTasksIterator().next(),scheduler.getTasks().iterator().next());
+//	}
 	
 	@Test
 	public void hasAsTask_ValidCase(){
