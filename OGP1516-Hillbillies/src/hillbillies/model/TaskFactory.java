@@ -9,7 +9,6 @@ import hillbillies.part3.programs.SourceLocation;
 
 public class TaskFactory implements ITaskFactory<Expression, Statement, Task> {
 
-	private List<Task> tasks;
 
 	public TaskFactory(){
 		
@@ -30,7 +29,6 @@ public class TaskFactory implements ITaskFactory<Expression, Statement, Task> {
 				tasks.add(task);
 			}
 		}
-		this.tasks = tasks;
 		
 		return tasks;
 	}
@@ -42,7 +40,7 @@ public class TaskFactory implements ITaskFactory<Expression, Statement, Task> {
 
 	@Override
 	public Statement createWhile(Expression condition, Statement body, SourceLocation sourceLocation) {
-		return new WhileStatement<>((BooleanExpression) condition,(ComposedStatement) body);
+		return new WhileStatement<BooleanExpression,Statement>((BooleanExpression) condition,(ComposedStatement) body);
 	}
 
 	@Override
@@ -57,22 +55,23 @@ public class TaskFactory implements ITaskFactory<Expression, Statement, Task> {
 
 	@Override
 	public Statement createPrint(Expression value, SourceLocation sourceLocation) {
-		return new PrintStatement<>(value);
+		return new PrintStatement<Expression>(value);
 	}
 
 	@Override
 	public Statement createSequence(List<Statement> statements, SourceLocation sourceLocation) {
-		return new SequenceStatement(statements);
+		return new SequenceStatement<Statement>(statements);
 	}
 
 	@Override
 	public Statement createMoveTo(Expression position, SourceLocation sourceLocation) {
-		return new MoveToStatement<>((PositionExpression) position);
+		return new MoveToStatement<PositionExpression>((PositionExpression) position);
 	}
 
 	@Override
 	public Statement createWork(Expression position, SourceLocation sourceLocation) {
-		return new WorkStatement<>((PositionExpression) position);
+		return new WorkStatement<PositionExpression>((PositionExpression) position);
+		
 	}
 
 	@Override
@@ -96,47 +95,47 @@ public class TaskFactory implements ITaskFactory<Expression, Statement, Task> {
 
 	@Override
 	public Expression createIsSolid(Expression position, SourceLocation sourceLocation) {
-		return new IsSolidExpression<>((PositionExpression) position);
+		return new IsSolidExpression<PositionExpression>((PositionExpression) position);
 	}
 
 	@Override
 	public Expression createIsPassable(Expression position, SourceLocation sourceLocation) {
-		return new IsPassableExpression<>((PositionExpression) position);
+		return new IsPassableExpression<PositionExpression>((PositionExpression) position);
 	}
 
 	@Override
 	public Expression createIsFriend(Expression unit, SourceLocation sourceLocation) {
-		return new IsFriendExpression<>((UnitExpression) unit);
+		return new IsFriendExpression<UnitExpression>((UnitExpression) unit);
 	}
 
 	@Override
 	public Expression createIsEnemy(Expression unit, SourceLocation sourceLocation) {
-		return new IsEnemyExpression<>((UnitExpression) unit);
+		return new IsEnemyExpression<UnitExpression>((UnitExpression) unit);
 	}
 
 	@Override
 	public Expression createIsAlive(Expression unit, SourceLocation sourceLocation) {
-		return new IsAliveExpression<>((UnitExpression) unit);
+		return new IsAliveExpression<UnitExpression>((UnitExpression) unit);
 	}
 
 	@Override
 	public Expression createCarriesItem(Expression unit, SourceLocation sourceLocation) {
-		return new CarriesItemExpression<>((UnitExpression) unit);
+		return new CarriesItemExpression<UnitExpression>((UnitExpression) unit);
 	}
 
 	@Override
 	public Expression createNot(Expression expression, SourceLocation sourceLocation) {
-		return new NegationExpression<>((BooleanExpression) expression);
+		return new NegationExpression<BooleanExpression>((BooleanExpression) expression);
 	}
 	
 	@Override
 	public Expression createAnd(Expression left, Expression right, SourceLocation sourceLocation) {
-		return new AndExpression<>((BooleanExpression)left, (BooleanExpression)right);
+		return new AndExpression<BooleanExpression>((BooleanExpression)left, (BooleanExpression)right);
 	}
 
 	@Override
 	public Expression createOr(Expression left, Expression right, SourceLocation sourceLocation) {
-		return new OrExpression<>((BooleanExpression)left, (BooleanExpression)right);
+		return new OrExpression<BooleanExpression>((BooleanExpression)left, (BooleanExpression)right);
 	}
 
 	@Override

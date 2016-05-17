@@ -3,7 +3,7 @@ package hillbillies.model.statement;
 import hillbillies.model.ExecutionContext;
 import hillbillies.model.expression.BooleanExpression;
 
-public class IfElseStatement<E extends BooleanExpression, S extends ComposedStatement,T extends ComposedStatement>
+public class IfElseStatement<E extends BooleanExpression, S extends Statement,T extends ComposedStatement>
 extends ExpressionStatement<E> implements IComposedBinaryStatement<S,T>{
 	
 	public IfElseStatement(E condition, S thenBody, T elseBody){

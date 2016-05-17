@@ -327,7 +327,7 @@ public class Scheduler implements Iterable<Task> {
 		private Task next;
 		
 		public boolean hasNext() {
-			return getTasks().size()!= 0;
+			return getTasks().size()!= TasksExecuted.size();
 			}
 
 		
@@ -340,15 +340,18 @@ public class Scheduler implements Iterable<Task> {
 			}
 			
 			else if(LastPriority == null) {
-				int priority = 0; 
-				if(TasksExecuted.size() != 0){
-					priority = TasksExecuted.get(TasksExecuted.size()-1).getPriority();
-				}
+				//int priority = 0;
+				int newPriority = 0;
+//				if(TasksExecuted.size() != 0){
+//					priority = TasksExecuted.get(TasksExecuted.size()-1).getPriority();
+//					noTasksExecuted =false;
+//				}
 				next = getTasks().get(0);
+				newPriority = next.getPriority();
 				for(Task t: getTasks()){
-					if (t.getPriority()>priority && !TasksExecuted.contains(t)){
+					if ((t.getPriority()>newPriority) && !TasksExecuted.contains(t)){
 						next = t;
-						priority = t.getPriority();
+						newPriority = t.getPriority();
 						
 					}		
 				}

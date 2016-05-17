@@ -7,7 +7,7 @@ import be.kuleuven.cs.som.annotate.*;
 import hillbillies.model.ExecutionContext;
 import hillbillies.model.Unit;
 
-public class SequenceStatement<E extends ComposedStatement> extends ComposedStatement  
+public class SequenceStatement<E extends Statement> extends ComposedStatement  
 	implements ISequenceStatement<E>{
 	
 	public SequenceStatement(List<E> statements){
@@ -31,18 +31,23 @@ public class SequenceStatement<E extends ComposedStatement> extends ComposedStat
 		
 	}
 	
-	public void removeFirstStatement() {
+	public void addStatement(E statement){
+		List<E> list = getStatements();
+		list.add(statement);
+		setStatements(list);
+		
+	}
+	
+	public Statement removeFirstStatement() {
+		Statement first = (Statement)getStatements().get(0);
 		List<E> statements = (List<E>) getStatements().remove(0);
 		setStatements(statements);
 		if (getStatements().size()==0){
 			setStatementExecuted(true);
 		}
+		return first;
 	}
 	
-	public void stopExecutingStatement() {
-		// TODO Auto-generated method stub
-		
-	}
 
 
 }

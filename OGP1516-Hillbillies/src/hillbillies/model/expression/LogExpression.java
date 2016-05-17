@@ -5,7 +5,6 @@ import hillbillies.model.Log;
 import hillbillies.model.Position;
 import hillbillies.model.Unit;
 import hillbillies.model.Vector;
-import hillbillies.model.expression.vuilbak.BasicPExpression;
 
 public class LogExpression extends PositionExpression {
 	public LogExpression(){

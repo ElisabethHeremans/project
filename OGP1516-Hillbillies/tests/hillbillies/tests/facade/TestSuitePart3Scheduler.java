@@ -69,10 +69,9 @@ public class TestSuitePart3Scheduler {
 		Assert.assertTrue(scheduler.iterator().hasNext());
 		System.out.println("NEXT" +scheduler.iterator().next().toString());
 		Assert.assertTrue(scheduler.iterator().hasNext());
-		System.out.println("NEXT" +scheduler.iterator().next().toString());
-		System.out.println("NEXT FALSE" +scheduler.iterator().next().toString());
-		System.out.println("NEXT FALSE" +scheduler.iterator().next().toString());
-		System.out.println("NEXT FALSE" +scheduler.iterator().next().toString());
+
+		System.out.print(scheduler.iterator().next().toString());
+
 		Assert.assertFalse(scheduler.iterator().hasNext());
 		System.out.println("---------------------------------END 1");		
 	}
@@ -239,8 +238,8 @@ public class TestSuitePart3Scheduler {
 	
 	@Test 
 	public void getFaction(){
-		Assert.assertEquals(null, scheduler.getFaction());
-		faction.setScheduler(scheduler);
+		//Assert.assertEquals(null, scheduler.getFaction());
+		//faction.setScheduler(scheduler);
 		Assert.assertEquals(faction, scheduler.getFaction());
 	}
 	

@@ -21,23 +21,24 @@ public class AssignmentStatement<E extends Expression> extends ExpressionStateme
 //		setVariable(variable);
 //		variable.setValue(expression.getValue());
 	}
-	@Basic @Raw
-	public VariableExpression getVariable() {
-		return variable;
-	}
-	
-	@Raw
-	public void setVariable(VariableExpression name) {
-		this.variable = name;
-	}
-	
-	private VariableExpression variable;
+//	@Basic @Raw
+//	public VariableExpression getVariable() {
+//		return variable;
+//	}
+//	
+//	@Raw
+//	public void setVariable(VariableExpression name) {
+//		this.variable = name;
+//	}
+//	
+//	private VariableExpression variable;
 	
 	private String variableName;
-
+	@Basic @Raw
 	public String getVariableName() {
 		return variableName;
 	}
+	@Raw
 	public void setVariableName(String variableName) {
 		this.variableName = variableName;
 	}

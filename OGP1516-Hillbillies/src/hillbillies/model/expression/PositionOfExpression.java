@@ -3,7 +3,6 @@ package hillbillies.model.expression;
 import hillbillies.model.ExecutionContext;
 import hillbillies.model.Position;
 import hillbillies.model.Unit;
-import hillbillies.model.expression.vuilbak.ComposedPExpression;
 
 public class PositionOfExpression<E extends UnitExpression> extends UnaryPositionExpression<E> {
 
