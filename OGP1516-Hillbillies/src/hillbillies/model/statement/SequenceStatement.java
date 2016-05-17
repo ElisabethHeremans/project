@@ -33,7 +33,12 @@ public class SequenceStatement<E extends Statement> extends ComposedStatement
 	
 	public void addStatement(E statement){
 		List<E> list = getStatements();
-		list.add(statement);
+		if (statement instanceof SequenceStatement){
+			for (Statement stat: ((SequenceStatement<E>)statement).getStatements())
+				list.add((E) stat);
+		}
+		else
+			list.add(statement);
 		setStatements(list);
 		
 	}

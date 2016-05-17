@@ -99,8 +99,6 @@ public class Scheduler implements Iterable<Task> {
 	 * @throws IllegalArgumentException
 	 * 		If the given task is not well formed. (???)
 	 */
-
-	
 	public void addAsTask(Task task) throws IllegalArgumentException{
 		//System.out.print("adding task");
 		if(! canHaveAsTask(task)){
@@ -117,12 +115,23 @@ public class Scheduler implements Iterable<Task> {
 			this.tasks.add(task);
 		}
 	}
-
-
+	/**
+	 * Add all the tasks in the given list of tasks to this scheduler
+	 * @param tasks
+	 * 			The list of tasks to be added to this scheduler
+	 * @effect For all the tasks in the given list, add the task to this scheduler.
+	 * 			|for (Task task: tasks){
+	 *			|	this.addAsTask(task);
+	 *			|}
+	 */
+	public void addTasks(List<Task> tasks) throws IllegalArgumentException{
+		for (Task task: tasks)
+			this.addAsTask(task);
+	}
 
 
 	/**
-	 * Remove the given task from the set of tasks attached to this scheduler.
+	 * Remove the given task from the list of tasks attached to this scheduler.
 	 * @param task
 	 * 		The task to be removed.
 	 * @post This new scheduler does not have the given task as one of its tasks.
@@ -143,11 +152,30 @@ public class Scheduler implements Iterable<Task> {
 	}
 	
 	/**
+	 * Remove the given tasks from the list of tasks attached to this scheduler
+	 * 
+	 * @param tasks
+	 * 			 A list with all the tasks to be removed.
+	 * @effect For all the tasks in the list of tasks, remove the task from this scheduler
+	 * 			|for (Task task: tasks){
+	 *			|	this.removeAsTask(task);
+	 *			|}
+	 */
+	public void removeTasks(List<Task> tasks) throws IllegalArgumentException{
+		for (Task task: tasks){
+			removeAsTask(task);
+		}
+	}
+	
+	/**
 	 * Replace the given task by the other given task.
 	 * @param toReplace
 	 * 	The task to replace.
 	 * @param replacement
-	 * 	The new task.
+	 * 		The new task.
+	 * @effect If the task to replace is currently being executed, interrupt the execution of the task to replace.
+	 * 			|if (toReplace.getExecutingUnit()!=null)
+	 *			|	toReplace.interruptExecution();
 	 * @effect This scheduler does not have the old task as one of its tasks.
 	 * 		| removeAsTask(toReplace)
 	 * @effect This scheduler has the new task as one of its tasks.
@@ -162,7 +190,7 @@ public class Scheduler implements Iterable<Task> {
 			throw new IllegalArgumentException();
 		else{
 			if (toReplace.getExecutingUnit()!=null){
-				toReplace.getExecutingUnit().setStatus(null);
+				toReplace.interruptExecution();
 			}
 			//addAsTask(replacement,getPriority(toReplace));
 			addAsTask(replacement);
@@ -172,7 +200,7 @@ public class Scheduler implements Iterable<Task> {
 
 	
 	/**
-	 * Return the set collecting all tasks attached to this scheduler.
+	 * Return the list collecting all tasks attached to this scheduler.
 	 */
 	@Basic @Raw
 	public List<Task> getTasks(){
@@ -208,6 +236,7 @@ public class Scheduler implements Iterable<Task> {
 //		}
 //		return null;
 //		return getTasks().last();
+		boolean notBeingExecutedFound = (getTasks().get(0).getExecutingUnit()==null);
 		int prior = getTasks().get(0).getPriority();
 		Task HighestPriorityTask = getTasks().get(0);
 		for(Task task: getTasks()){
@@ -316,40 +345,40 @@ public class Scheduler implements Iterable<Task> {
 	private List<Task> TasksExecuted = new ArrayList<Task>();
 	
 	/**
-	 * Return an iterator returning all the tasks of this scheduler, one by one.
+	 * List collecting all tasks that have been iterated over.
+	 */
+	private List<Task> iteratedTasks = new ArrayList<Task>();
+	
+	/**
+	 * Return an iterator returning all the tasks of this scheduler by descending priority.
 	 */
 	@Override
 	public Iterator<Task> iterator() {
 		
 		return new Iterator<Task>(){
 		
-		private Integer LastPriority;
+		//private Integer LastPriority;
 		private Task next;
 		
 		public boolean hasNext() {
-			return getTasks().size()!= TasksExecuted.size();
+			return getTasks().size()!= iteratedTasks.size();
 			}
 
 		
 		public Task next() {
-			System.out.print("executed  "+TasksExecuted.size());
+			System.out.print("iterated  "+iteratedTasks.size());
 			System.out.print("tasks size  "+getTasks().size());
 
 			if (!hasNext()){
 				throw new NoSuchElementException();
 			}
 			
-			else if(LastPriority == null) {
-				//int priority = 0;
+			else /*if(LastPriority == null)*/ {
 				int newPriority = 0;
-//				if(TasksExecuted.size() != 0){
-//					priority = TasksExecuted.get(TasksExecuted.size()-1).getPriority();
-//					noTasksExecuted =false;
-//				}
 				next = getTasks().get(0);
 				newPriority = next.getPriority();
 				for(Task t: getTasks()){
-					if ((t.getPriority()>newPriority) && !TasksExecuted.contains(t)){
+					if ((t.getPriority()>newPriority) && !iteratedTasks.contains(t)){
 						next = t;
 						newPriority = t.getPriority();
 						
@@ -357,8 +386,8 @@ public class Scheduler implements Iterable<Task> {
 				}
 				
 			}
-			TasksExecuted.add(next);
-			LastPriority = null;
+			iteratedTasks.add(next);
+			//LastPriority = null;
 			return next;	
 			
 		}

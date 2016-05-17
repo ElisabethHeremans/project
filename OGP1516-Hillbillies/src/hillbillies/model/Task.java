@@ -406,14 +406,22 @@ public class Task {
 	 * 
 	 * @param executingUnit 
 	 * 			the executingUnit to set
+	 * @effect If the current executing unit of this task is not null, set its task to null
+	 * 			|if (this.getExecutingUnit()!= null)
+	 *			|	this.getExecutingUnit().setTask(null);
 	 * @post The executing unit of this new task is the given unit.
 	 * 			|new.getExecutingUnit() == executingUnit
+	 * @effect The task of the given executing unit is set to this task.
+	 * 			|executingUnit.setTask(this);
+	 * 
 	 */
 	@Raw
 	public void setExecutingUnit(Unit executingUnit) throws IllegalArgumentException {
 		if (!canHaveAsExecutingUnit(executingUnit)){
 			throw new IllegalArgumentException();
 		}
+		if (this.getExecutingUnit()!= null)
+			this.getExecutingUnit().setTask(null);
 		this.getExecutionContext().setExecutingUnit(executingUnit);
 		executingUnit.setTask(this);
 	}
@@ -432,7 +440,7 @@ public class Task {
 	 *			|   result == true;
 	 */
 	public boolean canHaveAsExecutingUnit(Unit executingUnit) {
-		if (this.getSelectedCube() !=null)
+		if (executingUnit != null && this.getSelectedCube() !=null)
 			return executingUnit.getWorld().isCubeInWorld(this.getSelectedCube());
 		return true;
 	}
@@ -477,25 +485,6 @@ public class Task {
 	}
 	
 	/**
-	 * Execute this task.
-	 * 
-	 * @effect Execute the activities statement of this task.
-	 * 			|getActivities().executeStatement(getExecutionContext())
-	 * @throws NullPointerException
-	 * 			If the executing unit of this task is null.
-	 * 			|this.getExecutingUnit()==null
-	 * 
-	 */
-	public void executeTask() throws NullPointerException{
-		if (this.getExecutingUnit() == null)
-			throw new NullPointerException();
-//		System.out.print(getActivities() + "   ");
-//		System.out.print(this.getExecutionContext().getSelectedCube());
-//		System.out.print(this.getExecutionContext().getExecutingUnit());
-		getActivities().executeStatement(getExecutionContext());
-	}
-	
-	/**
 	 * 
 	 * Return the execution context of this task.
 	 */
@@ -522,6 +511,45 @@ public class Task {
 	private ExecutionContext executionContext;
 	
 	/**
+	 * Execute this task.
+	 * 
+	 * @effect Execute the activities statement of this task.
+	 * 			|getActivities().executeStatement(getExecutionContext())
+	 * @throws NullPointerException
+	 * 			If the executing unit of this task is null.
+	 * 			|this.getExecutingUnit()==null
+	 * 
+	 */
+	public void executeTask() throws NullPointerException{
+		if (this.getExecutingUnit() == null)
+			throw new NullPointerException();
+//		System.out.print(getActivities() + "   ");
+//		System.out.print(this.getExecutionContext().getSelectedCube());
+//		System.out.print(this.getExecutionContext().getExecutingUnit());
+		getActivities().executeStatement(getExecutionContext());
+	}
+	
+	/**
+	 * Interrupt the execution of this task. Set the executing unit to null, 
+	 * re-add the completed statements to activities and reduce the priority of this task.
+	 * 
+	 * @effect The executing unit of this task is set to null.
+	 * @effect the activities of this task is set to a sequence statement containing the completed activities
+	 * 			and the non-completed activities.
+	 * 			|this.setActivities(this.getCompletedActivities().addStatement(this.getActivities()))
+	 * @effect The priority of this task is reduced with one.
+	 * 			|this.setPriority(getPriority()-1)
+	 */
+	@SuppressWarnings("unchecked")
+	public void interruptExecution(){
+		this.setExecutingUnit(null);
+		Statement activities = this.getCompletedActivities();
+		((SequenceStatement<Statement>) activities).addStatement(getActivities());
+		this.setActivities(activities);
+		this.setPriority(getPriority()-1);
+	}
+	
+	/**
 	 * Return a string representing this task: the name of this task.
 	 * 
 	 * @return the name of this task as a string
@@ -531,5 +559,7 @@ public class Task {
 	public String toString(){
 		return getName();
 	}
+	
+	
 
 }

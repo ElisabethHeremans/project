@@ -978,7 +978,7 @@ public class Unit {
 		else{
 			this.isExecutingTask = false;
 			this.getFaction().getScheduler().removeAsTask(this.getTask());
-			this.setTask(null);
+			this.getTask().setExecutingUnit(null);;
 		}
 	}
 	
