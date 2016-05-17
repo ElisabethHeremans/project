@@ -423,7 +423,8 @@ public class Task {
 		if (this.getExecutingUnit()!= null)
 			this.getExecutingUnit().setTask(null);
 		this.getExecutionContext().setExecutingUnit(executingUnit);
-		executingUnit.setTask(this);
+		if (executingUnit != null)
+			executingUnit.setTask(this);
 	}
 
 	

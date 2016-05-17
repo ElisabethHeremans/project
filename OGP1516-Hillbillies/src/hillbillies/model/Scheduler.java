@@ -228,8 +228,7 @@ public class Scheduler implements Iterable<Task> {
 	/**
 	 * Return the task with the highest priority that is currently not being executed.
 	 */
-	private Task getHighestPriorityTask(){
-
+	public Task getHighestPriorityTask(){
 		List<Task> tasksNotExecuted = new ArrayList<>();
 		this.getTasks().stream().filter(n->n.getExecutingUnit()==null).forEach(tasksNotExecuted::add);
 		if (tasksNotExecuted.size()==0)

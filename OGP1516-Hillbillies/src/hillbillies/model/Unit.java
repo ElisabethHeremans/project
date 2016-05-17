@@ -867,8 +867,10 @@ public class Unit {
 		if (this.getStatus() == Status.FALLING){
 			falling(duration);
 		}
-		if (this.isExecutingTask  && !isExecutingStatement)
+		if (this.isExecutingTask  && !isExecutingStatement){
+			System.out.println(" execute task ");
 			executeProgram(duration);
+		}
 		if (this.isExecutingTask &&this.getTask() != null){
 			System.out.println("EXECUTING TASK");
 			System.out.println("STATUS =" +getStatus());
@@ -920,7 +922,7 @@ public class Unit {
 		}
 		else if (this.getStatus() == Status.DONE && targetPosition != null && !this.isEnableDefaultBehaviour()){
 			moveTo1(targetPosition);
-			System.out.println(" MOVING ");
+			//System.out.println(" MOVING ");
 
 		}
 		else if (this.isEnableDefaultBehaviour() && this.getStatus() == Status.DONE){
@@ -958,11 +960,14 @@ public class Unit {
 	public void stopExecutingStatement(){
 		this.isExecutingStatement = false;
 		this.getTask().removeFirstStatement();
+		System.out.println(" stopped executing statement ");
+		System.out.println(getStatus());
 	}
 	
 	private void executeProgram(float duration) {
 		taskTimer = 0.001;
 		if (!this.getTask().isComplete()){
+			System.out.println(" not complete ");
 			if (taskTimer > duration){
 				this.isExecutingStatement = true;
 				this.getTask().executeTask();
@@ -976,9 +981,14 @@ public class Unit {
 			}
 		}
 		else{
+			System.out.println(" complete ");
 			this.isExecutingTask = false;
 			this.getFaction().getScheduler().removeAsTask(this.getTask());
-			this.getTask().setExecutingUnit(null);;
+			System.out.println(" complete1 ");
+			System.out.println(this.getTask());
+			this.getTask().setExecutingUnit(null);
+			System.out.println(" complete2 ");
+
 		}
 	}
 	
@@ -1269,15 +1279,16 @@ public class Unit {
 		queuePos.clear();
 		if (!canHaveAsPosition(targetPosition)){
 			throw new IllegalArgumentException();
-			
 		}
-
-		if (canMove()) {
+		if (Util.fuzzyEquals(Vector.getDistance(this.getPosition(), targetPosition), 0))
+			setStatus(Status.DONE);
+		else if (canMove()) {
 			this.targetPosition = targetPosition;
 			setStatus(Status.IN_CENTER);
 			int index = 0;
 			int[] nextPosition;
 			while (!Util.fuzzyEquals(Vector.getDistance(this.getPosition(), targetPosition), 0) && canMove()){
+				System.out.println(" wants to move ");
 				int[] position = {(int) targetPosition[0], (int) targetPosition[1], (int) targetPosition[2]};
 				int[] positionn = {(int) targetPosition[0], (int) targetPosition[1], (int) targetPosition[2], 0};
 				queue.add(positionn);
@@ -1427,6 +1438,8 @@ public class Unit {
 			if (this.isExecutingStatement){
 				stopExecutingStatement();
 			}
+			else if (this.isEnableDefaultBehaviour())
+				startDefaultBehaviour();
 		}
 		else if (nextTargetPosition != null && Vector.getDistance(nextTargetPosition, startPosition)-Vector.getDistance(startPosition, this.getPosition())<=0.0){
 			setExperiencePoints(this.getExperiencePoints()+1);
@@ -1767,7 +1780,11 @@ public class Unit {
 		setStatus(Status.DONE);
 		if (this.isExecutingStatement){
 			stopExecutingStatement();
+			System.out.println(" done ");
 		}
+		else if (this.isEnableDefaultBehaviour())
+			startDefaultBehaviour();
+
 	}
 	/**
 	 * A variable registering the progress of a unit's work.
@@ -1841,6 +1858,9 @@ public class Unit {
 		if (this.isExecutingStatement){
 			stopExecutingStatement();
 		}
+		else if (this.isEnableDefaultBehaviour())
+			startDefaultBehaviour();
+
 	}
 
 	/**
@@ -2035,6 +2055,8 @@ public class Unit {
 		} else {
 			this.setStaminaPoints(getMaxPoints());
 			setStatus(Status.DONE);
+			if (this.isEnableDefaultBehaviour())
+				startDefaultBehaviour();
 		}
 	}
 
@@ -2104,10 +2126,10 @@ public class Unit {
 			setEnableDefaultBehaviour(true);
 			System.out.print(" restart default ");
 			System.out.print(this.getFaction().getScheduler());
-			System.out.print(this.getFaction().getScheduler().iterator().hasNext());
-			if (this.getFaction().getScheduler() != null && this.getFaction().getScheduler().iterator().hasNext()){
+			System.out.print(this.getFaction().getScheduler().getTasks());
+			if (this.getFaction().getScheduler() != null && this.getFaction().getScheduler().getHighestPriorityTask()!=null){
 				this.isExecutingTask = true;
-				Task newTask = this.getFaction().getScheduler().iterator().next();
+				Task newTask = this.getFaction().getScheduler().getHighestPriorityTask();
 				newTask.setExecutingUnit(this);
 				this.isExecutingStatement = true;
 				this.getTask().executeTask();
@@ -2133,14 +2155,16 @@ public class Unit {
 			else{
 				i = new Random().nextInt(4);
 			} 
+			System.out.println(" i " + i);
 			if (i == 0) {
 				setStatus(Status.IN_CENTER);
 				try {
-					double[] pos = new double[] { (new Random().nextDouble()) * this.getWorld().getxDimension(), 
-							(new Random().nextDouble()) * this.getWorld().getyDimension(),
-							(new Random().nextDouble()) * this.getWorld().getzDimension() };
+					int[] pos = new int[] { new Random().nextInt(this.getWorld().getxDimension()), 
+							new Random().nextInt(this.getWorld().getyDimension()), 
+							new Random().nextInt(this.getWorld().getzDimension()) };
+					System.out.println(Arrays.toString(pos));
 					moveTo1(pos);
-						startSprinting();
+					startSprinting();
 				}
 				catch (IllegalArgumentException exc){
 					startDefaultBehaviour();
@@ -2149,9 +2173,10 @@ public class Unit {
 			if (i == 1) {
 				setStatus(Status.IN_CENTER);
 				try {
-					double[] pos = new double[] { (new Random().nextDouble()) * this.getWorld().getxDimension(), 
-							(new Random().nextDouble()) * this.getWorld().getyDimension(),
-							(new Random().nextDouble()) * this.getWorld().getzDimension() };
+					int[] pos = new int[] { new Random().nextInt(this.getWorld().getxDimension()), 
+							new Random().nextInt(this.getWorld().getyDimension()), 
+							new Random().nextInt(this.getWorld().getzDimension()) };
+					System.out.println(Arrays.toString(pos));
 					moveTo1(pos);
 					stopSprinting();
 				}
@@ -2162,9 +2187,10 @@ public class Unit {
 			if (i == 2){
 				List<int[]> neighbouring = this.getWorld().getNeighboringCubes(this.getCubeCoordinate());
 				neighbouring.add(this.getCubeCoordinate());
-				
+				for (int[] n:neighbouring)
+					System.out.println(Arrays.toString(n));
 				i = new Random().nextInt(neighbouring.size());
-				//System.out.print(Arrays.toString(neighbouring.get(i)));
+				System.out.print(Arrays.toString(neighbouring.get(i)));
 				work(neighbouring.get(i));
 			}
 			if (i == 3){
