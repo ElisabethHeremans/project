@@ -981,14 +981,14 @@ public class Unit {
 			}
 		}
 		else{
-			System.out.println(" complete ");
+			//System.out.println(" complete ");
 			this.isExecutingTask = false;
 			this.getFaction().getScheduler().removeAsTask(this.getTask());
-			System.out.println(" complete1 ");
-			System.out.println(this.getTask());
+			//System.out.println(" complete1 ");
+			//System.out.println(this.getTask());
 			this.getTask().setExecutingUnit(null);
-			System.out.println(" complete2 ");
-
+			//System.out.println(" complete2 ");
+			this.setStatus(Status.DONE);
 		}
 	}
 	
@@ -2167,6 +2167,7 @@ public class Unit {
 					startSprinting();
 				}
 				catch (IllegalArgumentException exc){
+					System.out.println(" catched ");
 					startDefaultBehaviour();
 				}
 			}
@@ -2197,10 +2198,13 @@ public class Unit {
 				rest();
 			}
 			if (i==4){
-				//System.out.println(potentialEnemies);
-				int index = new Random().nextInt(potentialEnemies.size());
+				if (potentialEnemies.size() != 0){
+					int index = new Random().nextInt(potentialEnemies.size());
 				//System.out.println(index);
-				attack(potentialEnemies.get(index));
+					attack(potentialEnemies.get(index));
+				}
+				else
+					startDefaultBehaviour();
 			}
 				
 		}}
