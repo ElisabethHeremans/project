@@ -1,7 +1,7 @@
 package hillbillies.model.expression;
 
-public abstract class BinaryBooleanExpression<E extends BooleanExpression> 
-extends BooleanExpression implements IComposedBinaryExpression<E> {
+public abstract class BinaryBooleanExpression<E extends Expression<Boolean>> 
+extends Expression<Boolean> implements IComposedBinaryExpression<E> {
 	
 	public BinaryBooleanExpression(E left, E right){
 		setRightExpression(right);

@@ -987,7 +987,7 @@ public class Unit {
 			//System.out.println(" complete1 ");
 			//System.out.println(this.getTask());
 			this.getTask().setExecutingUnit(null);
-			//System.out.println(" complete2 ");
+			System.out.println(" executed "+ task.toString());
 			this.setStatus(Status.DONE);
 		}
 	}
@@ -2171,7 +2171,7 @@ public class Unit {
 					startDefaultBehaviour();
 				}
 			}
-			if (i == 1) {
+			else if (i == 1) {
 				setStatus(Status.IN_CENTER);
 				try {
 					int[] pos = new int[] { new Random().nextInt(this.getWorld().getxDimension()), 
@@ -2185,7 +2185,7 @@ public class Unit {
 					startDefaultBehaviour();
 				}
 			}
-			if (i == 2){
+			else if (i == 2){
 				List<int[]> neighbouring = this.getWorld().getNeighboringCubes(this.getCubeCoordinate());
 				neighbouring.add(this.getCubeCoordinate());
 				for (int[] n:neighbouring)
@@ -2194,10 +2194,10 @@ public class Unit {
 				System.out.print(Arrays.toString(neighbouring.get(i)));
 				work(neighbouring.get(i));
 			}
-			if (i == 3){
+			else if (i == 3){
 				rest();
 			}
-			if (i==4){
+			else if (i==4){
 				if (potentialEnemies.size() != 0){
 					int index = new Random().nextInt(potentialEnemies.size());
 				//System.out.println(index);

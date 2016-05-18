@@ -2,7 +2,7 @@ package hillbillies.model.expression;
 
 import hillbillies.model.ExecutionContext;
 
-public class BasicVariableExpression extends VariableExpression {
+public class BasicVariableExpression<V extends Object> extends VariableExpression<V> {
 	public BasicVariableExpression(String variableName){
 		setName(variableName);
 		//setValue in AssignmentStatement gedaan
@@ -21,11 +21,12 @@ public class BasicVariableExpression extends VariableExpression {
 	private String name;
 
 	@Override
-	public Object evaluateExpression(ExecutionContext context) {
-		return context.getVariables().get(getName()).getValue();
+	public V evaluateExpression(ExecutionContext context) {
+		setValue((V) context.getVariables().get(getName()).getValue());
+		return getValue();
 	}
 	
-	public Expression getAssociatedExpression(ExecutionContext context){
+	public Expression<?> getAssociatedExpression(ExecutionContext context){
 		return context.getVariables().get(getName());
 	}
 	

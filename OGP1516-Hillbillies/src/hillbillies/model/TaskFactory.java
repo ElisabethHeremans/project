@@ -7,7 +7,7 @@ import hillbillies.model.Position;
 import hillbillies.part3.programs.ITaskFactory;
 import hillbillies.part3.programs.SourceLocation;
 
-public class TaskFactory implements ITaskFactory<Expression, Statement, Task> {
+public class TaskFactory implements ITaskFactory<Expression<?>, Statement, Task> {
 
 
 	public TaskFactory(){
@@ -85,12 +85,12 @@ public class TaskFactory implements ITaskFactory<Expression, Statement, Task> {
 	}
 
 	@Override
-	public Expression createReadVariable(String variableName, SourceLocation sourceLocation) {
+	public Expression<?> createReadVariable(String variableName, SourceLocation sourceLocation) {
 //		Expression expr = new BasicVariableExpression(variableName);
 //		expr.getAssociatedExpression();
 //		for (Expression express: getTask().getExecutionContext().get(2).keySet())
 //			//if value == variableName
-		return new BasicVariableExpression(variableName);
+		return new BasicVariableExpression<Object>(variableName);
 	}
 
 	@Override
@@ -134,8 +134,8 @@ public class TaskFactory implements ITaskFactory<Expression, Statement, Task> {
 	}
 
 	@Override
-	public Expression createOr(Expression left, Expression right, SourceLocation sourceLocation) {
-		return new OrExpression<BooleanExpression>((BooleanExpression)left, (BooleanExpression)right);
+	public Expression<?> createOr(Expression<?> left, Expression<?> right, SourceLocation sourceLocation) {
+		return new OrExpression<Expression<Boolean>>((Expression<Boolean>)left, (Expression<Boolean>)right);
 	}
 
 	@Override

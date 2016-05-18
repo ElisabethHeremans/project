@@ -44,7 +44,7 @@ public class TestSuitePart3Scheduler {
 		selectedCubes.add(new int[] {1,2,3});
 		System.out.println("StartParsing");
 		tasks = TaskParser.parseTasksFromString(
-				"name: \"work task\"\npriority: 1\nactivities: work selected;", (ITaskFactory<Expression, ?, Task>) new TaskFactory(),
+				"name: \"work task\"\npriority: 1\nactivities: work selected;", (ITaskFactory<Expression<?>, ?, Task>) new TaskFactory(),
 				selectedCubes);
 		task1 = tasks.get(0);
 		System.out.println("task 1 "+ task1);
@@ -52,7 +52,7 @@ public class TestSuitePart3Scheduler {
 		System.out.println("task 2 "+task2);
 		task3 = TaskParser.parseTasksFromString(
 				"name: \"operate workshop\"\npriority: 100\nactivities: if (is_solid boulder || carries_item this) then moveTo position_of this; moveTo boulder; fi",
-				(ITaskFactory<Expression, ?, Task>) new TaskFactory(), Collections.emptyList()).get(0);
+				(ITaskFactory<Expression<?>, ?, Task>) new TaskFactory(), Collections.emptyList()).get(0);
 		System.out.println("task 3 "+task3);
 		faction.setScheduler(scheduler);
 	}
