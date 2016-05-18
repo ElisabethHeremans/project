@@ -13,10 +13,10 @@ import hillbillies.part3.programs.SourceLocation;
 public class TestSuitePart3TaskFactory {
 	
 	private TaskFactory factory;
-	private Expression falseExpr;
+	private Expression<?> falseExpr;
 	private Expression enemyExpr;
 	private Expression xyz;
-	private Expression var;
+	private Expression<?> var;
 	private SourceLocation sourceLoc;
 	private Statement moveTo;
 	private Statement print;
@@ -31,7 +31,7 @@ public class TestSuitePart3TaskFactory {
 		falseExpr = new FalseExpression();
 		enemyExpr = new EnemyExpression();
 		xyz = new XYZExpression(new Position(new int[] {1,1,1}));
-		var = new BasicVariableExpression("var");
+		var = new BasicVariableExpression<Object>("var");
 		sourceLoc = new SourceLocation(5,3);
 		print = new PrintStatement<Expression>(enemyExpr);
 		breakStat = new BreakStatement();
@@ -183,9 +183,9 @@ public class TestSuitePart3TaskFactory {
 	
 	@Test
 	public final void createReadVariable(){
-		Expression e = factory.createReadVariable("x", sourceLoc);
+		Expression<?> e = factory.createReadVariable("x", sourceLoc);
 		Assert.assertTrue(e instanceof BasicVariableExpression);
-		Assert.assertEquals("x",((BasicVariableExpression) e).getName());
+		Assert.assertEquals("x",((BasicVariableExpression<?>) e).getName());
 
 	}
 	
@@ -289,8 +289,9 @@ public class TestSuitePart3TaskFactory {
 	
 	@Test
 	public final void createOr_valid(){
-		Expression e1 = factory.createCarriesItem(enemyExpr, sourceLoc);
-		Expression e2 = factory.createOr(e1, falseExpr, sourceLoc);
+		//Expression<?> e1 = factory.createCarriesItem(enemyExpr, sourceLoc);
+		Expression<?> e1 = factory.createReadVariable("x", sourceLoc);
+		Expression<?> e2 = factory.createOr(e1, falseExpr, sourceLoc);
 		Assert.assertTrue(e2 instanceof OrExpression<?>);
 		Assert.assertEquals(e1,((OrExpression<?>) e2).getLeftExpression());
 		Assert.assertEquals(falseExpr,((OrExpression<?>) e2).getRightExpression());

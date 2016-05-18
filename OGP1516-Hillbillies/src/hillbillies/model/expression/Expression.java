@@ -10,11 +10,17 @@ import hillbillies.model.statement.ExpressionStatement;
 import hillbillies.model.statement.Statement;
 import hillbillies.part3.programs.SourceLocation;
 
-public abstract class Expression{
+public abstract class Expression<V>{
 	
-	public abstract Object getValue() ;
+	public V getValue() {
+		return value;
+	}
+	private V value;
+	public void setValue(V value){
+		this.value = value;
+	}
 	
-	public abstract Object evaluateExpression(ExecutionContext context);
+	public abstract V evaluateExpression(ExecutionContext context);
 
 	public void setSourceLocation(SourceLocation sourceLocation) {
 		this.sourceLocation = sourceLocation;

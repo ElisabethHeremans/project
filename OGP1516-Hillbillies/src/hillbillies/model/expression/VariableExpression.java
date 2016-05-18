@@ -1,15 +1,15 @@
 package hillbillies.model.expression;
 
-public abstract class VariableExpression extends Expression {
+public abstract class VariableExpression<V extends Object> extends Expression<V> {
 	
-	public void setValue(Object object){
+	public void setValue(V object){
 		value = object;
 	}
 	
-	private Object value;
+	private V value;
 	
 	@Override
-	public final Object getValue() {
+	public final V getValue() {
 		return value;
 	}
 	

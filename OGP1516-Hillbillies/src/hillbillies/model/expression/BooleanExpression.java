@@ -2,7 +2,7 @@ package hillbillies.model.expression;
 
 import hillbillies.model.ExecutionContext;
 
-public abstract class BooleanExpression extends Expression {
+public abstract class BooleanExpression extends Expression<Boolean> {
 	
 	
 	public BooleanExpression(){
