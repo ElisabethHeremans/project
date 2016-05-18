@@ -5,6 +5,13 @@ import java.util.function.Predicate;
 
 import be.kuleuven.cs.som.annotate.*;
 
+/**
+ * @invar The tasks for a scheduler must be valid tasks for any scheduler.
+ * 		| canHaveAsTask(getTask)
+ * @invar Each scheduler can have its faction as its faction.
+ * 		| canHavaAsFaction(getFaction)
+ */
+
 public class Scheduler implements Iterable<Task> {
 	/**
 	 * Initialize a new scheduler.
@@ -315,6 +322,19 @@ public class Scheduler implements Iterable<Task> {
 	@Raw
 	private boolean hasProperFaction(){
 		return (this.getFaction() == null || this.getFaction().getScheduler()==this);
+	}
+	
+	/**
+	 * Check whether this scheduler can have the given faction 
+	 * as a faction attached to it.
+	 * @return True if and only if the given faction is not  an effective faction
+	 * 		or if the given faction references this scheduler as 
+	 * 		the scheduler attached to it.
+	 * 		| result == (this.getFaction() == null || this.getFaction().getScheduler()==this)
+	 */
+	@Raw
+	private boolean canHaveAsFaction(Faction faction){
+		return (faction == null || faction.getScheduler()==this);
 	}
 	
 	/**

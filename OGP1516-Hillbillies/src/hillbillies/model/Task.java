@@ -385,6 +385,7 @@ public class Task {
 	@Raw
 	public void setScheduledUnit(Unit scheduledUnit) {
 		this.scheduledUnit = scheduledUnit;
+		scheduledUnit.setScheduledTask(this);
 	}
 
 	/**
@@ -426,6 +427,7 @@ public class Task {
 		if (this.getExecutingUnit()!= null)
 			this.getExecutingUnit().setTask(null);
 		this.getExecutionContext().setExecutingUnit(executingUnit);
+		this.setScheduledUnit(executingUnit);
 		if (executingUnit != null)
 			executingUnit.setTask(this);
 	}
