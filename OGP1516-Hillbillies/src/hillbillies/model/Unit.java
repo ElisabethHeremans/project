@@ -838,7 +838,7 @@ public class Unit {
 	 *             If the duration is less than zero or exceeds or equals 0.2 s.
 	 */
 	public void advanceTime(float duration) throws IllegalArgumentException {
-		//System.out.println("-----------------------------------ADVANCETIME UNIT----------------------------------");
+		System.out.println("-----------------------------------ADVANCETIME UNIT----------------------------------");
 //		System.out.print(" 1: "+ this.getExperiencePoints());
 //		System.out.print(" 2 " + this.getHitpoints());
 		if (!(Util.fuzzyGreaterThanOrEqualTo(duration, 0.0-Util.DEFAULT_EPSILON )&& Util.fuzzyLessThanOrEqualTo((double)duration, 0.2+Util.DEFAULT_EPSILON))){
@@ -867,40 +867,20 @@ public class Unit {
 		if (this.getStatus() == Status.FALLING){
 			falling(duration);
 		}
-		if (this.isExecutingTask  && !isExecutingStatement){
+		//System.out.println(" test 1 "+ (this.isExecutingTask  && !isExecutingStatement));
+		if (this.isExecutingTask){
+			if ( !isExecutingStatement){
 			System.out.println(" execute task ");
 			executeProgram(duration);
+			}
 		}
 		if (this.isExecutingTask &&this.getTask() != null){
+			System.out.println(this.isExecutingTask  && !isExecutingStatement);
+			System.out.println(this.isExecutingTask);
+			System.out.println(!isExecutingStatement);
 			System.out.println("EXECUTING TASK");
 			System.out.println("STATUS =" +getStatus());
 		}
-//		if (this.isExecutingTask && !this.isExecutingStatement) 
-//				 /*&& Util.fuzzyGreaterThanOrEqualTo(taskTimer, 0.001))*/{
-//			//System.out.println(" executed working ");
-//			//taskTimer = 0.0;
-//			this.getTask().removeFirstStatement();
-//			System.out.println(" 1 ");
-//			if (!this.getTask().isComplete()){
-//				this.isExecutingStatement = true;
-//				taskTimer += 0.001;
-//				this.getTask().executeTask(this);
-//			}
-//			else{
-//				//System.out.println(" TASK COMPLETE ");
-//				this.isExecutingTask = false;
-//				this.getFaction().getScheduler().removeAsTask(this.getTask());
-//				this.setTask(null);
-//				//System.out.println(" TASK RESET ");
-//			}
-//		}
-//		if (!this.isExecutingTask && this.getFaction().getScheduler().iterator().hasNext()){
-//			Task next = this.getFaction().getScheduler().iterator().next();
-//			System.out.println("NEW TASK ASSIGNED");
-//			System.out.println(next.getName().toString());
-//			next.executeTask(this);
-//		}
-		//System.out.println(" UIT TASK ");
 		if (this.isFollowing() != null) {
 			if(this.isNeighbouringOrSameCube(this.isFollowing().getCubeCoordinate())){
 				this.stopFollowing();
@@ -974,14 +954,17 @@ public class Unit {
 			}
 			else{
 				while (taskTimer < duration && !isExecutingStatement && !this.getTask().isComplete()){
+					System.out.println(" entering this loop ");
 					this.isExecutingStatement = true;
+					System.out.println(this.getTask());
 					this.getTask().executeTask();
 					taskTimer += 0.001;
 				}
 			}
 		}
-		else{
-			//System.out.println(" complete ");
+		if (this.getTask().isComplete()
+				){
+			System.out.println(" complete ");
 			this.isExecutingTask = false;
 			this.getFaction().getScheduler().removeAsTask(this.getTask());
 			//System.out.println(" complete1 ");

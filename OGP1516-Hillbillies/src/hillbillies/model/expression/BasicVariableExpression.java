@@ -22,7 +22,9 @@ public class BasicVariableExpression<V extends Object> extends VariableExpressio
 
 	@Override
 	public V evaluateExpression(ExecutionContext context) {
+		System.out.println(" this variable " + context.getVariables().get(getName()));
 		setValue((V) context.getVariables().get(getName()).getValue());
+		
 		return getValue();
 	}
 	

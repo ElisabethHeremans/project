@@ -249,7 +249,7 @@ public class Task {
 		List<Statement> statements = new ArrayList<Statement>();
 		List<String> variableNames = new ArrayList<String>();
 	
-		if (activities instanceof SequenceStatement<?>){
+		if (activities instanceof SequenceStatement){
 			statements = (List<Statement>) ((SequenceStatement<?>)activities).getStatements();
 		}
 		else
@@ -265,14 +265,14 @@ public class Task {
 				if (! isWellFormed(stat))
 					return false;
 			else{
-					Expression e = ((ExpressionStatement<?>)stat).getExpression();
+					Expression<?> e = ((ExpressionStatement<?>)stat).getExpression();
 					if (e instanceof BracketVariableExpression){
 						e = ((BracketVariableExpression)e).getExpression();
 					}
 					if (e instanceof BasicVariableExpression){
 						boolean variableAssigned = false;
 						for (String name: variableNames){
-							if (name == ((BasicVariableExpression)e).getName())
+							if (name == ((BasicVariableExpression<?>)e).getName())
 								variableAssigned = true;
 							
 						}
@@ -320,18 +320,21 @@ public class Task {
 	public void removeFirstStatement(){
 		if (this.getActivities() instanceof SequenceStatement){
 			Statement first = ((SequenceStatement<?>) this.getActivities()).removeFirstStatement();
-			((SequenceStatement<Statement>)completedActivities).addStatement(first);
+			((SequenceStatement<?>)completedActivities).addStatement(first);
 			//setCompletedActivities(getCompletedActivities());
 			if (this.getActivities().isStatementExecuted()){
 				this.setActivities(null);
 				this.setComplete(true);
+				//this.getExecutingUnit().
 			}
 		}
 		else{
-			((SequenceStatement<Statement>)completedActivities).addStatement(getActivities());
+			((SequenceStatement<?>)completedActivities).addStatement(getActivities());
 			this.setActivities(null);
 			this.setComplete(true);
 		}
+		//System.out.println(((SequenceStatement<?>) this.getActivities()).getStatements());
+		System.out.println(" first statement removed ");
 	}
 	
 	/**
@@ -481,7 +484,7 @@ public class Task {
 	 * 			added to the execution context of this new task.
 	 * 			|this.getExecutionContext().addVariable(variableName,expr);
 	 */
-	public void addVariable(String variableName,Expression expr){
+	public void addVariable(String variableName,Expression<?> expr){
 		 this.getExecutionContext().addVariable(variableName,expr);
 	}
 	
@@ -524,7 +527,7 @@ public class Task {
 	public void executeTask() throws NullPointerException{
 		if (this.getExecutingUnit() == null)
 			throw new NullPointerException();
-//		System.out.print(getActivities() + "   ");
+		System.out.print(" activities "+ getActivities() + "   ");
 //		System.out.print(this.getExecutionContext().getSelectedCube());
 //		System.out.print(this.getExecutionContext().getExecutingUnit());
 		getActivities().executeStatement(getExecutionContext());
@@ -545,7 +548,7 @@ public class Task {
 	public void interruptExecution(){
 		this.setExecutingUnit(null);
 		Statement activities = this.getCompletedActivities();
-		((SequenceStatement<Statement>) activities).addStatement(getActivities());
+		((SequenceStatement<?>) activities).addStatement(getActivities());
 		this.setActivities(activities);
 		this.setPriority(getPriority()-1);
 	}

@@ -4,10 +4,11 @@ import hillbillies.model.ExecutionContext;
 import hillbillies.model.Unit;
 import hillbillies.model.expression.Expression;
 
-public class PrintStatement<E extends Expression> extends ExpressionStatement<E> {
+public class PrintStatement<E extends Expression<?>> extends ExpressionStatement<E> {
 
 	public PrintStatement(E e) {
 		setExpression(e);
+		System.out.println(e);
 	}
 
 	@Override

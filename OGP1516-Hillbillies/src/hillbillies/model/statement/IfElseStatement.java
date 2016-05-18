@@ -2,8 +2,9 @@ package hillbillies.model.statement;
 
 import hillbillies.model.ExecutionContext;
 import hillbillies.model.expression.BooleanExpression;
+import hillbillies.model.expression.Expression;
 
-public class IfElseStatement<E extends BooleanExpression, S extends Statement,T extends ComposedStatement>
+public class IfElseStatement<E extends Expression<Boolean>, S extends Statement,T extends ComposedStatement>
 extends ExpressionStatement<E> implements IComposedBinaryStatement<S,T>{
 	
 	public IfElseStatement(E condition, S thenBody, T elseBody){

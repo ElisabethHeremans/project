@@ -7,6 +7,7 @@ import static org.junit.Assert.assertNotNull;
 import java.util.Collections;
 import java.util.List;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -69,7 +70,8 @@ public class TestSuitePart3Task {
 		facade.schedule(scheduler, task);
 		facade.schedule(scheduler, task1);
 		System.out.print(scheduler.getTasks().size());
-		advanceTimeFor(facade, world, 24, 0.02);
+		advanceTimeFor(facade, world,24 , 0.02);
+		
 		
 
 		// work task has been executed
@@ -82,7 +84,7 @@ public class TestSuitePart3Task {
 	}
 	
 	@Test
-	public void testTaskExecuted2() throws ModelException {
+	public void testTaskExecuted3() throws ModelException {
 		System.out.println("*******************TEST 3************************");
 		int[][][] types = new int[3][3][3];
 		types[1][1][0] = TYPE_ROCK;
@@ -97,31 +99,85 @@ public class TestSuitePart3Task {
 
 		Scheduler scheduler = facade.getScheduler(faction);
 
+//		List<Task> tasks = TaskParser.parseTasksFromString(
+//				"name: \"work task low priority\"\npriority: 1\nactivities: work selected;", facade.createTaskFactory(),
+//				Collections.singletonList(new int[] { 1, 1, 1 }));
+//		List<Task> task3 = TaskParser.parseTasksFromString(
+//				"name: \"work task highest priority\"\npriority: 2\nactivities: work selected;", facade.createTaskFactory(),
+//				Collections.singletonList(new int[] { 0, 1, 1 }));
+		List<Task> task2 = TaskParser.parseTasksFromString(
+				"name: \"print variable\"\npriority: 2\nactivities: x := this; print x;", facade.createTaskFactory(),
+				Collections.singletonList(new int[] { 0, 1, 1 }));
+
+		// tasks are created
+		assertNotNull(task2);
+		// there's exactly one task
+		assertEquals(1, task2.size());
+		Task task = task2.get(0);
+		// test name
+		assertEquals("print variable", facade.getName(task));
+		// test priority
+		assertEquals(2, facade.getPriority(task));
+		
+		facade.schedule(scheduler, task);
+		//System.out.print(scheduler.getTasks().size());
+		//advanceTimeFor(facade, world, 24, 0.02);
+		world.advanceTime(0.0009);
+		world.advanceTime(0.0009);
+		
+
+		// work task has been executed
+		//assertEquals(TYPE_AIR, facade.getCubeType(world, 0, 1, 1));
+		// work task is removed from scheduler
+		System.out.print("remaining tasks  "+scheduler.getTasks().size());
+		//System.out.print(scheduler.);
+		assertFalse(facade.areTasksPartOf(scheduler, Collections.singleton(task)));
+	}
+
+	@Test
+	public void testTaskExecuted4() throws ModelException {
+		System.out.println("*******************TEST 4************************");
+		int[][][] types = new int[3][3][3];
+		types[1][1][0] = TYPE_ROCK;
+		types[1][1][1] = TYPE_ROCK;
+		types[1][1][2] = TYPE_TREE;
+		types[2][2][2] = TYPE_WORKSHOP;
+
+		World world = facade.createWorld(types, new DefaultTerrainChangeListener());
+		Unit unit = facade.createUnit("Test", new int[] { 0, 0, 0 }, 50, 50, 50, 50, true);
+		facade.addUnit(unit, world);
+		Faction faction = facade.getFaction(unit);
+
+		Scheduler scheduler = facade.getScheduler(faction);
+
 		List<Task> tasks = TaskParser.parseTasksFromString(
-				"name: \"work task\"\npriority: 1\nactivities: work selected;", facade.createTaskFactory(),
+				"name: \"work task\"\npriority: 2\nactivities: work selected;", facade.createTaskFactory(),
 				Collections.singletonList(new int[] { 1, 1, 1 }));
-		List<Task> task3 = TaskParser.parseTasksFromString(
-				"name: \"work task highest priority\"\npriority: 2\nactivities: work selected;", facade.createTaskFactory(),
+		List<Task> tasks1 = TaskParser.parseTasksFromString(
+				"name: \"move task\"\npriority: 1\nactivities: x := false; print x; if x then moveTo selected; fi", facade.createTaskFactory(),
 				Collections.singletonList(new int[] { 0, 1, 1 }));
 		// tasks are created
 		assertNotNull(tasks);
+		assertNotNull(tasks1);
 		// there's exactly one task
 		assertEquals(1, tasks.size());
 		Task task = tasks.get(0);
-		Task task1 = task3.get(0);
+		Task task1 = tasks1.get(0);
 		// test name
 		assertEquals("work task", facade.getName(task));
 		// test priority
-		assertEquals(1, facade.getPriority(task));
+		assertEquals(2, facade.getPriority(task));
 		
 		facade.schedule(scheduler, task);
 		facade.schedule(scheduler, task1);
 		System.out.print(scheduler.getTasks().size());
-		advanceTimeFor(facade, world, 24, 0.02);
+		advanceTimeFor(facade, world,24 , 0.02);
+		
 		
 
 		// work task has been executed
 		assertEquals(TYPE_AIR, facade.getCubeType(world, 0, 1, 1));
+		Assert.assertArrayEquals(new int[] { 0, 1, 1 }, unit.getCubeCoordinate());
 		// work task is removed from scheduler
 		System.out.print("remaining tasks  "+scheduler.getTasks().size());
 		//System.out.print(scheduler.);
