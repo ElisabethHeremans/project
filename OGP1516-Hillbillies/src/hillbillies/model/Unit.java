@@ -985,9 +985,9 @@ public class Unit {
 			this.isExecutingTask = false;
 			this.getFaction().getScheduler().removeAsTask(this.getTask());
 			//System.out.println(" complete1 ");
-			//System.out.println(this.getTask());
+			System.out.println(" executed "+ getTask().toString());
 			this.getTask().setExecutingUnit(null);
-			System.out.println(" executed "+ task.toString());
+			
 			this.setStatus(Status.DONE);
 		}
 	}
