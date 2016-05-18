@@ -3,7 +3,7 @@ package hillbillies.model.expression;
 import hillbillies.model.ExecutionContext;
 import hillbillies.model.Position;
 
-public abstract class PositionExpression extends Expression {
+public abstract class PositionExpression extends Expression<Position> {
 	public PositionExpression(){
 		
 	}

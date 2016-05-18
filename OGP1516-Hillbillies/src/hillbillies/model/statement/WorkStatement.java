@@ -1,10 +1,11 @@
 package hillbillies.model.statement;
 
 import hillbillies.model.ExecutionContext;
+import hillbillies.model.Position;
 import hillbillies.model.Unit;
-import hillbillies.model.expression.PositionExpression;
+import hillbillies.model.expression.Expression;
 
-public class WorkStatement<E extends PositionExpression> extends ActionStatement<E>{
+public class WorkStatement<E extends Expression<Position>> extends ActionStatement<E>{
 	
 	public WorkStatement(E position){
 		System.out.print(" selected "+ position.toString());

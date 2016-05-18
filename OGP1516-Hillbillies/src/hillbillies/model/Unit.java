@@ -2133,9 +2133,11 @@ public class Unit {
 			System.out.print(this.getFaction().getScheduler());
 			System.out.print(this.getFaction().getScheduler().getTasks());
 			if (this.getFaction().getScheduler() != null && this.getFaction().getScheduler().getHighestPriorityTask()!=null){
+				System.out.print(" execute task 1");
 				this.isExecutingTask = true;
 				Task newTask = this.getFaction().getScheduler().getHighestPriorityTask();
 				newTask.setExecutingUnit(this);
+				System.out.print(" execute task ");
 				this.isExecutingStatement = true;
 				this.getTask().executeTask();
 				//System.out.println(" 6 ");

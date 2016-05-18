@@ -3,7 +3,7 @@ package hillbillies.model.expression;
 import hillbillies.model.ExecutionContext;
 import hillbillies.model.Unit;
 
-public class IsFriendExpression<E extends UnitExpression> extends UnaryBooleanExpression<E> {
+public class IsFriendExpression<E extends Expression<Unit>> extends UnaryBooleanExpression<E> {
 
 	public IsFriendExpression(E e) {
 		setExpression(e);

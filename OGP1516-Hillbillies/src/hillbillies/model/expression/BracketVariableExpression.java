@@ -2,24 +2,28 @@ package hillbillies.model.expression;
 
 import hillbillies.model.ExecutionContext;
 
-public class BracketVariableExpression extends VariableExpression{
-	public BracketVariableExpression(Expression v){
+public class BracketVariableExpression<V extends Object, E extends VariableExpression<?>> extends VariableExpression<V> implements IComposedUnaryExpression<E>{
+	public BracketVariableExpression(E v){
 		setExpression(v);	
 	}
 
-	public Expression getExpression() {
+
+	@Override
+	public V evaluateExpression(ExecutionContext context) {
+		getExpression().evaluateExpression(context);
+		setValue((V)getExpression().getValue());
+		return getValue();
+	}
+
+	@Override
+	public E getExpression() {
 		return expression;
 	}
 
-	public void setExpression(Expression expression) {
-		this.expression = expression;
-	}
-
-	private Expression expression;
-
 	@Override
-	public Object evaluateExpression(ExecutionContext context) {
-		setValue(getExpression().getValue());
-		return getValue();
+	public void setExpression(E e) {
+		this.expression = e;
+		
 	}
+	private E expression;
 }

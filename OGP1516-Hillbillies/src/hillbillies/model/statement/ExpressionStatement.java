@@ -4,7 +4,7 @@ import be.kuleuven.cs.som.annotate.*;
 import hillbillies.model.ExecutionContext;
 import hillbillies.model.expression.Expression;
 
-public abstract class ExpressionStatement<E extends Expression > 
+public abstract class ExpressionStatement<E extends Expression<?> > 
 extends ComposedStatement implements IExpressionStatement<E>{
 	
 	

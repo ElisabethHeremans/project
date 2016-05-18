@@ -45,7 +45,16 @@ public class TaskFactory implements ITaskFactory<Expression<?>, Statement, Task>
 
 	@Override
 	public Statement createIf(Expression<?> condition, Statement ifBody, Statement elseBody, SourceLocation sourceLocation) {
-		return new IfElseStatement<Expression<Boolean>,ComposedStatement,ComposedStatement>((Expression<Boolean>) condition,(ComposedStatement) ifBody, (ComposedStatement)elseBody);
+		try{
+			return new IfElseStatement<BooleanExpression,ComposedStatement,ComposedStatement>((BooleanExpression) condition,(ComposedStatement) ifBody, (ComposedStatement)elseBody);
+		}
+		catch(ClassCastException c){
+			if (condition instanceof BasicVariableExpression){
+					return new IfElseStatement<BasicVariableExpression<Boolean>,ComposedStatement,ComposedStatement>((BasicVariableExpression<Boolean>) condition,(ComposedStatement) ifBody, (ComposedStatement)elseBody);
+			}
+			else
+				throw new ClassCastException();
+		}
 	}
 
 	@Override
@@ -64,8 +73,22 @@ public class TaskFactory implements ITaskFactory<Expression<?>, Statement, Task>
 	}
 
 	@Override
-	public Statement createMoveTo(Expression position, SourceLocation sourceLocation) {
-		return new MoveToStatement<PositionExpression>((PositionExpression) position);
+	public Statement createMoveTo(Expression<?> position, SourceLocation sourceLocation) {
+		try{
+			return new MoveToStatement<PositionExpression>((PositionExpression) position);
+		}
+		catch(ClassCastException c){
+			if (position instanceof BasicVariableExpression){
+				//Object val = ((BasicVariableExpression<?>)position).getValue();
+				//System.out.println("value" + val);
+				//if (val instanceof Position)
+				return new MoveToStatement<BasicVariableExpression<Position>>((BasicVariableExpression<Position>) position);
+				
+					
+			}
+			else
+				throw new ClassCastException();
+		}
 	}
 
 	@Override

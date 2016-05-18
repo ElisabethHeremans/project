@@ -13,28 +13,11 @@ import hillbillies.model.expression.VariableExpression;
 
 public class AssignmentStatement<E extends Expression<?>> extends ExpressionStatement<E> {
 	public AssignmentStatement(String variableName , E expression){
-//		if (expression.getValue() instanceof Boolean)
-//			BooleanExpression expr = (BooleanExpression)expression;
-//			setExpression(expr)
 		setExpression(expression);
 		System.out.println(getExpression());
 		setVariableName(variableName);
 		System.out.println(getVariableName());
-//		BasicVariableExpression variable = new BasicVariableExpression(getVariableName());
-//		setVariable(variable);
-//		variable.setValue(expression.getValue());
 	}
-//	@Basic @Raw
-//	public VariableExpression getVariable() {
-//		return variable;
-//	}
-//	
-//	@Raw
-//	public void setVariable(VariableExpression name) {
-//		this.variable = name;
-//	}
-//	
-//	private VariableExpression variable;
 	
 	private String variableName;
 	@Basic @Raw
@@ -55,12 +38,6 @@ public class AssignmentStatement<E extends Expression<?>> extends ExpressionStat
 		context.addVariable(getVariableName(), getExpression());
 		System.out.println(" variables "+(context.getVariables()));
 		context.getExecutingUnit().stopExecutingStatement();
-//		Object value = getExpression().evaluateExpression(context);
-//		if (value==Boolean.TRUE){
-//			setExpression(new TrueExpression());
-//		}
-//		BasicVariableExpression variable = new BasicVariableExpression(getVariableName());
-//		variable.setValue(getExpression().getValue());
 	}
 	
 }

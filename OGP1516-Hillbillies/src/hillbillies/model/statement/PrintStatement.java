@@ -8,7 +8,7 @@ public class PrintStatement<E extends Expression<?>> extends ExpressionStatement
 
 	public PrintStatement(E e) {
 		setExpression(e);
-		System.out.println(e);
+		//System.out.println(e);
 	}
 
 	@Override

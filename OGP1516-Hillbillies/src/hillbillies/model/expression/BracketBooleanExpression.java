@@ -2,7 +2,7 @@ package hillbillies.model.expression;
 
 import hillbillies.model.ExecutionContext;
 
-public class BracketBooleanExpression<E extends BooleanExpression> extends UnaryBooleanExpression<E> {
+public class BracketBooleanExpression<E extends Expression<Boolean>> extends UnaryBooleanExpression<E> {
 
 	public BracketBooleanExpression(E e) {
 		setExpression(e);

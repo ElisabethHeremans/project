@@ -5,8 +5,9 @@ import be.kuleuven.cs.som.annotate.Raw;
 import hillbillies.model.ExecutionContext;
 import hillbillies.model.Unit;
 import hillbillies.model.expression.BooleanExpression;
+import hillbillies.model.expression.Expression;
 
-public class WhileStatement<E extends BooleanExpression, S extends Statement>
+public class WhileStatement<E extends Expression<Boolean>, S extends Statement>
 extends ExpressionStatement<E> implements IComposedUnaryStatement<S> {
 	
 	public WhileStatement(E condition, S body){

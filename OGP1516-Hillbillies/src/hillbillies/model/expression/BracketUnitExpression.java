@@ -2,9 +2,8 @@ package hillbillies.model.expression;
 
 import hillbillies.model.ExecutionContext;
 import hillbillies.model.Unit;
-import hillbillies.model.types.UnitType;
 
-public class BracketUnitExpression<E extends UnitExpression> extends UnitExpression implements IComposedUnaryExpression<E>{
+public class BracketUnitExpression<E extends Expression<Unit>> extends UnitExpression implements IComposedUnaryExpression<E>{
 	public BracketUnitExpression(E e){
 		setExpression(e);
 	}

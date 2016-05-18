@@ -5,7 +5,7 @@ import hillbillies.model.ExecutionContext;
 import hillbillies.model.Position;
 import hillbillies.model.Unit;
 
-public class NextToExpression<E extends PositionExpression> extends UnaryPositionExpression<E> {
+public class NextToExpression<E extends Expression<Position>> extends UnaryPositionExpression<E> {
 	
 	public NextToExpression(E position){
 		setExpression(position);

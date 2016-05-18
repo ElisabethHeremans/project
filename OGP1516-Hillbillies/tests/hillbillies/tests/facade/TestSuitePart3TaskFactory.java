@@ -14,8 +14,8 @@ public class TestSuitePart3TaskFactory {
 	
 	private TaskFactory factory;
 	private Expression<?> falseExpr;
-	private Expression enemyExpr;
-	private Expression xyz;
+	private Expression<?> enemyExpr;
+	private Expression<?> xyz;
 	private Expression<?> var;
 	private SourceLocation sourceLoc;
 	private Statement moveTo;
@@ -100,7 +100,7 @@ public class TestSuitePart3TaskFactory {
 	
 	@Test(expected = ClassCastException.class)
 	public final void createIf_invalidExpr(){
-		factory.createIf(enemyExpr,moveTo, breakStat,  sourceLoc);
+		factory.createIf(xyz,moveTo, print,  sourceLoc);
 	}
 	
 	@Test

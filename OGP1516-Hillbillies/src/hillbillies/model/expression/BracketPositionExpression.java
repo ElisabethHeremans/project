@@ -2,8 +2,9 @@ package hillbillies.model.expression;
 
 import hillbillies.model.ExecutionContext;
 import hillbillies.model.Position;
+import hillbillies.model.Unit;
 
-public class BracketPositionExpression<E extends PositionExpression> extends UnaryPositionExpression<E> {
+public class BracketPositionExpression<E extends Expression<Position>> extends UnaryPositionExpression<E> {
 	public BracketPositionExpression(E e){
 		setExpression(e);
 	}

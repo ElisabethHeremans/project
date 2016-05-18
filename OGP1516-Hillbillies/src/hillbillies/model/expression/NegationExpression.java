@@ -2,7 +2,7 @@ package hillbillies.model.expression;
 
 import hillbillies.model.ExecutionContext;
 
-public class NegationExpression<E extends BooleanExpression> extends UnaryBooleanExpression<E> {
+public class NegationExpression<E extends Expression<Boolean>> extends UnaryBooleanExpression<E> {
 
 	public NegationExpression(E e) {
 		setExpression(e);

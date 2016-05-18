@@ -1,8 +1,9 @@
 package hillbillies.model.expression;
 
 import hillbillies.model.ExecutionContext;
+import hillbillies.model.Position;
 
-public class IsPassableExpression<E extends PositionExpression> extends UnaryBooleanExpression<E> {
+public class IsPassableExpression<E extends Expression<Position>> extends UnaryBooleanExpression<E> {
 
 	public IsPassableExpression(E e) {
 		setExpression(e);
