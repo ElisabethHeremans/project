@@ -56,8 +56,10 @@ extends ExpressionStatement<E> implements IComposedBinaryStatement<S,T>{
 		super.executeStatement(context);
 		if (getExpression().getValue())
 			getFirstStatement().executeStatement(context);
+		else if (getSecondStatement()!= null)
+			getSecondStatement().executeStatement(context);
 		else
-			getSecondStatement().executeStatement(context);		
+			context.getExecutingUnit().stopExecutingStatement();
 	}
 
 }

@@ -154,8 +154,11 @@ public class TestSuitePart3Task {
 				"name: \"work task\"\npriority: 2\nactivities: work selected;", facade.createTaskFactory(),
 				Collections.singletonList(new int[] { 1, 1, 1 }));
 		List<Task> tasks1 = TaskParser.parseTasksFromString(
-				"name: \"move task\"\npriority: 1\nactivities: x := false; print x; if x then moveTo selected; fi", facade.createTaskFactory(),
+				"name: \"move task non-effective\"\npriority: 1\nactivities: x := false; print x; if x then moveTo selected; fi", facade.createTaskFactory(),
 				Collections.singletonList(new int[] { 0, 1, 1 }));
+		List<Task> tasks2 = TaskParser.parseTasksFromString(
+				"name: \"move task effective\"\npriority: -5\nactivities: x := true; print x; if x then moveTo selected; fi", facade.createTaskFactory(),
+				Collections.singletonList(new int[] { 0, 1, 2 }));
 		// tasks are created
 		assertNotNull(tasks);
 		assertNotNull(tasks1);
@@ -163,6 +166,7 @@ public class TestSuitePart3Task {
 		assertEquals(1, tasks.size());
 		Task task = tasks.get(0);
 		Task task1 = tasks1.get(0);
+		Task task2 = tasks2.get(0);
 		// test name
 		assertEquals("work task", facade.getName(task));
 		// test priority
@@ -170,6 +174,7 @@ public class TestSuitePart3Task {
 		
 		facade.schedule(scheduler, task);
 		facade.schedule(scheduler, task1);
+		facade.schedule(scheduler, task2);
 		System.out.print(scheduler.getTasks().size());
 		advanceTimeFor(facade, world,24 , 0.02);
 		
@@ -177,12 +182,13 @@ public class TestSuitePart3Task {
 
 		// work task has been executed
 		assertEquals(TYPE_AIR, facade.getCubeType(world, 0, 1, 1));
-		Assert.assertArrayEquals(new int[] { 0, 1, 1 }, unit.getCubeCoordinate());
+		Assert.assertArrayEquals(new int[] { 0, 1, 2 }, unit.getCubeCoordinate());
 		// work task is removed from scheduler
 		System.out.print("remaining tasks  "+scheduler.getTasks().size());
 		//System.out.print(scheduler.);
 		assertFalse(facade.areTasksPartOf(scheduler, Collections.singleton(task)));
 		assertFalse(facade.areTasksPartOf(scheduler, Collections.singleton(task1)));
+		assertFalse(facade.areTasksPartOf(scheduler, Collections.singleton(task2)));
 	}
 
 	

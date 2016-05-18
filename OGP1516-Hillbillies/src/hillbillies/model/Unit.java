@@ -1428,6 +1428,7 @@ public class Unit {
 			targetPosition = null;
 			setExperiencePoints(this.getExperiencePoints()+1);
 			if (this.isExecutingStatement){
+				System.out.println(Arrays.toString(this.getPosition()));
 				stopExecutingStatement();
 			}
 			else if (this.isEnableDefaultBehaviour())
