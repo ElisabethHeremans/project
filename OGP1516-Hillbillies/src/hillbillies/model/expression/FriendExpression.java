@@ -19,10 +19,14 @@ public class FriendExpression extends UnitExpression{
 				(int) Vector.getDistance(u2.getPosition(), unit.getPosition()));
 		
 		Optional<Unit> nearest = unit.getWorld().listAllUnits().stream()
-				.filter(n -> n.getFaction() == unit.getFaction())
+				.filter(n -> n.getFaction() == unit.getFaction() && n != unit)
 				.min(comp);
-		
-		return nearest.get();
+		if(nearest.isPresent()){
+			System.out.println("FRIEND" +nearest.toString());
+			return nearest.get();
+		}
+		else 
+			return null;
 	}
 
 //	private Unit findFriendUnit(Unit unit) {

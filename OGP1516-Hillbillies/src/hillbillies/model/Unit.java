@@ -838,7 +838,7 @@ public class Unit {
 	 *             If the duration is less than zero or exceeds or equals 0.2 s.
 	 */
 	public void advanceTime(float duration) throws IllegalArgumentException {
-		System.out.println("-----------------------------------ADVANCETIME UNIT----------------------------------");
+//		System.out.println("-----------------------------------ADVANCETIME UNIT----------------------------------");
 //		System.out.print(" 1: "+ this.getExperiencePoints());
 //		System.out.print(" 2 " + this.getHitpoints());
 		if (!(Util.fuzzyGreaterThanOrEqualTo(duration, 0.0-Util.DEFAULT_EPSILON )&& Util.fuzzyLessThanOrEqualTo((double)duration, 0.2+Util.DEFAULT_EPSILON))){
@@ -1210,7 +1210,7 @@ public class Unit {
 	 * 		 of the array that are passable and are neighboring solid terrain. 
 	 */
 	public Queue<int[]> search(int[] array){
-		System.out.println("search");
+		//System.out.println("search");
 		int[] position = {array[0], array[1], array[2]};
 		int n = array[3];
 		List<int[]> neighboringCubes = this.getWorld().getNeighboringCubes(position);
@@ -1238,9 +1238,11 @@ public class Unit {
 				}
 			}
 		}
-		System.out.print("length "+ length);
+		//System.out.print("length "+ length);
 		return queue;
 	}
+	
+	//double pathTimer =0;
 	/**
 	 * Makes this unit move to a given target position.
 	 * @param targetPosition
@@ -1275,13 +1277,13 @@ public class Unit {
 				
 				
 				int[] positionn = {(int) targetPosition[0], (int) targetPosition[1], (int) targetPosition[2], 0};
-				System.out.println(" wants to move to " +Arrays.toString(position));
-				System.out.println("StartPositie" +Arrays.toString(getCubeCoordinate()));
+				//System.out.println(" wants to move to " +Arrays.toString(position));
+				//System.out.println("StartPositie" +Arrays.toString(getCubeCoordinate()));
 				queue.add(positionn);
 				length = length +1;
 				queuePos.add(position);
-				while(!queueContainsPos((LinkedList<int[]>) queue, this.getCubeCoordinate()) && length>index && length<getWorld().getxDimension()*getWorld().getyDimension()*getWorld().getzDimension()){
-					System.out.println("index:" +index) ;
+				while(!queueContainsPos((LinkedList<int[]>) queue, this.getCubeCoordinate()) && length>index && index<getWorld().getxDimension()*getWorld().getyDimension()*getWorld().getzDimension()){
+					//System.out.println("index:" +index) ;
  					nextPosition = ((LinkedList<int[]>) queue).get(index);
 					search(nextPosition);
 					index = index+1;
@@ -1297,7 +1299,7 @@ public class Unit {
 						}
 					}
 				}
-				System.out.println(" is moving" );
+				//System.out.println(" is moving" );
 				moveToAdjacent(candidateNextArray[0]-this.getCubeCoordinate()[0],
 						candidateNextArray[1]-this.getCubeCoordinate()[1],
 						candidateNextArray[2]-this.getCubeCoordinate()[2]);
@@ -1408,6 +1410,7 @@ public class Unit {
 				
 		setPosition(Vector.vectorAdd(this.getPosition(), Vector.scalarMultiplication(v, duration)));
 		setOrientation((float) Math.atan2(v[1],v[0]));
+		//pathTimer += duration;
 		if (isSprinting()){
 
 			if (Util.fuzzyLessThanOrEqualTo(this.getStaminaPoints()-10.0*duration,0.0)){
@@ -2164,7 +2167,7 @@ public class Unit {
 					int[] pos = new int[] { new Random().nextInt(this.getWorld().getxDimension()), 
 							new Random().nextInt(this.getWorld().getyDimension()), 
 							new Random().nextInt(this.getWorld().getzDimension()) };
-					System.out.println(Arrays.toString(pos));
+					//System.out.println(Arrays.toString(pos));
 					moveTo1(pos);
 					startSprinting();
 				}
@@ -2179,7 +2182,7 @@ public class Unit {
 					int[] pos = new int[] { new Random().nextInt(this.getWorld().getxDimension()), 
 							new Random().nextInt(this.getWorld().getyDimension()), 
 							new Random().nextInt(this.getWorld().getzDimension()) };
-					System.out.println(Arrays.toString(pos));
+					//System.out.println(Arrays.toString(pos));
 					moveTo1(pos);
 					stopSprinting();
 				}
@@ -2191,9 +2194,9 @@ public class Unit {
 				List<int[]> neighbouring = this.getWorld().getNeighboringCubes(this.getCubeCoordinate());
 				neighbouring.add(this.getCubeCoordinate());
 				for (int[] n:neighbouring)
-					System.out.println(Arrays.toString(n));
+					//System.out.println(Arrays.toString(n));
 				i = new Random().nextInt(neighbouring.size());
-				System.out.print(Arrays.toString(neighbouring.get(i)));
+				//System.out.print(Arrays.toString(neighbouring.get(i)));
 				work(neighbouring.get(i));
 			}
 			else if (i == 3){

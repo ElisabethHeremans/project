@@ -27,7 +27,10 @@ public class WorkshopExpression extends PositionExpression {
 				}
 			}
 		}				
-		return new Position(nearest);
+		if(nearest != null)
+			return new Position(nearest);
+		else
+			return null;
 	}
 
 	@Override

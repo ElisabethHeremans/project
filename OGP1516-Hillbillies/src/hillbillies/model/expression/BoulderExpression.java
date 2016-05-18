@@ -21,7 +21,10 @@ public class BoulderExpression extends PositionExpression {
 					nearest = boulder;
 				}
 			}
-			return new Position(nearest.getWorld().getCubeCoordinate(nearest.getPosition()));
+			if(nearest != null)
+				return new Position(nearest.getWorld().getCubeCoordinate(nearest.getPosition()));
+			else
+				return null;
 		}
 
 		@Override

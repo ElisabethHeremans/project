@@ -561,9 +561,37 @@ public class Task {
 	 */
 	@Override
 	public String toString(){
-		return getName();
+		return getName().toString();
 	}
 	
+	public boolean executableActivities(){
+		List<Statement> statements = new ArrayList<Statement>();
+		List<Expression> expressions = new ArrayList<Expression>();
 	
+		if (activities instanceof SequenceStatement){
+			statements = (List<Statement>) ((SequenceStatement<?>)activities).getStatements();
+			for(Statement stat: statements){
+				if(stat instanceof ExpressionStatement){
+					expressions.add(((ExpressionStatement) stat).getExpression());
+				}
+			}
+		}
+		else if(activities instanceof ExpressionStatement){
+				expressions.add(((ExpressionStatement) activities).getExpression());
+			}
+	
+		for (Expression expr: expressions){
+			if (expr instanceof UnitExpression){
+				return expr.evaluateExpression(executionContext)!=null;
+			}
+			if (expr instanceof PositionExpression)
+				if(expr.evaluateExpression(executionContext)!=null)
+					return getExecutingUnit().canHaveAsPosition((double[]) expr.evaluateExpression(executionContext));
+				else
+					return false;
+		}
+		return true;
+	}
 
 }
+

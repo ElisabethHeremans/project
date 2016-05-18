@@ -56,6 +56,8 @@ public class TestSuitePart3Task {
 		List<Task> task3 = TaskParser.parseTasksFromString(
 				"name: \"work task highest priority\"\npriority: 2\nactivities: work selected;", facade.createTaskFactory(),
 				Collections.singletonList(new int[] { 0, 1, 1 }));
+		
+		
 		// tasks are created
 		assertNotNull(tasks);
 		// there's exactly one task
@@ -134,9 +136,59 @@ public class TestSuitePart3Task {
 		assertFalse(facade.areTasksPartOf(scheduler, Collections.singleton(task)));
 	}
 
+//	@Test
+//	public void testTaskExecuted4() throws ModelException {
+//		System.out.println("*******************TEST 4************************");
+//		int[][][] types = new int[3][3][3];
+//		types[1][1][0] = TYPE_ROCK;
+//		types[1][1][1] = TYPE_ROCK;
+//		types[1][1][2] = TYPE_TREE;
+//		types[2][2][2] = TYPE_WORKSHOP;
+//
+//		World world = facade.createWorld(types, new DefaultTerrainChangeListener());
+//		Unit unit = facade.createUnit("Test", new int[] { 0, 0, 0 }, 50, 50, 50, 50, true);
+//		facade.addUnit(unit, world);
+//		Faction faction = facade.getFaction(unit);
+//
+//		Scheduler scheduler = facade.getScheduler(faction);
+//
+//		List<Task> tasks = TaskParser.parseTasksFromString(
+//				"name: \"work task\"\npriority: 2\nactivities: work selected;", facade.createTaskFactory(),
+//				Collections.singletonList(new int[] { 1, 1, 1 }));
+//		List<Task> tasks1 = TaskParser.parseTasksFromString(
+//				"name: \"move task\"\npriority: 1\nactivities: x := false; print x; if x then moveTo selected; fi", facade.createTaskFactory(),
+//				Collections.singletonList(new int[] { 0, 1, 1 }));
+//		// tasks are created
+//		assertNotNull(tasks);
+//		assertNotNull(tasks1);
+//		// there's exactly one task
+//		assertEquals(1, tasks.size());
+//		Task task = tasks.get(0);
+//		Task task1 = tasks1.get(0);
+//		// test name
+//		assertEquals("work task", facade.getName(task));
+//		// test priority
+//		assertEquals(2, facade.getPriority(task));
+//		
+//		facade.schedule(scheduler, task);
+//		facade.schedule(scheduler, task1);
+//		System.out.print(scheduler.getTasks().size());
+//		advanceTimeFor(facade, world,24 , 0.02);
+//		
+//		
+//
+//		// work task has been executed
+//		assertEquals(TYPE_AIR, facade.getCubeType(world, 0, 1, 1));
+//		Assert.assertArrayEquals(new int[] { 0, 1, 1 }, unit.getCubeCoordinate());
+//		// work task is removed from scheduler
+//		System.out.print("remaining tasks  "+scheduler.getTasks().size());
+//		//System.out.print(scheduler.);
+//		assertFalse(facade.areTasksPartOf(scheduler, Collections.singleton(task)));
+//		assertFalse(facade.areTasksPartOf(scheduler, Collections.singleton(task1)));
+//	}
+	
 	@Test
-	public void testTaskExecuted4() throws ModelException {
-		System.out.println("*******************TEST 4************************");
+	public void executableActivities_InvalidBoulder() throws ModelException{
 		int[][][] types = new int[3][3][3];
 		types[1][1][0] = TYPE_ROCK;
 		types[1][1][1] = TYPE_ROCK;
@@ -147,39 +199,52 @@ public class TestSuitePart3Task {
 		Unit unit = facade.createUnit("Test", new int[] { 0, 0, 0 }, 50, 50, 50, 50, true);
 		facade.addUnit(unit, world);
 		Faction faction = facade.getFaction(unit);
-
 		Scheduler scheduler = facade.getScheduler(faction);
-
+		
 		List<Task> tasks = TaskParser.parseTasksFromString(
-				"name: \"work task\"\npriority: 2\nactivities: work selected;", facade.createTaskFactory(),
+				"name: \"move to boulder\"\npriority: 1\nactivities: moveTo boulder;", facade.createTaskFactory(),
 				Collections.singletonList(new int[] { 1, 1, 1 }));
+<<<<<<< HEAD
 		List<Task> tasks1 = TaskParser.parseTasksFromString(
 				"name: \"move task non-effective\"\npriority: 1\nactivities: x := false; print x; if x then moveTo selected; fi", facade.createTaskFactory(),
 				Collections.singletonList(new int[] { 0, 1, 1 }));
 		List<Task> tasks2 = TaskParser.parseTasksFromString(
 				"name: \"move task effective\"\npriority: -5\nactivities: x := true; print x; if x then moveTo selected; fi", facade.createTaskFactory(),
 				Collections.singletonList(new int[] { 0, 1, 2 }));
+=======
+
+		
+		
+>>>>>>> branch 'master' of https://github.com/ElisabethHeremans/project.git
 		// tasks are created
 		assertNotNull(tasks);
-		assertNotNull(tasks1);
 		// there's exactly one task
 		assertEquals(1, tasks.size());
 		Task task = tasks.get(0);
+<<<<<<< HEAD
 		Task task1 = tasks1.get(0);
 		Task task2 = tasks2.get(0);
+=======
+>>>>>>> branch 'master' of https://github.com/ElisabethHeremans/project.git
 		// test name
-		assertEquals("work task", facade.getName(task));
+		assertEquals("move to boulder", facade.getName(task));
 		// test priority
-		assertEquals(2, facade.getPriority(task));
+		assertEquals(1, facade.getPriority(task));
 		
 		facade.schedule(scheduler, task);
+<<<<<<< HEAD
 		facade.schedule(scheduler, task1);
 		facade.schedule(scheduler, task2);
 		System.out.print(scheduler.getTasks().size());
 		advanceTimeFor(facade, world,24 , 0.02);
 		
 		
+=======
+		task.setExecutingUnit(unit);
+		Assert.assertFalse(task.executableActivities());;
+>>>>>>> branch 'master' of https://github.com/ElisabethHeremans/project.git
 
+<<<<<<< HEAD
 		// work task has been executed
 		assertEquals(TYPE_AIR, facade.getCubeType(world, 0, 1, 1));
 		Assert.assertArrayEquals(new int[] { 0, 1, 2 }, unit.getCubeCoordinate());
@@ -189,9 +254,87 @@ public class TestSuitePart3Task {
 		assertFalse(facade.areTasksPartOf(scheduler, Collections.singleton(task)));
 		assertFalse(facade.areTasksPartOf(scheduler, Collections.singleton(task1)));
 		assertFalse(facade.areTasksPartOf(scheduler, Collections.singleton(task2)));
+=======
+	}
+	
+	@Test
+	public void executableActivities_InvalidUnit() throws ModelException{
+		int[][][] types = new int[3][3][3];
+		types[1][1][0] = TYPE_ROCK;
+		types[0][0][1] = TYPE_ROCK;
+		types[1][1][2] = TYPE_TREE;
+		types[2][2][2] = TYPE_WORKSHOP;
+
+		World world = facade.createWorld(types, new DefaultTerrainChangeListener());
+		
+		Unit unit = facade.createUnit("Test", new int[] { 1, 0, 0 }, 50, 50, 50, 50, true);
+		Unit other = facade.createUnit("TestOther", new int[] { 0, 1, 1 }, 50, 50, 50, 50, true);
+		facade.addUnit(unit, world);
+		facade.addUnit(other, world);
+		Faction faction = facade.getFaction(unit);
+		Scheduler scheduler = facade.getScheduler(faction);
+		
+		List<Task> tasks = TaskParser.parseTasksFromString(
+				"name: \"move to friend\"\npriority: 1\nactivities: follow friend;", facade.createTaskFactory(),
+				Collections.singletonList(new int[] { 1, 1, 1 }));
+
+		
+		
+		// tasks are created
+		assertNotNull(tasks);
+		// there's exactly one task
+		assertEquals(1, tasks.size());
+		Task task = tasks.get(0);
+		// test name
+		assertEquals("move to friend", facade.getName(task));
+		// test priority
+		assertEquals(1, facade.getPriority(task));
+		
+		facade.schedule(scheduler, task);
+		task.setExecutingUnit(unit);
+		Assert.assertFalse(task.executableActivities());;
+
+>>>>>>> branch 'master' of https://github.com/ElisabethHeremans/project.git
 	}
 
-	
+	@Test
+	public void executableActivities_Valid() throws ModelException{
+		int[][][] types = new int[3][3][3];
+		types[1][1][0] = TYPE_ROCK;
+		types[0][0][1] = TYPE_ROCK;
+		types[1][1][2] = TYPE_TREE;
+		types[2][2][2] = TYPE_WORKSHOP;
+
+		World world = facade.createWorld(types, new DefaultTerrainChangeListener());
+		
+		Unit unit = facade.createUnit("Test", new int[] { 1, 0, 0 }, 50, 50, 50, 50, true);
+		Unit other = facade.createUnit("TestOther", new int[] { 0, 1, 1 }, 50, 50, 50, 50, true);
+		facade.addUnit(unit, world);
+		facade.addUnit(other, world);
+		Faction faction = facade.getFaction(unit);
+		Scheduler scheduler = facade.getScheduler(faction);
+		
+		List<Task> tasks = TaskParser.parseTasksFromString(
+				"name: \"move to enemy\"\npriority: 1\nactivities: follow enemy;", facade.createTaskFactory(),
+				Collections.singletonList(new int[] { 1, 1, 1 }));
+
+		
+		
+		// tasks are created
+		assertNotNull(tasks);
+		// there's exactly one task
+		assertEquals(1, tasks.size());
+		Task task = tasks.get(0);
+		// test name
+		assertEquals("move to enemy", facade.getName(task));
+		// test priority
+		assertEquals(1, facade.getPriority(task));
+		
+		facade.schedule(scheduler, task);
+		task.setExecutingUnit(unit);
+		Assert.assertTrue(task.executableActivities());;
+
+	}
 
 	/**
 	 * Helper method to advance time for the given world by some time.
