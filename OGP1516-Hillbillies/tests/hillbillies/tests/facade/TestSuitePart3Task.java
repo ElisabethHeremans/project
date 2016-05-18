@@ -204,57 +204,22 @@ public class TestSuitePart3Task {
 		List<Task> tasks = TaskParser.parseTasksFromString(
 				"name: \"move to boulder\"\npriority: 1\nactivities: moveTo boulder;", facade.createTaskFactory(),
 				Collections.singletonList(new int[] { 1, 1, 1 }));
-<<<<<<< HEAD
-		List<Task> tasks1 = TaskParser.parseTasksFromString(
-				"name: \"move task non-effective\"\npriority: 1\nactivities: x := false; print x; if x then moveTo selected; fi", facade.createTaskFactory(),
-				Collections.singletonList(new int[] { 0, 1, 1 }));
-		List<Task> tasks2 = TaskParser.parseTasksFromString(
-				"name: \"move task effective\"\npriority: -5\nactivities: x := true; print x; if x then moveTo selected; fi", facade.createTaskFactory(),
-				Collections.singletonList(new int[] { 0, 1, 2 }));
-=======
-
-		
-		
->>>>>>> branch 'master' of https://github.com/ElisabethHeremans/project.git
 		// tasks are created
 		assertNotNull(tasks);
 		// there's exactly one task
 		assertEquals(1, tasks.size());
 		Task task = tasks.get(0);
-<<<<<<< HEAD
-		Task task1 = tasks1.get(0);
-		Task task2 = tasks2.get(0);
-=======
->>>>>>> branch 'master' of https://github.com/ElisabethHeremans/project.git
+
 		// test name
 		assertEquals("move to boulder", facade.getName(task));
 		// test priority
 		assertEquals(1, facade.getPriority(task));
 		
 		facade.schedule(scheduler, task);
-<<<<<<< HEAD
-		facade.schedule(scheduler, task1);
-		facade.schedule(scheduler, task2);
-		System.out.print(scheduler.getTasks().size());
-		advanceTimeFor(facade, world,24 , 0.02);
-		
-		
-=======
+
 		task.setExecutingUnit(unit);
 		Assert.assertFalse(task.executableActivities());;
->>>>>>> branch 'master' of https://github.com/ElisabethHeremans/project.git
 
-<<<<<<< HEAD
-		// work task has been executed
-		assertEquals(TYPE_AIR, facade.getCubeType(world, 0, 1, 1));
-		Assert.assertArrayEquals(new int[] { 0, 1, 2 }, unit.getCubeCoordinate());
-		// work task is removed from scheduler
-		System.out.print("remaining tasks  "+scheduler.getTasks().size());
-		//System.out.print(scheduler.);
-		assertFalse(facade.areTasksPartOf(scheduler, Collections.singleton(task)));
-		assertFalse(facade.areTasksPartOf(scheduler, Collections.singleton(task1)));
-		assertFalse(facade.areTasksPartOf(scheduler, Collections.singleton(task2)));
-=======
 	}
 	
 	@Test
@@ -294,7 +259,7 @@ public class TestSuitePart3Task {
 		task.setExecutingUnit(unit);
 		Assert.assertFalse(task.executableActivities());;
 
->>>>>>> branch 'master' of https://github.com/ElisabethHeremans/project.git
+
 	}
 
 	@Test
