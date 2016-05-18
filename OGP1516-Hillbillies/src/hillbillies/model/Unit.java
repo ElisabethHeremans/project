@@ -2510,6 +2510,7 @@ public class Unit {
 			assert task.getExecutingUnit() == this;
 		}
 		this.task = task;
+		setScheduledTask(task);
 	}
 	/**
 	 * Check whether this unit has a proper task assigned to it.
@@ -2533,6 +2534,46 @@ public class Unit {
 	 * Variable referencing the task that is assigned to this unit.
 	 */
 	private Task task;
+	
+	/**
+	 * Set the task assigned to this unit to the given task.
+	 * @param task
+	 * 		The task to be assigned to this unit.
+	 * @pre If the given task is effective, the unit's faction must reference
+	 * 		to a scheduler that contains this task.
+	 * 		| assert (faction.getScheduler().hasAsTask(task))
+	 * @post This unit references the given task as the task assigned to it.
+	 * 		| new.getTask() == task
+	 */
+	public void setScheduledTask(@Raw Task task){
+		if (task !=null){
+			assert this.getFaction().getScheduler().hasAsTask(task);
+			assert task.getScheduledUnit() == this;
+		}
+		this.scheduledTask = task;
+	}
+	/**
+	 * Check whether this unit has a proper task assigned to it.
+	 * @return True if and only if this unit does not reference an effective task
+	 * 		or if the faction referenced by this unit references a scheduler that
+	 * 		contains this task.
+	 * 		| result == (this.getTask() == null || this.getFaction().getScheduler().hasAsTask(task))
+	 */
+	@Raw
+	public boolean hasProperScheduledTask(){
+		return (this.getTask() == null || this.getFaction().getScheduler().hasAsTask(task));
+	}
+	/**
+	 * Return the task that is assigned to this unit.
+	 */
+	@Basic @Raw
+	public Task getScheduledTask(){
+		return this.scheduledTask;
+	}
+	/**
+	 * Variable referencing the task that is assigned to this unit.
+	 */
+	private Task scheduledTask;
 	
 	/**
 	 * Return a string that references this unit.
