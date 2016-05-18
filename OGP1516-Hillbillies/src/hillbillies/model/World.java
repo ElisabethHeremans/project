@@ -304,8 +304,8 @@ public class World {
 		boolean validPosFound = false;
 		double[] pos = new double[]{};
 		while (!validPosFound){
-			pos = new double[] { (new Random().nextDouble()) * getxDimension()*L, 
-					(new Random().nextDouble()) * this.getyDimension()*L,(new Random().nextDouble()) * getzDimension()*L };
+			pos = getCubeCenter(getCubeCoordinate(new double[] { (new Random().nextDouble()) * getxDimension()*L, 
+					(new Random().nextDouble()) * this.getyDimension()*L,(new Random().nextDouble()) * getzDimension()*L }));
 			if (this.isCubeInWorld(this.getCubeCoordinate(pos)) && this.getPassable(this.getCubeCoordinate(pos))
 					&& ((int) Math.floor(pos[2]) == 0 ||
 					!this.getPassable(getCubeCoordinate(new double[] {pos[0],pos[1],pos[2]-1.0}))))

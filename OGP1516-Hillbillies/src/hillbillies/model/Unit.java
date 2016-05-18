@@ -1198,6 +1198,7 @@ public class Unit {
 	 */
 	private int length = 0; 
 	
+	
 	// Documentatie bij een for loop? 
 	/**
 	 * Search the neighboring cubes of the array that are passable and
@@ -1209,7 +1210,7 @@ public class Unit {
 	 * 		 of the array that are passable and are neighboring solid terrain. 
 	 */
 	public Queue<int[]> search(int[] array){
-		//System.out.print("search");
+		System.out.println("search");
 		int[] position = {array[0], array[1], array[2]};
 		int n = array[3];
 		List<int[]> neighboringCubes = this.getWorld().getNeighboringCubes(position);
@@ -1237,8 +1238,7 @@ public class Unit {
 				}
 			}
 		}
-		//System.out.print("length "+ length);
-		//System.out.print("ok");
+		System.out.print("length "+ length);
 		return queue;
 	}
 	/**
@@ -1260,7 +1260,8 @@ public class Unit {
 	public void moveTo1(double[] targetPosition)throws IllegalArgumentException{
 		queue.clear();
 		queuePos.clear();
-		if (!canHaveAsPosition(targetPosition)){
+		int[] position = {(int) targetPosition[0], (int) targetPosition[1], (int) targetPosition[2]};
+		if (!canHaveAsPosition(targetPosition) || !getWorld().isNeighboringSolidTerrain(position)){
 			throw new IllegalArgumentException();
 		}
 		if (Util.fuzzyEquals(Vector.getDistance(this.getPosition(), targetPosition), 0))
@@ -1271,13 +1272,16 @@ public class Unit {
 			int index = 0;
 			int[] nextPosition;
 			while (!Util.fuzzyEquals(Vector.getDistance(this.getPosition(), targetPosition), 0) && canMove()){
-				System.out.println(" wants to move ");
-				int[] position = {(int) targetPosition[0], (int) targetPosition[1], (int) targetPosition[2]};
+				
+				
 				int[] positionn = {(int) targetPosition[0], (int) targetPosition[1], (int) targetPosition[2], 0};
+				System.out.println(" wants to move to " +Arrays.toString(position));
+				System.out.println("StartPositie" +Arrays.toString(getCubeCoordinate()));
 				queue.add(positionn);
 				length = length +1;
 				queuePos.add(position);
-				while(!queueContainsPos((LinkedList<int[]>) queue, this.getCubeCoordinate()) && length>index){
+				while(!queueContainsPos((LinkedList<int[]>) queue, this.getCubeCoordinate()) && length>index && length<getWorld().getxDimension()*getWorld().getyDimension()*getWorld().getzDimension()){
+					System.out.println("index:" +index) ;
  					nextPosition = ((LinkedList<int[]>) queue).get(index);
 					search(nextPosition);
 					index = index+1;
@@ -1293,9 +1297,14 @@ public class Unit {
 						}
 					}
 				}
+				System.out.println(" is moving" );
 				moveToAdjacent(candidateNextArray[0]-this.getCubeCoordinate()[0],
 						candidateNextArray[1]-this.getCubeCoordinate()[1],
 						candidateNextArray[2]-this.getCubeCoordinate()[2]);
+			}
+			else{
+				System.out.println("Unreachable");
+				throw new IllegalArgumentException();
 			}
 			}
 		}	
@@ -1667,10 +1676,12 @@ public class Unit {
 		case TREE:
 			this.getWorld().solidToPassableUpdate(targetPosition);
 			setExperiencePoints(this.getExperiencePoints()+10);
+			System.out.println("CASE TREE solidToPassableUpdate");
 			break;
 		case ROCK:
 			this.getWorld().solidToPassableUpdate(targetPosition);
 			setExperiencePoints(this.getExperiencePoints()+10);
+			System.out.println("CASE ROCK solidToPassableUpdate");
 			break;
 		default:
 			switch(this.getNbBoulders()){
@@ -1680,6 +1691,7 @@ public class Unit {
 				this.setWeight(this.getWeight()-this.getBoulder().getWeight());
 				this.setBoulder(null);
 				setExperiencePoints(this.getExperiencePoints()+10);
+				System.out.println("CASE CARRYING BOULDER addBoulder to the world");
 				break;
 			case 0:
 				switch(this.getNbLogs()){
@@ -1689,6 +1701,7 @@ public class Unit {
 					this.setWeight(this.getWeight()-this.getLog().getWeight());
 					this.setLog(null);
 					setExperiencePoints(this.getExperiencePoints()+10);
+					System.out.println("CASE NOT CARRYING BOULDER BUT LOG addLog to the world");
 					break;
 				case 0:
 					switch(this.getWorld().getTerrain(targetPosition)){
@@ -1699,6 +1712,7 @@ public class Unit {
 							case 0:
 								break;
 							default:
+								System.out.println("CASE NOT CARRYING BOULDER, NOT LOG, addLog to the unit");
 								Log log = (Log) this.getWorld().inspectCube(targetPosition).get(2).get(0);
 								this.getWorld().removeAsLog(log);
 								this.setLog(log);
@@ -1710,6 +1724,7 @@ public class Unit {
 						default:
 							switch(this.getWorld().getLogs(targetPosition).size()){
 							case 0:
+								System.out.println("CASE NOT CARRYING BOULDER, NOT LOG, addBoulder to the unit");
 								Boulder boulder = (Boulder) this.getWorld().inspectCube(targetPosition).get(3).get(0);
 								this.setBoulder(boulder);
 								this.getWorld().removeAsBoulder(boulder);
@@ -1724,6 +1739,7 @@ public class Unit {
 								this.setWeight(this.getWeight()+1);
 								this.setToughness(this.getToughness()+1);
 								setExperiencePoints(this.getExperiencePoints()+10);
+								System.out.println("CASE WORKSHOP + LOG + BOULDER");
 								break;
 							}
 							break;
@@ -1736,6 +1752,7 @@ public class Unit {
 							case 0:
 								break;
 							default:
+								System.out.println("CASE addLog to the unit");
 								Log log = (Log) this.getWorld().inspectCube(targetPosition).get(2).get(0);
 								this.getWorld().removeAsLog(log);
 								this.setLog(log);
@@ -1745,6 +1762,7 @@ public class Unit {
 							}
 							break;
 						default:
+							System.out.println("CASE addBoulder to the unit");
 							Boulder boulder = (Boulder) this.getWorld().inspectCube(targetPosition).get(3).get(0);
 							this.setBoulder(boulder);
 							this.getWorld().removeAsBoulder(boulder);
