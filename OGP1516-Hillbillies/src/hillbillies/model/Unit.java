@@ -1024,6 +1024,7 @@ public class Unit {
 
 					else if (this.getCurrentStatement().getNextStatement(this.getTask().getExecutionContext()) != null){
 						this.isExecutingStatement = true;
+						System.out.println(" execute next ");
 						this.getCurrentStatement().getNextStatement(this.getTask().getExecutionContext()).executeStatement(this.getTask().getExecutionContext());
 					}
 					else

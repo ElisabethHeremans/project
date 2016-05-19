@@ -365,10 +365,79 @@ public class TestSuitePart3Task {
 //		Assert.assertTrue(task.executableActivities());;
 //
 //	}
+//	
+//	@Test
+//	public void testTaskExecuted7() throws ModelException {
+//		System.out.println("*******************TEST 7************************");
+//		int[][][] types = new int[3][3][3];
+//		types[1][1][0] = TYPE_ROCK;
+//		types[1][1][1] = TYPE_ROCK;
+//		types[1][1][2] = TYPE_TREE;
+//		types[2][2][2] = TYPE_WORKSHOP;
+//
+//		World world = facade.createWorld(types, new DefaultTerrainChangeListener());
+//		Unit unit = facade.createUnit("Test", new int[] { 0, 0, 0 }, 50, 50, 50, 50, true);
+//		facade.addUnit(unit, world);
+//		Boulder boulder = new Boulder(new int[] {0,0,0});
+//		world.addAsBoulder(boulder);
+//		Assert.assertTrue(world.hasAsBoulder(boulder));
+//		Assert.assertTrue(unit.isNeighbouringOrSameCube(boulder.getWorld().getCubeCoordinate(boulder.getPosition())));
+//
+//		unit.setBoulder(boulder);
+//		world.removeAsBoulder(boulder);
+//		Assert.assertEquals(boulder, unit.getBoulder());
+//		
+//		Faction faction = facade.getFaction(unit);
+//
+//		Scheduler scheduler = facade.getScheduler(faction);
+//
+//		List<Task> tasks = TaskParser.parseTasksFromString(
+//				"name: \"dig tunnel\"\npriority: -10\nactivities: if (carries_item(this)) then work here; fi "
+//				+ "if (is_solid(1,1,2)) then moveTo (1,0,2); work (1,1,2); fi", facade.createTaskFactory(),
+//				Collections.singletonList(new int[] { 1, 1, 1 }));
+////		List<Task> tasks1 = TaskParser.parseTasksFromString(
+////				"name: \"move task\"\npriority: 1\nactivities: x := false; print x; if x then moveTo selected; fi", facade.createTaskFactory(),
+////				Collections.singletonList(new int[] { 0, 1, 1 }));
+////		List<Task> tasks2 = TaskParser.parseTasksFromString(
+//// 				"name: \"move task effective\"\npriority: -5\nactivities: x := true; print x; if x then moveTo selected; fi", facade.createTaskFactory(),
+//// 				Collections.singletonList(new int[] { 0, 1, 2 }));
+//  
+//		// tasks are created
+//		assertNotNull(tasks);
+//		// there's exactly one task
+//		assertEquals(1, tasks.size());
+//		Task task = tasks.get(0);
+////		Task task1 = tasks1.get(0);
+////		Task task2 = tasks2.get(0);
+//		// test name
+//		assertEquals("dig tunnel", facade.getName(task));
+//		// test priority
+//		assertEquals(-10, facade.getPriority(task));
+//		
+//		facade.schedule(scheduler, task);
+////		facade.schedule(scheduler, task1);
+////		facade.schedule(scheduler, task2);
+//		System.out.print(scheduler.getTasks().size());
+//		advanceTimeFor(facade, world,15 , 0.02);
+//		
+//		
+//
+//		// work task has been executed
+//		Assert.assertFalse(world.getPassable(new int[] { 1, 1, 2 }));
+//		Assert.assertTrue(world.hasAsBoulder(boulder));
+//		Assert.assertArrayEquals(new int[] {0,0,0},boulder.getWorld().getCubeCoordinate(boulder.getPosition()));
+//		// work task is removed from scheduler
+//		System.out.print("remaining tasks  "+scheduler.getTasks().size());
+//		//System.out.print(scheduler.);
+//		assertFalse(facade.areTasksPartOf(scheduler, Collections.singleton(task)));
+////		assertFalse(facade.areTasksPartOf(scheduler, Collections.singleton(task1)));
+////		assertFalse(facade.areTasksPartOf(scheduler, Collections.singleton(task2)));
+//
+//	}
 	
 	@Test
-	public void testTaskExecuted7() throws ModelException {
-		System.out.println("*******************TEST 7************************");
+	public void testTaskExecuted8() throws ModelException {
+		System.out.println("*******************TEST 8************************");
 		int[][][] types = new int[3][3][3];
 		types[1][1][0] = TYPE_ROCK;
 		types[1][1][1] = TYPE_ROCK;
@@ -392,9 +461,8 @@ public class TestSuitePart3Task {
 		Scheduler scheduler = facade.getScheduler(faction);
 
 		List<Task> tasks = TaskParser.parseTasksFromString(
-				"name: \"dig tunnel\"\npriority: -10\nactivities: if (carries_item(this)) then work here; fi "
-				+ "if (is_solid(1,1,2)) then moveTo (1,0,2); work (1,1,2); fi", facade.createTaskFactory(),
-				Collections.singletonList(new int[] { 1, 1, 1 }));
+				"name: \"dig\"\npriority: -10\nactivities: if carries_item (this) then work here; fi if is_solid(selected) then moveTo (next_to selected); work selected; fi "
+				, facade.createTaskFactory(),Collections.singletonList(new int[] { 1, 1, 1 }));
 //		List<Task> tasks1 = TaskParser.parseTasksFromString(
 //				"name: \"move task\"\npriority: 1\nactivities: x := false; print x; if x then moveTo selected; fi", facade.createTaskFactory(),
 //				Collections.singletonList(new int[] { 0, 1, 1 }));
@@ -410,7 +478,7 @@ public class TestSuitePart3Task {
 //		Task task1 = tasks1.get(0);
 //		Task task2 = tasks2.get(0);
 		// test name
-		assertEquals("dig tunnel", facade.getName(task));
+		assertEquals("dig", facade.getName(task));
 		// test priority
 		assertEquals(-10, facade.getPriority(task));
 		
@@ -434,6 +502,7 @@ public class TestSuitePart3Task {
 //		assertFalse(facade.areTasksPartOf(scheduler, Collections.singleton(task2)));
 
 	}
+	
 	/**
 	 * Helper method to advance time for the given world by some time.
 	 * 
