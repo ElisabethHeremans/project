@@ -142,15 +142,10 @@ public class Scheduler implements Iterable<Task> {
 	 * @param task
 	 * 		The task to be removed.
 	 * @post This new scheduler does not have the given task as one of its tasks.
-	 * @post If this scheduler has the given task as one of its tasks,
-	 * 		the given task is no longer attached to any scheduler.
-	 * @effect If this scheduler has the given task as one of its tasks, 
-	 * 			the task is removed from this new schedulers taskmap at the tasks position.
-	 * @effect If this scheduler has the given task as one of its tasks, the task is removed from its faction.
-	 * @effect If this scheduler has the given task as one of its tasks,
-	 * 		the given task is removed from the set of tasks attached to its faction.
+	 *			| this.tasks.remove(task);
 	 * @throws IllegalArgumentException
 	 * 			If the given task is not effective
+	 * 			| (task == null)
 	 */
 	public void removeAsTask(Task task) throws IllegalArgumentException{
 		if( task == null)

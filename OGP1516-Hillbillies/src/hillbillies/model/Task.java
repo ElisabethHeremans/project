@@ -600,6 +600,32 @@ public class Task {
 		}
 		return true;
 	}
+	
+	public void restoreTask(){
+		List<Statement> statements = new ArrayList<Statement>();
+		Statement activities = this.getCompletedActivities();
+		Statement activities2 = this.getActivities();
+		if (activities instanceof SequenceStatement){
+			statements = (List<Statement>) ((SequenceStatement<?>)activities).getStatements();
+			for(Statement stat: statements){
+					statements.add(stat);
+			}
+		}
+		else if(activities instanceof ExpressionStatement){
+				statements.add(activities);
+			}
+		if (activities2 instanceof SequenceStatement){
+			statements = (List<Statement>) ((SequenceStatement<?>)activities2).getStatements();
+			for(Statement stat: statements){
+					statements.add(stat);
+			}
+		}
+		else if(activities2 instanceof ExpressionStatement){
+				statements.add(activities2);
+			}
+		this.getExecutingUnit().stopExecutingTask();
+		this.setActivities((Statement) statements);
+	}
 
 }
 
