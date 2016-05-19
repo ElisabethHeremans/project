@@ -867,6 +867,10 @@ public class Unit {
 		if (this.getStatus() == Status.FALLING){
 			falling(duration);
 		}
+		
+		if (this.isExecutingTask && !this.getTask().executableActivities()){
+			this.getTask().restoreTask();
+		}
 		//System.out.println(" test 1 "+ (this.isExecutingTask  && !isExecutingStatement));
 		if (this.isExecutingTask){
 			if ( !isExecutingStatement){
@@ -943,6 +947,14 @@ public class Unit {
 		System.out.println(" stopped executing statement ");
 		System.out.println(getStatus());
 	}
+	
+	public void stopExecutingTask(){
+		this.isExecutingStatement = false;
+		this.getTask().setExecutingUnit(null);
+		this.setTask(null);
+		
+	}
+	
 	
 	private void executeProgram(float duration) {
 		taskTimer = 0.001;
