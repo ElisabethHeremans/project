@@ -222,6 +222,33 @@ public class TestSuitePart3Task {
 	}
 	
 	@Test
+	public void variableExpression_validExpression() throws ModelException{
+		System.out.println("*******************TEST 6************************");
+		int[][][] types = new int[3][3][3];
+		types[1][1][0] = TYPE_ROCK;
+		types[1][1][1] = TYPE_ROCK;
+		types[1][1][2] = TYPE_TREE;
+		types[2][2][2] = TYPE_WORKSHOP;
+		XYZExpression pos =new XYZExpression(new Position(new int[] {0,0,1}));
+		World world = facade.createWorld(types, new DefaultTerrainChangeListener());
+		Unit unit = facade.createUnit("Test", new int[] { 0, 0, 0 }, 50, 50, 50, 50, true);
+		facade.addUnit(unit, world);
+		Faction faction = facade.getFaction(unit);
+		Scheduler scheduler = facade.getScheduler(faction);
+
+		List<Task> tasks = TaskParser.parseTasksFromString(
+				"name: \"work task\"\npriority: -10\nactivities: x := pos; print x; if x then moveTo x; fi", facade.createTaskFactory(),
+				Collections.singletonList(new int[] { 1, 1, 1 }));
+		System.out.println("task made");
+		Task task = tasks.get(0);
+		facade.schedule(scheduler, task);
+		
+		advanceTimeFor(facade, world,10 , 0.02);
+
+		
+	}
+	
+	@Test
 	public void executableActivities_InvalidBoulder() throws ModelException{
 		int[][][] types = new int[3][3][3];
 		types[1][1][0] = TYPE_ROCK;

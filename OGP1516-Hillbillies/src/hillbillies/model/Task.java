@@ -574,27 +574,27 @@ public class Task {
 	
 	public boolean executableActivities(){
 		List<Statement> statements = new ArrayList<Statement>();
-		List<Expression> expressions = new ArrayList<Expression>();
+		List<Expression<?>> expressions = new ArrayList<Expression<?>>();
 	
 		if (activities instanceof SequenceStatement){
 			statements = (List<Statement>) ((SequenceStatement<?>)activities).getStatements();
 			for(Statement stat: statements){
 				if(stat instanceof ExpressionStatement){
-					expressions.add(((ExpressionStatement) stat).getExpression());
+					expressions.add(((ExpressionStatement<?>) stat).getExpression());
 				}
 			}
 		}
 		else if(activities instanceof ExpressionStatement){
-				expressions.add(((ExpressionStatement) activities).getExpression());
+				expressions.add(((ExpressionStatement<?>) activities).getExpression());
 			}
 	
-		for (Expression expr: expressions){
+		for (Expression<?> expr: expressions){
 			if (expr instanceof UnitExpression){
 				return expr.evaluateExpression(executionContext)!=null;
 			}
 			if (expr instanceof PositionExpression)
 				if(expr.evaluateExpression(executionContext)!=null)
-					return getExecutingUnit().canHaveAsPosition((double[]) expr.evaluateExpression(executionContext));
+					return getExecutingUnit().canHaveAsPosition(this.getExecutingUnit().getWorld().getCubeCenter(((PositionExpression)expr).evaluateExpression(executionContext).getCoords()));
 				else
 					return false;
 		}
