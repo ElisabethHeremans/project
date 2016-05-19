@@ -11,7 +11,6 @@ public class Vector {
 	 * 		The given double array for this vector.
 	 */
 	public Vector(double[] vector){
-		// zomaar leeg laten?
 	}
 	/**
 	 * Return the distance between two vectors.

@@ -9,9 +9,9 @@ import be.kuleuven.cs.som.annotate.*;
 /** 
  * A class of boulders, with a position.
  * 
- * @invar  The position of each boulder must be a valid position for any
+ * @invar  The position of each boulder must be a valid position for this
  *         boulder.
- *       | isValidPosition(getPosition())
+ * @invar The world of each boulder must be a proper world for this boulder.
  */
 public class Boulder extends RawMaterial {
 	

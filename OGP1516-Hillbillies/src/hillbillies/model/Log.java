@@ -8,7 +8,11 @@ import java.util.Random;
 import be.kuleuven.cs.som.annotate.*;
 
 /**
- * @invar The position of each log must be a valid position for any log. 
+ * A class of logs, with a position.
+ * 
+ * @invar The position of each log must be a valid position for this log. 
+ * @invar The world of each boulder must be a proper world for this boulder.
+ * 
  */
 public class Log extends RawMaterial {
 

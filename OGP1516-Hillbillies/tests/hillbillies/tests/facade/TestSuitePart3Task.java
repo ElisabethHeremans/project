@@ -463,12 +463,6 @@ public class TestSuitePart3Task {
 		List<Task> tasks = TaskParser.parseTasksFromString(
 				"name: \"dig\"\npriority: -10\nactivities: if carries_item (this) then work here; fi if is_solid(selected) then moveTo (next_to selected); work selected; fi "
 				, facade.createTaskFactory(),Collections.singletonList(new int[] { 1, 1, 1 }));
-//		List<Task> tasks1 = TaskParser.parseTasksFromString(
-//				"name: \"move task\"\npriority: 1\nactivities: x := false; print x; if x then moveTo selected; fi", facade.createTaskFactory(),
-//				Collections.singletonList(new int[] { 0, 1, 1 }));
-//		List<Task> tasks2 = TaskParser.parseTasksFromString(
-// 				"name: \"move task effective\"\npriority: -5\nactivities: x := true; print x; if x then moveTo selected; fi", facade.createTaskFactory(),
-// 				Collections.singletonList(new int[] { 0, 1, 2 }));
   
 		// tasks are created
 		assertNotNull(tasks);
@@ -486,7 +480,7 @@ public class TestSuitePart3Task {
 //		facade.schedule(scheduler, task1);
 //		facade.schedule(scheduler, task2);
 		System.out.print(scheduler.getTasks().size());
-		advanceTimeFor(facade, world,15 , 0.02);
+		advanceTimeFor(facade, world,25 , 0.02);
 		
 		
 
@@ -500,6 +494,7 @@ public class TestSuitePart3Task {
 		assertFalse(facade.areTasksPartOf(scheduler, Collections.singleton(task)));
 //		assertFalse(facade.areTasksPartOf(scheduler, Collections.singleton(task1)));
 //		assertFalse(facade.areTasksPartOf(scheduler, Collections.singleton(task2)));
+		Assert.assertTrue(unit.getTask()==null);
 
 	}
 	

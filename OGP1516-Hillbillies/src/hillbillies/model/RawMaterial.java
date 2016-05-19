@@ -1,15 +1,30 @@
 package hillbillies.model;
-
-import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Raw;
-
+import be.kuleuven.cs.som.annotate.Basic;
+/**
+ * A class of raw materials
+ * 
+ * @invar  The position of each raw material must be a valid position for this
+ *         raw material.
+ * @invar The world of each raw material must be a proper world for this raw material.
+ */
 public abstract class RawMaterial {
-
+	/**
+	 * Initialize this new raw material with a given double position
+	 * @param position
+	 * 		The double position for this new raw material
+	 * @effect The position of this new raw material is set to the given position. 
+	 */
 	public RawMaterial(double[] position) {
 		this.setPosition(position);
 
 	}
-	
+	/**
+	 * Initialize this new raw material with a given integer position
+	 * @param position
+	 * 		The integer position for this new raw material
+	 * @effect The position of this new raw material is set to the given position. 
+	 */
 	public RawMaterial(int[] position){
 		this(new double[] {(double) position[0]+0.5, (double)position[1]+0.5,(double) position[2]+0.5});
 	}

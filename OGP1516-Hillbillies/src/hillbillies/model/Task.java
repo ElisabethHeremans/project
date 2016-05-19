@@ -169,7 +169,7 @@ public class Task {
 		this.isComplete = isComplete;
 	}
 
-	private boolean isComplete;
+	private boolean isComplete = false;
 
 	/**
 	 * Return the activities of this task.

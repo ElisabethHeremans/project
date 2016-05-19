@@ -742,7 +742,7 @@ public class Unit {
 	 */
 	public void setFaction(@Raw Faction faction){
 		if (faction !=null)
-			assert world.hasAsUnit(this);
+			assert faction.hasAsUnit(this);
 		this.faction = faction;
 	}
 	/**
@@ -780,8 +780,10 @@ public class Unit {
 	 * 		| new.getWorld() == world
 	 */
 	public void setWorld(@Raw World world){
-		if (world !=null)
+		if (world !=null){
 			assert world.hasAsUnit(this);
+			
+		}
 		this.world = world;
 	}
 	
@@ -839,7 +841,7 @@ public class Unit {
 	 *             If the duration is less than zero or exceeds or equals 0.2 s.
 	 */
 	public void advanceTime(float duration) throws IllegalArgumentException {
-		System.out.println("-----------------------------------ADVANCETIME UNIT----------------------------------");
+		//System.out.println("-----------------------------------ADVANCETIME UNIT----------------------------------");
 //		System.out.print(" 1: "+ this.getExperiencePoints());
 //		System.out.print(" 2 " + this.getHitpoints());
 		if (!(Util.fuzzyGreaterThanOrEqualTo(duration, 0.0-Util.DEFAULT_EPSILON )&& Util.fuzzyLessThanOrEqualTo((double)duration, 0.2+Util.DEFAULT_EPSILON))){
@@ -951,6 +953,7 @@ public class Unit {
 	
 	public void stopExecutingTask(){
 		this.isExecutingStatement = false;
+		this.isExecutingTask = false;
 		this.setCurrentStatement(null);
 		this.getTask().setExecutingUnit(null);
 		this.setTask(null);
@@ -991,7 +994,11 @@ public class Unit {
 	}
 	private void executeProgram(float duration) {
 		taskTimer = 0.001;
-
+		System.out.println(" exec program ");
+		System.out.println(this.getTask());
+		System.out.println(this.getFaction().getScheduler().getTasks());
+		System.out.println(this.getFaction().getScheduler());
+		System.out.println(this.getFaction().getScheduler().getHighestPriorityTask());
 		if (!this.getTask().isComplete()){
 			System.out.println(" not complete ");
 			
@@ -1010,6 +1017,7 @@ public class Unit {
 					this.getTask().setComplete(true);
 			}
 			else{
+				System.out.println(" b ");
 				
 				while (taskTimer < duration && !isExecutingStatement && !this.getTask().isComplete()){
 					System.out.println(" entering this loop ");
@@ -1034,9 +1042,10 @@ public class Unit {
 				}
 			}
 		}
-		if (!this.isExecutingStatement &&this.getCurrentStatement().getNextStatement(this.getTask().getExecutionContext()) == null){
+		if (!this.isExecutingStatement && this.isExecutingTask && this.getCurrentStatement().getNextStatement(this.getTask().getExecutionContext()) == null){
+			System.out.println(" c ");
 			
-			this.isExecutingTask = false;
+			//this.isExecutingTask = false;
 			this.getFaction().getScheduler().removeAsTask(this.getTask());
 			this.stopExecutingTask();
 			
@@ -1149,6 +1158,7 @@ public class Unit {
 	 */
 	public double getCurrentSpeed() {
 		if (this.getStatus() == Status.MOVING) {
+			System.out.println(" moving ");
 			if (isSprinting())
 				return 2.0 * getWalkingSpeed();
 			return getWalkingSpeed();
@@ -1169,7 +1179,7 @@ public class Unit {
 	 * 		   |	|| status == Status.IN_CENTER || status == Status.FALLING)
 	 */
 	public boolean canMove() {
-		//System.out.print(this.getStatus().toString());
+		System.out.print(this.getStatus().toString());
 		if (this.getStatus() == Status.RESTING || this.getStatus() == Status.DONE || this.getStatus() == Status.IN_CENTER || this.getStatus() == Status.FALLING)
 			return true;
 		return false;
@@ -1255,7 +1265,7 @@ public class Unit {
 				getPosition()[2] + (double) dz }))
 			throw new IllegalArgumentException();
 		if (canMove()) {
-			//System.out.print("can move");
+			System.out.print("can move");
 			startPosition = new double[] {this.getPosition()[0],this.getPosition()[1],this.getPosition()[2]};
 			nextTargetPosition = this.getWorld().getCubeCenter(new double[] {this.getCubePosition()[0] + (double) dx , this.getCubePosition()[1] 
 				+ (double) dy , this.getCubePosition()[2] + (double) dz });
@@ -1344,10 +1354,27 @@ public class Unit {
 		queuePos.clear();
 		int[] position = {(int) targetPosition[0], (int) targetPosition[1], (int) targetPosition[2]};
 		if (!canHaveAsPosition(targetPosition) || !getWorld().isNeighboringSolidTerrain(position)){
-			throw new IllegalArgumentException();
+			if (this.isExecutingTask){
+				stopExecutingTask();
+				//startDefaultBehaviour;
+			}
+			else
+				throw new IllegalArgumentException();
 		}
-		if (Util.fuzzyEquals(Vector.getDistance(this.getPosition(), targetPosition), 0))
+		else if (Util.fuzzyEquals(Vector.getDistance(this.getPosition(), targetPosition), 0)){
 			setStatus(Status.DONE);
+			queue = new LinkedList<>();
+			queuePos = new LinkedList<>();
+			targetPosition = null;
+			setExperiencePoints(this.getExperiencePoints()+1);
+			if (this.isExecutingStatement){
+				System.out.println(Arrays.toString(this.getPosition()));
+				stopExecutingStatement();
+			}
+			else if (this.isEnableDefaultBehaviour())
+				startDefaultBehaviour();
+
+		}
 		else if (canMove()) {
 			this.targetPosition = targetPosition;
 			setStatus(Status.IN_CENTER);
@@ -1386,7 +1413,9 @@ public class Unit {
 			}
 			else{
 				System.out.println("Unreachable");
-				throw new IllegalArgumentException();
+				//throw new IllegalArgumentException();
+				if ( this.isEnableDefaultBehaviour())
+					startDefaultBehaviour();
 			}
 			}
 		}	
@@ -1487,7 +1516,7 @@ public class Unit {
 		double[] v = new double[] {getCurrentSpeed()*(nextTargetPosition[0]-startPosition[0])/d,
 				getCurrentSpeed()*(nextTargetPosition[1]-startPosition[1])/d,
 				getCurrentSpeed()*(nextTargetPosition[2]-startPosition[2])/d};
-				
+		System.out.println(Arrays.toString(v));
 		setPosition(Vector.vectorAdd(this.getPosition(), Vector.scalarMultiplication(v, duration)));
 		setOrientation((float) Math.atan2(v[1],v[0]));
 		//pathTimer += duration;
@@ -1570,7 +1599,7 @@ public class Unit {
 	/**
 	 * Return the walking speed of this unit.
 	 */
-	private double getWalkingSpeed() {
+	public double getWalkingSpeed() {
 		return this.walkingSpeed;
 	}
 	
@@ -1591,11 +1620,11 @@ public class Unit {
 	 *         unit's basespeed.
 	 *         | walkingSpeed = getBaseSpeed()
 	 */
-
 	private void setWalkingSpeed(int dz) {
-		if (dz == -1)
+		if (dz == -1){
 			walkingSpeed = 1.2 * getBaseSpeed();
-		if (dz == 1)
+		}
+		else if (dz == 1)
 			walkingSpeed = 0.5 * getBaseSpeed();
 		else
 			walkingSpeed = getBaseSpeed();
@@ -2211,7 +2240,7 @@ public class Unit {
 			setEnableDefaultBehaviour(true);
 			System.out.print(" restart default ");
 			System.out.print(this.getFaction().getScheduler());
-			System.out.print(this.getFaction().getScheduler().getTasks());
+			System.out.print(this.getFaction().getScheduler().getHighestPriorityTask());
 			if (this.getFaction().getScheduler() != null && this.getFaction().getScheduler().getHighestPriorityTask()!=null){
 				System.out.print(" execute task 1");
 				this.isExecutingTask = true;
@@ -2219,10 +2248,6 @@ public class Unit {
 				newTask.setExecutingUnit(this);
 				System.out.print(" execute task ");
 				this.isExecutingStatement = false;
-				
-				//System.out.println(" 6 ");
-				//System.out.println(getFaction().getScheduler().getAllTasksIterator().next());
-				
 			}
 			else{
 			//System.out.println(" 7 ");

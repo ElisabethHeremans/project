@@ -1,6 +1,8 @@
 package hillbillies.model.expression;
 
 import java.util.List;
+import java.util.Random;
+
 import hillbillies.model.ExecutionContext;
 import hillbillies.model.Position;
 import hillbillies.model.Unit;
@@ -17,8 +19,8 @@ public class NextToExpression<E extends Expression<Position>> extends UnaryPosit
 		List<int[]> neighbouringPositions = context.getExecutingUnit().getWorld().getNeighboringCubes(pos);
 		if (neighbouringPositions.isEmpty())
 			return null;
-		else
-			return new Position(neighbouringPositions.get(0));
+		int i = new Random().nextInt(neighbouringPositions.size());
+		return new Position(neighbouringPositions.get(i));
 	}
 
 	@Override

@@ -58,6 +58,7 @@ extends ExpressionStatement<E> implements IComposedBinaryStatement<S,T>{
 	public void executeStatement(ExecutionContext context) {
 		context.getExecutingUnit().setCurrentStatement(this);
 		System.out.println(" executing if else ");
+		System.out.println(getExpression());
 		getExpression().evaluateExpression(context);
 		System.out.println(getExpression().getValue());
 		if (getExpression().getValue()){
