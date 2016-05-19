@@ -17,6 +17,7 @@ public class PositionOfExpression<E extends Expression<Unit>> extends UnaryPosit
 
 	@Override
 	public Position evaluateExpression(ExecutionContext context) {
+		getExpression().evaluateExpression(context);
 		setValue(new Position(getPositionOfUnit()));
 		return getValue();
 	}

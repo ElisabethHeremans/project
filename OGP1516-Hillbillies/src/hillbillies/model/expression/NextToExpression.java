@@ -11,9 +11,10 @@ public class NextToExpression<E extends Expression<Position>> extends UnaryPosit
 		setExpression(position);
 	}
 
-	private Position getNextTo(Unit unit) {
+	private Position getNextTo(ExecutionContext context) {
+		getExpression().evaluateExpression(context);
 		int[] pos = getExpression().getValue().getCoords();
-		List<int[]> neighbouringPositions = unit.getWorld().getNeighboringCubes(pos);
+		List<int[]> neighbouringPositions = context.getExecutingUnit().getWorld().getNeighboringCubes(pos);
 		if (neighbouringPositions.isEmpty())
 			return null;
 		else
@@ -22,7 +23,7 @@ public class NextToExpression<E extends Expression<Position>> extends UnaryPosit
 
 	@Override
 	public Position evaluateExpression(ExecutionContext context) {
-		setValue(getNextTo(context.getExecutingUnit()));
+		setValue(getNextTo(context));
 		return getValue();
 	}
 	
