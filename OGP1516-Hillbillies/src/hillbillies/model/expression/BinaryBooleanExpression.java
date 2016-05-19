@@ -1,5 +1,7 @@
 package hillbillies.model.expression;
 
+import hillbillies.model.ExecutionContext;
+
 public abstract class BinaryBooleanExpression<E extends Expression<Boolean>> 
 extends Expression<Boolean> implements IComposedBinaryExpression<E> {
 	
@@ -30,6 +32,7 @@ extends Expression<Boolean> implements IComposedBinaryExpression<E> {
 	}
 
 	private E leftExp;
+	
 	
 
 }

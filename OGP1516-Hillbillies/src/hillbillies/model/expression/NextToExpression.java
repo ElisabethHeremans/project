@@ -25,6 +25,7 @@ public class NextToExpression<E extends Expression<Position>> extends UnaryPosit
 
 	@Override
 	public Position evaluateExpression(ExecutionContext context) {
+
 		setValue(getNextTo(context));
 		return getValue();
 	}

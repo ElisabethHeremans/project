@@ -20,6 +20,7 @@ public class BracketUnitExpression<E extends Expression<Unit>> extends UnitExpre
 
 	@Override
 	public Unit evaluateExpression(ExecutionContext context) {
+		this.getExpression().evaluateExpression(context);
 		setValue(getExpression().getValue());
 		return getValue();
 	}

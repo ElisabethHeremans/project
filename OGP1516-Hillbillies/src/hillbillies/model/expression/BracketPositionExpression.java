@@ -11,6 +11,7 @@ public class BracketPositionExpression<E extends Expression<Position>> extends U
 
 	@Override
 	public Position evaluateExpression(ExecutionContext context) {
+		this.getExpression().evaluateExpression(context);
 		setValue(getExpression().getValue());
 		return getValue();
 	}

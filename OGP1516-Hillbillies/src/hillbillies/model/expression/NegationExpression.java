@@ -10,6 +10,7 @@ public class NegationExpression<E extends Expression<Boolean>> extends UnaryBool
 
 	@Override
 	public Boolean evaluateExpression(ExecutionContext context) {
+		getExpression().evaluateExpression(context);
 		setValue(!getExpression().getValue());
 		return getValue();
 	}

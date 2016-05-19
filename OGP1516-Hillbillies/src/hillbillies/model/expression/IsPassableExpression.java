@@ -11,6 +11,7 @@ public class IsPassableExpression<E extends Expression<Position>> extends UnaryB
 
 	@Override
 	public Boolean evaluateExpression(ExecutionContext context) {
+		getExpression().evaluateExpression(context);
 		setValue(context.getExecutingUnit().getWorld().getTerrain(getExpression().getValue().getCoords()).isPassable());
 		return getValue();
 	}

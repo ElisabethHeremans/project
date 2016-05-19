@@ -79,12 +79,7 @@ public class TaskFactory implements ITaskFactory<Expression<?>, Statement, Task>
 		}
 		catch(ClassCastException c){
 			if (position instanceof BasicVariableExpression){
-				//Object val = ((BasicVariableExpression<?>)position).getValue();
-				//System.out.println("value" + val);
-				//if (val instanceof Position)
 				return new MoveToStatement<BasicVariableExpression<Position>>((BasicVariableExpression<Position>) position);
-				
-					
 			}
 			else
 				throw new ClassCastException();
@@ -92,68 +87,173 @@ public class TaskFactory implements ITaskFactory<Expression<?>, Statement, Task>
 	}
 
 	@Override
-	public Statement createWork(Expression position, SourceLocation sourceLocation) {
-		return new WorkStatement<PositionExpression>((PositionExpression) position);
+	public Statement createWork(Expression<?> position, SourceLocation sourceLocation) {
+		try{
+			return new WorkStatement<PositionExpression>((PositionExpression) position);
+		}
+		catch(ClassCastException c){
+			if (position instanceof BasicVariableExpression){
+				return new WorkStatement<BasicVariableExpression<Position>>((BasicVariableExpression<Position>) position);
+			}
+			else
+				throw new ClassCastException();
+		}
+
 		
 	}
 
 	@Override
-	public Statement createFollow(Expression unit, SourceLocation sourceLocation) {
-		return new FollowStatement<UnitExpression>((UnitExpression) unit);
+	public Statement createFollow(Expression<?> unit, SourceLocation sourceLocation) {
+		try{
+			return new FollowStatement<UnitExpression>((UnitExpression) unit);
+		}
+		catch(ClassCastException c){
+			if (unit instanceof BasicVariableExpression){
+				return new FollowStatement<BasicVariableExpression<Unit>>((BasicVariableExpression<Unit>) unit);
+			}
+			else
+				throw new ClassCastException();
+		}
+
 	}
 
 	@Override
-	public Statement createAttack(Expression unit, SourceLocation sourceLocation) {
-		return new AttackStatement<UnitExpression>((UnitExpression) unit);
+	public Statement createAttack(Expression<?> unit, SourceLocation sourceLocation) {
+		try{
+			return new AttackStatement<UnitExpression>((UnitExpression) unit);
+		}
+		catch(ClassCastException c){
+			if (unit instanceof BasicVariableExpression){
+				return new AttackStatement<BasicVariableExpression<Unit>>((BasicVariableExpression<Unit>) unit);
+			}
+			else
+				throw new ClassCastException();
+		}
+
 	}
 
 	@Override
 	public Expression<?> createReadVariable(String variableName, SourceLocation sourceLocation) {
-//		Expression expr = new BasicVariableExpression(variableName);
-//		expr.getAssociatedExpression();
-//		for (Expression express: getTask().getExecutionContext().get(2).keySet())
-//			//if value == variableName
 		return new BasicVariableExpression<Object>(variableName);
 	}
 
 	@Override
-	public Expression createIsSolid(Expression position, SourceLocation sourceLocation) {
-		return new IsSolidExpression<PositionExpression>((PositionExpression) position);
+	public Expression<?> createIsSolid(Expression<?> position, SourceLocation sourceLocation) {
+		try{
+			return new IsSolidExpression<PositionExpression>((PositionExpression) position);
+		}
+		catch(ClassCastException c){
+			if (position instanceof BasicVariableExpression){
+				return new IsSolidExpression<BasicVariableExpression<Position>>((BasicVariableExpression<Position>) position);
+			}
+			else
+				throw new ClassCastException();
+		}
+
 	}
 
 	@Override
-	public Expression createIsPassable(Expression position, SourceLocation sourceLocation) {
-		return new IsPassableExpression<PositionExpression>((PositionExpression) position);
+	public Expression<?> createIsPassable(Expression<?> position, SourceLocation sourceLocation) {
+		try{
+			return new IsPassableExpression<PositionExpression>((PositionExpression) position);
+		}
+		catch(ClassCastException c){
+			if (position instanceof BasicVariableExpression){
+				return new IsPassableExpression<BasicVariableExpression<Position>>((BasicVariableExpression<Position>) position);
+			}
+			else
+				throw new ClassCastException();
+		}
 	}
 
 	@Override
-	public Expression createIsFriend(Expression unit, SourceLocation sourceLocation) {
-		return new IsFriendExpression<UnitExpression>((UnitExpression) unit);
+	public Expression<?> createIsFriend(Expression<?> unit, SourceLocation sourceLocation) {
+		try{
+			return new IsFriendExpression<UnitExpression>((UnitExpression) unit);
+		}
+		catch(ClassCastException c){
+			if (unit instanceof BasicVariableExpression){
+				return new IsFriendExpression<BasicVariableExpression<Unit>>((BasicVariableExpression<Unit>) unit);
+			}
+			else
+				throw new ClassCastException();
+		}
+
 	}
 
 	@Override
-	public Expression createIsEnemy(Expression unit, SourceLocation sourceLocation) {
-		return new IsEnemyExpression<UnitExpression>((UnitExpression) unit);
+	public Expression<?> createIsEnemy(Expression<?> unit, SourceLocation sourceLocation) {
+		try{
+			return new IsEnemyExpression<UnitExpression>((UnitExpression) unit);
+		}
+		catch(ClassCastException c){
+			if (unit instanceof BasicVariableExpression){
+				return new IsEnemyExpression<BasicVariableExpression<Unit>>((BasicVariableExpression<Unit>) unit);
+			}
+			else
+				throw new ClassCastException();
+		}
+
 	}
 
 	@Override
-	public Expression createIsAlive(Expression unit, SourceLocation sourceLocation) {
-		return new IsAliveExpression<UnitExpression>((UnitExpression) unit);
+	public Expression<?> createIsAlive(Expression<?> unit, SourceLocation sourceLocation) {
+		try{
+			return new IsAliveExpression<UnitExpression>((UnitExpression) unit);
+		}
+		catch(ClassCastException c){
+			if (unit instanceof BasicVariableExpression){
+				return new IsAliveExpression<BasicVariableExpression<Unit>>((BasicVariableExpression<Unit>) unit);
+			}
+			else
+				throw new ClassCastException();
+		}
+
 	}
 
 	@Override
-	public Expression createCarriesItem(Expression unit, SourceLocation sourceLocation) {
-		return new CarriesItemExpression<UnitExpression>((UnitExpression) unit);
+	public Expression<?> createCarriesItem(Expression<?> unit, SourceLocation sourceLocation) {
+		try{
+			return new CarriesItemExpression<UnitExpression>((UnitExpression) unit);
+		}
+		catch(ClassCastException c){
+			if (unit instanceof BasicVariableExpression){
+				return new CarriesItemExpression<BasicVariableExpression<Unit>>((BasicVariableExpression<Unit>) unit);
+			}
+			else
+				throw new ClassCastException();
+		}
+
 	}
 
 	@Override
-	public Expression createNot(Expression expression, SourceLocation sourceLocation) {
-		return new NegationExpression<BooleanExpression>((BooleanExpression) expression);
+	public Expression<?> createNot(Expression<?> expression, SourceLocation sourceLocation) {
+		try{
+			return new NegationExpression<BooleanExpression>((BooleanExpression) expression);
+		}
+		catch(ClassCastException c){
+			if (expression instanceof BasicVariableExpression){
+				return new NegationExpression<BasicVariableExpression<Boolean>>((BasicVariableExpression<Boolean>) expression);
+			}
+			else
+				throw new ClassCastException();
+		}
+
 	}
 	
 	@Override
 	public Expression createAnd(Expression left, Expression right, SourceLocation sourceLocation) {
-		return new AndExpression<BooleanExpression>((BooleanExpression)left, (BooleanExpression)right);
+		try{
+			return new AndExpression<BooleanExpression>((BooleanExpression)left, (BooleanExpression)right);
+		}
+		catch(ClassCastException c){
+			if (expression instanceof BasicVariableExpression){
+				return new AndExpression<BasicVariableExpression<Boolean>>((BasicVariableExpression<Boolean>) expression);
+			}
+			else
+				throw new ClassCastException();
+		}
+
 	}
 
 	@Override

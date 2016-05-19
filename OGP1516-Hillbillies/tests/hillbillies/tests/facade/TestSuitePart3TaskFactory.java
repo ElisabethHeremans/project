@@ -17,6 +17,7 @@ public class TestSuitePart3TaskFactory {
 	private Expression<?> enemyExpr;
 	private Expression<?> xyz;
 	private Expression<?> var;
+	private Expression<Boolean> var2;
 	private SourceLocation sourceLoc;
 	private Statement moveTo;
 	private Statement print;
@@ -32,9 +33,11 @@ public class TestSuitePart3TaskFactory {
 		enemyExpr = new EnemyExpression();
 		xyz = new XYZExpression(new Position(new int[] {1,1,1}));
 		var = new BasicVariableExpression<Object>("var");
+		var2 = new BasicVariableExpression<Boolean>("var");
 		sourceLoc = new SourceLocation(5,3);
-		print = new PrintStatement<Expression>(enemyExpr);
+		print = new PrintStatement<Expression<?>>(enemyExpr);
 		breakStat = new BreakStatement();
+		moveTo = new MoveToStatement<PositionExpression>((PositionExpression) xyz);
 		list = new ArrayList<Statement>();
 		list.add(moveTo);
 		list.add(print);
@@ -137,6 +140,11 @@ public class TestSuitePart3TaskFactory {
 	@Test(expected = ClassCastException.class)
 	public final void createMoveTo_invalidExpr(){
 		factory.createMoveTo(enemyExpr, sourceLoc);
+	}
+	
+	@Test
+	public final void createMoveTo_invalidVariable(){
+		factory.createMoveTo(var2, sourceLoc);
 	}
 	
 	@Test

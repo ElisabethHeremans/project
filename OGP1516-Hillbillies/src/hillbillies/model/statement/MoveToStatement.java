@@ -21,7 +21,7 @@ public class MoveToStatement<E extends Expression<Position>> extends ActionState
 	public void executeStatement(ExecutionContext context) {
 		context.getExecutingUnit().setCurrentStatement(this);
 		getExpression().evaluateExpression(context);
-		System.out.println(" move to stat " + Arrays.toString(getExpression().getValue().getCoords()));
+		//System.out.println(" move to stat " + Arrays.toString(getExpression().getValue().getCoords()));
 		context.getExecutingUnit().moveTo1(getExpression().getValue().getCoords());
 		
 	}

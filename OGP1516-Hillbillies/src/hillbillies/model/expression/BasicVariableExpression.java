@@ -5,8 +5,6 @@ import hillbillies.model.ExecutionContext;
 public class BasicVariableExpression<V extends Object> extends VariableExpression<V> {
 	public BasicVariableExpression(String variableName){
 		setName(variableName);
-		//setValue in AssignmentStatement gedaan
-		//?? setVariable(variable);
 	}
 
 	private void setName(String variableName) {

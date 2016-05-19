@@ -19,8 +19,10 @@ public class SequenceStatement<E extends Statement> extends ComposedStatement
 	}
 	@Basic @Override
 	public void setStatements(List<E> statements) {
-		for (E statement: statements)
+		for (E statement: statements){
+			//System.out.println(statement);
 			statement.setSuperStatement(this);
+		}
 		this.statements = statements;
 	}
 

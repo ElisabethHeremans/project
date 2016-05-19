@@ -9,6 +9,9 @@ public class OrExpression<E extends Expression<Boolean>> extends BinaryBooleanEx
 
 	@Override
 	public Boolean evaluateExpression(ExecutionContext context) {
+		this.getLeftExpression().evaluateExpression(context);
+		this.getRightExpression().evaluateExpression(context);
+
 		setValue(getRightExpression().getValue() || getLeftExpression().getValue());
 		return getValue();
 	}
