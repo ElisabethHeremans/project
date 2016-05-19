@@ -838,7 +838,7 @@ public class Unit {
 	 *             If the duration is less than zero or exceeds or equals 0.2 s.
 	 */
 	public void advanceTime(float duration) throws IllegalArgumentException {
-//		System.out.println("-----------------------------------ADVANCETIME UNIT----------------------------------");
+		System.out.println("-----------------------------------ADVANCETIME UNIT----------------------------------");
 //		System.out.print(" 1: "+ this.getExperiencePoints());
 //		System.out.print(" 2 " + this.getHitpoints());
 		if (!(Util.fuzzyGreaterThanOrEqualTo(duration, 0.0-Util.DEFAULT_EPSILON )&& Util.fuzzyLessThanOrEqualTo((double)duration, 0.2+Util.DEFAULT_EPSILON))){
@@ -875,9 +875,6 @@ public class Unit {
 			}
 		}
 		if (this.isExecutingTask &&this.getTask() != null){
-			System.out.println(this.isExecutingTask  && !isExecutingStatement);
-			System.out.println(this.isExecutingTask);
-			System.out.println(!isExecutingStatement);
 			System.out.println("EXECUTING TASK");
 			System.out.println("STATUS =" +getStatus());
 		}
@@ -905,7 +902,9 @@ public class Unit {
 			//System.out.println(" MOVING ");
 
 		}
+		
 		else if (this.isEnableDefaultBehaviour() && this.getStatus() == Status.DONE){
+			
 			startDefaultBehaviour();
 			System.out.println(" DEFAULT ");
 		}
@@ -964,14 +963,16 @@ public class Unit {
 		}
 		if (this.getTask().isComplete()
 				){
-			System.out.println(" complete ");
+			
 			this.isExecutingTask = false;
 			this.getFaction().getScheduler().removeAsTask(this.getTask());
 			//System.out.println(" complete1 ");
 			System.out.println(" executed "+ getTask().toString());
+			System.out.println(getTask());
 			this.getTask().setExecutingUnit(null);
-			
+			System.out.println(" complete ");
 			this.setStatus(Status.DONE);
+			System.out.println(" complete ");
 		}
 	}
 	

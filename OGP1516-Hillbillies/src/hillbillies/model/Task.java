@@ -384,8 +384,10 @@ public class Task {
 	 */
 	@Raw
 	public void setScheduledUnit(Unit scheduledUnit) {
+		
 		this.scheduledUnit = scheduledUnit;
-		scheduledUnit.setScheduledTask(this);
+		if (scheduledUnit != null)
+			scheduledUnit.setScheduledTask(this);
 	}
 
 	/**
@@ -426,8 +428,12 @@ public class Task {
 		}
 		if (this.getExecutingUnit()!= null)
 			this.getExecutingUnit().setTask(null);
+		System.out.println(" set exec unit ");
 		this.getExecutionContext().setExecutingUnit(executingUnit);
+		System.out.println(" set exec unit ");
+		
 		this.setScheduledUnit(executingUnit);
+		System.out.println(" set exec unit ");
 		if (executingUnit != null)
 			executingUnit.setTask(this);
 	}
