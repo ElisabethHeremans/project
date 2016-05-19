@@ -2240,11 +2240,15 @@ public class Unit {
 			setEnableDefaultBehaviour(true);
 			System.out.print(" restart default ");
 			System.out.print(this.getFaction().getScheduler());
-			System.out.print(this.getFaction().getScheduler().getHighestPriorityTask());
-			if (this.getFaction().getScheduler() != null && this.getFaction().getScheduler().getHighestPriorityTask()!=null){
+			
+			Task potentialTask = this.getFaction().getScheduler().getHighestPriorityTask
+					(this.getFaction().getScheduler().getTasksSatisfying(n->(n.getScheduledUnit()==null||n.getScheduledUnit()==this)));
+
+			if (this.getFaction().getScheduler() != null && potentialTask!=null){
+				
 				System.out.print(" execute task 1");
 				this.isExecutingTask = true;
-				Task newTask = this.getFaction().getScheduler().getHighestPriorityTask();
+				Task newTask = potentialTask;
 				newTask.setExecutingUnit(this);
 				System.out.print(" execute task ");
 				this.isExecutingStatement = false;

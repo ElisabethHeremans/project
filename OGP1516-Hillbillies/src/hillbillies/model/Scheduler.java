@@ -187,7 +187,7 @@ public class Scheduler implements Iterable<Task> {
 	 * 	or this scheduler can't have the new task as one of its tasks.
 	 * 		| !hasAsTask(toReplace) || !canHaveAsTask(replacement)
 	 */
-	public void replaceAsTask(Task toReplace, Task replacement){
+	public void replaceTask(Task toReplace, Task replacement){
 		if (!hasAsTask(toReplace) || !canHaveAsTask(replacement))
 			throw new IllegalArgumentException();
 		else{
@@ -228,11 +228,18 @@ public class Scheduler implements Iterable<Task> {
 	}
 	
 	/**
-	 * Return the task with the highest priority that is currently not being executed.
+	 * Return the task with the highest priority that is currently not being executed or scheduled for an other unit.
 	 */
 	public Task getHighestPriorityTask(){
+		Set<Task> tasks = new HashSet<Task>();
+		for (Task task: getTasks())
+			tasks.add(task);
+		return this.getHighestPriorityTask(tasks);
+	}
+	
+	public Task getHighestPriorityTask(Set<Task> tasks){
 		List<Task> tasksNotExecuted = new ArrayList<>();
-		this.getTasks().stream().filter(n->(n.getExecutingUnit()==null&& n.getScheduledUnit()==null)).forEach(tasksNotExecuted::add);
+		tasks.stream().filter(n->(n.getExecutingUnit()==null)).forEach(tasksNotExecuted::add);
 		if (tasksNotExecuted.size()==0){
 			System.out.println("TasksAllExecuted");
 			return null;
@@ -249,6 +256,7 @@ public class Scheduler implements Iterable<Task> {
 		
 			return HighestPriorityTask;
 		}
+
 	}
 	
 	/**
@@ -279,7 +287,7 @@ public class Scheduler implements Iterable<Task> {
 	 * 	If this scheduler does not have the given task as one of its tasks.
 	 * 		| ! this.hasAsTask(task)
 	 */
-	private void markTaskForUnit(Task task,Unit unit){
+	public void markTaskForUnit(Task task,Unit unit){
 		if (!this.getFaction().hasAsUnit(unit))
 			throw new IllegalArgumentException();
 		if (! this.hasAsTask(task))

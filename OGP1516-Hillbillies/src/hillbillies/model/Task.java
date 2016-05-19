@@ -543,8 +543,8 @@ public class Task {
 	}
 	
 	/**
-	 * Interrupt the execution of this task. Set the executing unit to null, 
-	 * re-add the completed statements to activities and reduce the priority of this task.
+	 * Interrupt the execution of this task. Make the executing unit stop executing this task
+	 *  and reduce the priority of this task.
 	 * 
 	 * @effect The executing unit of this task is set to null.
 	 * @effect the activities of this task is set to a sequence statement containing the completed activities
@@ -553,12 +553,10 @@ public class Task {
 	 * @effect The priority of this task is reduced with one.
 	 * 			|this.setPriority(getPriority()-1)
 	 */
-	@SuppressWarnings("unchecked")
 	public void interruptExecution(){
-		this.setExecutingUnit(null);
-		Statement activities = this.getCompletedActivities();
-		((SequenceStatement<?>) activities).addStatement(getActivities());
-		this.setActivities(activities);
+		this.getExecutingUnit().stopExecutingTask();
+		//this.setExecutingUnit(null);
+		//this.setActivities(activities);
 		this.setPriority(getPriority()-1);
 	}
 	
@@ -602,31 +600,31 @@ public class Task {
 		return true;
 	}
 	
-	public void restoreTask(){
-		List<Statement> statements = new ArrayList<Statement>();
-		Statement activities = this.getCompletedActivities();
-		Statement activities2 = this.getActivities();
-		if (activities instanceof SequenceStatement){
-			statements = (List<Statement>) ((SequenceStatement<?>)activities).getStatements();
-			for(Statement stat: statements){
-					statements.add(stat);
-			}
-		}
-		else if(activities instanceof ExpressionStatement){
-				statements.add(activities);
-			}
-		if (activities2 instanceof SequenceStatement){
-			statements = (List<Statement>) ((SequenceStatement<?>)activities2).getStatements();
-			for(Statement stat: statements){
-					statements.add(stat);
-			}
-		}
-		else if(activities2 instanceof ExpressionStatement){
-				statements.add(activities2);
-			}
-		this.getExecutingUnit().stopExecutingTask();
-		this.setActivities((Statement) statements);
-	}
+//	public void restoreTask(){
+//		List<Statement> statements = new ArrayList<Statement>();
+//		Statement activities = this.getCompletedActivities();
+//		Statement activities2 = this.getActivities();
+//		if (activities instanceof SequenceStatement){
+//			statements = (List<Statement>) ((SequenceStatement<?>)activities).getStatements();
+//			for(Statement stat: statements){
+//					statements.add(stat);
+//			}
+//		}
+//		else if(activities instanceof ExpressionStatement){
+//				statements.add(activities);
+//			}
+//		if (activities2 instanceof SequenceStatement){
+//			statements = (List<Statement>) ((SequenceStatement<?>)activities2).getStatements();
+//			for(Statement stat: statements){
+//					statements.add(stat);
+//			}
+//		}
+//		else if(activities2 instanceof ExpressionStatement){
+//				statements.add(activities2);
+//			}
+//		this.getExecutingUnit().stopExecutingTask();
+//		this.setActivities((Statement) statements);
+//	}
 
 }
 

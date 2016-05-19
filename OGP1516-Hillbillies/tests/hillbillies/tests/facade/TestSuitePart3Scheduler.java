@@ -199,7 +199,7 @@ public class TestSuitePart3Scheduler {
 	@Test
 	public void replaceAsTask_ValidCase(){
 		scheduler.addAsTask(task1);
-		scheduler.replaceAsTask(task1, task3);
+		scheduler.replaceTask(task1, task3);
 		Assert.assertFalse(scheduler.hasAsTask(task1));
 		Assert.assertTrue(scheduler.hasAsTask(task3));
 		Assert.assertTrue(scheduler.getTasks().size() == 1);
@@ -208,13 +208,13 @@ public class TestSuitePart3Scheduler {
 	@Test (expected = IllegalArgumentException.class)
 	public void replaceAsTask_InvalidTaskToReplace() throws IllegalArgumentException{
 		scheduler.addAsTask(task1);
-		scheduler.replaceAsTask(task3, task1);
+		scheduler.replaceTask(task3, task1);
 	}
 	
 	@Test (expected = IllegalArgumentException.class)
 	public void replaceAsTask_InvalidReplacement() throws IllegalArgumentException{
 		scheduler.addAsTask(task1);
-		scheduler.replaceAsTask(task1, null);
+		scheduler.replaceTask(task1, null);
 	}
 	
 	@Test
