@@ -2255,6 +2255,7 @@ public class Unit {
 				}
 				catch (IllegalArgumentException exc){
 					System.out.println(" catched ");
+					setStatus(Status.DONE);
 					startDefaultBehaviour();
 				}
 			}
@@ -2269,6 +2270,8 @@ public class Unit {
 					stopSprinting();
 				}
 				catch (IllegalArgumentException exc){
+					System.out.println(" catched ");
+					setStatus(Status.DONE);
 					startDefaultBehaviour();
 				}
 			}
