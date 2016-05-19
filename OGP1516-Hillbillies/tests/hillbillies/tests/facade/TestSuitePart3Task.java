@@ -424,6 +424,8 @@ public class TestSuitePart3Task {
 
 		// work task has been executed
 		Assert.assertFalse(world.getPassable(new int[] { 1, 1, 2 }));
+		Assert.assertTrue(world.hasAsBoulder(boulder));
+		Assert.assertArrayEquals(new int[] {0,0,0},boulder.getWorld().getCubeCoordinate(boulder.getPosition()));
 		// work task is removed from scheduler
 		System.out.print("remaining tasks  "+scheduler.getTasks().size());
 		//System.out.print(scheduler.);
