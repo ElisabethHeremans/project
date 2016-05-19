@@ -37,7 +37,10 @@ import ogp.framework.util.Util;
  *        |isValidPosition(targetPosition)
  * @invar The nextTargetPosition is a position in a neighbouring cube of this units position, and a position inside the game world.
  * 		  |isValidPosition(nextTargetPosition) && this.isNeighbouringCube(getCubePosition(nextTargetPosition))
- * @invar
+ * @invar Each unit can have its task as its taks.
+ * 		  |canHaveAsTask(this.getTask())
+ * @invar Each unit can have its scheduled task as its task.
+ * 		  |canHaveAsTask(this.getScheduledTask())
  * @version 2.0
  * @author adminheremans
  */
@@ -960,38 +963,63 @@ public class Unit {
 		
 	}
 	
-	
+	/**
+	 * A variable registering the currentStatement of this unit.
+	 */
 	private Statement currentStatement;
 	
-	
+	/**
+	 * A variable registering the lastStatementInSequence of this unit.
+	 */
 	private Statement lastStatementInSequence;
 	
 	
 	/**
+	 * Return the currentStatement of this unit.
 	 * @return the currentStatement
 	 */
 	public Statement getCurrentStatement() {
 		return currentStatement;
 	}
 	/**
-	 * @param currentStatement the currentStatement to set
+	 * Set the currentStatement of this unit to the given
+	 *  currentStatement.
+	 * @param currentStatement 
+	 * 	the currentStatement to set
+	 * @post the currentStatement of this unit is equal to
+	 * 	the given currentStatement.
+	 * 		| this.currentStatement = currentStatement
 	 */
 	public void setCurrentStatement(Statement currentStatement) {
 		this.currentStatement = currentStatement;
 	}
 
 	/**
-	 * @return the setLastStatementInSequence
+	 * Return the getLastStatementInSequence of this unit.
+	 * @return the lastStatementInSequence
 	 */
 	public Statement getLastStatementInSequence() {
 		return lastStatementInSequence;
 	}
 	/**
-	 * @param setLastStatementInSequence the setLastStatementInSequence to set
+	 * Set the lastStatementInSequence of this unit to the given
+	 *  setLastStatementInSequence.
+	 * @param setLastStatementInSequence 
+	 * 	the lastStatementInSequence to set
+	 * @post the lastStatementInSequence of this unit is equal to
+	 * 	the given setLastStatementInSesuence.
+	 * 		| this.lastStatementInSequence = setLastStatementInSequence
 	 */
 	public void setLastStatementInSequence(Statement setLastStatementInSequence) {
 		this.lastStatementInSequence = setLastStatementInSequence;
 	}
+	
+	/**
+	 * Execute the statements of the assigned task to this unit.
+	 * @param duration
+	 * The game time after which executeProgram is called.
+	 * 		
+	 */
 	private void executeProgram(float duration) {
 		taskTimer = 0.001;
 		System.out.println(" exec program ");
@@ -2637,6 +2665,18 @@ public class Unit {
 	public boolean hasProperTask(){
 		return (this.getTask() == null || this.getFaction().getScheduler().hasAsTask(task));
 	}
+	/**
+	 * Check whether this unit can have a given task as its task.
+	 * @param task
+	 * 		The task to check.
+	 * @return True if and only if the given task is not effective or
+	 * 	the faction assigned to this unit has this task in its scheduler.
+	 * 		| result == (task == null || this.getFaction().getScheduler().hasAsTask(task))
+	 */
+	public boolean canHaveAsTask(Task task){
+		return (task == null || this.getFaction().getScheduler().hasAsTask(task));
+	}
+	
 	/**
 	 * Return the task that is assigned to this unit.
 	 */
