@@ -317,33 +317,33 @@ public class Task {
 	 * 			|this.setActivities(null);
 	 *			|this.setComplete(true);
 	 */
-	public void removeFirstStatement(){
-		if (this.getActivities() instanceof SequenceStatement){
-			Statement first = ((SequenceStatement<?>) this.getActivities()).removeFirstStatement();
-			((SequenceStatement<?>)completedActivities).addStatement(first);
-			//setCompletedActivities(getCompletedActivities());
-			if (this.getActivities().isStatementExecuted()){
-				this.setActivities(null);
-				this.setComplete(true);
-				//this.getExecutingUnit().
-			}
-		}
-		else{
-			((SequenceStatement<?>)completedActivities).addStatement(getActivities());
-			this.setActivities(null);
-			this.setComplete(true);
-		}
-		//System.out.println(((SequenceStatement<?>) this.getActivities()).getStatements());
-		System.out.println(" first statement removed ");
-	}
+//	public void removeFirstStatement(){
+//		if (this.getActivities() instanceof SequenceStatement){
+//			Statement first = ((SequenceStatement<?>) this.getActivities()).removeFirstStatement();
+//			((SequenceStatement<?>)completedActivities).addStatement(first);
+//			//setCompletedActivities(getCompletedActivities());
+//			if (this.getActivities().isStatementExecuted()){
+//				this.setActivities(null);
+//				this.setComplete(true);
+//				//this.getExecutingUnit().
+//			}
+//		}
+//		else{
+//			((SequenceStatement<?>)completedActivities).addStatement(getActivities());
+//			this.setActivities(null);
+//			this.setComplete(true);
+//		}
+//		//System.out.println(((SequenceStatement<?>) this.getActivities()).getStatements());
+//		System.out.println(" first statement removed ");
+//	}
 	
 	/**
 	 * Return the completedActivities
 	 */
-	@Basic @Raw
-	public Statement getCompletedActivities() {
-		return completedActivities;
-	}
+//	@Basic @Raw
+//	public Statement getCompletedActivities() {
+//		return completedActivities;
+//	}
 
 	/**
 	 * Set the completed activities of this task to the given statement.
@@ -353,15 +353,15 @@ public class Task {
 	 * @post The completed activities of this new task is equal to completedActivities
 	 * 			| new.getCompletedActivities() == completedActivities;
 	 */
-	@Raw
-	public void setCompletedActivities(Statement completedActivities) {
-		this.completedActivities = completedActivities;
-	}
-	
-	/**
-	 * Variable registering the completed activities of this task.
-	 */
-	private Statement completedActivities = new SequenceStatement<Statement>(new ArrayList<Statement>());
+//	@Raw
+//	public void setCompletedActivities(Statement completedActivities) {
+//		this.completedActivities = completedActivities;
+//	}
+//	
+//	/**
+//	 * Variable registering the completed activities of this task.
+//	 */
+//	private Statement completedActivities = new SequenceStatement<Statement>(new ArrayList<Statement>());
 
 
 	/**
@@ -428,9 +428,9 @@ public class Task {
 		}
 		if (this.getExecutingUnit()!= null)
 			this.getExecutingUnit().setTask(null);
-		System.out.println(" set exec unit ");
+		//System.out.println(" set exec unit ");
 		this.getExecutionContext().setExecutingUnit(executingUnit);
-		System.out.println(" set exec unit ");
+		//System.out.println(" set exec unit ");
 		
 		this.setScheduledUnit(executingUnit);
 		System.out.println(" set exec unit ");
@@ -538,6 +538,7 @@ public class Task {
 		System.out.print(" activities "+ getActivities() + "   ");
 //		System.out.print(this.getExecutionContext().getSelectedCube());
 //		System.out.print(this.getExecutionContext().getExecutingUnit());
+		
 		getActivities().executeStatement(getExecutionContext());
 	}
 	

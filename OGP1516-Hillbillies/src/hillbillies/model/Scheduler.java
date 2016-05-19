@@ -7,9 +7,9 @@ import be.kuleuven.cs.som.annotate.*;
 
 /**
  * @invar The tasks for a scheduler must be valid tasks for any scheduler.
- * 		| canHaveAsTask(getTask)
+ * 		| canHaveAsTask(getTask())
  * @invar Each scheduler can have its faction as its faction.
- * 		| canHavaAsFaction(getFaction)
+ * 		| canHaveAsFaction(getFaction)
  */
 
 public class Scheduler implements Iterable<Task> {
@@ -232,7 +232,7 @@ public class Scheduler implements Iterable<Task> {
 	 */
 	public Task getHighestPriorityTask(){
 		List<Task> tasksNotExecuted = new ArrayList<>();
-		this.getTasks().stream().filter(n->n.getExecutingUnit()==null).forEach(tasksNotExecuted::add);
+		this.getTasks().stream().filter(n->(n.getExecutingUnit()==null&& n.getScheduledUnit()==null)).forEach(tasksNotExecuted::add);
 		if (tasksNotExecuted.size()==0){
 			System.out.println("TasksAllExecuted");
 			return null;

@@ -15,6 +15,8 @@ public class AttackStatement<E extends Expression<Unit>> extends ActionStatement
 
 	@Override
 	public void executeStatement(ExecutionContext context) {
+		context.getExecutingUnit().setCurrentStatement(this);
+
 		getExpression().evaluateExpression(context);
 		context.getExecutingUnit().attack(getExpression().getValue());
 		

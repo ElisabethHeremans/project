@@ -15,6 +15,7 @@ public class WorkStatement<E extends Expression<Position>> extends ActionStateme
 
 	@Override
 	public void executeStatement(ExecutionContext context) {
+		context.getExecutingUnit().setCurrentStatement(this);
 		super.executeStatement(context);
 		getExpression().evaluateExpression(context);
 //		System.out.print(" expr "+getExpression());

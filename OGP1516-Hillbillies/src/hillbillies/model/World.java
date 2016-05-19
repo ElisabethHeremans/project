@@ -828,7 +828,7 @@ public class World {
 	 * @throws IllegalArgumentException
 	 * 		If the given boulder is not effective.
 	 */
-	void removeAsBoulder(Boulder boulder) throws IllegalArgumentException{
+	public void removeAsBoulder(Boulder boulder) throws IllegalArgumentException{
 		if( boulder == null)
 			throw new IllegalArgumentException();
 		if (hasAsBoulder(boulder)){

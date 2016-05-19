@@ -28,18 +28,21 @@ extends ExpressionStatement<E> implements IComposedBinaryStatement<S,T>{
 
 	@Override
 	public void setFirstStatement(S statement) {
+		statement.setSuperStatement(this);
 		this.thenBody = statement;
 		
 	}
 
 	@Override
 	public S getFirstStatement() {
-		// TODO Auto-generated method stub
+		
 		return thenBody;
 	}
 
 	@Override
 	public void setSecondStatement(T statement) {
+		if (statement != null)
+			statement.setSuperStatement(this);
 		this.elseBody = statement;
 		
 	}
@@ -53,13 +56,23 @@ extends ExpressionStatement<E> implements IComposedBinaryStatement<S,T>{
 
 	@Override
 	public void executeStatement(ExecutionContext context) {
-		super.executeStatement(context);
-		if (getExpression().getValue())
+		context.getExecutingUnit().setCurrentStatement(this);
+		System.out.println(" executing if else ");
+		getExpression().evaluateExpression(context);
+		System.out.println(getExpression().getValue());
+		if (getExpression().getValue()){
 			getFirstStatement().executeStatement(context);
-		else if (getSecondStatement()!= null)
+			System.out.println("  if  ");
+		}
+		else if (getSecondStatement()!= null){
 			getSecondStatement().executeStatement(context);
-		else
+			System.out.println(" if else bla");
+			System.out.println(getSecondStatement());
+		}
+		else{
 			context.getExecutingUnit().stopExecutingStatement();
+			System.out.println(" if else bla2");
+		}
 	}
 
 }

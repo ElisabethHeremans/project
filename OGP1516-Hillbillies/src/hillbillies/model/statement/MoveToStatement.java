@@ -1,5 +1,7 @@
 package hillbillies.model.statement;
 
+import java.util.Arrays;
+
 import hillbillies.model.ExecutionContext;
 import hillbillies.model.Position;
 import hillbillies.model.Unit;
@@ -17,8 +19,9 @@ public class MoveToStatement<E extends Expression<Position>> extends ActionState
 
 	@Override
 	public void executeStatement(ExecutionContext context) {
+		context.getExecutingUnit().setCurrentStatement(this);
 		getExpression().evaluateExpression(context);
-		System.out.println(" move to stat " + getExpression().getValue().getCoords());
+		System.out.println(" move to stat " + Arrays.toString(getExpression().getValue().getCoords()));
 		context.getExecutingUnit().moveTo1(getExpression().getValue().getCoords());
 		
 	}

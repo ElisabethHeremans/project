@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Random;
 import be.kuleuven.cs.som.annotate.*;
+import hillbillies.model.statement.Statement;
 import ogp.framework.util.Util;
 
 /**
@@ -868,9 +869,9 @@ public class Unit {
 			falling(duration);
 		}
 		
-		if (this.isExecutingTask && !this.getTask().executableActivities()){
-			this.getTask().restoreTask();
-		}
+//		if (this.isExecutingTask && !this.getTask().executableActivities()){
+//			this.getTask().restoreTask();
+//		}
 		//System.out.println(" test 1 "+ (this.isExecutingTask  && !isExecutingStatement));
 		if (this.isExecutingTask){
 			if ( !isExecutingStatement){
@@ -907,7 +908,7 @@ public class Unit {
 
 		}
 		
-		else if (this.isEnableDefaultBehaviour() && this.getStatus() == Status.DONE){
+		else if (this.isEnableDefaultBehaviour() && this.getStatus() == Status.DONE && !this.isExecutingTask){
 			
 			startDefaultBehaviour();
 			System.out.println(" DEFAULT ");
@@ -942,50 +943,114 @@ public class Unit {
 	
 	public void stopExecutingStatement(){
 		this.isExecutingStatement = false;
-		this.getTask().removeFirstStatement();
+		//this.getTask().removeFirstStatement();
 		System.out.println(" stopped executing statement ");
 		System.out.println(getStatus());
+		//this.executeProgram(duration);
 	}
 	
 	public void stopExecutingTask(){
 		this.isExecutingStatement = false;
+		this.setCurrentStatement(null);
 		this.getTask().setExecutingUnit(null);
 		this.setTask(null);
 		
 	}
 	
 	
+	private Statement currentStatement;
+	
+	
+	private Statement lastStatementInSequence;
+	
+	
+	/**
+	 * @return the currentStatement
+	 */
+	public Statement getCurrentStatement() {
+		return currentStatement;
+	}
+	/**
+	 * @param currentStatement the currentStatement to set
+	 */
+	public void setCurrentStatement(Statement currentStatement) {
+		this.currentStatement = currentStatement;
+	}
+
+	/**
+	 * @return the setLastStatementInSequence
+	 */
+	public Statement getLastStatementInSequence() {
+		return lastStatementInSequence;
+	}
+	/**
+	 * @param setLastStatementInSequence the setLastStatementInSequence to set
+	 */
+	public void setLastStatementInSequence(Statement setLastStatementInSequence) {
+		this.lastStatementInSequence = setLastStatementInSequence;
+	}
 	private void executeProgram(float duration) {
 		taskTimer = 0.001;
+
 		if (!this.getTask().isComplete()){
 			System.out.println(" not complete ");
+			
 			if (taskTimer > duration){
-				this.isExecutingStatement = true;
-				this.getTask().executeTask();
+				
+				if (this.getCurrentStatement()==null){
+					this.isExecutingStatement = true;
+					this.getTask().executeTask();
+				}
+				
+				else if (this.getCurrentStatement().getNextStatement(this.getTask().getExecutionContext()) != null){
+					this.isExecutingStatement = true;
+					this.getCurrentStatement().getNextStatement(this.getTask().getExecutionContext()).executeStatement(this.getTask().getExecutionContext());
+				}
+				else
+					this.getTask().setComplete(true);
 			}
 			else{
+				
 				while (taskTimer < duration && !isExecutingStatement && !this.getTask().isComplete()){
 					System.out.println(" entering this loop ");
-					this.isExecutingStatement = true;
+					//this.isExecutingStatement = true;
+					
 					System.out.println(this.getTask());
-					this.getTask().executeTask();
+					System.out.println(this.getCurrentStatement());
+					if (this.getCurrentStatement()==null){
+						this.isExecutingStatement = true;
+						this.getTask().executeTask();
+					}
+
+					else if (this.getCurrentStatement().getNextStatement(this.getTask().getExecutionContext()) != null){
+						this.isExecutingStatement = true;
+						this.getCurrentStatement().getNextStatement(this.getTask().getExecutionContext()).executeStatement(this.getTask().getExecutionContext());
+					}
+					else
+						this.getTask().setComplete(true);
+					
 					taskTimer += 0.001;
 				}
 			}
 		}
-		if (this.getTask().isComplete()
-				){
+		if (!this.isExecutingStatement &&this.getCurrentStatement().getNextStatement(this.getTask().getExecutionContext()) == null){
 			
 			this.isExecutingTask = false;
 			this.getFaction().getScheduler().removeAsTask(this.getTask());
+			this.stopExecutingTask();
+			
 			//System.out.println(" complete1 ");
-			System.out.println(" executed "+ getTask().toString());
+			//System.out.println(" executed "+ getTask().toString());
 			System.out.println(getTask());
-			this.getTask().setExecutingUnit(null);
+			//this.getTask().setExecutingUnit(null);
 			System.out.println(" complete ");
 			this.setStatus(Status.DONE);
 			System.out.println(" complete ");
 		}
+
+		
+//		System.out.println(this.getCurrentStatement());
+//		System.out.println(this.getCurrentStatement().getNextStatement(this.getTask().getExecutionContext()));
 	}
 	
 	/**
@@ -1273,6 +1338,7 @@ public class Unit {
 	 * 		| !canHaveAsPosition(targetPosition)
 	 */
 	public void moveTo1(double[] targetPosition)throws IllegalArgumentException{
+		System.out.println(" move to 1");
 		queue.clear();
 		queuePos.clear();
 		int[] position = {(int) targetPosition[0], (int) targetPosition[1], (int) targetPosition[2]};
@@ -1290,7 +1356,7 @@ public class Unit {
 				
 				
 				int[] positionn = {(int) targetPosition[0], (int) targetPosition[1], (int) targetPosition[2], 0};
-				//System.out.println(" wants to move to " +Arrays.toString(position));
+				System.out.println(" wants to move to " +Arrays.toString(position));
 				//System.out.println("StartPositie" +Arrays.toString(getCubeCoordinate()));
 				queue.add(positionn);
 				length = length +1;
@@ -1312,7 +1378,7 @@ public class Unit {
 						}
 					}
 				}
-				//System.out.println(" is moving" );
+				System.out.println(" is moving" );
 				moveToAdjacent(candidateNextArray[0]-this.getCubeCoordinate()[0],
 						candidateNextArray[1]-this.getCubeCoordinate()[1],
 						candidateNextArray[2]-this.getCubeCoordinate()[2]);
@@ -2151,8 +2217,8 @@ public class Unit {
 				Task newTask = this.getFaction().getScheduler().getHighestPriorityTask();
 				newTask.setExecutingUnit(this);
 				System.out.print(" execute task ");
-				this.isExecutingStatement = true;
-				this.getTask().executeTask();
+				this.isExecutingStatement = false;
+				
 				//System.out.println(" 6 ");
 				//System.out.println(getFaction().getScheduler().getAllTasksIterator().next());
 				
@@ -2345,11 +2411,11 @@ public class Unit {
  		else if (boulder == null)
  			return true;
  		else{
- 			return (((boulder.getWorld()==this.getWorld()) && (!boulder.isTerminated()) &&
- 					((boulder.getWorld().getCubePosition(boulder.getPosition())[0]==this.getWorld().getCubeCoordinate(this.getPosition())[0] 
- 					&& boulder.getWorld().getCubePosition(boulder.getPosition())[1]==this.getWorld().getCubeCoordinate(this.getPosition())[1] 
- 							&& boulder.getWorld().getCubePosition(boulder.getPosition())[2]==this.getWorld().getCubeCoordinate(this.getPosition())[2]) 
- 				|| this.isNeighbouringCube(boulder.getPosition()))));
+ 			return (((boulder.getWorld()==this.getWorld()) && (!boulder.isTerminated()) && this.isNeighbouringOrSameCube(boulder.getCubeCoordinate())));
+// 					((boulder.getWorld().getCubeCoordinate(boulder.getPosition())[0]==this.getWorld().getCubeCoordinate(this.getPosition())[0] 
+// 					&& boulder.getWorld().getCubeCoordinate(boulder.getPosition())[1]==this.getWorld().getCubeCoordinate(this.getPosition())[1] 
+// 							&& boulder.getWorld().getCubeCoordinate(boulder.getPosition())[2]==this.getWorld().getCubeCoordinate(this.getPosition())[2]) 
+// 				|| this.isNeighbouringCube(boulder.getPosition()))));
  		}
  	}
  	

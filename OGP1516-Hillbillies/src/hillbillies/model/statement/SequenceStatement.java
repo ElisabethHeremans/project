@@ -19,6 +19,8 @@ public class SequenceStatement<E extends Statement> extends ComposedStatement
 	}
 	@Basic @Override
 	public void setStatements(List<E> statements) {
+		for (E statement: statements)
+			statement.setSuperStatement(this);
 		this.statements = statements;
 	}
 
@@ -27,8 +29,15 @@ public class SequenceStatement<E extends Statement> extends ComposedStatement
 	@Override
 	public void executeStatement(ExecutionContext context) {
 		System.out.println(" execute sequence statement ");
-		getStatements().get(0).executeStatement(context);
 		
+		context.getExecutingUnit().setCurrentStatement(this);
+		for (int index = 0 ; index < getStatements().size() ; index++){
+			getStatements().get(index).setIndex(index);
+			getStatements().get(index).setLast(false);
+		}
+		this.getStatements().get(getStatements().size()-1).setLast(true);
+		//context.getExecutingUnit().setLastStatementInSequence(getStatements().get(getStatements().size()-1));
+		getStatements().get(0).executeStatement(context);
 		
 	}
 	
@@ -44,18 +53,18 @@ public class SequenceStatement<E extends Statement> extends ComposedStatement
 		
 	}
 	
-	public Statement removeFirstStatement() {
-		E first = (E)getStatements().get(0);
-		//System.out.println(E);
-		System.out.println(getStatements());
-		List<E> statements = getStatements();
-		statements.remove(0);
-		setStatements(statements);
-		if (getStatements().size()==0){
-			setStatementExecuted(true);
-		}
-		return first;
-	}
+//	public Statement removeFirstStatement() {
+//		E first = (E)getStatements().get(0);
+//		//System.out.println(E);
+//		System.out.println(getStatements());
+//		List<E> statements = getStatements();
+//		statements.remove(0);
+//		setStatements(statements);
+//		if (getStatements().size()==0){
+//			setStatementExecuted(true);
+//		}
+//		return first;
+//	}
 	
 
 

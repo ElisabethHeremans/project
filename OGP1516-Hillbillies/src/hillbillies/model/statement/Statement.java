@@ -21,6 +21,36 @@ public abstract class Statement{
 //	private Task task;
 
 	public abstract void executeStatement(ExecutionContext context);
+	
+	/**
+	 * @return the superStatement
+	 */
+	public Statement getSuperStatement() {
+		return superStatement;
+	}
+
+	/**
+	 * @param superStatement the superStatement to set
+	 */
+	public void setSuperStatement(Statement superStatement) {
+		this.superStatement = superStatement;
+	}
+
+	private Statement superStatement;
+	
+	
+	public Statement getNextStatement(ExecutionContext context){
+		if (!isLast() && this.getSuperStatement() != null){
+			return (Statement) ((SequenceStatement<?>)getSuperStatement()).getStatements().get(this.getIndex()+1);
+		}
+		else if (isLast() && this.getSuperStatement() != null){
+			return getSuperStatement().getNextStatement(context);
+		}
+		else
+			return null;
+	
+	}
+
 
 //	public abstract void removeFirstStatement();
 //	
@@ -40,6 +70,38 @@ public abstract class Statement{
 	 */
 	public void setStatementExecuted(boolean statementExecuted) {
 		this.statementExecuted = statementExecuted;
+	}
+	
+	private int index;
+	
+	private boolean isLast = true;
+
+	/**
+	 * @return the index
+	 */
+	public int getIndex() {
+		return index;
+	}
+
+	/**
+	 * @param index the index to set
+	 */
+	public void setIndex(int index) {
+		this.index = index;
+	}
+
+	/**
+	 * @return the isLast
+	 */
+	public boolean isLast() {
+		return isLast;
+	}
+
+	/**
+	 * @param isLast the isLast to set
+	 */
+	public void setLast(boolean isLast) {
+		this.isLast = isLast;
 	}
 
 

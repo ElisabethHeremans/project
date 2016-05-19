@@ -15,6 +15,8 @@ public class FollowStatement<E extends Expression<Unit>> extends ActionStatement
 
 	@Override
 	public void executeStatement(ExecutionContext context) {
+		context.getExecutingUnit().setCurrentStatement(this);
+
 		getExpression().evaluateExpression(context);
 		context.getExecutingUnit().startFollowing(getExpression().getValue());
 		

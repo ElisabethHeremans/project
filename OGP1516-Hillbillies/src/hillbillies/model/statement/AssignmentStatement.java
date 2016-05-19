@@ -30,14 +30,16 @@ public class AssignmentStatement<E extends Expression<?>> extends ExpressionStat
 	}
 	@Override
 	public void executeStatement(ExecutionContext context) {
+		context.getExecutingUnit().setCurrentStatement(this);
 		System.out.println(" execute assignment statemnet ");
 		getExpression().evaluateExpression(context);
-		//System.out.println(getExpression().getValue());
+		System.out.println(getExpression().getValue());
 		//System.out.println(getVariableName());
 		//System.out.println(getExpression());
 		context.addVariable(getVariableName(), getExpression());
 		System.out.println(" variables "+(context.getVariables()));
 		context.getExecutingUnit().stopExecutingStatement();
 	}
+
 	
 }

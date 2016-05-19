@@ -13,6 +13,7 @@ extends ExpressionStatement<E> implements IComposedUnaryStatement<S> {
 	public WhileStatement(E condition, S body){
 		setExpression(condition);
 		setStatement(body);
+		
 	}
 	
 	public E getCondition() {
@@ -27,10 +28,12 @@ extends ExpressionStatement<E> implements IComposedUnaryStatement<S> {
 	@Basic @Raw @Override
 	public final S getStatement() {
 		return statement;
+		
 	}
 
 	@Raw @Override
 	public final void setStatement(S statement) {
+		statement.setSuperStatement(this);
 		this.statement = statement;
 	}
 	
@@ -40,17 +43,37 @@ extends ExpressionStatement<E> implements IComposedUnaryStatement<S> {
 
 	@Override
 	public void executeStatement(ExecutionContext context) {
+		context.getExecutingUnit().setCurrentStatement(this);
 		super.executeStatement(context);
-		while (getExpression().getValue()){
-			if (getStatement() instanceof BreakStatement){
-				context.getExecutingUnit().stopExecutingStatement();
-			}
-			else{
-				getStatement().executeStatement(context);
-			}
+		if (getExpression().getValue()){
+//			if (getStatement() instanceof BreakStatement){
+//				context.getExecutingUnit().stopExecutingStatement();
+//			}
+//			else{
+			getStatement().executeStatement(context);
+//			}
 		}
-		context.getExecutingUnit().stopExecutingStatement();
+		else
+			context.getExecutingUnit().stopExecutingStatement();
 
+			
+	}
+	
+	@Override
+	public Statement getNextStatement(ExecutionContext context){
+		super.executeStatement(context);
+		if (getExpression().getValue()){
+			return this;
+		}
+		
+		else if (!isLast() && this.getSuperStatement() != null){
+			return (Statement) ((SequenceStatement<?>)getSuperStatement()).getStatements().get(this.getIndex()+1);
+		}
+		else if (isLast() && this.getSuperStatement() != null){
+			return getSuperStatement().getNextStatement(context);
+		}
+		else
+			return null;
 			
 	}
 
