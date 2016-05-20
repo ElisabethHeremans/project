@@ -15,6 +15,7 @@ public class WorkStatement<E extends Expression<Position>> extends ActionStateme
 
 	@Override
 	public void executeStatement(ExecutionContext context) {
+		try{
 		context.getExecutingUnit().setCurrentStatement(this);
 		super.executeStatement(context);
 		getExpression().evaluateExpression(context);
@@ -22,7 +23,12 @@ public class WorkStatement<E extends Expression<Position>> extends ActionStateme
 //		System.out.print(" coords "+getExpression().getValue().getCoords());
 //		System.out.print(" unit "+context.getExecutingUnit());
 //		System.out.print();
-		context.getExecutingUnit().work(getExpression().getValue().getCoords());		
+		context.getExecutingUnit().work(getExpression().getValue().getCoords());	
+		}
+		catch(NullPointerException e){
+			context.getExecutingUnit().stopExecutingTask();
+		}
+
 	}
 	
 

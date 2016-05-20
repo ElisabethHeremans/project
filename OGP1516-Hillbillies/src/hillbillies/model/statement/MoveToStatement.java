@@ -19,11 +19,16 @@ public class MoveToStatement<E extends Expression<Position>> extends ActionState
 
 	@Override
 	public void executeStatement(ExecutionContext context) {
+		try{
 		context.getExecutingUnit().setCurrentStatement(this);
 		getExpression().evaluateExpression(context);
 		//System.out.println(" move to stat " + Arrays.toString(getExpression().getValue().getCoords()));
 		context.getExecutingUnit().moveTo1(getExpression().getValue().getCoords());
-		
+		}
+		catch(NullPointerException e){
+			context.getExecutingUnit().stopExecutingTask();
+		}
+
 	}
 	
 
