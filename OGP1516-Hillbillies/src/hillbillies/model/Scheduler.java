@@ -156,6 +156,7 @@ public class Scheduler implements Iterable<Task> {
 		if( task == null)
 			throw new IllegalArgumentException();
 		this.tasks.remove(task);
+		task.removeAsScheduler(this);
 	}
 	
 	/**

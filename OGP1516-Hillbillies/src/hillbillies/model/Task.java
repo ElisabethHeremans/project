@@ -600,6 +600,19 @@ public class Task {
 	 * Variable registering the set of schedulers of which this task is a task.
 	 */
 	private Set<Scheduler> schedulers = new HashSet<Scheduler>();
+
+	/**
+	 * Remove the given scheduler from the set of schedulers of this task.
+	 * @param scheduler
+	 * 			The scheduler to remove
+	 * @post The given scheduler is not a scheduler of this new task.
+	 * 		| ! this.getSchedulers().contains(scheduler)
+	 */
+	public void removeAsScheduler(Scheduler scheduler) {
+		if (this.getSchedulers().contains(scheduler))
+			schedulers.remove(scheduler);
+		
+	}
 	
 //	public void restoreTask(){
 //		List<Statement> statements = new ArrayList<Statement>();
