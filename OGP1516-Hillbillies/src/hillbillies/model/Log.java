@@ -209,7 +209,7 @@ public class Log extends RawMaterial {
 	@Override
 	public boolean hasProperWorld() {
 		return (super.hasProperWorld()&&
-				(this.getWorld()== null || this.getWorld().hasAsLog(this)));
+				(super.hasProperWorld()&&(this.getWorld()== null || this.getWorld().hasAsLog(this))));
 	}
 
 
