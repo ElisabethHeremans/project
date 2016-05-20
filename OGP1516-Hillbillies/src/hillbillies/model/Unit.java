@@ -825,17 +825,22 @@ public class Unit {
 	 * 			this unit is terminated.
 	 * @effect If this unit must fall and is not already falling, this unit shall fall.
 	 * @effect If the status of this unit is falling, the unit will continue falling.
-	 * @effect If this unit must rest, this unit shall rest.
+	 * @effect Else if this unit must rest, this unit shall rest.
+	 * @effect Else if this unit is executing a task, but is not executing a statement, 
+	 * 			this unit will continue executing this task.
+	 * @effect If this unit is following another unit, this unit will move to the other unit if the other unit is not falling.
+	 * 			If this unit is neighboring the other unit or is in the same cube as the other unit, this unit will stop following the other unit.
 	 * @effect If this unit is doing nothing, while default behaviour is not enabled, and the unit still has a
 	 *         targetPosition, this unit shall resume moving to the targetPosition.
 	 * @effect If this unit's default behaviour is enabled, and this unit is
-	 *         doing nothing, he shall start a default behaviour.
+	 *         doing nothing and this unit is not executing a task, he shall start a default behaviour.
 	 * @effect If this unit is moving, this unit shall continue moving.
 	 * @effect If this unit is working, he will continue working.
 	 * @effect If the status of this unit is initial resting, this unit will continue initial resting.
 	 * @effect If the status of this unit is resting, this unit will continue resting.
-	 * @effect If this unit's status is attacking, this new unit's attackTimer will be increased with duration and if the attackTimer becomes 
-	 * 			equal or greater then one, this new unit's status will be updated to done.
+	 * @effect If this unit's status is attacking, this new unit's attackTimer will be increased with duration. If the attackTimer becomes 
+	 * 			equal or greater then one, this new unit's status will be updated to done. If this unit is executing a task, this unit will 
+	 * 			stop executing its task.
 	 * @effect If this unit is carrying a boulder, the position of the boulder equals
 	 *			the position of this unit.
 	 * @effect If this unit is carrying a log, the position of the log equals
@@ -844,9 +849,6 @@ public class Unit {
 	 *             If the duration is less than zero or exceeds or equals 0.2 s.
 	 */
 	public void advanceTime(float duration) throws IllegalArgumentException {
-		//System.out.println("-----------------------------------ADVANCETIME UNIT----------------------------------");
-//		System.out.print(" 1: "+ this.getExperiencePoints());
-//		System.out.print(" 2 " + this.getHitpoints());
 		if (!(Util.fuzzyGreaterThanOrEqualTo(duration, 0.0-Util.DEFAULT_EPSILON )&& Util.fuzzyLessThanOrEqualTo((double)duration, 0.2+Util.DEFAULT_EPSILON))){
 			System.out.println(duration);
 			throw new IllegalArgumentException();
@@ -875,17 +877,12 @@ public class Unit {
 		}
 		else if (mustRest()){
 			rest();
-			System.out.println(" RESTING ");
 		}
 		else if (this.isExecutingTask&& !isExecutingStatement){
-			System.out.println(" execute task ");
 			executeProgram(duration);
 			
 		}
-		if (this.isExecutingTask &&this.getTask() != null){
-			System.out.println("EXECUTING TASK");
-			System.out.println("STATUS =" +getStatus());
-		}
+
 		if (this.isFollowing() != null) {
 			if(this.isNeighbouringOrSameCube(this.isFollowing().getCubeCoordinate())){
 				this.stopFollowing();
@@ -896,29 +893,22 @@ public class Unit {
 				}
 			}
 		}
-		//System.out.println(" UIT FOLLOW ");
-//		System.out.print(Arrays.toString(targetPosition));
-//		System.out.print(this.isEnableDefaultBehaviour());
-//		System.out.print(this.getStatus());
+
 		else if (this.getStatus() == Status.DONE && targetPosition != null && !this.isEnableDefaultBehaviour()){
 			moveTo1(targetPosition);
-			//System.out.println(" MOVING ");
 
 		}
 		
 		else if (this.isEnableDefaultBehaviour() && this.getStatus() == Status.DONE && !this.isExecutingTask){
 			
 			startDefaultBehaviour();
-			System.out.println(" DEFAULT ");
 		}
 		else if (this.getStatus() == Status.MOVING) {
 			moving1(duration);
-			System.out.println("MOVING ");
 		}
 		
 		else if (this.getStatus() == Status.WORKING) {
 			working(duration);
-			//System.out.print(" 4.5 ");
 		} 
 		else if (getStatus() == Status.INITIAL_RESTING) {
 			initialResting(duration);
@@ -936,7 +926,6 @@ public class Unit {
 			}
 
 		}
-		//System.out.print(" 4 ");
 		if (this.getLog() != null)
 			this.getLog().setPosition(this.getPosition());
 		if (this.getBoulder() != null)
@@ -944,17 +933,35 @@ public class Unit {
 
 	}
 	
+	/**
+	 * Makes this unit stop executing its statement.
+	 * @post This unit is not executing a statement and has no targetPosition.
+	 * 		| this.isExecutingStatement = false;
+	 * 		| this.targetPosition = null;
+	 * @post This unit is not following an effective other unit.
+	 * 		| if (this.isFollowing()!=null)
+	 * 		|	then this.stopFollowing()
+	 */
 	public void stopExecutingStatement(){
 		this.isExecutingStatement = false;
 		this.targetPosition = null;
-		//this.getTask().removeFirstStatement();
-		System.out.println(" stopped executing statement ");
-		System.out.println(getStatus());
-		//this.executeProgram(duration);
 		if (this.isFollowing()!=null)
 			this.stopFollowing();
 	}
 	
+	/**
+	 * Makes this unit stop executing its task.
+	 * @post This unit is not executing a task or a statement.
+	 * 		|this.isExecutingStatement = false
+	 * 		|this.isExecutingTask = false
+	 * @post This unit has no currentStatement or targetPosition() or task.
+	 * 		|this.setCurrentStatement(null)
+	 * 		|this.targetPosition = null
+	 * 		|this.setTask(null)
+	 * @effect This unit is not following an effective other unit.
+	 * 		| if (this.isFollowing()!=null)
+	 * 		|	then this.stopFollowing()
+	 */
 	public void stopExecutingTask(){
 		this.isExecutingStatement = false;
 		this.isExecutingTask = false;
