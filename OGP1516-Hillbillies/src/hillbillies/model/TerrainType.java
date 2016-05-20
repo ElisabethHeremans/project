@@ -20,7 +20,7 @@ public enum TerrainType {
 	 */
 	@Basic @Raw @Immutable
 	public final int getType() {
-		return type;
+		return this.type;
 	}
 	
 	public static final TerrainType getTerrain(int type){
@@ -39,9 +39,9 @@ public enum TerrainType {
 		return passable;
 	}
 
-	private final int type;
+	private  int type;
 	
-	private final boolean passable;
+	private  boolean passable;
 	
 	
 	
