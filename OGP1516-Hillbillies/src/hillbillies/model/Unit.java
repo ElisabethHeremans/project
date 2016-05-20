@@ -2551,11 +2551,7 @@ public class Unit {
  		else if (log == null)
  			return true;
  		else{
- 			return (((log.getWorld()==this.getWorld()) && (!log.isTerminated()) &&
- 					((log.getWorld().getCubePosition(log.getPosition())[0]==this.getWorld().getCubeCoordinate(this.getPosition())[0] 
- 					&& log.getWorld().getCubePosition(log.getPosition())[1]==this.getWorld().getCubeCoordinate(this.getPosition())[1] 
- 							&& log.getWorld().getCubePosition(log.getPosition())[2]==this.getWorld().getCubeCoordinate(this.getPosition())[2]) 
- 				|| this.isNeighbouringCube(log.getPosition()))));
+ 			return (((log.getWorld()==this.getWorld()) && (!log.isTerminated()) && this.isNeighbouringOrSameCube(log.getCubeCoordinate())));
  		}
  	}
  	
