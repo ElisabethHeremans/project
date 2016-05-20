@@ -2543,6 +2543,7 @@ public class Unit {
  		else if (log == null)
  			return true;
  		else{
+ 			System.out.println((((log.getWorld()==this.getWorld()) && (!log.isTerminated()) && this.isNeighbouringOrSameCube(log.getCubeCoordinate()))));
  			return (((log.getWorld()==this.getWorld()) && (!log.isTerminated()) && this.isNeighbouringOrSameCube(log.getCubeCoordinate())));
  		}
  	}
