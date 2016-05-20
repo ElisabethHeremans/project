@@ -2,10 +2,12 @@ package hillbillies.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import hillbillies.model.expression.*;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import be.kuleuven.cs.som.annotate.*;
 import hillbillies.model.statement.*;
@@ -262,6 +264,8 @@ public class Task {
 	 * 			|result == true
 	 */
 	public static boolean isWellFormed(Statement activities, List<String> variables){
+		System.out.println("check is well formed");
+		System.out.println(variables);
 		List<Statement> statements = new ArrayList<Statement>();
 		List<String> variableNames = new ArrayList<String>();
 
@@ -278,9 +282,11 @@ public class Task {
 	
 		for (Statement stat: statements){
 			if (stat instanceof AssignmentStatement<?>){
+				System.out.println(" assignment statement ");
 				variableNames.add(((AssignmentStatement<?>) stat).getVariableName());
 			}
-			else if (stat instanceof BreakStatement)
+			else if (stat instanceof BreakStatement){
+				System.out.println(" break statement ");
 				if (stat.getSuperStatement() == null)
 					return false;
 				else if (!(stat.getSuperStatement() instanceof WhileStatement)){
@@ -288,33 +294,42 @@ public class Task {
 							(! (stat.getSuperStatement().getSuperStatement() instanceof WhileStatement)))
 						return false;
 				}
-			else if(stat instanceof SequenceStatement)
+			}
+			else if(stat instanceof SequenceStatement){
+				System.out.println(" sequence statement ");
 				if (! isWellFormed(stat,variableNames))
 					return false;
+			}
 			else{
+				System.out.println("expression statement ");
 					Expression<?> e = ((ExpressionStatement<?>)stat).getExpression();
 					if (e instanceof BracketVariableExpression){
 						e = ((BracketVariableExpression)e).getExpression();
 					}
+					System.out.println("variable epr "+ e.toString());
 					if (e instanceof BasicVariableExpression<?>){
+						System.out.println("variable epr "+ ((BasicVariableExpression<?>)e).getName());
 						boolean variableAssigned = false;
 						for (String name: variableNames){
-							if (name == ((BasicVariableExpression<?>)e).getName())
+							System.out.println(name);
+							if (name.equals(((BasicVariableExpression<?>)e).getName())){
 								variableAssigned = true;
+								System.out.println("true");
+							}
 							
 						}
 						if (!variableAssigned){
 							return false;
 						}
 					}
-					if (e instanceof IComposedUnaryStatement<?>){
-						if (!isWellFormed((Statement)((IComposedUnaryStatement<?>)e).getStatement(),variableNames))
+					if (stat instanceof IComposedUnaryStatement<?>){
+						if (!isWellFormed((Statement)((IComposedUnaryStatement<?>)stat).getStatement(),variableNames))
 							return false;
 					}
-					if (e instanceof IComposedBinaryStatement<?,?>){
-						if (!isWellFormed((Statement)((IComposedBinaryStatement<?,?>)e).getFirstStatement(),variableNames))
+					if (stat instanceof IComposedBinaryStatement<?,?>){
+						if (!isWellFormed((Statement)((IComposedBinaryStatement<?,?>)stat).getFirstStatement(),variableNames))
 							return false;
-						if (!isWellFormed((Statement)((IComposedBinaryStatement<?,?>)e).getSecondStatement(),variableNames))
+						if (!isWellFormed((Statement)((IComposedBinaryStatement<?,?>)stat).getSecondStatement(),variableNames))
 							return false;
 
 					}
@@ -497,9 +512,6 @@ public class Task {
 		if (this.getExecutingUnit() == null)
 			throw new NullPointerException();
 		System.out.print(" activities "+ getActivities() + "   ");
-//		System.out.print(this.getExecutionContext().getSelectedCube());
-//		System.out.print(this.getExecutionContext().getExecutingUnit());
-		
 		getActivities().executeStatement(getExecutionContext());
 	}
 	
@@ -560,6 +572,46 @@ public class Task {
 					return false;
 		}
 		return true;
+	}
+	
+	/**
+	 * Add the given scheduler as a scheduler of this task.
+	 * @param scheduler
+	 * 			The scheduler to add to the set of schedulers
+	 * @throws IllegalArgumentException
+	 * 			If the given scheduler does not have this task as its task.
+	 * 			| (!scheduler.hasAsTask(this))
+	 */
+	void addAsScheduler(@Raw Scheduler scheduler) throws IllegalArgumentException {
+		if (!scheduler.hasAsTask(this))
+			throw new IllegalArgumentException();
+		this.schedulers.add(scheduler);
+		
+	}
+	
+	/**
+	 * Return all the schedulers of which this task is a task.
+	 */
+	@Basic @Raw
+	public Set<Scheduler> getSchedulers(){
+		return this.schedulers;
+	}
+	/**
+	 * Variable registering the set of schedulers of which this task is a task.
+	 */
+	private Set<Scheduler> schedulers = new HashSet<Scheduler>();
+
+	/**
+	 * Remove the given scheduler from the set of schedulers of this task.
+	 * @param scheduler
+	 * 			The scheduler to remove
+	 * @post The given scheduler is not a scheduler of this new task.
+	 * 		| ! this.getSchedulers().contains(scheduler)
+	 */
+	public void removeAsScheduler(Scheduler scheduler) {
+		if (this.getSchedulers().contains(scheduler))
+			schedulers.remove(scheduler);
+		
 	}
 	
 //	public void restoreTask(){

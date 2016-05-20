@@ -669,7 +669,7 @@ public class Facade implements IFacade{
 	@Override
 	public boolean isWellFormed(Task task) throws ModelException {
 		try{
-			return Task.isWellFormed(task.getActivities());
+			return Task.isWellFormed(task.getActivities(),null);
 			}
 		catch (NullPointerException exc){
 			throw new ModelException();
@@ -703,7 +703,7 @@ public class Facade implements IFacade{
 	@Override
 	public void replace(Scheduler scheduler, Task original, Task replacement) throws ModelException {
 		try{
-			scheduler.replaceAsTask(original, replacement);
+			scheduler.replaceTask(original, replacement);
 		}
 		catch(IllegalArgumentException exc){
 			throw new ModelException();
@@ -738,8 +738,7 @@ public class Facade implements IFacade{
 
 	@Override
 	public Set<Scheduler> getSchedulersForTask(Task task) throws ModelException {
-		// TODO Auto-generated method stub
-		return null;
+		return task.getSchedulers();
 	}
 
 	@Override

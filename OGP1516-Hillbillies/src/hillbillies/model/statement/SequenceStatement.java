@@ -43,6 +43,7 @@ public class SequenceStatement<E extends Statement> extends ComposedStatement
 		
 	}
 	
+	
 	public void addStatement(Statement statement){
 		List<E> list = getStatements();
 		if (statement instanceof SequenceStatement){

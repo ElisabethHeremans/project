@@ -6,12 +6,31 @@ import java.util.Map;
 import hillbillies.model.expression.Expression;
 
 public class ExecutionContext {
-	public ExecutionContext(Unit executingUnit, int[] selectedCube, HashMap<String,Expression<?>> variables){
+	public ExecutionContext(Unit executingUnit, int[] selectedCube, HashMap<String,Expression<?>> variables, boolean broken){
 		setExecutingUnit(executingUnit);
 		setSelectedCube(selectedCube);
 		setVariables(variables);
 	}
 	
+	public ExecutionContext(Unit executingUnit, int[] selectedCube, HashMap<String,Expression<?>> variables){
+		this(executingUnit,selectedCube,variables,false);
+	}
+	private boolean broken = false;
+	
+	/**
+	 * @return the broken
+	 */
+	public boolean isBroken() {
+		return broken;
+	}
+
+
+	/**
+	 * @param broken the broken to set
+	 */
+	public void setBroken(boolean broken) {
+		this.broken = broken;
+	}
 	private Unit executingUnit;
 	
 	private int[] selectedCube;
@@ -86,4 +105,8 @@ public class ExecutionContext {
 	 */
 	public void setVariables(HashMap<String, Expression<?>> variables2) {
 		this.variables = variables2;
-	}}
+	}
+	
+	
+	
+}

@@ -1013,16 +1013,23 @@ public class Unit {
 				if (this.getCurrentStatement()==null){
 					this.isExecutingStatement = true;
 					this.getTask().executeTask();
+					System.out.println(" a ");
 				}
 				else if (this.getCurrentStatement().getNextStatement(this.getTask().getExecutionContext()) != null){
+					System.out.println(" b ");
+					System.out.println(this.getCurrentStatement().getNextStatement(this.getTask().getExecutionContext()));
 					this.isExecutingStatement = true;
 					this.getCurrentStatement().getNextStatement(this.getTask().getExecutionContext()).executeStatement(this.getTask().getExecutionContext());
+					
 				}
-				else
+				else{
 					this.getTask().setComplete(true);
+					System.out.println(" c ");
+				}
+				
 			}
 			else{
-				System.out.println(" b ");
+				System.out.println(" d ");
 				
 				while (taskTimer < duration && !isExecutingStatement && !this.getTask().isComplete()){
 					System.out.println(" entering this loop ");
@@ -1047,7 +1054,10 @@ public class Unit {
 				}
 			}
 		}
-		if (!this.isExecutingStatement && this.isExecutingTask && this.getCurrentStatement().getNextStatement(this.getTask().getExecutionContext()) == null){
+		System.out.println(this.isExecutingStatement);
+		System.out.println(this.isExecutingTask);
+		System.out.println(this.getCurrentStatement().getNextStatement(this.getTask().getExecutionContext()));
+		if ((this.getTask().isComplete())||(!this.isExecutingStatement && this.isExecutingTask && this.getCurrentStatement().getNextStatement(this.getTask().getExecutionContext()) == null)){
 			System.out.println(" c ");
 			
 			//this.isExecutingTask = false;

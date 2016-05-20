@@ -120,8 +120,13 @@ public class Scheduler implements Iterable<Task> {
 		if( ! getTasks().contains(task)){
 			//System.out.println(TasksExecuted);
 			this.tasks.add(task);
+			task.addAsScheduler(this);
 		}
+		
 	}
+	
+	
+	
 	/**
 	 * Add all the tasks in the given list of tasks to this scheduler
 	 * @param tasks
@@ -151,6 +156,7 @@ public class Scheduler implements Iterable<Task> {
 		if( task == null)
 			throw new IllegalArgumentException();
 		this.tasks.remove(task);
+		task.removeAsScheduler(this);
 	}
 	
 	/**
