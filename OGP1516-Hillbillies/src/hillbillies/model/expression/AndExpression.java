@@ -11,11 +11,17 @@ extends BinaryBooleanExpression<E,F> {
 
 	@Override
 	public Boolean evaluateExpression(ExecutionContext context) {
+		try{
 		this.getLeftExpression().evaluateExpression(context);
 		this.getRightExpression().evaluateExpression(context);
 
 		setValue(getRightExpression().getValue() && getLeftExpression().getValue());
 		return getValue();
+		}
+		catch(NullPointerException e){
+			return null;
+		}
+
 	}
 
 }

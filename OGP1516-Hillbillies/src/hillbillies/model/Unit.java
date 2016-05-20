@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Random;
 import be.kuleuven.cs.som.annotate.*;
-import hillbillies.model.statement.Statement;
+import hillbillies.model.statement.*;
 import ogp.framework.util.Util;
 
 /**
@@ -856,7 +856,7 @@ public class Unit {
 		if (this.isExecutingStatement)
 			taskTimer += duration;
 		
-		if (experiencePoints >=10){
+		if (this.getExperiencePoints() >=10){
 			setExperiencePoints(this.getExperiencePoints()-10);
 			if (isValidStrength(this.getStrength()+1) && this.getWeight()>=((this.getStrength()+1)+this.getAgility())/2 )
 				this.setStrength(this.getStrength()+1);
@@ -868,21 +868,26 @@ public class Unit {
 		if (this.getHitpoints() <= 0)
 			this.terminate();
 		if (this.getStatus() != Status.FALLING && mustFall()){
+			if (this.isExecutingTask){
+				stopExecutingTask();
+			}
 			fall();
 		}
 		if (this.getStatus() == Status.FALLING){
 			falling(duration);
 		}
-		
-//		if (this.isExecutingTask && !this.getTask().executableActivities()){
-//			this.getTask().restoreTask();
-//		}
-		//System.out.println(" test 1 "+ (this.isExecutingTask  && !isExecutingStatement));
-		if (this.isExecutingTask){
-			if ( !isExecutingStatement){
+		else if (mustRest()){
+			if (this.isExecutingTask){
+				stopExecutingTask();
+			}
+
+			rest();
+			System.out.println(" RESTING ");
+		}
+		else if (this.isExecutingTask&& !isExecutingStatement){
 			System.out.println(" execute task ");
 			executeProgram(duration);
-			}
+			
 		}
 		if (this.isExecutingTask &&this.getTask() != null){
 			System.out.println("EXECUTING TASK");
@@ -893,20 +898,15 @@ public class Unit {
 				this.stopFollowing();
 			}
 			else{
-				if(this.isFollowing().getStatus()==status.FALLING){
-				}	
-				else
+				if(!(this.isFollowing().getStatus()==Status.FALLING)){
 					moveTo1(this.isFollowing().getPosition());
+				}
 			}
 		}
 		//System.out.println(" UIT FOLLOW ");
 //		System.out.print(Arrays.toString(targetPosition));
 //		System.out.print(this.isEnableDefaultBehaviour());
 //		System.out.print(this.getStatus());
-		if (mustRest()){
-			rest();
-			System.out.println(" RESTING ");
-		}
 		else if (this.getStatus() == Status.DONE && targetPosition != null && !this.isEnableDefaultBehaviour()){
 			moveTo1(targetPosition);
 			//System.out.println(" MOVING ");
@@ -935,8 +935,17 @@ public class Unit {
 		} 
 		else if (getStatus() == Status.ATTACKING) {
 			attackTimer += duration;
-			if (attackTimer >= 1.0)
+			if (attackTimer >= 1.0){
 				setStatus(Status.DONE);
+			if (this.isExecutingStatement){
+				stopExecutingStatement();
+			}
+			else if (this.isExecutingTask)
+				stopExecutingTask();
+			else if (this.isEnableDefaultBehaviour())
+				startDefaultBehaviour();
+			}
+
 		}
 		//System.out.print(" 4 ");
 		if (this.getLog() != null)
@@ -948,18 +957,24 @@ public class Unit {
 	
 	public void stopExecutingStatement(){
 		this.isExecutingStatement = false;
+		this.targetPosition = null;
 		//this.getTask().removeFirstStatement();
 		System.out.println(" stopped executing statement ");
 		System.out.println(getStatus());
 		//this.executeProgram(duration);
+		if (this.isFollowing()!=null)
+			this.stopFollowing();
 	}
 	
 	public void stopExecutingTask(){
 		this.isExecutingStatement = false;
 		this.isExecutingTask = false;
 		this.setCurrentStatement(null);
+		this.targetPosition = null;
 		this.getTask().setExecutingUnit(null);
 		this.setTask(null);
+		if (this.isFollowing()!=null)
+			this.stopFollowing();
 		
 	}
 	
@@ -967,11 +982,6 @@ public class Unit {
 	 * A variable registering the currentStatement of this unit.
 	 */
 	private Statement currentStatement;
-	
-	/**
-	 * A variable registering the lastStatementInSequence of this unit.
-	 */
-	private Statement lastStatementInSequence;
 	
 	
 	/**
@@ -994,25 +1004,6 @@ public class Unit {
 		this.currentStatement = currentStatement;
 	}
 
-	/**
-	 * Return the getLastStatementInSequence of this unit.
-	 * @return the lastStatementInSequence
-	 */
-	public Statement getLastStatementInSequence() {
-		return lastStatementInSequence;
-	}
-	/**
-	 * Set the lastStatementInSequence of this unit to the given
-	 *  setLastStatementInSequence.
-	 * @param setLastStatementInSequence 
-	 * 	the lastStatementInSequence to set
-	 * @post the lastStatementInSequence of this unit is equal to
-	 * 	the given setLastStatementInSesuence.
-	 * 		| this.lastStatementInSequence = setLastStatementInSequence
-	 */
-	public void setLastStatementInSequence(Statement setLastStatementInSequence) {
-		this.lastStatementInSequence = setLastStatementInSequence;
-	}
 	
 	/**
 	 * Execute the statements of the assigned task to this unit.
@@ -1031,12 +1022,10 @@ public class Unit {
 			System.out.println(" not complete ");
 			
 			if (taskTimer > duration){
-				
 				if (this.getCurrentStatement()==null){
 					this.isExecutingStatement = true;
 					this.getTask().executeTask();
 				}
-				
 				else if (this.getCurrentStatement().getNextStatement(this.getTask().getExecutionContext()) != null){
 					this.isExecutingStatement = true;
 					this.getCurrentStatement().getNextStatement(this.getTask().getExecutionContext()).executeStatement(this.getTask().getExecutionContext());
@@ -1081,14 +1070,9 @@ public class Unit {
 			//System.out.println(" executed "+ getTask().toString());
 			System.out.println(getTask());
 			//this.getTask().setExecutingUnit(null);
-			System.out.println(" complete ");
 			this.setStatus(Status.DONE);
 			System.out.println(" complete ");
 		}
-
-		
-//		System.out.println(this.getCurrentStatement());
-//		System.out.println(this.getCurrentStatement().getNextStatement(this.getTask().getExecutionContext()));
 	}
 	
 	/**
@@ -1105,6 +1089,10 @@ public class Unit {
 		setStatus(Status.FALLING);
 		this.nextTargetPosition = Vector.vectorAdd(this.getPosition(), new double[] {0.0,0.0,-1.0});
 		this.startPosition = this.getPosition();
+		if (this.isExecutingTask){
+			stopExecutingTask();
+		}
+
 	}
 	/**
 	 * Check whether this unit needs to fall.
@@ -1399,11 +1387,11 @@ public class Unit {
 				System.out.println(Arrays.toString(this.getPosition()));
 				stopExecutingStatement();
 			}
-			else if (this.isEnableDefaultBehaviour())
-				startDefaultBehaviour();
 
 		}
 		else if (canMove()) {
+			if (this.isExecutingTask && ! (this.getCurrentStatement() instanceof MoveToStatement))
+				stopExecutingTask();
 			this.targetPosition = targetPosition;
 			setStatus(Status.IN_CENTER);
 			int index = 0;
@@ -1442,8 +1430,8 @@ public class Unit {
 			else{
 				System.out.println("Unreachable");
 				//throw new IllegalArgumentException();
-				if ( this.isEnableDefaultBehaviour())
-					startDefaultBehaviour();
+				if (this.isExecutingTask)
+					stopExecutingTask();
 			}
 			}
 		}	
@@ -1729,6 +1717,10 @@ public class Unit {
 			progressWork = (float) 0.0;
 			this.setOrientation((float) Math.atan2(workTargetPosition[1]+0.5 - this.getPosition()[1],
 					workTargetPosition[0]+0.5 - this.getPosition()[0]));
+			if (this.isExecutingTask && ! (this.getCurrentStatement() instanceof WorkStatement)){
+				stopExecutingTask();
+			}
+
 		}
 
 	}
@@ -1996,12 +1988,11 @@ public class Unit {
 					other.getPosition()[0] - this.getPosition()[0]));
 			other.defend(this);
 			attackTimer = 0.0;
+			if (this.isExecutingTask && ! (this.getCurrentStatement() instanceof AttackStatement)){
+				stopExecutingTask();
+			}
+
 		}
-		if (this.isExecutingStatement){
-			stopExecutingStatement();
-		}
-		else if (this.isEnableDefaultBehaviour())
-			startDefaultBehaviour();
 
 	}
 
@@ -2047,6 +2038,9 @@ public class Unit {
 	 */
 	public void defend(Unit unit) {
 		if (this.canDefend()){
+			if (this.isExecutingTask){
+				stopExecutingTask();
+			}
 			setStatus(Status.DEFENDING);
 			setOrientation((float) Math.atan2(unit.getPosition()[1] - this.getPosition()[1],
 					unit.getPosition()[0] - this.getPosition()[0]));
@@ -2140,12 +2134,17 @@ public class Unit {
 	 */
 	public void rest() {
 		if (mustRest() || canRest()) {
+			stopSprinting();
 			restTimer = 0.0;
 			recoveredHitpoints = 0.0;
 			if (this.getHitpoints() < getMaxPoints())
 				setStatus(Status.INITIAL_RESTING);
 			else
 				setStatus(Status.RESTING);
+			if (this.isExecutingTask){
+				stopExecutingTask();
+			}
+
 		}
 	}
 	/**
@@ -2374,6 +2373,8 @@ public class Unit {
 		targetPosition = null;
 		nextTargetPosition = null;
 		setStatus(Status.DONE);
+		if (this.isExecutingTask)
+			stopExecutingTask();
 	}
 	
 	/**

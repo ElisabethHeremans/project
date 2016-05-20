@@ -11,10 +11,16 @@ public class IsAliveExpression<E extends Expression<Unit>> extends UnaryBooleanE
 
 	@Override
 	public Boolean evaluateExpression(ExecutionContext context) {
+		try{
 		getExpression().evaluateExpression(context);
 
 		setValue(!context.getExecutingUnit().isTerminated());
 		return getValue();
+		}
+		catch(NullPointerException e){
+			return null;
+		}
+
 	}
 
 }

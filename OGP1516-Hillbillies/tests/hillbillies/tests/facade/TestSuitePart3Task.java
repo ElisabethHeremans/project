@@ -418,7 +418,7 @@ public class TestSuitePart3Task {
 //		facade.schedule(scheduler, task1);
 //		facade.schedule(scheduler, task2);
 		System.out.print(scheduler.getTasks().size());
-		advanceTimeFor(facade, world,15 , 0.02);
+		advanceTimeFor(facade, world,25 , 0.02);
 		
 		
 

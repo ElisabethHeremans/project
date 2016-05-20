@@ -286,9 +286,9 @@ public class TestSuitePart3TaskFactory {
 	public final void createAnd_valid(){
 		Expression e1 = factory.createCarriesItem(enemyExpr, sourceLoc);
 		Expression e2 = factory.createAnd(e1, falseExpr, sourceLoc);
-		Assert.assertTrue(e2 instanceof AndExpression<?>);
-		Assert.assertEquals(e1,((AndExpression<?>) e2).getLeftExpression());
-		Assert.assertEquals(falseExpr,((AndExpression<?>) e2).getRightExpression());
+		Assert.assertTrue(e2 instanceof AndExpression<?,?>);
+		Assert.assertEquals(e1,((AndExpression<?,?>) e2).getLeftExpression());
+		Assert.assertEquals(falseExpr,((AndExpression<?,?>) e2).getRightExpression());
 	}
 	@Test(expected = ClassCastException.class)
 	public final void createAnd_invalidExpr(){
@@ -299,10 +299,10 @@ public class TestSuitePart3TaskFactory {
 	public final void createOr_valid(){
 		//Expression<?> e1 = factory.createCarriesItem(enemyExpr, sourceLoc);
 		Expression<?> e1 = factory.createReadVariable("x", sourceLoc);
-		Expression<?> e2 = factory.createOr(e1, falseExpr, sourceLoc);
-		Assert.assertTrue(e2 instanceof OrExpression<?>);
-		Assert.assertEquals(e1,((OrExpression<?>) e2).getLeftExpression());
-		Assert.assertEquals(falseExpr,((OrExpression<?>) e2).getRightExpression());
+		Expression<?> e2 = factory.createOr(falseExpr, e1, sourceLoc);
+		Assert.assertTrue(e2 instanceof OrExpression<?,?>);
+		Assert.assertEquals(e1,((OrExpression<?,?>) e2).getRightExpression());
+		Assert.assertEquals(falseExpr,((OrExpression<?,?>) e2).getLeftExpression());
 	}
 	@Test(expected = ClassCastException.class)
 	public final void createOr_invalidExpr(){

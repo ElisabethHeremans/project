@@ -9,11 +9,17 @@ public class OrExpression<E extends Expression<Boolean>,F extends Expression<Boo
 
 	@Override
 	public Boolean evaluateExpression(ExecutionContext context) {
+		try{
 		this.getLeftExpression().evaluateExpression(context);
 		this.getRightExpression().evaluateExpression(context);
 
 		setValue(getRightExpression().getValue() || getLeftExpression().getValue());
 		return getValue();
+		}
+		catch(NullPointerException e){
+			return null;
+		}
+
 	}
 
 	
