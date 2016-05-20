@@ -328,13 +328,10 @@ public class Scheduler implements Iterable<Task> {
 	 *  Return an iterator returning all the tasks of this scheduler, one by one.
 	 */
 	public Iterator<Task> getAllTasksIterator(){
-		//return new SchedulerIterator<Task>();
-		//return tasks.descendingIterator();
 		return tasks.iterator();
 
 	}
 
-	// methodes voor faction verder uitbreiden
 	/**
 	 * Return the faction of this scheduler.
 	 */
