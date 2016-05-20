@@ -8,6 +8,8 @@ import hillbillies.model.Status;
 import hillbillies.model.Unit;
 import hillbillies.model.World;
 import hillbillies.part2.listener.DefaultTerrainChangeListener;
+import hillbillies.part3.facade.IFacade;
+import ogp.framework.util.ModelException;
 import ogp.framework.util.Util;
 
 public class TestSuitePart3UnitFollow {
@@ -118,7 +120,9 @@ public class TestSuitePart3UnitFollow {
 	
 	@Test
 	public final void Follow_NotMoving(){
+		System.out.println("UNIT NOT MOVING");
 		world.addAsUnit(Aunit);
+		Aunit.setPosition(new double[] {0.5,2.5,1.5});
 		world.addAsUnit(Bunit);
 		Bunit.startFollowing(Aunit);
 		advanceTimeFor(Bunit,4.0,0.1);
@@ -130,15 +134,19 @@ public class TestSuitePart3UnitFollow {
 	
 	@Test
 	public final void Follow_Moving(){
+		System.out.println("UNIT MOVING");
 		world.addAsUnit(Aunit);
 		world.addAsUnit(Bunit);
+		Aunit.setPosition(new double[] {0.5,2.5,1.5});
 		Bunit.startFollowing(Aunit);
-		Aunit.moveTo1(new double[] {0.5,1.5,3.5});
-		advanceTimeFor(world,4.0,0.1);
+		Aunit.moveTo1(new double[] {2.5,2.5,1.5});
+		advanceTimeFor(world,10,0.1);
 		System.out.println(Arrays.toString(Bunit.getCubeCoordinate()));
 		System.out.println(Arrays.toString(Aunit.getCubeCoordinate()));
 		
 		Assert.assertTrue(Bunit.isNeighbouringOrSameCube(Aunit.getCubeCoordinate()));
 	}
+	
+
 
 }

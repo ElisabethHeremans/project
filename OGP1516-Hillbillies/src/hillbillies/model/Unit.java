@@ -884,12 +884,16 @@ public class Unit {
 		}
 
 		if (this.isFollowing() != null) {
+			System.out.println("IS FOLLOWING");
 			if(this.isNeighbouringOrSameCube(this.isFollowing().getCubeCoordinate())){
+				System.out.println("DONE FOLLOWING");
 				this.stopFollowing();
 			}
 			else{
+				System.out.println("OTHER STATUS " +isFollowing().getStatus());
 				if(!(this.isFollowing().getStatus()==Status.FALLING)){
-					moveTo1(this.isFollowing().getPosition());
+					System.out.println("IS MOVING TO UNIT " +this.getPosition().toString());
+					moveTo1(world.getCubeCoordinate(this.isFollowing().getPosition()));
 				}
 			}
 		}
@@ -1410,6 +1414,7 @@ public class Unit {
 
 		}
 		else if (canMove()) {
+			System.out.println("CAN MOVE");
 			if (this.isExecutingTask && ! (this.getCurrentStatement() instanceof MoveToStatement))
 				this.getTask().interruptExecution();
 			this.targetPosition = targetPosition;
