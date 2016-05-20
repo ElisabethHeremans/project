@@ -2296,11 +2296,12 @@ public class Unit {
 	 * 		 | if !(status == Status.DONE)
 	 * 		 |	then this.setEnableDefaultBehaviour(false)
 	 * @post If this unit can be assigned a task, this unit will start executing his task.
-	 * 		 | if (this.getFaction().getScheduler() != null 
-	 * 		 | && this.getFaction().getScheduler().getAllTasksIterator().hasNext())
-	 * 		 |		then setTask(this.getFaction().getScheduler().getAllTasksIterator().next());
-	 * 		 |		&& this.getTask().executeTask(this)
-	 * @effect If this unit's status is done, it will conduct at random an activity:
+	 * 		 | if (this.getFaction().getScheduler() != null && potentialTask!=null)
+	 * 		 |		then this.isExecutingTask = true;
+	 * 		 |		&& Task newTask = potentialTask;
+	 *		 |		&& newTask.setExecutingUnit(this);
+	 *		 |		&& this.isExecutingStatement = false;
+	 * @effect Else if this unit's status is done, it will conduct at random an activity:
 	 * 			 - this new unit's status is moving and this unit sprints to a random position
 	 * 			 - this new unit's status is moving and this unit walks to a random position
 	 * 			 - this unit starts working
@@ -2319,19 +2320,15 @@ public class Unit {
 	public void startDefaultBehaviour() {
 		if (this.getStatus() == Status.DONE) {
 			setEnableDefaultBehaviour(true);
-			System.out.print(" restart default ");
-			System.out.print(this.getFaction().getScheduler());
-			
+		
 			Task potentialTask = this.getFaction().getScheduler().getHighestPriorityTask
 					(this.getFaction().getScheduler().getTasksSatisfying(n->(n.getScheduledUnit()==null||n.getScheduledUnit()==this)));
 
 			if (this.getFaction().getScheduler() != null && potentialTask!=null){
 				
-				System.out.print(" execute task 1");
 				this.isExecutingTask = true;
 				Task newTask = potentialTask;
 				newTask.setExecutingUnit(this);
-				System.out.print(" execute task ");
 				this.isExecutingStatement = false;
 			}
 			else{
@@ -2528,10 +2525,6 @@ public class Unit {
  			return true;
  		else{
  			return (((boulder.getWorld()==this.getWorld()) && (!boulder.isTerminated()) && this.isNeighbouringOrSameCube(boulder.getCubeCoordinate())));
-// 					((boulder.getWorld().getCubeCoordinate(boulder.getPosition())[0]==this.getWorld().getCubeCoordinate(this.getPosition())[0] 
-// 					&& boulder.getWorld().getCubeCoordinate(boulder.getPosition())[1]==this.getWorld().getCubeCoordinate(this.getPosition())[1] 
-// 							&& boulder.getWorld().getCubeCoordinate(boulder.getPosition())[2]==this.getWorld().getCubeCoordinate(this.getPosition())[2]) 
-// 				|| this.isNeighbouringCube(boulder.getPosition()))));
  		}
  	}
  	
