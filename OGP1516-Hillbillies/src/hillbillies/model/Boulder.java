@@ -29,7 +29,7 @@ public class Boulder extends RawMaterial {
 	public Boulder(double[] position)
 			throws IllegalArgumentException {
 		super(position);
-		this.weight = new Random().nextInt(31)+ 10;
+		this.weight = new Random().nextInt(41)+ 10;
 	}
 	
 	/**

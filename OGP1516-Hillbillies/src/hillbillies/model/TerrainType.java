@@ -25,8 +25,12 @@ public enum TerrainType {
 	
 	public static final TerrainType getTerrain(int type){
 		for (TerrainType terrain: TerrainType.values()){
-			if (terrain.getType() == type)
+			//System.out.print("gegeven TYPE" +terrain.getType());
+			//System.out.println("TYPE" +type);
+			if (terrain.getType() == type){
+				//System.out.println("TERRAIN-----" +terrain);
 				return terrain;
+			}
 		}
 		return AIR;
 	}

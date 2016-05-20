@@ -47,12 +47,13 @@ public class World {
 	 */
 	public World(int[][][] terrainTypes, TerrainChangeListener listener) {
 		this.setTerrainTypes(terrainTypes);
+		//this.terrainTypes = terrainTypes;
 		this.xDimension = terrainTypes.length;
 		this.yDimension = terrainTypes[0].length;
 		this.zDimension = terrainTypes[0][0].length;
 		this.listener = listener;
 		this.connectedToBorder = new ConnectedToBorder(this.getxDimension(),this.getyDimension(),this.getzDimension());
-		initializeCubeTerrains();
+		//initializeCubeTerrains();
 	}
 	
 	
@@ -135,15 +136,16 @@ public class World {
 	 * 			that do not reference terrain types (integers other than 0,1,2 and 3)
 	 */
 	public final void setTerrainTypes(int[][][] terrainTypes) throws IllegalArgumentException {
-		for (int[][] i : terrainTypes){
-			for (int[] j: i){
-				for (int k: j){
-					if (k != 0 &&k != 1 &&k != 2&&k!= 3)
-						throw new IllegalArgumentException();
-				}
-			}
-		}
+//		for (int[][] i : terrainTypes){
+//			for (int[] j: i){
+//				for (int k: j){
+//					if (k != 0 &&k != 1 &&k != 2&&k!= 3)
+//						throw new IllegalArgumentException();
+//				}
+//			}
+//		}
 		this.terrainTypes = terrainTypes;
+		//System.out.println(terrainTypes.toString());
 	}
 	
 	/**
@@ -1224,16 +1226,16 @@ public class World {
 	 * @effect Change all the cubes that are passable in this world, from solid to passable, 
 	 * 			in the connectedToBorder variable.
 	 */
-	private void initializeCubeTerrains(){
-		for (int x=0; x < getxDimension(); x ++){
-			for (int y=0; y< getyDimension(); y++){
-				for (int z=0; z < getzDimension() ; z ++){
-					if (this.getPassable(new int[] {x,y,z}))
-						connectedToBorder.changeSolidToPassable(x, y, z);
-					}
-				}
-			}
-	}
+//	private void initializeCubeTerrains(){
+//		for (int x=0; x < getxDimension(); x ++){
+//			for (int y=0; y< getyDimension(); y++){
+//				for (int z=0; z < getzDimension() ; z ++){
+//					if (this.getPassable(new int[] {x,y,z}))
+//						connectedToBorder.changeSolidToPassable(x, y, z);
+//					}
+//				}
+//			}
+//	}
 	
 	/**
 	 * Check if the given cube is a solid cube connected to the border of this world.
