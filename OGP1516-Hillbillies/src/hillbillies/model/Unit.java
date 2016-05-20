@@ -849,6 +849,7 @@ public class Unit {
 	 *             If the duration is less than zero or exceeds or equals 0.2 s.
 	 */
 	public void advanceTime(float duration) throws IllegalArgumentException {
+		System.out.println(" a ");
 		if (!(Util.fuzzyGreaterThanOrEqualTo(duration, 0.0-Util.DEFAULT_EPSILON )&& Util.fuzzyLessThanOrEqualTo((double)duration, 0.2+Util.DEFAULT_EPSILON))){
 			System.out.println(duration);
 			throw new IllegalArgumentException();
@@ -857,7 +858,7 @@ public class Unit {
 		taskTimer += duration;
 		if (this.isExecutingStatement)
 			taskTimer += duration;
-		
+		System.out.println(" a ");
 		if (this.getExperiencePoints() >=10){
 			setExperiencePoints(this.getExperiencePoints()-10);
 			if (isValidStrength(this.getStrength()+1) && this.getWeight()>=((this.getStrength()+1)+this.getAgility())/2 )
@@ -867,6 +868,7 @@ public class Unit {
 			else if (isValidToughness(this.getToughness()+1))
 				this.setToughness(this.getToughness()+1);
 		}
+		System.out.println(" b ");
 		if (this.getHitpoints() <= 0)
 			this.terminate();
 		if (this.getStatus() != Status.FALLING && mustFall()){
@@ -879,9 +881,11 @@ public class Unit {
 			rest();
 		}
 		else if (this.isExecutingTask&& !isExecutingStatement){
+			System.out.println("re execute");
 			executeProgram(duration);
 			
 		}
+		System.out.println(" c ");
 
 		if (this.isFollowing() != null) {
 			System.out.println("IS FOLLOWING");
@@ -891,18 +895,20 @@ public class Unit {
 			}
 			else{
 				System.out.println("OTHER STATUS " +isFollowing().getStatus());
-				if(!(this.isFollowing().getStatus()==Status.FALLING)){
+				if(!(this.isFollowing().getStatus()==Status.FALLING 
+						&& !Arrays.equals(getWorld().getCubeCoordinate(targetPosition),this.isFollowing().getCubeCoordinate()))){
 					System.out.println("IS MOVING TO UNIT " +this.getPosition().toString());
-					moveTo1(world.getCubeCoordinate(this.isFollowing().getPosition()));
+					//moveTo1(world.getCubeCoordinate(this.isFollowing().getPosition()));
+					startFollowing(isFollowing());
 				}
 			}
 		}
 
-		else if (this.getStatus() == Status.DONE && targetPosition != null && !this.isEnableDefaultBehaviour()){
+		if (this.getStatus() == Status.DONE && targetPosition != null && !this.isEnableDefaultBehaviour()){
+			System.out.println(" move tooo");
 			moveTo1(targetPosition);
 
 		}
-		
 		else if (this.isEnableDefaultBehaviour() && this.getStatus() == Status.DONE && !this.isExecutingTask){
 			
 			startDefaultBehaviour();
@@ -1058,6 +1064,7 @@ public class Unit {
 		if (!this.getTask().isComplete()){			
 			if (taskTimer > duration){
 				if (this.getCurrentStatement()==null){
+					System.out.println(" start executing task");
 					this.isExecutingStatement = true;
 					this.getTask().executeTask();
 				}
@@ -1310,6 +1317,7 @@ public class Unit {
 				+ (double) dy , this.getCubePosition()[2] + (double) dz });
 			setStatus(Status.MOVING);
 			setWalkingSpeed(dz);
+			System.out.println(" move ");
 		}
 	}
 
@@ -1465,28 +1473,6 @@ public class Unit {
 		}	
 	}
 	
-//	private void moveToNext1(){
-//		if( queueContainsPos((LinkedList<int[]>) queue, this.getCubeCoordinate())){
-//			int[] candidateNextArray = null;
-//			for (int[] array: queue){
-//				double[] nextPos = {(double)array[0], (double)array[1], (double)array[2]};
-//				int n = array[3];
-//				if (this.isNeighbouringCube(nextPos)){
-//					if (candidateNextArray == null || candidateNextArray[3]> n){
-//						System.out.print("candidate " + Arrays.toString(candidateNextArray));
-//						candidateNextArray = array;
-//
-//					}
-//				}
-//			}
-//			//System.out.println("move to adjacent");
-//			//System.out.print(Arrays.toString(candidateNextArray));
-//			moveToAdjacent(candidateNextArray[0]-this.getCubeCoordinate()[0],
-//					candidateNextArray[1]-this.getCubeCoordinate()[1],candidateNextArray[2]-this.getCubeCoordinate()[2]);
-//		}
-//
-//	}
-	
 	
 	/**
 	 * Check whether a given array contains a given position
@@ -1614,7 +1600,7 @@ public class Unit {
 	 */
 	public void startFollowing(Unit other){
 		followedUnit = other;
-		moveTo1(other.getPosition());
+		moveTo1(other.getCubeCoordinate());
 	}
 	
 	/**
@@ -1634,6 +1620,7 @@ public class Unit {
 	 */
 	private void stopFollowing(){
 		followedUnit = null;
+		targetPosition = null;
 		this.setStatus(Status.DONE);
 		this.stopExecutingStatement();
 	}
@@ -2332,7 +2319,7 @@ public class Unit {
 					(this.getFaction().getScheduler().getTasksSatisfying(n->(n.getScheduledUnit()==null||n.getScheduledUnit()==this)));
 
 			if (this.getFaction().getScheduler() != null && potentialTask!=null){
-				
+				System.out.println(" start 1");
 				this.isExecutingTask = true;
 				Task newTask = potentialTask;
 				newTask.setExecutingUnit(this);

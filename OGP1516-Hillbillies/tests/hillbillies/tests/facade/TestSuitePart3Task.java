@@ -719,19 +719,21 @@ public class TestSuitePart3Task {
 		XYZExpression pos = new XYZExpression(new Position(new int[] {0,0,1}));
 		World world = facade.createWorld(types, new DefaultTerrainChangeListener());
 		Unit unit = facade.createUnit("Test", new int[] { 0, 0, 0 }, 50, 50, 50, 50, true);
-		Unit unit2 = facade.createUnit("Test", new int[] { 2, 2, 0 }, 50, 50, 50, 50, true);
+		Unit unit2 = facade.createUnit("Enemy", new int[] { 2, 2, 0 }, 50, 50, 50, 50, true);
+		
 		facade.addUnit(unit, world);
 		facade.addUnit(unit2, world);
+		Faction faction2 = facade.getFaction(unit2);
 		Faction faction = facade.getFaction(unit);
 		Scheduler scheduler = facade.getScheduler(faction);
-
+		Scheduler scheduler2 = facade.getScheduler(faction2);
 		List<Task> tasks = TaskParser.parseTasksFromString(
-				"name: \"move task\"\npriority: -10\nactivities: follow enemy;", facade.createTaskFactory(),
+				"name: \"move task\"\npriority: 10\nactivities: follow enemy;", facade.createTaskFactory(),
 				Collections.singletonList(new int[] { 1, 1, 1 }));
 		System.out.println("task made");
 		Task task = tasks.get(0);
 		facade.schedule(scheduler, task);
-		
+		System.out.println(task.getScheduledUnit());
 		advanceTimeFor(facade, world,15 , 0.02);
 		
 		assertFalse(facade.areTasksPartOf(scheduler, Collections.singleton(task)));
