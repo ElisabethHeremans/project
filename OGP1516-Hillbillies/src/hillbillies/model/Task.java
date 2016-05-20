@@ -545,6 +545,19 @@ public class Task {
 		return getName().toString();
 	}
 	
+	/**
+	 * Check whether all activities of this task are still executable.
+	 * @return True if and only if all expressions that return a unit, still return an effective unit
+	 * 		and all the expressions that return a position, still return a valid position.
+	 * 		| for all the expression in the statements of the activities:
+	 * 		| 	if expression is a unitExpression
+	 * 		|		then result == (expression.evaluateExpression(executionContext)!=null)
+	 * 		|	if expression is a positionExpression
+	 * 		|		if expression.evaluateExpression(executionContext)!=null
+	 * 		|			then result == (getExecutingUnit().canHaveAsPosition(this.getExecutingUnit().getWorld().getCubeCenter(((PositionExpression)expression).evaluateExpression(executionContext).getCoords())))
+	 * 		|		else result == false
+	 * 		|	else result == true
+	 */
 	public boolean executableActivities(){
 		List<Statement> statements = new ArrayList<Statement>();
 		List<Expression<?>> expressions = new ArrayList<Expression<?>>();
