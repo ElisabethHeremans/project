@@ -11,7 +11,6 @@ public class BreakStatement extends Statement {
 
 	@Override
 	public void executeStatement(ExecutionContext context) {
-		System.out.println("break uitgevoerd");
 		context.getExecutingUnit().setCurrentStatement(this);
 		context.setBroken(true);
 		context.getExecutingUnit().stopExecutingStatement();
