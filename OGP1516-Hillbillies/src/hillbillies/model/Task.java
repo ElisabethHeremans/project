@@ -262,6 +262,7 @@ public class Task {
 	 * 			|result == true
 	 */
 	public static boolean isWellFormed(Statement activities, List<String> variables){
+		System.out.println("check is well formed");
 		List<Statement> statements = new ArrayList<Statement>();
 		List<String> variableNames = new ArrayList<String>();
 
@@ -278,9 +279,11 @@ public class Task {
 	
 		for (Statement stat: statements){
 			if (stat instanceof AssignmentStatement<?>){
+				System.out.println(" assignment statement ");
 				variableNames.add(((AssignmentStatement<?>) stat).getVariableName());
 			}
-			else if (stat instanceof BreakStatement)
+			else if (stat instanceof BreakStatement){
+				System.out.println(" break statement ");
 				if (stat.getSuperStatement() == null)
 					return false;
 				else if (!(stat.getSuperStatement() instanceof WhileStatement)){
@@ -288,14 +291,19 @@ public class Task {
 							(! (stat.getSuperStatement().getSuperStatement() instanceof WhileStatement)))
 						return false;
 				}
-			else if(stat instanceof SequenceStatement)
+			}
+			else if(stat instanceof SequenceStatement){
+				System.out.println(" sequence statement ");
 				if (! isWellFormed(stat,variableNames))
 					return false;
+			}
 			else{
+				System.out.println("expression statement ");
 					Expression<?> e = ((ExpressionStatement<?>)stat).getExpression();
 					if (e instanceof BracketVariableExpression){
 						e = ((BracketVariableExpression)e).getExpression();
 					}
+					System.out.println("variable epr "+ e.toString());
 					if (e instanceof BasicVariableExpression<?>){
 						boolean variableAssigned = false;
 						for (String name: variableNames){
@@ -307,14 +315,14 @@ public class Task {
 							return false;
 						}
 					}
-					if (e instanceof IComposedUnaryStatement<?>){
-						if (!isWellFormed((Statement)((IComposedUnaryStatement<?>)e).getStatement(),variableNames))
+					if (stat instanceof IComposedUnaryStatement<?>){
+						if (!isWellFormed((Statement)((IComposedUnaryStatement<?>)stat).getStatement(),variableNames))
 							return false;
 					}
-					if (e instanceof IComposedBinaryStatement<?,?>){
-						if (!isWellFormed((Statement)((IComposedBinaryStatement<?,?>)e).getFirstStatement(),variableNames))
+					if (stat instanceof IComposedBinaryStatement<?,?>){
+						if (!isWellFormed((Statement)((IComposedBinaryStatement<?,?>)stat).getFirstStatement(),variableNames))
 							return false;
-						if (!isWellFormed((Statement)((IComposedBinaryStatement<?,?>)e).getSecondStatement(),variableNames))
+						if (!isWellFormed((Statement)((IComposedBinaryStatement<?,?>)stat).getSecondStatement(),variableNames))
 							return false;
 
 					}
