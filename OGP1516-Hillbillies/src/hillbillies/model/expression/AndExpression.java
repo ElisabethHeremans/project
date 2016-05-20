@@ -2,9 +2,10 @@ package hillbillies.model.expression;
 
 import hillbillies.model.ExecutionContext;
 
-public class AndExpression<E extends Expression<Boolean>> extends BinaryBooleanExpression<E> {
+public class AndExpression<E extends Expression<Boolean>,F extends Expression<Boolean>> 
+extends BinaryBooleanExpression<E,F> {
 
-	public AndExpression(E left, E right) {
+	public AndExpression(E left, F right) {
 		super(left, right);
 	}
 

@@ -2,8 +2,8 @@ package hillbillies.model.expression;
 
 import hillbillies.model.ExecutionContext;
 
-public class OrExpression<E extends Expression<Boolean>> extends BinaryBooleanExpression<E> {
-	public OrExpression(E left, E right) {
+public class OrExpression<E extends Expression<Boolean>,F extends Expression<Boolean>> extends BinaryBooleanExpression<E,F> {
+	public OrExpression(E left, F right) {
 		super(left, right);
 	}
 
