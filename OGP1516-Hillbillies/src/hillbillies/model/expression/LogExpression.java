@@ -30,6 +30,7 @@ public class LogExpression extends PositionExpression {
 	@Override
 	public Position evaluateExpression(ExecutionContext context) {
 		setValue(findNearestLog(context.getExecutingUnit()));
+		System.out.println(getValue());
 		return getValue();
 	}
 }

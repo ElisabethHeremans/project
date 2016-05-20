@@ -113,7 +113,7 @@ public class Scheduler implements Iterable<Task> {
 			throw new IllegalArgumentException();
 		}
 		
-		if(!Task.isWellFormed(task.getActivities())){
+		if(!Task.isWellFormed(task.getActivities(),null)){
 			System.out.print("problem 2");
 			throw new IllegalArgumentException();
 		}

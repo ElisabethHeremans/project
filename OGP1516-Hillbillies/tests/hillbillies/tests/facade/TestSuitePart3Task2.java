@@ -15,6 +15,7 @@ import org.junit.Test;
 
 import hillbillies.model.*;
 import hillbillies.model.expression.XYZExpression;
+import hillbillies.model.statement.Statement;
 import hillbillies.part2.listener.DefaultTerrainChangeListener;
 import hillbillies.part3.facade.Facade;
 import hillbillies.part3.facade.IFacade;
@@ -105,6 +106,15 @@ public class TestSuitePart3Task2 {
 		System.out.println(logsAtCubeMap.get(new Position(new int[] {0,0,0})));
 	}
 	
+	@Test
+	public void test_WellFormedTrue(){
+		Task task = new Task("x", 5, new Statement, new int[] { 1, 1, 1 })
+		List<Task> tasks = TaskParser.parseTasksFromString(
+				"name: \"task\"\npriority: 1\nactivities: x := log; if carries_item this then moveTo x; "
+				+ "else moveTo (0,0,2); fi moveTo boulder; while true do print x; break; done", facade.createTaskFactory(),
+				Collections.singletonList(new int[] { 1, 1, 1 }));
+		Task task = tasks.get(0);
+	}
 	
 	/**
 	 * Helper method to advance time for the given world by some time.

@@ -189,7 +189,7 @@ public class Task {
 	 * 		   | result == isWellFormed(activities)
 	 */
 	public static boolean isValidActivities(Statement activities) {
-		return isWellFormed(activities);
+		return isWellFormed(activities,null);
 	}
 
 	/**
@@ -221,34 +221,55 @@ public class Task {
 	 * 
 	 * @param activities
 	 * 			The statement to check.
+	 * @param variables
+	 * 			The already assigned variables in superstatements of this statement.
 	 * @return For all the statements in statement:
 	 * 			- if the statement is an AssignmentStatement
-	 * 				add the variable to a list of defined variables
-	 * 				|definedVariables.add(statement.getVariableName())
+	 * 				add the variable to the list of assigned variables
+	 * 				|variableNames.add(statement.getVariableName())
 	 * 			- if the statement is a BreakStatement
-	 * 				return false
-	 * 				|result == false
+	 * 				if the superstatement is null, return false
+	 * 				else if the superstatement is not a whilestatement, and the superstatement's superstatement
+	 * 					is null or not a while statement, return false
+	 * 				|if (stat.getSuperStatement() == null)
+	 * 				|  result == false;
+	 * 				|else if (!(stat.getSuperStatement() instanceof WhileStatement)){
+	 * 				|  if (stat.getSuperStatement().getSuperStatement() == null || 
+	 * 				|			(! (stat.getSuperStatement().getSuperStatement() instanceof WhileStatement)))
+	 * 				|		result == false;
 	 * 			- if the statement is a SequenceStatement
-	 * 				if this statement is well formed, return false
-	 * 				|if (!isWellFormed(statement))
+	 * 				if this statement is not well formed with the current variableNames as assigned variables, return false
+	 * 				|if (!isWellFormed(statement, variableNames))
 	 * 				|	result == false
 	 * 			- if the statement is an ExpressionStatement
 	 * 				- if the expression in the statement is a VariableExpression
 	 * 					if the variable is not in the list of defined variables, return false
 	 * 					| if (!definedVariables.contains(expression.getName()))
 	 * 					|	result == false
-	 * 				- if the statement is a ComposedStatement
-	 * 					if the statement is not a while statement 
-	 * 					and the statement in this statement is break, return false
-	 * 					|if ((! statement instanceof WhileStatement) && statement.getStatement() instanceof BreakStatement))
-	 * 					|	result == false
+	 * 				- if the statement is a ComposedUnaryStatement
+	 * 					if this statement in this statement not well formed 
+	 * 						with the current variableNames as assigned variables, return false
+	 *					|if (!isWellFormed((Statement)((IComposedUnaryStatement<?>)e).getStatement(),variableNames))
+	 *					|	result == false;
+	 * 				- if the statement is a ComposedBinaryStatement
+	 * 					if one of the two statement in this statement not well formed 
+	 * 						with the current variableNames as assigned variables, return false
+	 *					|if (!isWellFormed((Statement)((IComposedBinaryStatement<?>)e).getFirstStatement(),variableNames))
+	 *					|	result == false;
+	 *					|if (!isWellFormed((Statement)((IComposedBinaryStatement<?>)e).getSecondStatement(),variableNames))
+	 *					|	result == false;
 	 * @return Else, return true
 	 * 			|result == true
 	 */
-	public static boolean isWellFormed(Statement activities){
+	public static boolean isWellFormed(Statement activities, List<String> variables){
 		List<Statement> statements = new ArrayList<Statement>();
 		List<String> variableNames = new ArrayList<String>();
-	
+
+		if (variables == null|| variables.size()==0)
+			variableNames = new ArrayList<String>();
+		else
+			for (String var: variables)
+				variableNames.add(var);
 		if (activities instanceof SequenceStatement){
 			statements = (List<Statement>) ((SequenceStatement<?>)activities).getStatements();
 		}
@@ -260,16 +281,22 @@ public class Task {
 				variableNames.add(((AssignmentStatement<?>) stat).getVariableName());
 			}
 			else if (stat instanceof BreakStatement)
-				return false;
+				if (stat.getSuperStatement() == null)
+					return false;
+				else if (!(stat.getSuperStatement() instanceof WhileStatement)){
+					if (stat.getSuperStatement().getSuperStatement() == null || 
+							(! (stat.getSuperStatement().getSuperStatement() instanceof WhileStatement)))
+						return false;
+				}
 			else if(stat instanceof SequenceStatement)
-				if (! isWellFormed(stat))
+				if (! isWellFormed(stat,variableNames))
 					return false;
 			else{
 					Expression<?> e = ((ExpressionStatement<?>)stat).getExpression();
 					if (e instanceof BracketVariableExpression){
 						e = ((BracketVariableExpression)e).getExpression();
 					}
-					if (e instanceof BasicVariableExpression){
+					if (e instanceof BasicVariableExpression<?>){
 						boolean variableAssigned = false;
 						for (String name: variableNames){
 							if (name == ((BasicVariableExpression<?>)e).getName())
@@ -280,89 +307,23 @@ public class Task {
 							return false;
 						}
 					}
-					if (stat instanceof IComposedUnaryStatement<?>)
-						if (!( stat instanceof WhileStatement<?,?>))
-							if(((IComposedUnaryStatement<?>)stat).getStatement() 
-									instanceof BreakStatement)
-								return false;
-					if (stat instanceof IComposedBinaryStatement<?,?>)
-						if ((((IComposedBinaryStatement<?,?>)stat).getFirstStatement() 
-								instanceof BreakStatement) ||
-								(((IComposedBinaryStatement<?,?>)stat).getSecondStatement() 
-										instanceof BreakStatement))
+					if (e instanceof IComposedUnaryStatement<?>){
+						if (!isWellFormed((Statement)((IComposedUnaryStatement<?>)e).getStatement(),variableNames))
 							return false;
-									
+					}
+					if (e instanceof IComposedBinaryStatement<?,?>){
+						if (!isWellFormed((Statement)((IComposedBinaryStatement<?,?>)e).getFirstStatement(),variableNames))
+							return false;
+						if (!isWellFormed((Statement)((IComposedBinaryStatement<?,?>)e).getSecondStatement(),variableNames))
+							return false;
+
+					}
+					
 				}
 			}
 		return true;
 		}
 	
-	/**
-	 * Remove the first statement of this task.
-	 * 
-	 * @effect If the activities is a sequencestatement, 
-	 * 			remove the first statement from this sequencestatement 
-	 * 			and add this statement to the completed activities of this task.
-	 * 			|if ((this.getActivities() instanceof SequenceStatement))
-	 * 			|completedActivities.addStatement(this.getActivities()).removeFirstStatement());
-	 * 				If the whole sequencestatement of activities is executed, 
-	 * 				set this task as complete, and set the activities of this task to null.
-	 * 				|if (this.getActivities().isStatementExecuted())
-	 * 				|this.setActivities(null)
-	 * 				|this.setComplete(true)
-	 * @effect If the activities is not a sequencestatement,
-	 * 			set the activities of this task to null and set this task to completed.
-	 * 			|if (!(this.getActivities() instanceof SequenceStatement))
-	 * 			|completedActivities.addStatement(getActivities())
-	 * 			|this.setActivities(null);
-	 *			|this.setComplete(true);
-	 */
-//	public void removeFirstStatement(){
-//		if (this.getActivities() instanceof SequenceStatement){
-//			Statement first = ((SequenceStatement<?>) this.getActivities()).removeFirstStatement();
-//			((SequenceStatement<?>)completedActivities).addStatement(first);
-//			//setCompletedActivities(getCompletedActivities());
-//			if (this.getActivities().isStatementExecuted()){
-//				this.setActivities(null);
-//				this.setComplete(true);
-//				//this.getExecutingUnit().
-//			}
-//		}
-//		else{
-//			((SequenceStatement<?>)completedActivities).addStatement(getActivities());
-//			this.setActivities(null);
-//			this.setComplete(true);
-//		}
-//		//System.out.println(((SequenceStatement<?>) this.getActivities()).getStatements());
-//		System.out.println(" first statement removed ");
-//	}
-	
-	/**
-	 * Return the completedActivities
-	 */
-//	@Basic @Raw
-//	public Statement getCompletedActivities() {
-//		return completedActivities;
-//	}
-
-	/**
-	 * Set the completed activities of this task to the given statement.
-	 * 
-	 * @param completedActivities 
-	 * 			the completedActivities to set
-	 * @post The completed activities of this new task is equal to completedActivities
-	 * 			| new.getCompletedActivities() == completedActivities;
-	 */
-//	@Raw
-//	public void setCompletedActivities(Statement completedActivities) {
-//		this.completedActivities = completedActivities;
-//	}
-//	
-//	/**
-//	 * Variable registering the completed activities of this task.
-//	 */
-//	private Statement completedActivities = new SequenceStatement<Statement>(new ArrayList<Statement>());
-
 
 	/**
 	 * Return the scheduled unit for this task.
