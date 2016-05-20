@@ -1795,6 +1795,7 @@ public class Unit {
 	 * 		|	setExperiencePoints(this.getExperiencePoints()+10)
 	 */
 	private void endWork(int[] targetPosition) {
+		System.out.println(" target work "+Arrays.toString(targetPosition));
 		switch(this.getWorld().getTerrain(targetPosition)){
 		case TREE:
 			this.getWorld().solidToPassableUpdate(targetPosition);
@@ -1827,6 +1828,7 @@ public class Unit {
 					System.out.println("CASE NOT CARRYING BOULDER BUT LOG addLog to the world");
 					break;
 				case 0:
+					System.out.println("Case not carrying logs or boulders");
 					switch(this.getWorld().getTerrain(targetPosition)){
 					case WORKSHOP:
 						switch(this.getWorld().getBoulders(targetPosition).size()){
@@ -1845,6 +1847,7 @@ public class Unit {
 							}
 							break;
 						default:
+							System.out.println("there are boulders present in this workshop");
 							switch(this.getWorld().getLogs(targetPosition).size()){
 							case 0:
 								System.out.println("CASE NOT CARRYING BOULDER, NOT LOG, addBoulder to the unit");
@@ -1871,6 +1874,7 @@ public class Unit {
 					default:
 						switch(this.getWorld().getBoulders(targetPosition).size()){
 						case 0:
+							System.out.println(" no boulders in this air");
 							switch(this.getWorld().getLogs(targetPosition).size()){
 							case 0:
 								break;

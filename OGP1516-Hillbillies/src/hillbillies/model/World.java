@@ -877,6 +877,7 @@ public class World {
 			bouldersAtCube = new HashSet<Boulder>();
 			bouldersAtCube.add(boulder);
 			this.bouldersAtCubeMap.put(new Position(boulder.getCubeCoordinate()),bouldersAtCube);
+			System.out.println(" boulder in map "+ this.logsAtCubeMap.get(new Position(boulder.getCubeCoordinate()).toString()));
 		}
 	}
 
@@ -1055,6 +1056,7 @@ public class World {
 	 * 			If the given log is not attached to this world.
 	 */
 	void addLogToLogsAtCubeMap(Log log) throws IllegalArgumentException{
+		System.out.print(log);
 		if(!this.hasAsLog(log))
 			throw new IllegalArgumentException();
 		Set<Log> logsAtCube = this.logsAtCubeMap.get(new Position(log.getCubeCoordinate()));
@@ -1065,8 +1067,13 @@ public class World {
 		else{
 			logsAtCube = new HashSet<Log>();
 			logsAtCube.add(log);
+			System.out.println(logsAtCube);
+			System.out.println(log.getCubeCoordinate());
 			this.logsAtCubeMap.put(new Position(log.getCubeCoordinate()),logsAtCube);
+			System.out.println(" log in map "+ this.logsAtCubeMap.get(new Position(log.getCubeCoordinate()).toString()));
+
 		}
+		System.out.println(" log in map "+ this.logsAtCubeMap.get(new Position(log.getCubeCoordinate()).toString()));
 	}
 
 	/**
