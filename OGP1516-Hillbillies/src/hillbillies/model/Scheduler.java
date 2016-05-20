@@ -424,8 +424,6 @@ public class Scheduler implements Iterable<Task> {
 
 		
 		public Task next() {
-			System.out.print("iterated  "+iteratedTasks.size());
-			System.out.print("tasks size  "+getTasks().size());
 
 			if (!hasNext()){
 				throw new NoSuchElementException();

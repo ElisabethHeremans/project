@@ -264,8 +264,6 @@ public class Task {
 	 * 			|result == true
 	 */
 	public static boolean isWellFormed(Statement activities, List<String> variables){
-		System.out.println("check is well formed");
-		System.out.println(variables);
 		List<Statement> statements = new ArrayList<Statement>();
 		List<String> variableNames = new ArrayList<String>();
 
@@ -282,11 +280,9 @@ public class Task {
 	
 		for (Statement stat: statements){
 			if (stat instanceof AssignmentStatement<?>){
-				System.out.println(" assignment statement ");
 				variableNames.add(((AssignmentStatement<?>) stat).getVariableName());
 			}
 			else if (stat instanceof BreakStatement){
-				System.out.println(" break statement ");
 				if (stat.getSuperStatement() == null)
 					return false;
 				else if (!(stat.getSuperStatement() instanceof WhileStatement)){
@@ -296,25 +292,19 @@ public class Task {
 				}
 			}
 			else if(stat instanceof SequenceStatement){
-				System.out.println(" sequence statement ");
 				if (! isWellFormed(stat,variableNames))
 					return false;
 			}
 			else{
-				System.out.println("expression statement ");
 					Expression<?> e = ((ExpressionStatement<?>)stat).getExpression();
 					if (e instanceof BracketVariableExpression){
 						e = ((BracketVariableExpression)e).getExpression();
 					}
-					System.out.println("variable epr "+ e.toString());
 					if (e instanceof BasicVariableExpression<?>){
-						System.out.println("variable epr "+ ((BasicVariableExpression<?>)e).getName());
 						boolean variableAssigned = false;
 						for (String name: variableNames){
-							System.out.println(name);
 							if (name.equals(((BasicVariableExpression<?>)e).getName())){
 								variableAssigned = true;
-								System.out.println("true");
 							}
 							
 						}
@@ -404,12 +394,9 @@ public class Task {
 		}
 		if (this.getExecutingUnit()!= null)
 			this.getExecutingUnit().setTask(null);
-		//System.out.println(" set exec unit ");
 		this.getExecutionContext().setExecutingUnit(executingUnit);
-		//System.out.println(" set exec unit ");
 		
 		this.setScheduledUnit(executingUnit);
-		System.out.println(" set exec unit ");
 		if (executingUnit != null)
 			executingUnit.setTask(this);
 	}
@@ -511,7 +498,6 @@ public class Task {
 	public void executeTask() throws NullPointerException{
 		if (this.getExecutingUnit() == null)
 			throw new NullPointerException();
-		System.out.print(" activities "+ getActivities() + "   ");
 		getActivities().executeStatement(getExecutionContext());
 	}
 	
@@ -528,7 +514,6 @@ public class Task {
 	 */
 	public void interruptExecution(){
 		this.getExecutingUnit().stopExecutingTask();
-		System.out.println(" interrupting ");
 		//this.setExecutingUnit(null);
 		//this.setActivities(activities);
 		this.setPriority(this.getPriority()-1);

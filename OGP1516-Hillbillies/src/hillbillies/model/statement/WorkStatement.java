@@ -8,7 +8,6 @@ import hillbillies.model.expression.Expression;
 public class WorkStatement<E extends Expression<Position>> extends ActionStatement<E>{
 	
 	public WorkStatement(E position){
-		System.out.print(" selected "+ position.toString());
 		setExpression(position);
 	}
 
@@ -19,10 +18,6 @@ public class WorkStatement<E extends Expression<Position>> extends ActionStateme
 		context.getExecutingUnit().setCurrentStatement(this);
 		super.executeStatement(context);
 		getExpression().evaluateExpression(context);
-//		System.out.print(" expr "+getExpression());
-//		System.out.print(" coords "+getExpression().getValue().getCoords());
-//		System.out.print(" unit "+context.getExecutingUnit());
-//		System.out.print();
 		context.getExecutingUnit().work(getExpression().getValue().getCoords());	
 		}
 		catch(NullPointerException e){
