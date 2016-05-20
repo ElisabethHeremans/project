@@ -868,19 +868,12 @@ public class Unit {
 		if (this.getHitpoints() <= 0)
 			this.terminate();
 		if (this.getStatus() != Status.FALLING && mustFall()){
-			if (this.isExecutingTask){
-				stopExecutingTask();
-			}
 			fall();
 		}
 		if (this.getStatus() == Status.FALLING){
 			falling(duration);
 		}
 		else if (mustRest()){
-			if (this.isExecutingTask){
-				stopExecutingTask();
-			}
-
 			rest();
 			System.out.println(" RESTING ");
 		}
@@ -940,10 +933,6 @@ public class Unit {
 			if (this.isExecutingStatement){
 				stopExecutingStatement();
 			}
-			else if (this.isExecutingTask)
-				stopExecutingTask();
-			else if (this.isEnableDefaultBehaviour())
-				startDefaultBehaviour();
 			}
 
 		}
@@ -975,7 +964,6 @@ public class Unit {
 		this.setTask(null);
 		if (this.isFollowing()!=null)
 			this.stopFollowing();
-		
 	}
 	
 	/**
@@ -1090,7 +1078,7 @@ public class Unit {
 		this.nextTargetPosition = Vector.vectorAdd(this.getPosition(), new double[] {0.0,0.0,-1.0});
 		this.startPosition = this.getPosition();
 		if (this.isExecutingTask){
-			stopExecutingTask();
+			this.getTask().interruptExecution();
 		}
 
 	}
@@ -1371,7 +1359,7 @@ public class Unit {
 		int[] position = {(int) targetPosition[0], (int) targetPosition[1], (int) targetPosition[2]};
 		if (!canHaveAsPosition(targetPosition) || !getWorld().isNeighboringSolidTerrain(position)){
 			if (this.isExecutingTask){
-				stopExecutingTask();
+				this.getTask().interruptExecution();
 				//startDefaultBehaviour;
 			}
 			else
@@ -1391,7 +1379,7 @@ public class Unit {
 		}
 		else if (canMove()) {
 			if (this.isExecutingTask && ! (this.getCurrentStatement() instanceof MoveToStatement))
-				stopExecutingTask();
+				this.getTask().interruptExecution();
 			this.targetPosition = targetPosition;
 			setStatus(Status.IN_CENTER);
 			int index = 0;
@@ -1431,7 +1419,8 @@ public class Unit {
 				System.out.println("Unreachable");
 				//throw new IllegalArgumentException();
 				if (this.isExecutingTask)
-					stopExecutingTask();
+					this.getTask().interruptExecution();
+
 			}
 			}
 		}	
@@ -1718,7 +1707,8 @@ public class Unit {
 			this.setOrientation((float) Math.atan2(workTargetPosition[1]+0.5 - this.getPosition()[1],
 					workTargetPosition[0]+0.5 - this.getPosition()[0]));
 			if (this.isExecutingTask && ! (this.getCurrentStatement() instanceof WorkStatement)){
-				stopExecutingTask();
+				this.getTask().interruptExecution();
+
 			}
 
 		}
@@ -1989,7 +1979,8 @@ public class Unit {
 			other.defend(this);
 			attackTimer = 0.0;
 			if (this.isExecutingTask && ! (this.getCurrentStatement() instanceof AttackStatement)){
-				stopExecutingTask();
+				this.getTask().interruptExecution();
+
 			}
 
 		}
@@ -2039,7 +2030,8 @@ public class Unit {
 	public void defend(Unit unit) {
 		if (this.canDefend()){
 			if (this.isExecutingTask){
-				stopExecutingTask();
+				this.getTask().interruptExecution();
+
 			}
 			setStatus(Status.DEFENDING);
 			setOrientation((float) Math.atan2(unit.getPosition()[1] - this.getPosition()[1],
@@ -2142,7 +2134,7 @@ public class Unit {
 			else
 				setStatus(Status.RESTING);
 			if (this.isExecutingTask){
-				stopExecutingTask();
+				this.getTask().interruptExecution();
 			}
 
 		}
@@ -2374,7 +2366,7 @@ public class Unit {
 		nextTargetPosition = null;
 		setStatus(Status.DONE);
 		if (this.isExecutingTask)
-			stopExecutingTask();
+			this.getTask().interruptExecution();
 	}
 	
 	/**

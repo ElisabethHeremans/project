@@ -557,7 +557,8 @@ public class Task {
 		this.getExecutingUnit().stopExecutingTask();
 		//this.setExecutingUnit(null);
 		//this.setActivities(activities);
-		this.setPriority(getPriority()-1);
+		this.setPriority(this.getPriority()-1);
+
 	}
 	
 	/**
