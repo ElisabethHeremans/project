@@ -35,7 +35,7 @@ public class TestSuitePart3Task2 {
 	}
 	
 	@Test
-	public void test_breakStatement() throws ModelException {
+	public void test_carriesItemAndLogFalling() throws ModelException {
 		System.out.println("*******************TEST BREAK************************");
 		int[][][] types = new int[3][3][3];
 		types[1][1][0] = TYPE_ROCK;
@@ -47,20 +47,20 @@ public class TestSuitePart3Task2 {
 		Unit unit = facade.createUnit("Test", new int[] { 0, 0, 0 }, 50, 50, 50, 50, true);
 		Log log = new Log(new int[] {0,1,1});
 		world.addAsLog(log);
-		Boulder boulder = new Boulder(new int[] {0,1,1});
+		Boulder boulder = new Boulder(new int[] {0,0,1});
 		facade.addUnit(unit, world);
 		world.addAsBoulder(boulder);
 		Faction faction = facade.getFaction(unit);
 		Assert.assertEquals(1, world.getLogs(new int[] {0,1,1}).size());
-		Assert.assertEquals(1, world.getLogs(new int[] {0,1,1}).size());
+		Assert.assertEquals(1, world.getBoulders(new int[] {0,0,1}).size());
 		Scheduler scheduler = facade.getScheduler(faction);
 
 		List<Task> tasks = TaskParser.parseTasksFromString(
-				"name: \"work task\"\npriority: 1\nactivities: work selected;", facade.createTaskFactory(),
+				"name: \"work task\"\npriority: 1\nactivities: x := log;", facade.createTaskFactory(),
 				Collections.singletonList(new int[] { 1, 1, 1 }));
 		List<Task> tasks2 = TaskParser.parseTasksFromString(
-				"name: \"break task\"\npriority: 2\nactivities: x := log; work log; if carries_item this then moveTo (0,0,1); else moveTo (0,0,2); fi y:= selected;", facade.createTaskFactory(),
-				Collections.singletonList(new int[] { 0, 1, 1 }));
+				"name: \"break task\"\npriority: 2\nactivities: x := log; work selected; if carries_item this then moveTo (0,0,1); else moveTo (0,0,2); fi y:= selected;", facade.createTaskFactory(),
+				Collections.singletonList(new int[] { 0, 1, 0 }));
 		
 		
 		// tasks are created
@@ -81,14 +81,16 @@ public class TestSuitePart3Task2 {
 		
 		
 
-		// work task has been executed
-		assertEquals(TYPE_AIR, facade.getCubeType(world, 0, 1, 1));
+		Assert.assertArrayEquals(new int[] {0,0,1}, unit.getCubeCoordinate());
 		// work task is removed from scheduler
-		System.out.print("remaining tasks  "+scheduler.getTasks().size());
+		Assert.assertEquals(0,scheduler.getTasks().size());
 		//System.out.print(scheduler.);
 		assertFalse(facade.areTasksPartOf(scheduler, Collections.singleton(task)));
 		assertFalse(facade.areTasksPartOf(scheduler, Collections.singleton(task1)));
-		System.out.print(" position " + Arrays.toString(unit.getPosition()));
+		//System.out.print(" position " + Arrays.toString(unit.getPosition()));
+		Assert.assertEquals(0, world.getLogs(new int[] {0,1,0}).size());
+		Assert.assertEquals(1, world.getBoulders(new int[] {0,0,0}).size());
+
 	}
 
 	private Map<Position,Boolean> logsAtCubeMap = new HashMap<Position,Boolean>();

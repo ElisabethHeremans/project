@@ -1874,6 +1874,9 @@ public class Unit {
 						}
 						break;
 					default:
+						System.out.println(this.getWorld().listAllBoulders());
+						System.out.println(this.getWorld().getBoulders(targetPosition));
+						System.out.println(this.getWorld().listAllLogs());
 						switch(this.getWorld().getBoulders(targetPosition).size()){
 						case 0:
 							System.out.println(" no boulders in this air");
