@@ -11,8 +11,9 @@ public class OrExpression<E extends Expression<Boolean>,F extends Expression<Boo
 	public Boolean evaluateExpression(ExecutionContext context) {
 		try{
 		this.getLeftExpression().evaluateExpression(context);
+		System.out.println(getLeftExpression().getValue());
 		this.getRightExpression().evaluateExpression(context);
-
+		System.out.println(getRightExpression().getValue());
 		setValue(getRightExpression().getValue() || getLeftExpression().getValue());
 		return getValue();
 		}

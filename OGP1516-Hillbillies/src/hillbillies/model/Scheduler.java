@@ -296,6 +296,25 @@ public class Scheduler implements Iterable<Task> {
 			task.setScheduledUnit(unit);
 
 	}
+	
+	/**
+	 * Reset the scheduled unit for the given task.
+	 * @param task
+	 * 		The task of which the scheduled unit needs to be reset.
+	 * @effect The scheduled unit of the given task references no effective task as its scheduled task.
+	 * 		|task.getScheduledUnit().setScheduledTask(null);
+	 * @effect The given task references no effective unit as its scheduled unit.
+	 * 		| task.setScheduledUnit(null);
+	 * @throws IllegalArgumentExeption
+	 * 		If this scheduler does not references the given task as one of its tasks.
+	 * 		|! this.hasAsTask(task)
+	 */
+	public void unmarkTaskForUnit(Task task){
+		if (! this.hasAsTask(task))
+			throw new IllegalArgumentException();
+		task.getScheduledUnit().setScheduledTask(null);
+		task.setScheduledUnit(null);
+	}
 
 	/**
 	 *  Return an iterator returning all the tasks of this scheduler, one by one.
