@@ -57,7 +57,7 @@ public class TestSuitePart3Task2 {
 		Scheduler scheduler = facade.getScheduler(faction);
 
 		List<Task> tasks = TaskParser.parseTasksFromString(
-				"name: \" work task\"\npriority: 1\nactivities: work selected;", facade.createTaskFactory(),
+				"name: \"work task\"\npriority: 1\nactivities: work selected;", facade.createTaskFactory(),
 				Collections.singletonList(new int[] { 1, 1, 1 }));
 		List<Task> tasks2 = TaskParser.parseTasksFromString(
 				"name: \"task\"\npriority: 2\nactivities: x := log; work selected; if carries_item this then moveTo (0,0,1); else moveTo (0,0,2); fi y:= selected;", facade.createTaskFactory(),
@@ -71,7 +71,7 @@ public class TestSuitePart3Task2 {
 		Task task = tasks.get(0);
 		Task task1 = tasks2.get(0);
 		// test name
-		assertEquals(" work task", facade.getName(task));
+		assertEquals("work task", facade.getName(task));
 		// test priority
 		assertEquals(1, facade.getPriority(task));
 		
@@ -115,25 +115,52 @@ public class TestSuitePart3Task2 {
 		// no problem making these tasks -> wellFormed = true
 	}
 	
-	@Test
-	public void test_WellFormedFalseNonInstantiatedVariable(){
-		List<Task> tasks = TaskParser.parseTasksFromString(
-				"name: \"task\"\npriority: 1\nactivities: x := log; if carries_item this then moveTo x; "
-				+ "else moveTo (0,0,2); fi moveTo boulder; while true do print y; break; done", facade.createTaskFactory(),
-				Collections.singletonList(new int[] { 1, 1, 1 }));
-		Assert.assertTrue(tasks == null);
-		//Task task= tasks.get(0);
-	}
+//	@Test
+//	public void test_WellFormedFalseNonInstantiatedVariable(){
+//		List<Task> tasks = TaskParser.parseTasksFromString(
+//				"name: \"task\"\npriority: 1\nactivities: x := log; if carries_item this then moveTo x; "
+//				+ "else moveTo (0,0,2); fi moveTo boulder; while true do print y; break; done", facade.createTaskFactory(),
+//				Collections.singletonList(new int[] { 1, 1, 1 }));
+//		Assert.assertTrue(tasks == null);
+//		//Task task= tasks.get(0);
+//	}
+//	
+//	@Test
+//	public void test_WellFormedFalseBreakWrong(){
+//		System.out.println("test well formed false!");
+//		List<Task> tasks = TaskParser.parseTasksFromString(
+//				"name: \"task\"\npriority: 1\nactivities: x := log; if carries_item this then moveTo x; "
+//				+ "else break; fi moveTo boulder; while true do print x; break; done;", facade.createTaskFactory(),
+//				Collections.singletonList(new int[] { 1, 1, 1 }));
+//		Assert.assertTrue(tasks == null);
+//
+//	}
 	
 	@Test
-	public void test_WellFormedFalseBreakWrong(){
-		System.out.println("test well formed false!");
+	public void test_ExecuteTaskEffective() throws ModelException{
+		int[][][] types = new int[3][3][3];
+		types[1][1][0] = TYPE_ROCK;
+		types[1][1][1] = TYPE_ROCK;
+		types[1][1][2] = TYPE_TREE;
+		types[2][2][2] = TYPE_WORKSHOP;
+
+		World world = facade.createWorld(types, new DefaultTerrainChangeListener());
+		Unit unit = facade.createUnit("Test", new int[] { 0, 0, 0 }, 50, 50, 50, 50, true);
+
 		List<Task> tasks = TaskParser.parseTasksFromString(
 				"name: \"task\"\npriority: 1\nactivities: x := log; if carries_item this then moveTo x; "
-				+ "else break; fi moveTo boulder; while true do print x; break; done;", facade.createTaskFactory(),
+				+ "else moveTo (0,0,2); fi moveTo boulder; while true do print x; break; done", facade.createTaskFactory(),
 				Collections.singletonList(new int[] { 1, 1, 1 }));
-		Assert.assertTrue(tasks == null);
+		Task task = tasks.get(0);
+		Faction faction = unit.getFaction();
+		Scheduler scheduler = facade.getScheduler(faction);
 
+		facade.schedule(scheduler, task);
+		
+		task.setExecutingUnit(unit);
+		task.executeTask();
+		Assert.assertEquals(task, unit.getTask());
+		Assert.assertTrue(unit.isExecutingStatement);
 	}
 	
 	

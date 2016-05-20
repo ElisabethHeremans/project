@@ -2,10 +2,12 @@ package hillbillies.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import hillbillies.model.expression.*;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import be.kuleuven.cs.som.annotate.*;
 import hillbillies.model.statement.*;
@@ -263,6 +265,7 @@ public class Task {
 	 */
 	public static boolean isWellFormed(Statement activities, List<String> variables){
 		System.out.println("check is well formed");
+		System.out.println(variables);
 		List<Statement> statements = new ArrayList<Statement>();
 		List<String> variableNames = new ArrayList<String>();
 
@@ -305,10 +308,14 @@ public class Task {
 					}
 					System.out.println("variable epr "+ e.toString());
 					if (e instanceof BasicVariableExpression<?>){
+						System.out.println("variable epr "+ ((BasicVariableExpression<?>)e).getName());
 						boolean variableAssigned = false;
 						for (String name: variableNames){
-							if (name == ((BasicVariableExpression<?>)e).getName())
+							System.out.println(name);
+							if (name.equals(((BasicVariableExpression<?>)e).getName())){
 								variableAssigned = true;
+								System.out.println("true");
+							}
 							
 						}
 						if (!variableAssigned){
@@ -505,9 +512,6 @@ public class Task {
 		if (this.getExecutingUnit() == null)
 			throw new NullPointerException();
 		System.out.print(" activities "+ getActivities() + "   ");
-//		System.out.print(this.getExecutionContext().getSelectedCube());
-//		System.out.print(this.getExecutionContext().getExecutingUnit());
-		
 		getActivities().executeStatement(getExecutionContext());
 	}
 	
@@ -569,6 +573,33 @@ public class Task {
 		}
 		return true;
 	}
+	
+	/**
+	 * Add the given scheduler as a scheduler of this task.
+	 * @param scheduler
+	 * 			The scheduler to add to the set of schedulers
+	 * @throws IllegalArgumentException
+	 * 			If the given scheduler does not have this task as its task.
+	 * 			| (!scheduler.hasAsTask(this))
+	 */
+	void addAsScheduler(@Raw Scheduler scheduler) throws IllegalArgumentException {
+		if (!scheduler.hasAsTask(this))
+			throw new IllegalArgumentException();
+		this.schedulers.add(scheduler);
+		
+	}
+	
+	/**
+	 * Return all the schedulers of which this task is a task.
+	 */
+	@Basic @Raw
+	public Set<Scheduler> getSchedulers(){
+		return this.schedulers;
+	}
+	/**
+	 * Variable registering the set of schedulers of which this task is a task.
+	 */
+	private Set<Scheduler> schedulers = new HashSet<Scheduler>();
 	
 //	public void restoreTask(){
 //		List<Statement> statements = new ArrayList<Statement>();
