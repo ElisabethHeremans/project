@@ -1467,6 +1467,9 @@ public class Unit {
 				//throw new IllegalArgumentException();
 				if (this.isExecutingTask)
 					this.getTask().interruptExecution();
+				this.setStatus(Status.DONE);
+				targetPosition = null;
+				this.startDefaultBehaviour();
 
 			}
 			}
@@ -1600,6 +1603,7 @@ public class Unit {
 	 */
 	public void startFollowing(Unit other){
 		followedUnit = other;
+		setStatus(Status.MOVING);
 		moveTo1(other.getCubeCoordinate());
 	}
 	
