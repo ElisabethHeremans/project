@@ -528,6 +528,7 @@ public class Task {
 	 */
 	public void interruptExecution(){
 		this.getExecutingUnit().stopExecutingTask();
+		System.out.println(" interrupting ");
 		//this.setExecutingUnit(null);
 		//this.setActivities(activities);
 		this.setPriority(this.getPriority()-1);

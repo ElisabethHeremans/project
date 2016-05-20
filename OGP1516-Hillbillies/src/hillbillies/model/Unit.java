@@ -971,6 +971,7 @@ public class Unit {
 		this.isExecutingTask = false;
 		this.setCurrentStatement(null);
 		this.targetPosition = null;
+		this.getTask().setComplete(false);
 		this.getTask().setExecutingUnit(null);
 		this.setTask(null);
 		if (this.isFollowing()!=null)
