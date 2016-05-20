@@ -15,6 +15,7 @@ public class PrintStatement<E extends Expression<?>> extends ExpressionStatement
 	public void executeStatement(ExecutionContext context) {
 		context.getExecutingUnit().setCurrentStatement(this);
 		getExpression().evaluateExpression(context);
+		System.out.println(getExpression().toString());
 		context.getExecutingUnit().stopExecutingStatement();
 	}
 	

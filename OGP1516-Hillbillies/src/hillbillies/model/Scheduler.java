@@ -234,8 +234,9 @@ public class Scheduler implements Iterable<Task> {
 	}
 	
 	/**
-	 * Return the task with the highest priority that is currently not being executed.
-	 * @Return null if there are no tasks or all tasks or being executes. Otherwise, return the task 
+	 * Return the task with the highest priority that is currently not being executed
+	 *  in the set of all the tasks of this scheduler.
+	 * @return null if there are no tasks or all tasks or being executes. Otherwise, return the task 
 	 * 	that has the highest priority of all tasks that are not being executed.
 	 * 		| List<Task> tasksNotExecuted = tasks.stream().filter(n->(n.getExecutingUnit()==null)).forEach(tasksNotExecuted::add)
 	 * 		| if (tasksNotExecuted.size()==0)
@@ -255,6 +256,23 @@ public class Scheduler implements Iterable<Task> {
 		return this.getHighestPriorityTask(tasks);
 	}
 	
+	/**
+	 * Return the task with the highest priority that is currently not being executed, from the set of given tasks.
+	 * @param tasks
+	 * 		the set of given tasks from which the highest priority task must be taken.
+	 * @return null if there are no tasks or all tasks or being executes. Otherwise, return the task 
+	 * 	that has the highest priority of all tasks that are not being executed.
+	 * 		| List<Task> tasksNotExecuted = tasks.stream().filter(n->(n.getExecutingUnit()==null)).forEach(tasksNotExecuted::add)
+	 * 		| if (tasksNotExecuted.size()==0)
+	 * 		|	then result == null;
+	 * 		| else
+	 * 		|	 for all tasks in tasksNotExecuted
+	 * 		|		prior = tasksNotExecuted.get(0).getPriority()
+	 * 		|		if (task.getPriority()> prior)
+	 * 		|			then HighestPriorityTask = task
+	 * 		|				&& prior = task.getPriority()
+	 * 		|	result == HighestPriorityTask
+	 */
 	public Task getHighestPriorityTask(Set<Task> tasks){
 		List<Task> tasksNotExecuted = new ArrayList<>();
 		tasks.stream().filter(n->(n.getExecutingUnit()==null)).forEach(tasksNotExecuted::add);
