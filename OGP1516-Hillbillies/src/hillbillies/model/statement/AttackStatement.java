@@ -25,19 +25,6 @@ public class AttackStatement<E extends Expression<Unit>> extends ActionStatement
 		}
 		
 	}
-	
-//	public AttackStatement(UnitExpression unit){
-//		setUnit(unit);
-//	}
-//	
-//	public UnitExpression getUnit() {
-//		return unit;
-//	}
-//
-//	public void setUnit(UnitExpression unit) {
-//		this.unit = unit;
-//	}
-//
-//	private UnitExpression unit;
+
 
 }

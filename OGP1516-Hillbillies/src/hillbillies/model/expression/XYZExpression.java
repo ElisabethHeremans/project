@@ -4,11 +4,7 @@ import hillbillies.model.ExecutionContext;
 import hillbillies.model.Position;
 
 public class XYZExpression extends PositionExpression {
-	
-//	public XYZExpression(int x, int y, int z){
-//		setValue(Position(new int[] {x,y,z}));
-//	
-//	}
+
 	
 	public XYZExpression(Position pos){
 		setValue(pos);

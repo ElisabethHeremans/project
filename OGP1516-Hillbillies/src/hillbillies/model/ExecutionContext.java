@@ -40,24 +40,16 @@ public class ExecutionContext {
 	public void addVariable(String variableName,Expression<?> expr){
 		if (getVariables()==null)
 			setVariables(new HashMap<String,Expression<?>>());
-//		System.out.println("add variable");
-//		System.out.println(variableName);
-//		System.out.println(variables);
-//		System.out.println(expr);
 		try{
 			variables.put(variableName, expr);
 		}
 		catch(ClassCastException exc){
-			System.out.println(exc);
 		}
 		catch(UnsupportedOperationException exc2){
-			System.out.println(exc2);
 		}
 		catch(IllegalArgumentException exc3){
-			System.out.println(exc3);
 		}
 		catch(NullPointerException exc4){
-			System.out.println(exc4);
 		
 		}
 		

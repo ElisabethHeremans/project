@@ -9,7 +9,6 @@ extends ComposedStatement implements IExpressionStatement<E>{
 	
 	
 	public ExpressionStatement(){
-		//setExpression(e);
 	}
 	
 

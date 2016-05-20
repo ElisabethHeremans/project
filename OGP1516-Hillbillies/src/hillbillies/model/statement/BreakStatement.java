@@ -20,7 +20,6 @@ public class BreakStatement extends Statement {
 	public Statement getNextStatement(ExecutionContext context){
 		Statement sup = this.getSuperStatement();
 		while (!(sup instanceof WhileStatement)){
-			System.out.println(sup);
 			sup = sup.getSuperStatement();
 		}
 		return sup.getNextStatement(context);

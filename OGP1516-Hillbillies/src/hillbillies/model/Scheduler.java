@@ -235,6 +235,18 @@ public class Scheduler implements Iterable<Task> {
 	
 	/**
 	 * Return the task with the highest priority that is currently not being executed.
+	 * @Return null if there are no tasks or all tasks or being executes. Otherwise, return the task 
+	 * 	that has the highest priority of all tasks that are not being executed.
+	 * 		| List<Task> tasksNotExecuted = tasks.stream().filter(n->(n.getExecutingUnit()==null)).forEach(tasksNotExecuted::add)
+	 * 		| if (tasksNotExecuted.size()==0)
+	 * 		|	then result == null;
+	 * 		| else
+	 * 		|	 for all tasks in tasksNotExecuted
+	 * 		|		prior = tasksNotExecuted.get(0).getPriority()
+	 * 		|		if (task.getPriority()> prior)
+	 * 		|			then HighestPriorityTask = task
+	 * 		|				&& prior = task.getPriority()
+	 * 		|	result == HighestPriorityTask
 	 */
 	public Task getHighestPriorityTask(){
 		Set<Task> tasks = new HashSet<Task>();
@@ -412,8 +424,6 @@ public class Scheduler implements Iterable<Task> {
 
 		
 		public Task next() {
-			System.out.print("iterated  "+iteratedTasks.size());
-			System.out.print("tasks size  "+getTasks().size());
 
 			if (!hasNext()){
 				throw new NoSuchElementException();

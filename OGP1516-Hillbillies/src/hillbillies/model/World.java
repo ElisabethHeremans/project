@@ -136,16 +136,15 @@ public class World {
 	 * 			that do not reference terrain types (integers other than 0,1,2 and 3)
 	 */
 	public final void setTerrainTypes(int[][][] terrainTypes) throws IllegalArgumentException {
-//		for (int[][] i : terrainTypes){
-//			for (int[] j: i){
-//				for (int k: j){
-//					if (k != 0 &&k != 1 &&k != 2&&k!= 3)
-//						throw new IllegalArgumentException();
-//				}
-//			}
-//		}
+		for (int[][] i : terrainTypes){
+			for (int[] j: i){
+				for (int k: j){
+					if (k != 0 &&k != 1 &&k != 2&&k!= 3)
+						throw new IllegalArgumentException();
+				}
+			}
+		}
 		this.terrainTypes = terrainTypes;
-		//System.out.println(terrainTypes.toString());
 	}
 	
 	/**
@@ -879,7 +878,6 @@ public class World {
 			bouldersAtCube = new HashSet<Boulder>();
 			bouldersAtCube.add(boulder);
 			this.bouldersAtCubeMap.put(new Position(boulder.getCubeCoordinate()),bouldersAtCube);
-			//System.out.println(" boulder in map "+ this.logsAtCubeMap.get(new Position(boulder.getCubeCoordinate()).toString()));
 		}
 	}
 
@@ -1038,7 +1036,6 @@ public class World {
 	 */
 	public Set<Log> getLogs(int[] position)throws IllegalArgumentException{
 		if (!this.isCubeInWorld(position)){
-			//System.out.println(position[0]+" "+position[1]+" "+position[2]);
 			throw new IllegalArgumentException();
 		}
 		if (logsAtCubeMap.get(new Position(position))==null)
@@ -1058,7 +1055,6 @@ public class World {
 	 * 			If the given log is not attached to this world.
 	 */
 	void addLogToLogsAtCubeMap(Log log) throws IllegalArgumentException{
-		System.out.print(log);
 		if(!this.hasAsLog(log))
 			throw new IllegalArgumentException();
 		Set<Log> logsAtCube = this.logsAtCubeMap.get(new Position(log.getCubeCoordinate()));
@@ -1069,13 +1065,9 @@ public class World {
 		else{
 			logsAtCube = new HashSet<Log>();
 			logsAtCube.add(log);
-			//System.out.println(logsAtCube);
-			//System.out.println(log.getCubeCoordinate());
 			this.logsAtCubeMap.put(new Position(log.getCubeCoordinate()),logsAtCube);
-			//System.out.println(" log in map "+ this.logsAtCubeMap.get(new Position(log.getCubeCoordinate()).toString()));
 
 		}
-		//System.out.println(" log in map "+ this.logsAtCubeMap.get(new Position(log.getCubeCoordinate()).toString()));
 	}
 
 	/**
@@ -1319,7 +1311,6 @@ public class World {
 	 * 			If the duration is not valid, not between 0 and 0.2.
 	 */
 	public void advanceTime(double duration) throws IllegalArgumentException{
-		//System.out.print("1");
 		if (!(Util.fuzzyGreaterThanOrEqualTo(duration, 0.0-Util.DEFAULT_EPSILON )&& Util.fuzzyLessThanOrEqualTo((double)duration, 0.2+Util.DEFAULT_EPSILON))){
 			throw new IllegalArgumentException();
 		}
@@ -1329,11 +1320,9 @@ public class World {
 				unit.advanceTime((float)duration);
 			}
 		}
-		//System.out.print("3");
 		for (Boulder boulder: boulders){
 			boulder.advanceTime((float) duration);
 		}
-		//System.out.print("4");
 		for (Log log: logs){
 			log.advanceTime((float) duration);
 		}

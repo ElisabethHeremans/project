@@ -11,7 +11,6 @@ public class ThisExpression extends UnitExpression{
 	@Override
 	public Unit evaluateExpression(ExecutionContext context) {
 		setValue(context.getExecutingUnit());
-		System.out.println("  this ");
 		return getValue();
 	}
 
