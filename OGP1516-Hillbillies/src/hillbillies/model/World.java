@@ -879,7 +879,7 @@ public class World {
 			bouldersAtCube = new HashSet<Boulder>();
 			bouldersAtCube.add(boulder);
 			this.bouldersAtCubeMap.put(new Position(boulder.getCubeCoordinate()),bouldersAtCube);
-			System.out.println(" boulder in map "+ this.logsAtCubeMap.get(new Position(boulder.getCubeCoordinate()).toString()));
+			//System.out.println(" boulder in map "+ this.logsAtCubeMap.get(new Position(boulder.getCubeCoordinate()).toString()));
 		}
 	}
 
@@ -1069,13 +1069,13 @@ public class World {
 		else{
 			logsAtCube = new HashSet<Log>();
 			logsAtCube.add(log);
-			System.out.println(logsAtCube);
-			System.out.println(log.getCubeCoordinate());
+			//System.out.println(logsAtCube);
+			//System.out.println(log.getCubeCoordinate());
 			this.logsAtCubeMap.put(new Position(log.getCubeCoordinate()),logsAtCube);
-			System.out.println(" log in map "+ this.logsAtCubeMap.get(new Position(log.getCubeCoordinate()).toString()));
+			//System.out.println(" log in map "+ this.logsAtCubeMap.get(new Position(log.getCubeCoordinate()).toString()));
 
 		}
-		System.out.println(" log in map "+ this.logsAtCubeMap.get(new Position(log.getCubeCoordinate()).toString()));
+		//System.out.println(" log in map "+ this.logsAtCubeMap.get(new Position(log.getCubeCoordinate()).toString()));
 	}
 
 	/**

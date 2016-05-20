@@ -1879,6 +1879,7 @@ public class Unit {
 							System.out.println(" no boulders in this air");
 							switch(this.getWorld().getLogs(targetPosition).size()){
 							case 0:
+								System.out.println(" no logs in this air");
 								break;
 							default:
 								System.out.println("CASE addLog to the unit");
