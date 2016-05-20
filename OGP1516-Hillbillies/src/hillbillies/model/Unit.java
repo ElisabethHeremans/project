@@ -1862,7 +1862,9 @@ public class Unit {
 								Boulder boulder2 = (Boulder) this.getWorld().inspectCube(targetPosition).get(3).get(0);
 								this.getWorld().removeAsBoulder(boulder2);
 								this.getWorld().removeAsLog(log);
+								System.out.println("WEIGHT " +getWeight());
 								this.setWeight(this.getWeight()+1);
+								System.out.println("Tougness " +getToughness());
 								this.setToughness(this.getToughness()+1);
 								setExperiencePoints(this.getExperiencePoints()+10);
 								System.out.println("CASE WORKSHOP + LOG + BOULDER");
@@ -1881,8 +1883,8 @@ public class Unit {
 							default:
 								System.out.println("CASE addLog to the unit");
 								Log log = (Log) this.getWorld().inspectCube(targetPosition).get(2).get(0);
-								this.getWorld().removeAsLog(log);
 								this.setLog(log);
+								this.getWorld().removeAsLog(log);
 								setExperiencePoints(this.getExperiencePoints()+10);
 								this.setWeight(this.getWeight()+log.getWeight());
 								break;
@@ -2547,6 +2549,10 @@ public class Unit {
  		else if (log == null)
  			return true;
  		else{
+ 			System.out.println((log.getWorld()==this.getWorld()));
+ 			System.out.println(log.getWorld());
+ 			System.out.println(!log.isTerminated());
+ 			System.out.println(this.isNeighbouringOrSameCube(log.getCubeCoordinate()));
  			System.out.println((((log.getWorld()==this.getWorld()) && (!log.isTerminated()) && this.isNeighbouringOrSameCube(log.getCubeCoordinate()))));
  			return (((log.getWorld()==this.getWorld()) && (!log.isTerminated()) && this.isNeighbouringOrSameCube(log.getCubeCoordinate())));
  		}

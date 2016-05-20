@@ -547,7 +547,7 @@ public class TestSuitePart3Task {
 //		facade.schedule(scheduler, task1);
 //		facade.schedule(scheduler, task2);
 		System.out.print(scheduler.getTasks().size());
-		advanceTimeFor(facade, world,20 , 0.02);
+		advanceTimeFor(facade, world,35 , 0.02);
 		
 		
 
@@ -557,8 +557,8 @@ public class TestSuitePart3Task {
 		Assert.assertFalse(world.hasAsLog(log));
 		//Assert.assertArrayEquals(new int[] {0,0,0},boulder.getWorld().getCubeCoordinate(boulder.getPosition()));
 		// work task is removed from scheduler
-		Assert.assertEquals(51, unit.getWeight());
-		Assert.assertEquals(51, unit.getToughness());
+		Assert.assertEquals(96, unit.getWeight());
+		Assert.assertEquals(96, unit.getToughness());
 		System.out.print("remaining tasks  "+scheduler.getTasks().size());
 		//System.out.print(scheduler.);
 		assertFalse(facade.areTasksPartOf(scheduler, Collections.singleton(task)));
