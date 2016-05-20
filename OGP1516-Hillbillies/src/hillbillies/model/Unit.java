@@ -951,9 +951,10 @@ public class Unit {
 	
 	/**
 	 * Makes this unit stop executing its task.
-	 * @post This unit is not executing a task or a statement.
+	 * @post This unit is not executing a task or a statement, the previous task is not complete anymore.
 	 * 		|this.isExecutingStatement = false
 	 * 		|this.isExecutingTask = false
+	 * 		|!this.getTask().isComplete()
 	 * @post This unit has no currentStatement or targetPosition() or task.
 	 * 		|this.setCurrentStatement(null)
 	 * 		|this.targetPosition = null
