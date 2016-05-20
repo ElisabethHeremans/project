@@ -25,9 +25,14 @@ public class NextToExpression<E extends Expression<Position>> extends UnaryPosit
 
 	@Override
 	public Position evaluateExpression(ExecutionContext context) {
-
+		try{
 		setValue(getNextTo(context));
 		return getValue();
+		}
+		catch(NullPointerException e){
+			return null;
+		}
+
 	}
 	
 

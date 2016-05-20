@@ -2,31 +2,31 @@ package hillbillies.model.expression;
 
 import hillbillies.model.ExecutionContext;
 
-public abstract class BinaryBooleanExpression<E extends Expression<Boolean>> 
-extends Expression<Boolean> implements IComposedBinaryExpression<E> {
+public abstract class BinaryBooleanExpression<E extends Expression<Boolean>,F extends Expression<Boolean>> 
+extends Expression<Boolean> implements IComposedBinaryExpression<E,F> {
 	
-	public BinaryBooleanExpression(E left, E right){
+	public BinaryBooleanExpression(E left, F right){
 		setRightExpression(right);
 		setLeftExpression(left);
 				
 	}
 	
-	
-	public E getRightExpression(){
+	@Override
+	public F getRightExpression(){
 		return rightExp;
 	}
 	
-	private E rightExp;
+	private F rightExp;
 	
-
-	public void setRightExpression(E rightExp) {
+	@Override
+	public void setRightExpression(F rightExp) {
 		this.rightExp = rightExp;
 	}
-
+	@Override
 	public E getLeftExpression(){
 		return leftExp;
 	}
-
+	@Override
 	public void setLeftExpression(E leftExp) {
 		this.leftExp = leftExp;
 	}

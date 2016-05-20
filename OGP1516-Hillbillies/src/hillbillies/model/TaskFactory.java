@@ -34,13 +34,24 @@ public class TaskFactory implements ITaskFactory<Expression<?>, Statement, Task>
 	}
 
 	@Override
-	public Statement createAssignment(String variableName, Expression value, SourceLocation sourceLocation) {
-		return new AssignmentStatement<Expression>(variableName, value); // correct? 
+	public Statement createAssignment(String variableName, Expression<?> value, SourceLocation sourceLocation) {
+		return new AssignmentStatement<Expression<?>>(variableName, value); // correct? 
 	}
 
 	@Override
-	public Statement createWhile(Expression condition, Statement body, SourceLocation sourceLocation) {
-		return new WhileStatement<BooleanExpression,Statement>((BooleanExpression) condition,(ComposedStatement) body);
+	public Statement createWhile(Expression<?> condition, Statement body, SourceLocation sourceLocation) {
+		try{
+			return new WhileStatement<BooleanExpression,Statement>((BooleanExpression) condition,(Statement) body);
+		}
+		catch(ClassCastException c){
+			if (condition instanceof BasicVariableExpression){
+					return new WhileStatement<BasicVariableExpression<Boolean>,Statement>
+					((BasicVariableExpression<Boolean>) condition,(Statement) body);
+			}
+			else
+				throw new ClassCastException();
+		}
+
 	}
 
 	@Override
@@ -63,8 +74,8 @@ public class TaskFactory implements ITaskFactory<Expression<?>, Statement, Task>
 	}
 
 	@Override
-	public Statement createPrint(Expression value, SourceLocation sourceLocation) {
-		return new PrintStatement<Expression>(value);
+	public Statement createPrint(Expression<?> value, SourceLocation sourceLocation) {
+		return new PrintStatement<Expression<?>>(value);
 	}
 
 	@Override
@@ -211,6 +222,7 @@ public class TaskFactory implements ITaskFactory<Expression<?>, Statement, Task>
 
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Expression<?> createCarriesItem(Expression<?> unit, SourceLocation sourceLocation) {
 		try{
@@ -226,6 +238,7 @@ public class TaskFactory implements ITaskFactory<Expression<?>, Statement, Task>
 
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Expression<?> createNot(Expression<?> expression, SourceLocation sourceLocation) {
 		try{
@@ -242,93 +255,172 @@ public class TaskFactory implements ITaskFactory<Expression<?>, Statement, Task>
 	}
 	
 	@Override
-	public Expression createAnd(Expression left, Expression right, SourceLocation sourceLocation) {
+	public Expression<?> createAnd(Expression<?> left, Expression<?> right, SourceLocation sourceLocation) {
 		try{
-			return new AndExpression<BooleanExpression>((BooleanExpression)left, (BooleanExpression)right);
+			return new AndExpression<BooleanExpression,BooleanExpression>((BooleanExpression)left, (BooleanExpression)right);
 		}
 		catch(ClassCastException c){
-			if (expression instanceof BasicVariableExpression){
-				return new AndExpression<BasicVariableExpression<Boolean>>((BasicVariableExpression<Boolean>) expression);
+			if (left instanceof BasicVariableExpression){
+				try{
+					return new AndExpression<BasicVariableExpression<Boolean>,BooleanExpression>
+					((BasicVariableExpression<Boolean>) left,(BooleanExpression)right);
+				}
+				catch(ClassCastException d){
+					if (right instanceof BasicVariableExpression){
+						try{
+							return new AndExpression<BasicVariableExpression<Boolean>,BasicVariableExpression<Boolean>>
+							((BasicVariableExpression<Boolean>) left,(BasicVariableExpression<Boolean>)right);
+						}
+						catch (ClassCastException e){
+							throw new ClassCastException();
+						}
+					}
+					else
+						throw new ClassCastException();
+				}
+			}
+			else if (right instanceof BasicVariableExpression){
+				try{
+					return new AndExpression<BooleanExpression,BasicVariableExpression<Boolean>>
+					((BooleanExpression) left,(BasicVariableExpression<Boolean>)right);
+
+				}
+				catch (ClassCastException f){
+					throw new ClassCastException();
+				}
+			}
+			else
+				throw new ClassCastException();
+		}
+	}
+
+	@Override
+	public Expression<?> createOr(Expression<?> left, Expression<?> right, SourceLocation sourceLocation) {
+		try{
+			return new OrExpression<BooleanExpression,BooleanExpression>((BooleanExpression)left, (BooleanExpression)right);
+		}
+		catch(ClassCastException c){
+			if (left instanceof BasicVariableExpression){
+				try{
+					return new OrExpression<BasicVariableExpression<Boolean>,BooleanExpression>
+					((BasicVariableExpression<Boolean>) left,(BooleanExpression)right);
+				}
+				catch(ClassCastException d){
+					if (right instanceof BasicVariableExpression){
+						try{
+							return new OrExpression<BasicVariableExpression<Boolean>,BasicVariableExpression<Boolean>>
+							((BasicVariableExpression<Boolean>) left,(BasicVariableExpression<Boolean>)right);
+						}
+						catch (ClassCastException e){
+							throw new ClassCastException();
+						}
+					}
+					else
+						throw new ClassCastException();
+				}
+			}
+			else if (right instanceof BasicVariableExpression){
+				try{
+					return new OrExpression<BooleanExpression,BasicVariableExpression<Boolean>>
+					((BooleanExpression) left,(BasicVariableExpression<Boolean>)right);
+
+				}
+				catch (ClassCastException f){
+					throw new ClassCastException();
+				}
+			}
+			else
+				throw new ClassCastException();
+		}
+	}
+
+	@Override
+	public Expression<?> createHerePosition(SourceLocation sourceLocation) {
+		return new HereExpression();
+	}
+
+	@Override
+	public Expression<?> createLogPosition(SourceLocation sourceLocation) {
+		return new LogExpression();
+	}
+
+	@Override
+	public Expression<?> createBoulderPosition(SourceLocation sourceLocation) {
+		return new BoulderExpression();
+	}
+
+	@Override
+	public Expression<?> createWorkshopPosition(SourceLocation sourceLocation) {
+		return new WorkshopExpression();
+	}
+
+	@Override
+	public Expression<?> createSelectedPosition(SourceLocation sourceLocation) {
+		return new SelectedExpression();
+	}
+
+	@Override
+	public Expression<?> createNextToPosition(Expression<?> position, SourceLocation sourceLocation) {
+		try{
+			return new NextToExpression<PositionExpression>((PositionExpression) position);
+		}
+		catch(ClassCastException c){
+			if (position instanceof BasicVariableExpression){
+				return new IsSolidExpression<BasicVariableExpression<Position>>((BasicVariableExpression<Position>) position);
+			}
+			else
+				throw new ClassCastException();
+		}
+	}
+
+	@Override
+	public Expression<?> createLiteralPosition(int x, int y, int z, SourceLocation sourceLocation) {
+		return new XYZExpression(new Position(new int[] {x,y,z}));
+	}
+
+	@Override
+	public Expression<?> createThis(SourceLocation sourceLocation) {
+		return new ThisExpression();
+	}
+
+	@Override
+	public Expression<?> createFriend(SourceLocation sourceLocation) {
+		return new FriendExpression();
+	}
+
+	@Override
+	public Expression<?> createEnemy(SourceLocation sourceLocation) {
+		return new EnemyExpression();
+	}
+
+	@Override
+	public Expression<?> createAny(SourceLocation sourceLocation) {
+		return new AnyExpression();
+	}
+
+	@Override
+	public Expression<?> createTrue(SourceLocation sourceLocation) {
+		return new TrueExpression();
+	}
+
+	@Override
+	public Expression<?> createFalse(SourceLocation sourceLocation) {
+		return new FalseExpression();
+	}
+
+	@Override
+	public Expression<?> createPositionOf(Expression<?> unit, SourceLocation sourceLocation) {
+		try{
+			return new PositionOfExpression<UnitExpression>((UnitExpression) unit);
+		}
+		catch(ClassCastException c){
+			if (unit instanceof BasicVariableExpression){
+				return new PositionOfExpression<BasicVariableExpression<Unit>>((BasicVariableExpression<Unit>) unit);
 			}
 			else
 				throw new ClassCastException();
 		}
 
-	}
-
-	@Override
-	public Expression<?> createOr(Expression<?> left, Expression<?> right, SourceLocation sourceLocation) {
-		return new OrExpression<Expression<Boolean>>((Expression<Boolean>)left, (Expression<Boolean>)right);
-	}
-
-	@Override
-	public Expression createHerePosition(SourceLocation sourceLocation) {
-		return new HereExpression();
-	}
-
-	@Override
-	public Expression createLogPosition(SourceLocation sourceLocation) {
-		return new LogExpression();
-	}
-
-	@Override
-	public Expression createBoulderPosition(SourceLocation sourceLocation) {
-		return new BoulderExpression();
-	}
-
-	@Override
-	public Expression createWorkshopPosition(SourceLocation sourceLocation) {
-		return new WorkshopExpression();
-	}
-
-	@Override
-	public Expression createSelectedPosition(SourceLocation sourceLocation) {
-		return new SelectedExpression();
-	}
-
-	@Override
-	public Expression createNextToPosition(Expression position, SourceLocation sourceLocation) {
-		return new NextToExpression<>((PositionExpression) position);
-	}
-
-	@Override
-	public Expression createLiteralPosition(int x, int y, int z, SourceLocation sourceLocation) {
-		return new XYZExpression(new Position(new int[] {x,y,z}));
-	}
-
-	@Override
-	public Expression createThis(SourceLocation sourceLocation) {
-		return new ThisExpression();
-	}
-
-	@Override
-	public Expression createFriend(SourceLocation sourceLocation) {
-		return new FriendExpression();
-	}
-
-	@Override
-	public Expression createEnemy(SourceLocation sourceLocation) {
-		return new EnemyExpression();
-	}
-
-	@Override
-	public Expression createAny(SourceLocation sourceLocation) {
-		return new AnyExpression();
-	}
-
-	@Override
-	public Expression createTrue(SourceLocation sourceLocation) {
-		return new TrueExpression();
-	}
-
-	@Override
-	public Expression createFalse(SourceLocation sourceLocation) {
-		return new FalseExpression();
-	}
-
-	@Override
-	public Expression createPositionOf(Expression unit, SourceLocation sourceLocation) {
-		return new PositionOfExpression<>((UnitExpression) unit);
 	}
 
 

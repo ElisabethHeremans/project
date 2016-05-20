@@ -11,10 +11,16 @@ public class IsEnemyExpression<E extends Expression<Unit>> extends UnaryBooleanE
 
 	@Override
 	public Boolean evaluateExpression(ExecutionContext context) {
+		try{
 		getExpression().evaluateExpression(context);
 
 		setValue(context.getExecutingUnit().getFaction() != getExpression().getValue().getFaction());
 		return getValue();
+		}
+		catch(NullPointerException e){
+			return null;
+		}
+
 	}
 	
 
