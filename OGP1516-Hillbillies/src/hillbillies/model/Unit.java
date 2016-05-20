@@ -2598,11 +2598,6 @@ public class Unit {
  		else if (log == null)
  			return true;
  		else{
- 			System.out.println((log.getWorld()==this.getWorld()));
- 			System.out.println(log.getWorld());
- 			System.out.println(!log.isTerminated());
- 			System.out.println(this.isNeighbouringOrSameCube(log.getCubeCoordinate()));
- 			System.out.println((((log.getWorld()==this.getWorld()) && (!log.isTerminated()) && this.isNeighbouringOrSameCube(log.getCubeCoordinate()))));
  			return (((log.getWorld()==this.getWorld()) && (!log.isTerminated()) && this.isNeighbouringOrSameCube(log.getCubeCoordinate())));
  		}
  	}

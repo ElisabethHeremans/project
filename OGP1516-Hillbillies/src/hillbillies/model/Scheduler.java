@@ -234,7 +234,7 @@ public class Scheduler implements Iterable<Task> {
 	}
 	
 	/**
-	 * Return the task with the highest priority that is currently not being executed or scheduled for an other unit.
+	 * Return the task with the highest priority that is currently not being executed.
 	 */
 	public Task getHighestPriorityTask(){
 		Set<Task> tasks = new HashSet<Task>();
