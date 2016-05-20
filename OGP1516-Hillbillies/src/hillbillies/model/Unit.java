@@ -1603,7 +1603,7 @@ public class Unit {
 	 */
 	public void startFollowing(Unit other){
 		followedUnit = other;
-		setStatus(Status.MOVING);
+		//setStatus(Status.MOVING);
 		moveTo1(other.getCubeCoordinate());
 	}
 	
