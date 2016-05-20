@@ -318,8 +318,10 @@ public class Scheduler implements Iterable<Task> {
 	public void unmarkTaskForUnit(Task task){
 		if (! this.hasAsTask(task))
 			throw new IllegalArgumentException();
-		task.getScheduledUnit().setScheduledTask(null);
-		task.setScheduledUnit(null);
+		if ( task.getScheduledUnit() != null){
+			task.getScheduledUnit().setScheduledTask(null);
+			task.setScheduledUnit(null);
+		}
 	}
 
 	/**
@@ -361,7 +363,7 @@ public class Scheduler implements Iterable<Task> {
 	 * 		| result == (this.getFaction() == null || this.getFaction().getScheduler()==this)
 	 */
 	@Raw
-	private boolean canHaveAsFaction(Faction faction){
+	public boolean canHaveAsFaction(Faction faction){
 		return (faction == null || faction.getScheduler()==this);
 	}
 	

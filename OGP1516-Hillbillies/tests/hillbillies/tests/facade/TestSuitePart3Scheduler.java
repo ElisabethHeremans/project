@@ -71,8 +71,8 @@ public class TestSuitePart3Scheduler {
 		task2 = tasks.get(1);
 		System.out.println("task 2 "+task2);
 		List<Task> tasks = TaskParser.parseTasksFromString(
-				"name: \"print task\"\npriority: -10\nactivities: x := true; print x; if x then moveTo selected; fi", facade.createTaskFactory(),
-				Collections.singletonList(new int[] { 1, 1, 1 }));
+				"name: \"while loop\"\npriority: -10\nactivities: while is_solid selected do moveTo next_to selected; work selected; done"
+				, facade.createTaskFactory(),Collections.singletonList(new int[] { 1, 1, 1 }));
 		task3 = tasks.get(0);
 //		List<Task> tasks3 = TaskParser.parseTasksFromString(
 //				"name: \"operate workshop\"\npriority: 100\nactivities: if ((is_solid(selected))||(carries_item(this))) then moveTo boulder; work position_of this; fi",
@@ -319,11 +319,55 @@ public class TestSuitePart3Scheduler {
 		scheduler.addAsTask(task1);
 		scheduler.addAsTask(task3);
 		world.addAsUnit(unit);
+		world.addAsUnit(unit2);
 		faction = unit.getFaction();
+		unit2.setFaction(null);
+		faction.addAsUnit(unit2);
 		faction.setScheduler(scheduler);
 		scheduler.markTaskForUnit(task3, unit);
-		advanceTimeFor(world, 2,0.1);
-		Assert.assertEquals(task3, unit.getTask());
+		advanceTimeFor(world, 5,0.1);
+		Assert.assertFalse(task3 == unit2.getTask());
+		Assert.assertTrue(task3 == unit.getTask()||task1 == unit.getTask());	
+		}
+	
+	@Test (expected = IllegalArgumentException.class)
+	public void unmarkTask_IllegalTask() throws IllegalArgumentException{
+		scheduler.addAsTask(task1);
+		scheduler.addAsTask(task3);
+		world.addAsUnit(unit);
+		faction = unit.getFaction();
+		faction.setScheduler(scheduler);
+		scheduler.unmarkTaskForUnit(task2);
+		
+	}
+	
+	@Test
+	public void unmarkTask_ValidCaseNotScheduled(){
+		scheduler.addAsTask(task1);
+		scheduler.addAsTask(task3);
+		world.addAsUnit(unit);
+		faction = unit.getFaction();
+		faction.setScheduler(scheduler);
+		scheduler.unmarkTaskForUnit(task1);
+		Assert.assertEquals(null, task1.getScheduledUnit());
+		Assert.assertEquals(null, unit.getScheduledTask());
+		
+	}
+	
+	@Test
+	public void unmarkTask_ValidCaseReset(){
+		scheduler.addAsTask(task1);
+		scheduler.addAsTask(task3);
+		world.addAsUnit(unit);
+		faction = unit.getFaction();
+		faction.setScheduler(scheduler);
+		scheduler.markTaskForUnit(task1, unit);
+		Assert.assertEquals(unit, task1.getScheduledUnit());
+		Assert.assertEquals(task1, unit.getScheduledTask());
+		scheduler.unmarkTaskForUnit(task1);
+		Assert.assertEquals(null, task1.getScheduledUnit());
+		Assert.assertEquals(null, unit.getScheduledTask());
+		
 	}
 	
 	@Test 
@@ -332,6 +376,53 @@ public class TestSuitePart3Scheduler {
 		faction = unit.getFaction();
 		faction.setScheduler(scheduler);
 		Assert.assertEquals(faction, scheduler.getFaction());
+	}
+	
+	@Test
+	public void canHaveAsFaction_Invalid(){
+		faction = new Faction();
+		Assert.assertFalse(scheduler.canHaveAsFaction(faction));
+	}
+	
+	@Test
+	public void canHaveAsFaction_Null(){
+		Assert.assertTrue(scheduler.canHaveAsFaction(null));
+	}
+	
+	@Test
+	public void canHaveAsFaction_Valid(){
+		faction = new Faction();
+		faction.setScheduler(scheduler);
+		Assert.assertTrue(scheduler.canHaveAsFaction(faction));
+	}
+	
+	@Test
+	public void getHighestPriorityTask_Empty(){
+		Set<Task> tasks = new HashSet<Task>();
+		Assert.assertEquals(null, scheduler.getHighestPriorityTask(tasks));
+	}
+	
+	@Test
+	public void getHighestPriorityTask_Normal(){
+		Set<Task> tasks = new HashSet<Task>();
+		tasks.add(task1);
+		tasks.add(task3);
+		Assert.assertEquals(task1, scheduler.getHighestPriorityTask(tasks));
+	}
+	
+	@Test
+	public void getHighestPriorityTask_ExecutingTask(){
+		Set<Task> tasks = new HashSet<Task>();
+		tasks.add(task1);
+		tasks.add(task3);
+		scheduler.addAsTask(task1);
+		scheduler.addAsTask(task3);
+		world.addAsUnit(unit);
+		faction = unit.getFaction();
+		faction.setScheduler(scheduler);
+		world.advanceTime(0.19);
+		world.advanceTime(0.19);
+		Assert.assertEquals(task3, scheduler.getHighestPriorityTask(tasks));
 	}
 	
 	/**

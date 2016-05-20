@@ -2714,6 +2714,9 @@ public class Unit {
 	 * 		| new.getTask() == task
 	 */
 	public void setScheduledTask(@Raw Task task){
+		if (task == null){
+			this.scheduledTask = null;
+		}
 		if (task !=null){
 			assert this.getFaction().getScheduler().hasAsTask(task);
 			assert task.getScheduledUnit() == this;
