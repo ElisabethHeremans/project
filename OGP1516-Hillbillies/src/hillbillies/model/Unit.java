@@ -1001,49 +1001,71 @@ public class Unit {
 
 	
 	/**
-	 * Execute the statements of the assigned task to this unit.
+	 * Execute the next statements of the assigned task to this unit, when a statement is executed.
+	 * 
 	 * @param duration
-	 * The game time after which executeProgram is called.
+	 * 		The game time after which executeProgram is called.
+	 * @post The task timer of this new unit is equal to 0,001
+	 * 		|new.taskTimer = 0.001
+	 * @effect If the task of this unit is not complete, 
+	 * 			|if (!this.getTask().isComplete())
+	 * 			_if the taskTimer is greater than duration,
+	 * 			 - if the current statement is null, this unit executes its task.
+	 * 				|if (this.getCurrentStatement()==null){
+	 *				| 	this.isExecutingStatement = true;
+	 * 				|	this.getTask().executeTask();
+	 * 			 - else if the next statement of the current statement of this unit is not null, 
+	 * 					this unit executes this next statement
+	 * 				|else if (this.getCurrentStatement().getNextStatement(this.getTask().getExecutionContext()) != null){
+	 *				|	this.isExecutingStatement = true;
+	 *				|	this.getCurrentStatement().getNextStatement(this.getTask().getExecutionContext()).executeStatement(this.getTask().getExecutionContext());
+	 * 			 - else, set this task to complete.
+	 * 				|this.getTask().setComplete(true);
+	 * 			_if the taskTimer is smaller than duration, while 
+	 * 			  while the taskTimer is smaller than duration and this unit is not executing a statement and its task is not complete
+	 * 			 - if the current statement is null, this unit executes its task.
+	 * 				|if (this.getCurrentStatement()==null){
+	 *				| 	this.isExecutingStatement = true;
+	 * 				|	this.getTask().executeTask();
+	 * 			 - else if the next statement of the current statement of this unit is not null, 
+	 * 					this unit executes this next statement
+	 * 				|else if (this.getCurrentStatement().getNextStatement(this.getTask().getExecutionContext()) != null){
+	 *				|	this.isExecutingStatement = true;
+	 *				|	this.getCurrentStatement().getNextStatement(this.getTask().getExecutionContext()).executeStatement(this.getTask().getExecutionContext());
+	 * 			 - else, set this task to complete.
+	 * 				|this.getTask().setComplete(true);
+	 * 			 - taskTimer is incremented with 0.001
+	 * 				| taskTimer += 0.001
+	 * @effect Afterwards, if the task of this unit is complete, 
+	 * 			or if the unit is not executing a statemnet but has a task and has no next statement:
+	 * 				The task of this unit is removed from the scheduler, 
+	 * 				the unit stops executing its task and the units status is set to done.
+	 * 				|if ((this.getTask().isComplete())||(!this.isExecutingStatement && this.isExecutingTask && this.getCurrentStatement().getNextStatement(this.getTask().getExecutionContext()) == null)){
+	 *				|	this.getFaction().getScheduler().removeAsTask(this.getTask());
+	 *				|	this.stopExecutingTask();
+	 *				|	this.setStatus(Status.DONE);
+	 *
 	 * 		
 	 */
 	private void executeProgram(float duration) {
 		taskTimer = 0.001;
-		System.out.println(" exec program ");
-		System.out.println(this.getTask());
-		System.out.println(this.getFaction().getScheduler().getTasks());
-		System.out.println(this.getFaction().getScheduler());
-		System.out.println(this.getFaction().getScheduler().getHighestPriorityTask());
-		if (!this.getTask().isComplete()){
-			System.out.println(" not complete ");
-			
+		if (!this.getTask().isComplete()){			
 			if (taskTimer > duration){
 				if (this.getCurrentStatement()==null){
 					this.isExecutingStatement = true;
 					this.getTask().executeTask();
-					System.out.println(" a ");
 				}
 				else if (this.getCurrentStatement().getNextStatement(this.getTask().getExecutionContext()) != null){
-					System.out.println(" b ");
-					System.out.println(this.getCurrentStatement().getNextStatement(this.getTask().getExecutionContext()));
 					this.isExecutingStatement = true;
 					this.getCurrentStatement().getNextStatement(this.getTask().getExecutionContext()).executeStatement(this.getTask().getExecutionContext());
 					
 				}
 				else{
 					this.getTask().setComplete(true);
-					System.out.println(" c ");
 				}
-				
 			}
-			else{
-				System.out.println(" d ");
-				
+			else{				
 				while (taskTimer < duration && !isExecutingStatement && !this.getTask().isComplete()){
-					System.out.println(" entering this loop ");
-					//this.isExecutingStatement = true;
-					
-					System.out.println(this.getTask());
-					System.out.println(this.getCurrentStatement());
 					if (this.getCurrentStatement()==null){
 						this.isExecutingStatement = true;
 						this.getTask().executeTask();
@@ -1051,7 +1073,6 @@ public class Unit {
 
 					else if (this.getCurrentStatement().getNextStatement(this.getTask().getExecutionContext()) != null){
 						this.isExecutingStatement = true;
-						System.out.println(" execute next ");
 						this.getCurrentStatement().getNextStatement(this.getTask().getExecutionContext()).executeStatement(this.getTask().getExecutionContext());
 					}
 					else
@@ -1061,22 +1082,10 @@ public class Unit {
 				}
 			}
 		}
-		System.out.println(this.isExecutingStatement);
-		System.out.println(this.isExecutingTask);
-		System.out.println(this.getCurrentStatement().getNextStatement(this.getTask().getExecutionContext()));
 		if ((this.getTask().isComplete())||(!this.isExecutingStatement && this.isExecutingTask && this.getCurrentStatement().getNextStatement(this.getTask().getExecutionContext()) == null)){
-			System.out.println(" c ");
-			
-			//this.isExecutingTask = false;
 			this.getFaction().getScheduler().removeAsTask(this.getTask());
 			this.stopExecutingTask();
-			
-			//System.out.println(" complete1 ");
-			//System.out.println(" executed "+ getTask().toString());
-			System.out.println(getTask());
-			//this.getTask().setExecutingUnit(null);
 			this.setStatus(Status.DONE);
-			System.out.println(" complete ");
 		}
 	}
 	
@@ -1089,6 +1098,9 @@ public class Unit {
 	 * 		the next target position is one z-level lower than the position of this unit.
 	 * 		| this.nextTargetPosition = Vector.vectorAdd(this.getPosition(), new double[] {0.0,0.0,-1.0})
 	 * 		| && this.startPosition = this.getPosition()
+	 * @effect If this unit is executing a task, interrupt the execution of the task.
+	 * 		|if (this.isExecutingTask)
+	 *		|		this.getTask().interruptExecution();
 	 */ 
 	private void fall() {
 		setStatus(Status.FALLING);
@@ -1365,6 +1377,9 @@ public class Unit {
 	 * 		| search(nextPosition)
 	 * 		| moveToAdjacent(candidateNextArray[0]-this.getCubeCoordinate()[0],
 	 *		| candidateNextArray[1]-this.getCubeCoordinate()[1],candidateNextArray[2]-this.getCubeCoordinate()[2])
+	 * @effect If this unit is executing a task the unit is not executing a move statement, interrupt the execution of the task.
+	 * 		|if (this.isExecutingTask && ! (this.getCurrentStatement() instanceof MoveToStatement))
+	 *		|		this.getTask().interruptExecution();
 	 * @throws IllegalArgumentException
 	 * 		The given target position is not a valid position for a unit.
 	 * 		| !canHaveAsPosition(targetPosition)
@@ -1531,7 +1546,10 @@ public class Unit {
 	 *		| else if (nextTargetPosition != null && Vector.getDistance(nextTargetPosition, startPosition)
 	 *		|	-Vector.getDistance(startPosition, this.getPosition())<=0.0 && targetPosition == null)
 	 *		|		then setExperiencePoints(this.getExperiencePoints()+1)
-	 *		|		&& setPosition(nextTargetPosition) && setStatus(Status.DONE)	   
+	 *		|		&& setPosition(nextTargetPosition) && setStatus(Status.DONE)
+	 * @effect If this unit has arrived to target position and is executing a statement, stop executing this statement
+	 * 		|if (this.isExecutingStatement)
+	 *		|		this.stopExecutingStatement()
 	 */
 	private void moving1(double duration){
 		double d = Vector.getDistance(nextTargetPosition,startPosition);
@@ -1603,8 +1621,9 @@ public class Unit {
 	
 	/**
 	 * This unit will stop following any other unit.
-	 * @effect This unit status will be set to done.
+	 * @effect This unit status will be set to done and it will stop executing its statement
 	 * 		| this.setStatus(Status.DONE)
+	 * 		| this.stopExecutingStatement();
 	 */
 	private void stopFollowing(){
 		followedUnit = null;
@@ -1700,7 +1719,8 @@ public class Unit {
 	/**
 	 * Make the unit work.
 	 * 
-	 * @post If a unit can work, his new status will be updated to working.
+	 * 	 If a unit can work, 
+	 * @post his new status will be updated to working.
 	 * 		 | if (canWork())
 	 *		 |	then new.status == Status.WORKING
 	 * @post The workingTime and the progressWork of this new unit will be set on zero
@@ -1708,6 +1728,9 @@ public class Unit {
 	 * 		 | new.workingTime == (float) 0.0
 	 *		 | new.totalWorkingTime == (float) 500.0 / this.getStrength()
 	 *	 	 | new.progressWork == (float) 0.0
+	 * @effect If this unit is executing a task the unit is not executing a work statement, interrupt the execution of the task.
+	 * 		|if (this.isExecutingTask && ! (this.getCurrentStatement() instanceof WorkStatement))
+	 *		|		this.getTask().interruptExecution();
 	 * @throws IllegalArgumentException
 	 * 	The given position isn't neighboring this unit's position or isn't this unit's position.
 	 * 		 | !(this.isNeighbouringCube(position)||this.getCubeCoordinate()!=position)
@@ -1810,6 +1833,9 @@ public class Unit {
 	 * 		| case ROCK
 	 * 		|	then this.getWorld().solidToPassableUpdate(targetPosition) &&
 	 * 		|	setExperiencePoints(this.getExperiencePoints()+10)
+	 * @effect if this unit is executing a statement, stop executing the statemnet
+	 * 		|if (isExecuitingStatement), 
+	 * 		|	stopExecutingStatement()
 	 */
 	private void endWork(int[] targetPosition) {
 		System.out.println(" target work "+Arrays.toString(targetPosition));
@@ -1983,6 +2009,9 @@ public class Unit {
 	 * 		 |	then this.setOrientation((float) Math.atan2(other.getPosition()[1] - this.getPosition()[1],
 	 *		 |		other.getPosition()[0] - this.getPosition()[0])) && other.defend(this).
 	 *		 |		(new other).defend(this)
+	 * @effect If this unit is executing a task the unit is not executing an attack statement, interrupt the execution of the task.
+	 * 		|if (this.isExecutingTask && ! (this.getCurrentStatement() instanceof AttackStatement))
+	 *		|		this.getTask().interruptExecution();
 	 * @throws IllegalArgumentException
 	 * 			If the unit that will be attacked isn't positioned in a neighboring cube or in the same cube.
 	 * 			| (!(isNeighbouringCube(other.getCubePosition()) || ((other.getCubeCoordinate()[0] == this.getCubeCoordinate()[0])
@@ -2051,6 +2080,9 @@ public class Unit {
 	 * 		   | 	if (this.getHitpoints() - unit.getStrength() / 10.0 <=0)
 	 * 		   |		then this.setHitPoints(0.0)
 	 * 		   |	}
+	 * @effect If this unit is executing a task 
+	 * 		|if (this.isExecutingTask )
+	 *		|		this.getTask().interruptExecution();
 	 * @post This new unit's status is DONE.
 	 * 		   | new.status == Status.DONE;
 	 */
@@ -2150,6 +2182,9 @@ public class Unit {
 	 * 		 | if (mustRest() || canRest())
 	 * 		 |		if (this.getHitpoints() >= max_nbPoints())
 	 * 	 	 |			then status = Status.RESTING
+	 * @effect If this unit is executing a task 
+	 * 		|if (this.isExecutingTask )
+	 *		|		this.getTask().interruptExecution();
 	 */
 	public void rest() {
 		if (mustRest() || canRest()) {
