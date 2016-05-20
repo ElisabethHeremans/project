@@ -30,8 +30,6 @@ public class AssignmentStatement<E extends Expression<?>> extends ExpressionStat
 	public void executeStatement(ExecutionContext context) {
 		context.getExecutingUnit().setCurrentStatement(this);
 		getExpression().evaluateExpression(context);
-		//System.out.println(getVariableName());
-		//System.out.println(getExpression());
 		context.addVariable(getVariableName(), getExpression());
 		context.getExecutingUnit().stopExecutingStatement();
 	}
