@@ -46,10 +46,7 @@ extends ExpressionStatement<E> implements IComposedUnaryStatement<S> {
 		context.getExecutingUnit().setCurrentStatement(this);
 		super.executeStatement(context);
 		if (getExpression().getValue()){
-//			if (getStatement() instanceof BreakStatement){
-//				context.getExecutingUnit().stopExecutingStatement();
-//			}
-//			else{
+			System.out.println("execute while ");
 			getStatement().executeStatement(context);
 //			}
 		}
@@ -62,20 +59,28 @@ extends ExpressionStatement<E> implements IComposedUnaryStatement<S> {
 	@Override
 	public Statement getNextStatement(ExecutionContext context){
 		super.executeStatement(context);
-		if (getExpression().getValue()){
+		System.out.println(" in get next while ");
+		System.out.println(context.isBroken());
+		if (!context.isBroken()&& getExpression().getValue()){
 			return this;
 		}
-		
-		else if (!isLast() && this.getSuperStatement() != null){
+		context.setBroken(false);
+		System.out.println(" in get next while ");
+		if (!isLast() && this.getSuperStatement() != null){
+			System.out.println(" a ");
 			return (Statement) ((SequenceStatement<?>)getSuperStatement()).getStatements().get(this.getIndex()+1);
 		}
-		else if (isLast() && this.getSuperStatement() != null){
+		else if (this.getSuperStatement() != null){
+			System.out.println(" b ");
 			return getSuperStatement().getNextStatement(context);
 		}
-		else
+		else{
+			System.out.println(" c ");
 			return null;
+		}
 			
 	}
+	
 
 
 }

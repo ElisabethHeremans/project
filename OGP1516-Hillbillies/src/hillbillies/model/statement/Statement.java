@@ -40,10 +40,10 @@ public abstract class Statement{
 	
 	
 	public Statement getNextStatement(ExecutionContext context){
-		if (!isLast() && this.getSuperStatement() != null){
+		if (! context.isBroken() &&!isLast() && this.getSuperStatement() != null){
 			return (Statement) ((SequenceStatement<?>)getSuperStatement()).getStatements().get(this.getIndex()+1);
 		}
-		else if (isLast() && this.getSuperStatement() != null){
+		if (this.getSuperStatement() != null){
 			return getSuperStatement().getNextStatement(context);
 		}
 		else
